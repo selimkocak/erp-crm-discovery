@@ -15,6 +15,7 @@ import {
   getReportProfile,
   getCustomQuestions,
   getCustomAnswers,
+  getAllProjectFollowups,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -35,6 +36,7 @@ import type {
   ReportProjectNote,
   ReportProfile,
   ReportSummaryStats,
+  ReportFollowupItem,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -50,13 +52,14 @@ export async function buildReportModel(
   const includeUnanswered = options.includeUnanswered ?? false;
 
   // 1. Fetch core data in parallel
-  const [detailData, reportProfile, findings, requirements, risks, notes] = await Promise.all([
+  const [detailData, reportProfile, findings, requirements, risks, notes, dbFollowups] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
     getFindings(projectId),
     getRequirements(projectId),
     getRisks(projectId),
     getProjectNotes(projectId),
+    getAllProjectFollowups(projectId),
   ]);
 
   if (!detailData) {
@@ -75,8 +78,9 @@ export async function buildReportModel(
 
   const packVersions: Record<string, string> = {};
 
-  // 3. Question lookup map for source question text resolution
+  // 3. Question lookup maps for source question text & process resolution
   const questionTextMap = new Map<string, string>();
+  const questionProcessMap = new Map<string, string>();
 
   // 4. Build Business Functions and Scope
   const reportScope: ReportScopeItem[] = [];
@@ -96,6 +100,7 @@ export async function buildReportModel(
         packVersions[fn.code] = `${loadedPack.meta.pack_id} v${loadedPack.meta.version}`;
         for (const q of loadedPack.questions) {
           questionTextMap.set(q.id, q.question);
+          questionProcessMap.set(q.id, q.process);
         }
       }
     }
@@ -114,6 +119,7 @@ export async function buildReportModel(
 
     for (const cq of customQuestionsList) {
       questionTextMap.set(cq.id, cq.question_text);
+      questionProcessMap.set(cq.id, cq.process_name);
     }
 
     // Visibility (Branching) + Adapted Custom Questions
@@ -128,8 +134,16 @@ export async function buildReportModel(
 
     const visibleQuestions: Question[] = [...canonicalVisible, ...adaptedCustomQuestions];
 
+    // Follow-ups for this business function
+    const fnFollowupsMap = new Map<string, any>();
+    for (const fol of dbFollowups) {
+      if (fol.business_function_code === fn.code) {
+        fnFollowupsMap.set(fol.question_id, fol);
+      }
+    }
+
     const progress = loadedPack
-      ? calculateProgress(visibleQuestions, answersMap)
+      ? calculateProgress(visibleQuestions, answersMap, fnFollowupsMap)
       : { answered: 0, total: 0, percentage: 0 };
 
     totalQuestionsCount += progress.total;
@@ -208,10 +222,11 @@ export async function buildReportModel(
 
     for (const q of visibleQuestions) {
       const ans = answersMap.get(q.id);
+      const fol = fnFollowupsMap.get(q.id);
       const formattedAns = formatAnswer(q, ans);
 
-      if (!includeUnanswered && !formattedAns.isAnswered) {
-        continue; // Skip unanswered question if option not set
+      if (!includeUnanswered && !formattedAns.isAnswered && !fol) {
+        continue; // Skip unanswered question if option not set and no followup
       }
 
       // Find semantic items linked to this specific question
@@ -230,6 +245,7 @@ export async function buildReportModel(
         answerType: q.answer_type,
         criticality: q.criticality,
         isCustom: q.is_custom,
+        followup: fol ? { flagType: fol.flag_type, note: fol.note } : null,
         formattedAnswer: formattedAns,
         findings: qFindings,
         requirements: qRequirements,
@@ -332,6 +348,25 @@ export async function buildReportModel(
   const globalRisks = risks.map(mapRisk);
   const projectNotes = notes.map(mapNote);
 
+  // Assemble ReportFollowupItem[]
+  const reportFollowups: ReportFollowupItem[] = dbFollowups.map((f) => {
+    const fnObj = functions.find((fn) => fn.code === f.business_function_code);
+    return {
+      id: f.id,
+      businessFunctionCode: f.business_function_code,
+      businessFunctionNameTr: fnObj?.name_tr || f.business_function_code,
+      processName: questionProcessMap.get(f.question_id) || "Genel Süreç",
+      questionId: f.question_id,
+      questionText: questionTextMap.get(f.question_id) || f.question_id,
+      flagType: f.flag_type,
+      note: f.note,
+      createdAt: f.created_at,
+    };
+  });
+
+  const revisitCount = dbFollowups.filter((f) => f.flag_type === "revisit").length;
+  const criticalFollowupCount = dbFollowups.filter((f) => f.flag_type === "critical").length;
+
   // Summary stats
   const completedFunctions = functions.filter((f) => f.status === "completed").length;
   const inProgressFunctions = functions.filter((f) => f.status === "in_progress").length;
@@ -350,6 +385,9 @@ export async function buildReportModel(
     totalNotes: notes.length,
     answeredQuestions: answeredQuestionsCount,
     totalQuestions: totalQuestionsCount,
+    openFollowupCount: dbFollowups.length,
+    revisitCount,
+    criticalFollowupCount,
   };
 
   const progressPercent =
@@ -359,8 +397,8 @@ export async function buildReportModel(
 
   const isComplete =
     totalQuestionsCount > 0
-      ? (answeredQuestionsCount >= totalQuestionsCount && notStartedFunctions === 0 && inProgressFunctions === 0)
-      : (notStartedFunctions === 0);
+      ? (answeredQuestionsCount >= totalQuestionsCount && notStartedFunctions === 0 && inProgressFunctions === 0 && dbFollowups.length === 0)
+      : (notStartedFunctions === 0 && dbFollowups.length === 0);
 
   const reportType: "interim" | "final" = isComplete ? "final" : "interim";
   const draftLabel = isComplete
@@ -407,6 +445,7 @@ export async function buildReportModel(
     company: reportCompany,
     scope: reportScope,
     businessFunctions: reportFunctions,
+    followups: reportFollowups,
     globalFindings,
     globalRequirements,
     globalRisks,

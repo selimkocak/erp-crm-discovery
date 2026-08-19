@@ -205,3 +205,29 @@ export interface ProjectCustomQuestionAnswer {
   created_at: string;
   updated_at: string;
 }
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-9: Question Follow-up Flags & Open Questions
+// ─────────────────────────────────────────────────────────────
+
+export type FollowupFlagType = 'revisit' | 'critical';
+export type FollowupStatus = 'open' | 'resolved';
+
+export interface QuestionFollowup {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string;
+  flag_type: FollowupFlagType;
+  note: string | null;
+  status: FollowupStatus;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
+}
+
+export interface FollowupSummaryCounts {
+  revisitCount: number;
+  criticalCount: number;
+  totalFollowupCount: number;
+}

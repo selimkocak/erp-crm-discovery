@@ -1,13 +1,18 @@
 /**
- * ERP CRM Discovery — QuestionNavigator Component
+ * ERP CRM Discovery — QuestionNavigator Component (FAZ-9 Enhanced)
  *
  * Collapsible left sidebar / drawer for instant question navigation.
  * Displays all visible questions grouped by process, with real-time completion statuses:
  * - CURRENT (active question highlighted)
- * - ANSWERED (green checkmark)
- * - REQUIRED_INCOMPLETE (amber warning indicator)
- * - UNANSWERED (neutral empty indicator)
+ * - 🟢 ANSWERED (green checkmark)
+ * - 🟡 REVISIT / SONRA DÖN (yellow/amber dot indicator)
+ * - 🔴 CRITICAL / KRİTİK TAKİP (red circle indicator)
+ * - ! REQUIRED_INCOMPLETE (amber warning indicator)
+ * - ○ UNANSWERED (neutral empty indicator)
  * - [Özel Soru] (custom question badge)
+ *
+ * Filter bar:
+ * [Tümü] [Cevaplanan] [🟡 Sonra Dön (N)] [🔴 Kritik (N)] [Cevaplanmayan]
  */
 
 import React, { useState } from "react";
@@ -23,13 +28,17 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
+import type { QuestionFollowup } from "../types";
 import { isQuestionAnswered } from "../engine/progress";
+
+export type NavigatorFilterType = "all" | "answered" | "revisit" | "critical" | "unanswered";
 
 interface QuestionNavigatorProps {
   isOpen: boolean;
   onToggle: () => void;
   questions: Question[];
   answers: Map<string, AnswerData>;
+  followups?: Map<string, QuestionFollowup>;
   currentQuestionId: string | null;
   onSelectQuestion: (questionId: string) => void;
   onAddCustomQuestion?: () => void;
@@ -41,36 +50,71 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   onToggle,
   questions,
   answers,
+  followups = new Map(),
   currentQuestionId,
   onSelectQuestion,
   onAddCustomQuestion,
   bfNameTr,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [activeFilter, setActiveFilter] = useState<NavigatorFilterType>("all");
 
-  // Filter questions based on search term
+  // Calculate follow-up and completion counts for tabs
+  let totalAnsweredCount = 0;
+  let revisitCount = 0;
+  let criticalCount = 0;
+  let unansweredCount = 0;
+
+  for (const q of questions) {
+    const fol = followups.get(q.id);
+    if (fol && fol.status === "open") {
+      if (fol.flag_type === "critical") criticalCount++;
+      else if (fol.flag_type === "revisit") revisitCount++;
+    } else {
+      const answered = isQuestionAnswered(q, answers.get(q.id), fol);
+      if (answered) {
+        totalAnsweredCount++;
+      } else {
+        unansweredCount++;
+      }
+    }
+  }
+
+  // Filter questions based on filter tab and search term
   const filteredQuestions = questions.filter((q) => {
+    const fol = followups.get(q.id);
+    const isOpenFollowup = fol && fol.status === "open";
+    const isAnswered = isQuestionAnswered(q, answers.get(q.id), fol);
+
+    // Tab filter
+    if (activeFilter === "answered" && !isAnswered) return false;
+    if (activeFilter === "revisit" && (!isOpenFollowup || fol?.flag_type !== "revisit")) return false;
+    if (activeFilter === "critical" && (!isOpenFollowup || fol?.flag_type !== "critical")) return false;
+    if (activeFilter === "unanswered" && (isAnswered || isOpenFollowup)) return false;
+
+    // Search term filter
     if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
     return (
       q.question.toLowerCase().includes(term) ||
       q.process.toLowerCase().includes(term) ||
-      q.id.toLowerCase().includes(term)
+      q.id.toLowerCase().includes(term) ||
+      (fol?.note && fol.note.toLowerCase().includes(term))
     );
   });
 
-  // Calculate separate stats
+  // Calculate separate stats for canonical vs custom
   const canonicalQuestions = questions.filter((q) => !q.is_custom);
   const customQuestions = questions.filter((q) => q.is_custom);
 
   const canonicalRequired = canonicalQuestions.filter((q) => q.required);
   const canonicalAnswered = canonicalRequired.filter((q) =>
-    isQuestionAnswered(q, answers.get(q.id))
+    isQuestionAnswered(q, answers.get(q.id), followups.get(q.id))
   ).length;
 
   const customRequired = customQuestions.filter((q) => q.required);
   const customAnswered = customRequired.filter((q) =>
-    isQuestionAnswered(q, answers.get(q.id))
+    isQuestionAnswered(q, answers.get(q.id), followups.get(q.id))
   ).length;
 
   // Group filtered questions by process
@@ -107,33 +151,44 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
       >
         <Layers size={15} />
         <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>Sorular ({questions.length})</span>
+        {(revisitCount > 0 || criticalCount > 0) && (
+          <span style={{ display: "inline-flex", gap: "0.15rem", fontSize: "0.75rem" }}>
+            {revisitCount > 0 && <span>🟡{revisitCount}</span>}
+            {criticalCount > 0 && <span>🔴{criticalCount}</span>}
+          </span>
+        )}
         <ChevronRight size={14} />
       </button>
     );
   }
 
   return (
-    <aside className="question-navigator" style={{
-      width: "320px",
-      minWidth: "320px",
-      height: "calc(100vh - 4rem)",
-      position: "sticky",
-      top: "4rem",
-      backgroundColor: "var(--bg-surface)",
-      borderRight: "1px solid var(--border-subtle)",
-      display: "flex",
-      flexDirection: "column",
-      zIndex: 35,
-      boxShadow: "var(--shadow-sm)",
-    }}>
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div style={{
-        padding: "0.875rem 1rem",
-        borderBottom: "1px solid var(--border-subtle)",
+    <aside
+      className="question-navigator"
+      style={{
+        width: "330px",
+        minWidth: "330px",
+        height: "calc(100vh - 4rem)",
+        position: "sticky",
+        top: "4rem",
+        backgroundColor: "var(--bg-surface)",
+        borderRight: "1px solid var(--border-subtle)",
         display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-      }}>
+        flexDirection: "column",
+        zIndex: 35,
+        boxShadow: "var(--shadow-sm)",
+      }}
+    >
+      {/* ── Header ──────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          padding: "0.75rem 1rem",
+          borderBottom: "1px solid var(--border-subtle)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <Layers size={16} style={{ color: "var(--primary)" }} />
           <div>
@@ -157,8 +212,119 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
         </button>
       </div>
 
+      {/* ── Filter Tabs ─────────────────────────────────────────────────── */}
+      <div
+        style={{
+          padding: "0.5rem 0.75rem",
+          borderBottom: "1px solid var(--border-subtle)",
+          display: "flex",
+          gap: "0.25rem",
+          overflowX: "auto",
+          backgroundColor: "var(--bg-app)",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveFilter("all")}
+          style={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            padding: "0.2rem 0.45rem",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid",
+            borderColor: activeFilter === "all" ? "var(--primary)" : "transparent",
+            backgroundColor: activeFilter === "all" ? "var(--primary-subtle)" : "transparent",
+            color: activeFilter === "all" ? "var(--primary)" : "var(--text-secondary)",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Tümü ({questions.length})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveFilter("answered")}
+          style={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            padding: "0.2rem 0.45rem",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid",
+            borderColor: activeFilter === "answered" ? "var(--success)" : "transparent",
+            backgroundColor: activeFilter === "answered" ? "rgba(16, 185, 129, 0.1)" : "transparent",
+            color: activeFilter === "answered" ? "var(--success)" : "var(--text-secondary)",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          ✓ Cevaplanan ({totalAnsweredCount})
+        </button>
+
+        {revisitCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setActiveFilter("revisit")}
+            style={{
+              fontSize: "0.6875rem",
+              fontWeight: 600,
+              padding: "0.2rem 0.45rem",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid",
+              borderColor: activeFilter === "revisit" ? "var(--warning)" : "transparent",
+              backgroundColor: activeFilter === "revisit" ? "rgba(245, 158, 11, 0.1)" : "transparent",
+              color: activeFilter === "revisit" ? "var(--warning)" : "var(--text-secondary)",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🟡 Sonra ({revisitCount})
+          </button>
+        )}
+
+        {criticalCount > 0 && (
+          <button
+            type="button"
+            onClick={() => setActiveFilter("critical")}
+            style={{
+              fontSize: "0.6875rem",
+              fontWeight: 600,
+              padding: "0.2rem 0.45rem",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid",
+              borderColor: activeFilter === "critical" ? "var(--danger)" : "transparent",
+              backgroundColor: activeFilter === "critical" ? "rgba(239, 68, 68, 0.1)" : "transparent",
+              color: activeFilter === "critical" ? "var(--danger)" : "var(--text-secondary)",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            🔴 Kritik ({criticalCount})
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setActiveFilter("unanswered")}
+          style={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            padding: "0.2rem 0.45rem",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid",
+            borderColor: activeFilter === "unanswered" ? "var(--text-muted)" : "transparent",
+            backgroundColor: activeFilter === "unanswered" ? "rgba(100, 116, 139, 0.1)" : "transparent",
+            color: activeFilter === "unanswered" ? "var(--text-primary)" : "var(--text-secondary)",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+          }}
+        >
+          ○ Boş ({unansweredCount})
+        </button>
+      </div>
+
       {/* ── Search & Actions ────────────────────────────────────────────── */}
-      <div style={{ padding: "0.75rem 1rem", borderBottom: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+      <div style={{ padding: "0.5rem 0.75rem", borderBottom: "1px solid var(--border-subtle)", display: "flex", flexDirection: "column", gap: "0.375rem" }}>
         <div style={{ position: "relative" }}>
           <Search size={14} style={{ position: "absolute", left: "0.625rem", top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }} />
           <input
@@ -170,8 +336,8 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
             style={{
               paddingLeft: "2rem",
               paddingRight: "0.5rem",
-              paddingTop: "0.375rem",
-              paddingBottom: "0.375rem",
+              paddingTop: "0.3rem",
+              paddingBottom: "0.3rem",
               fontSize: "0.8125rem",
             }}
           />
@@ -195,20 +361,22 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
       <div style={{ flex: 1, overflowY: "auto", padding: "0.5rem" }}>
         {processGroups.length === 0 ? (
           <div style={{ padding: "2rem 1rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.8125rem" }}>
-            Aramaya uygun soru bulunamadı.
+            Filtreye uygun soru bulunamadı.
           </div>
         ) : (
           processGroups.map((group) => (
             <div key={group.processName} style={{ marginBottom: "1rem" }}>
-              <div style={{
-                fontSize: "0.6875rem",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                color: "var(--text-muted)",
-                padding: "0.25rem 0.5rem",
-                marginBottom: "0.25rem",
-              }}>
+              <div
+                style={{
+                  fontSize: "0.6875rem",
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "var(--text-muted)",
+                  padding: "0.25rem 0.5rem",
+                  marginBottom: "0.25rem",
+                }}
+              >
                 {group.processName}
               </div>
 
@@ -216,8 +384,10 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
                 {group.items.map((q) => {
                   const isCurrent = q.id === currentQuestionId;
                   const ans = answers.get(q.id);
-                  const isAnswered = isQuestionAnswered(q, ans);
-                  const isRequiredIncomplete = q.required && !isAnswered;
+                  const fol = followups.get(q.id);
+                  const isFollowupActive = fol && fol.status === "open";
+                  const isAnswered = isQuestionAnswered(q, ans, fol);
+                  const isRequiredIncomplete = q.required && !isAnswered && !isFollowupActive;
 
                   return (
                     <button
@@ -233,7 +403,13 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
                         padding: "0.4rem 0.5rem",
                         borderRadius: "var(--radius-md)",
                         border: isCurrent ? "1px solid var(--primary-border)" : "1px solid transparent",
-                        backgroundColor: isCurrent ? "var(--primary-subtle)" : "transparent",
+                        backgroundColor: isCurrent
+                          ? "var(--primary-subtle)"
+                          : isFollowupActive
+                          ? fol.flag_type === "critical"
+                            ? "rgba(239, 68, 68, 0.04)"
+                            : "rgba(245, 158, 11, 0.04)"
+                          : "transparent",
                         cursor: "pointer",
                         transition: "all 0.15s ease",
                       }}
@@ -241,7 +417,13 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
                     >
                       {/* Status Icon */}
                       <span style={{ marginTop: "0.15rem", flexShrink: 0 }}>
-                        {isAnswered ? (
+                        {isFollowupActive ? (
+                          fol.flag_type === "critical" ? (
+                            <span style={{ fontSize: "0.875rem", lineHeight: 1 }} title="🔴 Kritik Takip">🔴</span>
+                          ) : (
+                            <span style={{ fontSize: "0.875rem", lineHeight: 1 }} title="🟡 Sonra Dön">🟡</span>
+                          )
+                        ) : isAnswered ? (
                           <CheckCircle2 size={14} style={{ color: "var(--success)" }} />
                         ) : isRequiredIncomplete ? (
                           <AlertCircle size={14} style={{ color: "var(--warning)" }} />
@@ -252,40 +434,64 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
 
                       {/* Question Order & Snippet */}
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                          fontSize: "0.75rem",
-                          fontWeight: isCurrent ? 700 : 500,
-                          color: isCurrent ? "var(--primary)" : "var(--text-primary)",
-                          lineHeight: 1.3,
-                        }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                            fontSize: "0.75rem",
+                            fontWeight: isCurrent ? 700 : 500,
+                            color: isCurrent ? "var(--primary)" : "var(--text-primary)",
+                            lineHeight: 1.3,
+                          }}
+                        >
                           <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
                             {String(q.order).padStart(2, "0")}.
                           </span>
-                          <span style={{
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}>
+                          <span
+                            style={{
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
                             {q.question}
                           </span>
                         </div>
 
+                        {/* Follow-up Note Snippet */}
+                        {isFollowupActive && (
+                          <div
+                            style={{
+                              fontSize: "0.6875rem",
+                              color: fol.flag_type === "critical" ? "var(--danger)" : "var(--warning)",
+                              fontWeight: 500,
+                              marginTop: "0.15rem",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {fol.flag_type === "critical" ? "Kritik Açık Konu" : "Teyit Bekliyor"}
+                            {fol.note ? `: ${fol.note}` : ""}
+                          </div>
+                        )}
+
                         {q.is_custom && (
-                          <span style={{
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.2rem",
-                            fontSize: "0.625rem",
-                            padding: "0.1rem 0.35rem",
-                            borderRadius: "var(--radius-sm)",
-                            backgroundColor: "var(--info-subtle)",
-                            color: "var(--info)",
-                            fontWeight: 600,
-                            marginTop: "0.2rem",
-                          }}>
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.2rem",
+                              fontSize: "0.625rem",
+                              padding: "0.1rem 0.35rem",
+                              borderRadius: "var(--radius-sm)",
+                              backgroundColor: "var(--info-subtle)",
+                              color: "var(--info)",
+                              fontWeight: 600,
+                              marginTop: "0.2rem",
+                            }}
+                          >
                             <Sparkles size={9} /> Özel Soru
                           </span>
                         )}
@@ -300,12 +506,41 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
       </div>
 
       {/* ── Footer Summary Stats ─────────────────────────────────────────── */}
-      <div style={{
-        padding: "0.75rem 1rem",
-        borderTop: "1px solid var(--border-subtle)",
-        backgroundColor: "var(--bg-app)",
-        fontSize: "0.75rem",
-      }}>
+      <div
+        style={{
+          padding: "0.75rem 1rem",
+          borderTop: "1px solid var(--border-subtle)",
+          backgroundColor: "var(--bg-app)",
+          fontSize: "0.75rem",
+        }}
+      >
+        {/* Takip Bayrakları Özeti */}
+        {(revisitCount > 0 || criticalCount > 0) && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.75rem",
+              padding: "0.35rem 0.5rem",
+              background: "var(--surface-color)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "var(--radius-sm)",
+              marginBottom: "0.5rem",
+            }}
+          >
+            {revisitCount > 0 && (
+              <span style={{ color: "var(--warning)", fontWeight: 600, fontSize: "0.75rem" }}>
+                🟡 {revisitCount} Teyit Bekliyor
+              </span>
+            )}
+            {criticalCount > 0 && (
+              <span style={{ color: "var(--danger)", fontWeight: 600, fontSize: "0.75rem" }}>
+                🔴 {criticalCount} Kritik Takip
+              </span>
+            )}
+          </div>
+        )}
+
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
           <span style={{ color: "var(--text-muted)" }}>Standart Sorular:</span>
           <strong style={{ color: "var(--text-primary)" }}>

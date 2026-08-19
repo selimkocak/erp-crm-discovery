@@ -13,11 +13,17 @@ import type { Question, AnswerData, ProgressResult } from "./types";
 
 /**
  * Bir sorunun cevaplanmış sayılıp sayılmadığını döndürür.
+ * 🟡 Sonra Dön veya 🔴 Kritik Takip bayrağı açık olan sorular "cevaplanmış" SAYILMAZ.
  */
 export function isQuestionAnswered(
   question: Question,
-  answerData: AnswerData | undefined
+  answerData: AnswerData | undefined,
+  followup?: { flag_type?: string; status?: string } | null
 ): boolean {
+  if (followup && (!followup.status || followup.status === "open")) {
+    return false;
+  }
+
   if (!question.required) return true;
   if (!answerData) return false;
 
@@ -61,7 +67,8 @@ export function isQuestionAnswered(
  */
 export function calculateProgress(
   visibleQuestions: Question[],
-  answers: Map<string, AnswerData>
+  answers: Map<string, AnswerData>,
+  followups?: Map<string, { flag_type?: string; status?: string }>
 ): ProgressResult {
   const requiredVisible = visibleQuestions.filter((q) => q.required);
   const total = requiredVisible.length;
@@ -71,7 +78,7 @@ export function calculateProgress(
   }
 
   const answered = requiredVisible.filter((q) =>
-    isQuestionAnswered(q, answers.get(q.id))
+    isQuestionAnswered(q, answers.get(q.id), followups?.get(q.id))
   ).length;
 
   const percentage = Math.round((answered / total) * 100);

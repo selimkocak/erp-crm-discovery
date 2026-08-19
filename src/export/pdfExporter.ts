@@ -276,13 +276,17 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
           doc.setFont(PDF_FONT_FAMILY, "bold");
           doc.setFontSize(8.5);
           doc.setTextColor(2, 132, 199);
-          const qPrefix = q.isCustom ? `[${q.id}] [Özel Soru]` : `[${q.id}]`;
+          let qPrefix = `[${q.id}]`;
+          if (q.isCustom) qPrefix += ` [Özel Soru]`;
+          if (q.followup) {
+            qPrefix += q.followup.flagType === "critical" ? ` [🔴 Kritik Takip]` : ` [🟡 Sonra Dön]`;
+          }
           doc.text(qPrefix, marginX + 4, currentY);
 
           doc.setTextColor(15, 23, 42);
-          const qPrefixWidth = q.isCustom ? 38 : 22;
+          const qPrefixWidth = Math.max(22, doc.getTextWidth(qPrefix) + 3);
           const qLines = doc.splitTextToSize(q.questionText, pageWidth - marginX * 2 - qPrefixWidth - 3);
-          doc.text(qLines, marginX + qPrefixWidth, currentY);
+          doc.text(qLines, marginX + 4 + qPrefixWidth, currentY);
           currentY += qLines.length * 4 + 1;
 
           // Cevaplar
@@ -390,6 +394,35 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   doc.setTextColor(2, 132, 199);
   doc.text("5. Proje Notları & Açık Konular", marginX, currentY);
   currentY += 6;
+
+  // Açık Sorular ve Teyit Bekleyen Saha Başlıkları Tablosu (FAZ-9)
+  if (report.followups && report.followups.length > 0) {
+    checkPageBreak(25);
+    const folRows = report.followups.map((fol) => [
+      fol.flagType === "critical" ? "🔴 Kritik Takip" : "🟡 Sonra Dön",
+      `${fol.businessFunctionNameTr}\n(${fol.processName})`,
+      `[${fol.questionId}]\n${fol.questionText}`,
+      fol.note || "Açıklama girilmedi.",
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      head: [[`Açık Sorular & Teyit Bekleyen Konular (${report.followups.length})`, "İş Fonksiyonu & Süreç", "Soru", "Takip Notu / Gerekçe"]],
+      body: folRows,
+      theme: "grid",
+      styles: { font: PDF_FONT_FAMILY },
+      headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [254, 243, 199], textColor: [146, 64, 14], fontSize: 8 },
+      bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 26 },
+        1: { cellWidth: 34 },
+        2: { cellWidth: 65 },
+        3: { cellWidth: "auto" },
+      },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 4;
+  }
 
   if (profile.open_topics) {
     autoTable(doc, {

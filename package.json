@@ -11,8 +11,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "pretest": "npm run generate",
-    "test": "tsx test/faz2_tests.ts && tsx test/faz3_semantic_test.ts && tsx test/faz4_report_test.ts && tsx test/faz5_export_test.ts && tsx test/clean_install_test.ts && tsx test/faz6_release_readiness_test.ts && tsx test/faz7_resumable_report_test.ts && tsx test/faz8_navigator_custom_questions_test.ts",
-    "test:windows": "tsx test/faz2_tests.ts && tsx test/faz3_semantic_test.ts && tsx test/faz4_report_test.ts && tsx test/faz5_export_test.ts && tsx test/faz6_release_readiness_test.ts && tsx test/faz7_resumable_report_test.ts && tsx test/faz8_navigator_custom_questions_test.ts",
+    "test": "tsx test/faz2_tests.ts && tsx test/faz3_semantic_test.ts && tsx test/faz4_report_test.ts && tsx test/faz5_export_test.ts && tsx test/clean_install_test.ts && tsx test/faz6_release_readiness_test.ts && tsx test/faz7_resumable_report_test.ts && tsx test/faz8_navigator_custom_questions_test.ts && tsx test/faz9_question_followups_test.ts",
+    "test:windows": "tsx test/faz2_tests.ts && tsx test/faz3_semantic_test.ts && tsx test/faz4_report_test.ts && tsx test/faz5_export_test.ts && tsx test/faz6_release_readiness_test.ts && tsx test/faz7_resumable_report_test.ts && tsx test/faz8_navigator_custom_questions_test.ts && tsx test/faz9_question_followups_test.ts",
     "release:check": "npm run test && npm run build && cargo check --manifest-path src-tauri/Cargo.toml",
     "git:prepare": "node scripts/git_prepare.mjs",
     "tauri": "tauri"

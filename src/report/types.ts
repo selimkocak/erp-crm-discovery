@@ -114,6 +114,18 @@ export interface ReportProjectNote {
   createdAt: string;
 }
 
+export interface ReportFollowupItem {
+  id: string;
+  businessFunctionCode: string;
+  businessFunctionNameTr: string;
+  processName: string;
+  questionId: string;
+  questionText: string;
+  flagType: "revisit" | "critical";
+  note?: string | null;
+  createdAt: string;
+}
+
 export interface ReportQuestionItem {
   id: string;
   order: number;
@@ -124,6 +136,10 @@ export interface ReportQuestionItem {
   answerType: string;
   criticality: string;
   isCustom?: boolean;
+  followup?: {
+    flagType: "revisit" | "critical";
+    note?: string | null;
+  } | null;
   formattedAnswer: ReportFormattedAnswer;
   findings: ReportFinding[];
   requirements: ReportRequirement[];
@@ -180,6 +196,9 @@ export interface ReportSummaryStats {
   totalNotes: number;
   answeredQuestions: number;
   totalQuestions: number;
+  openFollowupCount?: number;
+  revisitCount?: number;
+  criticalFollowupCount?: number;
 }
 
 export interface ReportModel {
@@ -188,6 +207,7 @@ export interface ReportModel {
   company: ReportCompany;
   scope: ReportScopeItem[];
   businessFunctions: ReportBusinessFunction[];
+  followups?: ReportFollowupItem[];
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

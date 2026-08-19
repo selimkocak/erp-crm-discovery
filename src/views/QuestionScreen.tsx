@@ -28,7 +28,16 @@ import {
   PlusCircle,
 } from "lucide-react";
 import type { QuestionPack, AnswerData, Question } from "../engine/types";
-import type { SemanticRecordType, Finding, Requirement, Risk, ProjectNote, ProjectCustomQuestion } from "../types";
+import type {
+  SemanticRecordType,
+  Finding,
+  Requirement,
+  Risk,
+  ProjectNote,
+  ProjectCustomQuestion,
+  QuestionFollowup,
+  FollowupFlagType,
+} from "../types";
 import {
   saveAnswer,
   getAllAnswers,
@@ -43,6 +52,9 @@ import {
   getCustomAnswers,
   saveCustomAnswer,
   deleteCustomQuestion,
+  getQuestionFollowups,
+  setQuestionFollowup,
+  removeQuestionFollowup,
 } from "../db/client";
 import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
@@ -53,6 +65,7 @@ import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticModal } from "../components/SemanticModal";
 import { QuestionNavigator } from "../components/QuestionNavigator";
 import { CustomQuestionModal } from "../components/CustomQuestionModal";
+import { FollowupModal } from "../components/FollowupModal";
 
 interface QuestionScreenProps {
   projectId: string;
@@ -75,6 +88,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 }) => {
   const [answers, setAnswers] = useState<Map<string, AnswerData>>(new Map());
   const [customQuestions, setCustomQuestions] = useState<ProjectCustomQuestion[]>([]);
+  const [followups, setFollowups] = useState<Map<string, QuestionFollowup>>(new Map());
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -87,6 +101,13 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   // Custom Question Modal State
   const [isCustomModalOpen, setIsCustomModalOpen] = useState<boolean>(false);
   const [editingCustomQuestion, setEditingCustomQuestion] = useState<ProjectCustomQuestion | null>(null);
+
+  // Followup Modal State (FAZ-9)
+  const [isFollowupModalOpen, setIsFollowupModalOpen] = useState<boolean>(false);
+  const [followupModalTarget, setFollowupModalTarget] = useState<{
+    question: Question;
+    initialFlagType?: FollowupFlagType;
+  } | null>(null);
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pendingSaveRef = useRef<{ qId: string; data: AnswerData; isCustom?: boolean } | null>(null);
@@ -105,13 +126,19 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const loadData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const [existingCanonicalAnswers, existingCustomAnswers, dbCustomQuestions, lastQId] =
-        await Promise.all([
-          getAllAnswers(projectId, bfCode),
-          getCustomAnswers(projectId, bfCode),
-          getCustomQuestions(projectId, bfCode),
-          getLastQuestionId(projectId, bfCode),
-        ]);
+      const [
+        existingCanonicalAnswers,
+        existingCustomAnswers,
+        dbCustomQuestions,
+        dbFollowups,
+        lastQId,
+      ] = await Promise.all([
+        getAllAnswers(projectId, bfCode),
+        getCustomAnswers(projectId, bfCode),
+        getCustomQuestions(projectId, bfCode),
+        getQuestionFollowups(projectId, bfCode),
+        getLastQuestionId(projectId, bfCode),
+      ]);
 
       // Merge canonical and custom answers into unified map
       const mergedAnswers = new Map<string, AnswerData>(existingCanonicalAnswers);
@@ -121,6 +148,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
       setAnswers(mergedAnswers);
       setCustomQuestions(dbCustomQuestions);
+      setFollowups(dbFollowups);
 
       // Build initial question list to resolve lastQId
       const canonicalVisible = getVisibleQuestions(pack.questions, mergedAnswers);
@@ -180,8 +208,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     loadQuestionSemanticItems();
   }, [loadQuestionSemanticItems]);
 
-  // ── İlerleme ───────────────────────────────────────────────────────────
-  const progress = calculateProgress(visibleQuestions, answers);
+  // ── İlerleme (Bayraklı sorular tamamlandı sayılmaz) ──────────────────────
+  const progress = calculateProgress(visibleQuestions, answers, followups);
 
   // ── Gerçek DB Kayıt İcrası ─────────────────────────────────────────────
   const executeDbSave = useCallback(
@@ -364,6 +392,40 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     setIsSemanticModalOpen(true);
   };
 
+  // Followup Handlers (FAZ-9)
+  const handleOpenFollowup = (question: Question, flagType?: FollowupFlagType) => {
+    setFollowupModalTarget({ question, initialFlagType: flagType ?? "revisit" });
+    setIsFollowupModalOpen(true);
+  };
+
+  const handleSaveFollowup = async (flagType: FollowupFlagType, note: string) => {
+    if (!followupModalTarget) return;
+    const q = followupModalTarget.question;
+    await setQuestionFollowup({
+      analysis_project_id: projectId,
+      business_function_code: bfCode,
+      question_id: q.id,
+      flag_type: flagType,
+      note: note || null,
+    });
+    const updated = await getQuestionFollowups(projectId, bfCode);
+    setFollowups(updated);
+    const newProgress = calculateProgress(visibleQuestions, answers, updated);
+    const newStatus = progressToStatus(newProgress.answered, newProgress.total);
+    await updateFunctionStatusByCode(projectId, bfCode, newStatus);
+  };
+
+  const handleRemoveFollowup = async () => {
+    if (!followupModalTarget) return;
+    const q = followupModalTarget.question;
+    await removeQuestionFollowup(projectId, bfCode, q.id);
+    const updated = await getQuestionFollowups(projectId, bfCode);
+    setFollowups(updated);
+    const newProgress = calculateProgress(visibleQuestions, answers, updated);
+    const newStatus = progressToStatus(newProgress.answered, newProgress.total);
+    await updateFunctionStatusByCode(projectId, bfCode, newStatus);
+  };
+
   // Extract unique process names for the custom question modal
   const existingProcesses = useMemo(() => {
     const set = new Set<string>();
@@ -408,6 +470,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         onToggle={() => setIsNavigatorOpen((prev) => !prev)}
         questions={visibleQuestions}
         answers={answers}
+        followups={followups}
         currentQuestionId={currentQuestion?.id ?? null}
         onSelectQuestion={jumpToQuestion}
         onAddCustomQuestion={handleAddCustomQuestion}
@@ -509,6 +572,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               answerData={answers.get(currentQuestion.id) ?? {}}
               onChange={handleAnswerChange}
               showValidation={showValidation}
+              followup={followups.get(currentQuestion.id) ?? null}
+              onOpenFollowup={handleOpenFollowup}
               onEditCustom={handleEditCustomQuestion}
               onDeleteCustom={handleDeleteCustomQuestion}
             />
@@ -600,7 +665,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                 className={`question-screen__nav-dot ${
                   i === safeIndex ? "question-screen__nav-dot--current" : ""
                 } ${
-                  isQuestionAnswered(q, answers.get(q.id))
+                  isQuestionAnswered(q, answers.get(q.id), followups.get(q.id))
                     ? "question-screen__nav-dot--answered"
                     : ""
                 }`}
@@ -654,6 +719,22 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             defaultType={modalType}
             defaultBfCode={bfCode}
             defaultQuestionId={currentQuestion.id}
+          />
+        )}
+
+        {/* ── Followup Modal (FAZ-9) ────────────────────────────────────────── */}
+        {isFollowupModalOpen && followupModalTarget && (
+          <FollowupModal
+            questionId={followupModalTarget.question.id}
+            questionText={followupModalTarget.question.question}
+            initialFlagType={followupModalTarget.initialFlagType}
+            existingFollowup={followups.get(followupModalTarget.question.id) ?? null}
+            onSave={handleSaveFollowup}
+            onRemove={handleRemoveFollowup}
+            onClose={() => {
+              setIsFollowupModalOpen(false);
+              setFollowupModalTarget(null);
+            }}
           />
         )}
 

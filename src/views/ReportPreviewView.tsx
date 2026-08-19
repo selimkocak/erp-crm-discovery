@@ -503,6 +503,14 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                                     Özel Soru
                                   </span>
                                 )}
+                                {q.followup && (
+                                  <span
+                                    className={`badge ${q.followup.flagType === "critical" ? "badge--danger" : "badge--warning"}`}
+                                    style={{ fontSize: "0.6875rem", display: "inline-flex", alignItems: "center", gap: "0.2rem", marginLeft: "0.25rem" }}
+                                  >
+                                    {q.followup.flagType === "critical" ? "🔴 Kritik Takip" : "🟡 Sonra Dön"}
+                                  </span>
+                                )}
                                 <div className="report-question-item__text">
                                   <strong>{q.questionText}</strong>
                                   {q.description && (
@@ -702,6 +710,57 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
               <span className="report-section__num">BÖLÜM 5</span>
               <h2 className="report-section__title">Proje Notları & Açık Konular</h2>
             </div>
+
+            {/* Açık Sorular ve Teyit Bekleyen Konular Tablosu (FAZ-9) */}
+            {report.followups && report.followups.length > 0 && (
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem", borderLeft: "4px solid var(--warning)" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "0.75rem" }}>
+                  <h3 className="report-summary-box__title" style={{ margin: 0, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span>Açık Sorular & Teyit Bekleyen Saha Başlıkları</span>
+                    <span className="badge badge--warning text-xs">
+                      {report.followups.length} Konu
+                    </span>
+                  </h3>
+                </div>
+
+                <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                  <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ width: "120px" }}>Öncelik / Durum</th>
+                        <th style={{ width: "140px" }}>İş Fonksiyonu</th>
+                        <th style={{ width: "160px" }}>Süreç</th>
+                        <th>Soru</th>
+                        <th>Takip Notu / Gerekçe</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.followups.map((fol) => (
+                        <tr key={fol.id}>
+                          <td>
+                            <span
+                              className={`badge ${fol.flagType === "critical" ? "badge--danger" : "badge--warning"}`}
+                              style={{ fontSize: "0.75rem", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+                            >
+                              {fol.flagType === "critical" ? "🔴 Kritik Takip" : "🟡 Sonra Dön"}
+                            </span>
+                          </td>
+                          <td><strong>{fol.businessFunctionNameTr}</strong></td>
+                          <td>{fol.processName}</td>
+                          <td>
+                            <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block" }}>{fol.questionId}</span>
+                            <strong>{fol.questionText}</strong>
+                          </td>
+                          <td style={{ color: fol.note ? "var(--text-color)" : "var(--text-muted)", fontStyle: fol.note ? "normal" : "italic" }}>
+                            {fol.note || "Açıklama girilmedi."}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             {/* Açık Konular */}
             <div className="report-summary-box">

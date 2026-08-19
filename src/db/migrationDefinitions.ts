@@ -220,5 +220,27 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_pcqo_question ON project_custom_question_options(custom_question_id);`,
       `CREATE INDEX IF NOT EXISTS idx_pcqa_project ON project_custom_question_answers(analysis_project_id);`
     ]
+  },
+  {
+    version: 6,
+    description: "Question Follow-up Flags: Revisit & Critical Tracking (FAZ-9)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS question_followups (
+        id                     TEXT PRIMARY KEY,
+        analysis_project_id    TEXT NOT NULL,
+        business_function_code TEXT NOT NULL,
+        question_id            TEXT NOT NULL,
+        flag_type              TEXT NOT NULL,
+        note                   TEXT,
+        status                 TEXT NOT NULL DEFAULT 'open',
+        created_at             TEXT NOT NULL,
+        updated_at             TEXT NOT NULL,
+        resolved_at            TEXT,
+        FOREIGN KEY (analysis_project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE,
+        UNIQUE (analysis_project_id, business_function_code, question_id)
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_qf_project_bf ON question_followups(analysis_project_id, business_function_code);`,
+      `CREATE INDEX IF NOT EXISTS idx_qf_flag ON question_followups(flag_type);`
+    ]
   }
 ] as const;

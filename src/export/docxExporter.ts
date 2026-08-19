@@ -41,12 +41,13 @@ function createTableCell(
   options: {
     isHeader?: boolean;
     bold?: boolean;
+    italics?: boolean;
     color?: string;
     widthPercent?: number;
     bgColor?: string;
   } = {}
 ): TableCell {
-  const { isHeader, bold, color = COLOR_DARK, widthPercent, bgColor } = options;
+  const { isHeader, bold, italics, color = COLOR_DARK, widthPercent, bgColor } = options;
 
   return new TableCell({
     width: widthPercent ? { size: widthPercent, type: WidthType.PERCENTAGE } : undefined,
@@ -64,6 +65,7 @@ function createTableCell(
           new TextRun({
             text,
             bold: isHeader || bold,
+            italics,
             size: isHeader ? 20 : 19, // 10pt / 9.5pt
             color: isHeader ? "334155" : color,
             font: FONT_FAMILY,
@@ -503,6 +505,18 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
             );
           }
 
+          if (q.followup) {
+            questionHeaderRuns.push(
+              new TextRun({
+                text: q.followup.flagType === "critical" ? `[🔴 Kritik Takip] ` : `[🟡 Sonra Dön] `,
+                bold: true,
+                size: 17,
+                color: q.followup.flagType === "critical" ? "DC2626" : COLOR_WARNING,
+                font: FONT_FAMILY,
+              })
+            );
+          }
+
           questionHeaderRuns.push(
             new TextRun({
               text: q.questionText,
@@ -750,6 +764,71 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
       ],
     })
   );
+
+  // Açık Sorular ve Teyit Bekleyen Saha Başlıkları Tablosu (FAZ-9)
+  if (report.followups && report.followups.length > 0) {
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 180, after: 80 },
+        children: [
+          new TextRun({
+            text: `Açık Sorular & Teyit Bekleyen Konular (${report.followups.length})`,
+            bold: true,
+            size: 22,
+            color: "B45309",
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    const followupRows: TableRow[] = [
+      new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Durum / Öncelik", { isHeader: true, widthPercent: 22, bgColor: "FEF3C7", color: "92400E" }),
+          createTableCell("İş Fonksiyonu & Süreç", { isHeader: true, widthPercent: 28, bgColor: "FEF3C7", color: "92400E" }),
+          createTableCell("Soru", { isHeader: true, widthPercent: 30, bgColor: "FEF3C7", color: "92400E" }),
+          createTableCell("Takip Notu / Gerekçe", { isHeader: true, widthPercent: 20, bgColor: "FEF3C7", color: "92400E" }),
+        ],
+      }),
+    ];
+
+    for (const fol of report.followups) {
+      const isCritical = fol.flagType === "critical";
+      followupRows.push(
+        new TableRow({
+          children: [
+            createTableCell(isCritical ? "🔴 Kritik Takip" : "🟡 Sonra Dön", {
+              bgColor: isCritical ? "FEE2E2" : "FFFBEB",
+              color: isCritical ? "991B1B" : "92400E",
+              bold: true,
+            }),
+            createTableCell(`${fol.businessFunctionNameTr}\n(${fol.processName})`, {
+              bgColor: "FFFFFF",
+            }),
+            createTableCell(`[${fol.questionId}]\n${fol.questionText}`, {
+              bgColor: "FFFFFF",
+              bold: true,
+            }),
+            createTableCell(fol.note || "Açıklama girilmedi.", {
+              bgColor: "FFFFFF",
+              italics: !fol.note,
+            }),
+          ],
+        })
+      );
+    }
+
+    docChildren.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: followupRows,
+      }),
+      new Paragraph({ spacing: { after: 180 } })
+    );
+  }
 
   if (profile.open_topics) {
     docChildren.push(

@@ -27,6 +27,9 @@ import type {
   ProjectCustomQuestion,
   ProjectCustomQuestionOption,
   CustomQuestionType,
+  QuestionFollowup,
+  FollowupFlagType,
+  FollowupSummaryCounts,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -1022,5 +1025,159 @@ export async function getCustomAnswers(
     }
   }
   return map;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-9: Question Follow-up Flags (Sonra Dön & Kritik Takip)
+// ─────────────────────────────────────────────────────────────
+
+export interface SetQuestionFollowupPayload {
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string;
+  flag_type: FollowupFlagType;
+  note?: string | null;
+}
+
+export async function setQuestionFollowup(
+  payload: SetQuestionFollowupPayload
+): Promise<string> {
+  const db = await getDb();
+  const id = generateId("qf");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO question_followups
+       (id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, 'open', $7, $7)
+     ON CONFLICT(analysis_project_id, business_function_code, question_id)
+     DO UPDATE SET
+       flag_type = $5,
+       note = $6,
+       status = 'open',
+       updated_at = $7,
+       resolved_at = NULL`,
+    [
+      id,
+      payload.analysis_project_id,
+      payload.business_function_code,
+      payload.question_id,
+      payload.flag_type,
+      payload.note ?? null,
+      now,
+    ]
+  );
+  return id;
+}
+
+export async function removeQuestionFollowup(
+  projectId: string,
+  bfCode: string,
+  questionId: string
+): Promise<void> {
+  const db = await getDb();
+  await db.execute(
+    `DELETE FROM question_followups
+     WHERE analysis_project_id = $1 AND business_function_code = $2 AND question_id = $3`,
+    [projectId, bfCode, questionId]
+  );
+}
+
+export async function resolveQuestionFollowup(
+  projectId: string,
+  bfCode: string,
+  questionId: string
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  await db.execute(
+    `UPDATE question_followups
+     SET status = 'resolved', resolved_at = $4, updated_at = $4
+     WHERE analysis_project_id = $1 AND business_function_code = $2 AND question_id = $3`,
+    [projectId, bfCode, questionId, now]
+  );
+}
+
+export async function getQuestionFollowups(
+  projectId: string,
+  bfCode?: string
+): Promise<Map<string, QuestionFollowup>> {
+  const db = await getDb();
+  let rows: QuestionFollowup[];
+
+  if (bfCode) {
+    rows = await db.select<QuestionFollowup[]>(
+      `SELECT id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at, resolved_at
+       FROM question_followups
+       WHERE analysis_project_id = $1 AND business_function_code = $2 AND status = 'open'`,
+      [projectId, bfCode]
+    );
+  } else {
+    rows = await db.select<QuestionFollowup[]>(
+      `SELECT id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at, resolved_at
+       FROM question_followups
+       WHERE analysis_project_id = $1 AND status = 'open'`,
+      [projectId]
+    );
+  }
+
+  const map = new Map<string, QuestionFollowup>();
+  for (const r of rows) {
+    map.set(r.question_id, r);
+  }
+  return map;
+}
+
+export async function getAllProjectFollowups(
+  projectId: string
+): Promise<QuestionFollowup[]> {
+  const db = await getDb();
+  return db.select<QuestionFollowup[]>(
+    `SELECT id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at, resolved_at
+     FROM question_followups
+     WHERE analysis_project_id = $1 AND status = 'open'
+     ORDER BY created_at ASC`,
+    [projectId]
+  );
+}
+
+export async function getFollowupSummaryCounts(
+  projectId: string,
+  bfCode?: string
+): Promise<FollowupSummaryCounts> {
+  const db = await getDb();
+  let rows: { flag_type: FollowupFlagType; count: number }[];
+
+  if (bfCode) {
+    rows = await db.select<{ flag_type: FollowupFlagType; count: number }[]>(
+      `SELECT flag_type, COUNT(*) as count
+       FROM question_followups
+       WHERE analysis_project_id = $1 AND business_function_code = $2 AND status = 'open'
+       GROUP BY flag_type`,
+      [projectId, bfCode]
+    );
+  } else {
+    rows = await db.select<{ flag_type: FollowupFlagType; count: number }[]>(
+      `SELECT flag_type, COUNT(*) as count
+       FROM question_followups
+       WHERE analysis_project_id = $1 AND status = 'open'
+       GROUP BY flag_type`,
+      [projectId]
+    );
+  }
+
+  let revisitCount = 0;
+  let criticalCount = 0;
+
+  for (const r of rows) {
+    if (r.flag_type === "revisit") revisitCount = Number(r.count);
+    else if (r.flag_type === "critical") criticalCount = Number(r.count);
+  }
+
+  return {
+    revisitCount,
+    criticalCount,
+    totalFollowupCount: revisitCount + criticalCount,
+  };
 }
 
