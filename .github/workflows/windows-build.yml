@@ -38,7 +38,7 @@ jobs:
           workspaces: './src-tauri'
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Generate Canonical Business Functions
         run: npm run generate
