@@ -1,0 +1,61 @@
+# Node & Package Managers
+node_modules/
+dist/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Rust & Tauri
+target/
+src-tauri/target/
+
+# Local Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Local Databases & SQLite
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Logs
+*.log
+logs/
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor Directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+
+# Test & Temporary Output
+test-output/
+tmp/
+temp/
+
+# Binary & Distribution Artifacts
+*.exe
+*.msi
+*.AppImage
+*.deb
+*.rpm
+*.zip
+*.tar.gz

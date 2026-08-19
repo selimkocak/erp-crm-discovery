@@ -1,0 +1,159 @@
+export type ProjectStatus = 'draft' | 'active' | 'completed';
+export type FunctionStatus = 'not_started' | 'in_progress' | 'completed';
+
+export interface AnalysisProject {
+  id: string;
+  name: string;
+  status: ProjectStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompanyProfile {
+  id: string;
+  analysis_project_id: string;
+  company_name: string;
+  trade_name?: string;
+  tax_number?: string;
+  city?: string;
+  country: string;
+  employee_count?: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BusinessFunction {
+  id: string;
+  code: string;
+  name_tr: string;
+  name_en: string;
+  category: string;
+  sort_order: number;
+  is_active: number;
+}
+
+export interface ProjectBusinessFunction {
+  id: string;
+  analysis_project_id: string;
+  business_function_id: string;
+  company_department_name?: string;
+  responsible_person?: string;
+  status: FunctionStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectListItem {
+  id: string;
+  name: string;
+  status: ProjectStatus;
+  created_at: string;
+  updated_at: string;
+  company_name: string;
+  city?: string;
+  selected_function_count: number;
+}
+
+export interface EnrichedProjectFunction extends ProjectBusinessFunction {
+  code: string;
+  name_tr: string;
+  name_en: string;
+  category: string;
+  sort_order: number;
+}
+
+export interface ProjectDetailData {
+  project: AnalysisProject;
+  company: CompanyProfile;
+  functions: EnrichedProjectFunction[];
+}
+
+export interface CreateProjectPayload {
+  projectName: string;
+  company: {
+    company_name: string;
+    trade_name?: string;
+    tax_number?: string;
+    city?: string;
+    country: string;
+    employee_count?: string;
+    notes?: string;
+  };
+  selectedFunctionIds: string[];
+}
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-3: Semantic Analysis Types (Findings, Requirements, Risks, Notes)
+// ─────────────────────────────────────────────────────────────
+
+export type FindingPriority = 'low' | 'medium' | 'high' | 'critical';
+export type FindingStatus = 'open' | 'confirmed' | 'resolved';
+
+export interface Finding {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string | null;
+  title: string;
+  description: string;
+  priority: FindingPriority;
+  status: FindingStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export type RequirementPriority = 'low' | 'medium' | 'high' | 'critical';
+export type RequirementStatus = 'draft' | 'confirmed' | 'out_of_scope' | 'implemented';
+
+export interface Requirement {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string | null;
+  title: string;
+  description: string;
+  priority: RequirementPriority;
+  status: RequirementStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export type RiskImpact = 'low' | 'medium' | 'high' | 'critical';
+export type RiskProbability = 'low' | 'medium' | 'high';
+export type RiskStatus = 'open' | 'mitigated' | 'accepted' | 'closed';
+
+export interface Risk {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string | null;
+  title: string;
+  description: string;
+  impact: RiskImpact;
+  probability: RiskProbability;
+  mitigation_note: string | null;
+  status: RiskStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectNote {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string | null;
+  question_id: string | null;
+  note: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type SemanticRecordType = 'finding' | 'requirement' | 'risk' | 'note';
+
+export interface SemanticSummaryCounts {
+  findingCount: number;
+  requirementCount: number;
+  openRiskCount: number;
+  totalRiskCount: number;
+  noteCount: number;
+}

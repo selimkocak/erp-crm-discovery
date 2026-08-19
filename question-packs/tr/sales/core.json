@@ -1,0 +1,624 @@
+{
+  "meta": {
+    "pack_id": "tr.sales.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "SALES",
+    "name": "Satış Ön Analizi",
+    "description": "ERP/CRM implementasyonu öncesinde satış süreçlerinin mevcut durumunu anlamaya yönelik temel analiz paketi."
+  },
+  "questions": [
+    {
+      "id": "SALES-001",
+      "process": "Müşteri ve Potansiyel Müşteri Yönetimi",
+      "order": 1,
+      "question": "Müşteri bilgileri nerede tutulur?",
+      "description": "Hangi sistemde veya yöntemde müşteri ana verisi saklandığını anlamaya çalışıyoruz.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "erp_crm", "label": "ERP/CRM sistemi", "allow_note": true, "is_other": false },
+        { "value": "excel", "label": "Excel veya benzeri dosyalar", "allow_note": true, "is_other": false },
+        { "value": "muhasebe", "label": "Muhasebe programı", "allow_note": true, "is_other": false },
+        { "value": "kisisel_not", "label": "Kişisel notlar veya e-posta", "allow_note": false, "is_other": false },
+        { "value": "yok", "label": "Merkezi bir kayıt yok", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-002",
+      "process": "Müşteri ve Potansiyel Müşteri Yönetimi",
+      "order": 2,
+      "question": "Yeni müşteri veya potansiyel müşteri nasıl sisteme eklenir?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "satis_girer", "label": "Satış personeli doğrudan sisteme girer", "allow_note": false, "is_other": false },
+        { "value": "onay_gerekli", "label": "Yönetici veya başka bir departman onayı gerekiyor", "allow_note": true, "is_other": false },
+        { "value": "excel_sonra", "label": "Önce Excel'e, sonra sisteme aktarılıyor", "allow_note": true, "is_other": false },
+        { "value": "sistematik_yok", "label": "Sistematik bir kayıt yapılmıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-003",
+      "process": "Müşteri ve Potansiyel Müşteri Yönetimi",
+      "order": 3,
+      "question": "Müşteriler segmentlere veya gruplara ayrılıyor mu?",
+      "description": "Örneğin büyük/küçük müşteri, bölge, sektör, kanal gibi sınıflandırmalar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_sistematik", "label": "Evet, tanımlı kriterlerle segmentasyon yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "evet_manuel", "label": "Evet ama kriterleri kişiden kişiye değişiyor", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, segmentasyon yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "planlanıyor", "label": "Planlanıyor ama henüz uygulanmıyor", "allow_note": true, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-004",
+      "process": "Müşteri ve Potansiyel Müşteri Yönetimi",
+      "order": 4,
+      "question": "Satış temsilcisinin hangi müşterilerden sorumlu olduğu nasıl belirleniyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_tanimli", "label": "Sistem üzerinde müşteri-temsilci ataması tanımlı", "allow_note": false, "is_other": false },
+        { "value": "bolge_bazli", "label": "Bölge veya coğrafyaya göre", "allow_note": true, "is_other": false },
+        { "value": "sektor_bazli", "label": "Sektör veya müşteri tipine göre", "allow_note": true, "is_other": false },
+        { "value": "yonetici_karar", "label": "Yönetici kararıyla, yazılı bir kural yok", "allow_note": true, "is_other": false },
+        { "value": "kisi_bagli", "label": "Kişiden kişiye farklılık gösteriyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-005",
+      "process": "Müşteri ve Potansiyel Müşteri Yönetimi",
+      "order": 5,
+      "question": "Müşteri bilgilerinin güncelliği nasıl sağlanıyor?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "periyodik", "label": "Periyodik güncelleme süreci var", "allow_note": true, "is_other": false },
+        { "value": "ihtiyac_aninda", "label": "İhtiyaç duyulduğunda güncelleniyor", "allow_note": false, "is_other": false },
+        { "value": "guncelleme_yok", "label": "Sistematik güncelleme yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-006",
+      "process": "Fırsat Yönetimi",
+      "order": 6,
+      "question": "Potansiyel satış fırsatları nerede takip ediliyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "crm_erp", "label": "ERP/CRM sistemi üzerinden", "allow_note": true, "is_other": false },
+        { "value": "excel", "label": "Excel veya benzeri dosyalarda", "allow_note": true, "is_other": false },
+        { "value": "eposta_not", "label": "E-posta ve kişisel notlarla", "allow_note": false, "is_other": false },
+        { "value": "kendi_yontem", "label": "Satış personeli kendi yöntemleriyle takip ediyor", "allow_note": true, "is_other": false },
+        { "value": "coklu", "label": "Birden fazla sistem/yöntem birlikte kullanılıyor", "allow_note": true, "is_other": false },
+        { "value": "takip_yok", "label": "Sistematik bir takip yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-007",
+      "process": "Fırsat Yönetimi",
+      "order": 7,
+      "question": "Satış pipeline'ınızda tanımlı fırsat aşamaları var mı?",
+      "description": "Örneğin: İlk görüşme → Teklif → Müzakere → Kapanış gibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_sistematik", "label": "Evet, yazılı ve herkesin uyguladığı aşamalar var", "allow_note": true, "is_other": false },
+        { "value": "evet_gayri", "label": "Evet ama gayrı resmi, kişiden kişiye farklı", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, tanımlı bir aşama yok", "allow_note": false, "is_other": false }
+      ],
+      "condition": {
+        "question_id": "SALES-006",
+        "operator": "not_equals",
+        "value": "takip_yok"
+      }
+    },
+    {
+      "id": "SALES-008",
+      "process": "Fırsat Yönetimi",
+      "order": 8,
+      "question": "Kaybedilen fırsatların nedenini kaydediyor musunuz?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_sistematik", "label": "Evet, sistematik olarak kaydediliyor", "allow_note": true, "is_other": false },
+        { "value": "evet_bazen", "label": "Bazen kaydediliyor", "allow_note": false, "is_other": false },
+        { "value": "hayir", "label": "Hayır, kayıt tutulmuyor", "allow_note": false, "is_other": false }
+      ],
+      "condition": {
+        "question_id": "SALES-006",
+        "operator": "not_equals",
+        "value": "takip_yok"
+      }
+    },
+    {
+      "id": "SALES-009",
+      "process": "Fırsat Yönetimi",
+      "order": 9,
+      "question": "Fırsat için tahmini kapanış tarihi ve kazanma olasılığı takip ediliyor mu?",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "kapanis_tarihi", "label": "Tahmini kapanış tarihi takip ediliyor", "allow_note": false, "is_other": false },
+        { "value": "olasilik", "label": "Kazanma olasılığı (%) takip ediliyor", "allow_note": false, "is_other": false },
+        { "value": "ikisi_de_yok", "label": "İkisi de takip edilmiyor", "allow_note": false, "is_other": false }
+      ],
+      "condition": {
+        "question_id": "SALES-006",
+        "operator": "not_equals",
+        "value": "takip_yok"
+      }
+    },
+    {
+      "id": "SALES-010",
+      "process": "Teklif Yönetimi",
+      "order": 10,
+      "question": "Müşteriye teklif nasıl oluşturuluyor?",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_crm", "label": "ERP/CRM modülünden", "allow_note": true, "is_other": false },
+        { "value": "excel", "label": "Excel veya Word şablonuyla", "allow_note": true, "is_other": false },
+        { "value": "teklif_yazilimi", "label": "Ayrı bir teklif yazılımıyla", "allow_note": true, "is_other": false },
+        { "value": "manuel", "label": "Serbest formatta, şablon yok", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-011",
+      "process": "Teklif Yönetimi",
+      "order": 11,
+      "question": "Teklif fiyatları nasıl belirleniyor?",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "standart_liste", "label": "Standart fiyat listesinden", "allow_note": false, "is_other": false },
+        { "value": "musteri_ozel", "label": "Müşteriye özel fiyat listesinden", "allow_note": true, "is_other": false },
+        { "value": "satis_manuel", "label": "Satış personeli manuel belirliyor", "allow_note": true, "is_other": false },
+        { "value": "maliyet_kar", "label": "Maliyet üzerine kâr eklenerek", "allow_note": true, "is_other": false },
+        { "value": "yonetici_onay", "label": "Yönetici onayıyla", "allow_note": true, "is_other": false },
+        { "value": "coklu_yontem", "label": "Birden fazla yöntem kullanılıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-012",
+      "process": "Teklif Yönetimi",
+      "order": 12,
+      "question": "İskonto uygulanıyor mu ve nasıl yönetiliyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sinir_onay", "label": "Evet, belirli limitler üzeri yönetici onayı gerekiyor", "allow_note": true, "is_other": false },
+        { "value": "satis_serbestce", "label": "Evet, satış personeli serbestçe uygulayabiliyor", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "İskonto uygulanmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-013",
+      "process": "Teklif Yönetimi",
+      "order": 13,
+      "question": "Teklifin revize edilmesi ve versiyon takibi nasıl yapılıyor?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_otomatik", "label": "Sistem otomatik versiyon oluşturuyor", "allow_note": false, "is_other": false },
+        { "value": "manuel_isim", "label": "Manuel olarak dosya ismiyle takip ediliyor (v1, v2...)", "allow_note": true, "is_other": false },
+        { "value": "takip_yok", "label": "Versiyon takibi yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-014",
+      "process": "Teklif Yönetimi",
+      "order": 14,
+      "question": "Teklif müşteriye nasıl iletiliyor?",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "eposta", "label": "E-posta ile", "allow_note": false, "is_other": false },
+        { "value": "portal", "label": "Müşteri portalı üzerinden", "allow_note": false, "is_other": false },
+        { "value": "fiziksel", "label": "Fiziksel olarak (elden, kargo)", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-015",
+      "process": "Satış Siparişi",
+      "order": 15,
+      "question": "Müşteri siparişi sisteme nasıl oluşturuluyor?",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tekliften_donusum", "label": "Onaylanan tekliften otomatik dönüşüm", "allow_note": true, "is_other": false },
+        { "value": "manuel_erp", "label": "Satış personeli manuel olarak ERP/sisteme giriyor", "allow_note": true, "is_other": false },
+        { "value": "musteri_portal", "label": "Müşteri kendi portalından giriyor", "allow_note": false, "is_other": false },
+        { "value": "eposta_giris", "label": "E-posta alınıp manuel sisteme işleniyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-016",
+      "process": "Satış Siparişi",
+      "order": 16,
+      "question": "Sipariş onay süreci nasıl işliyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "onay_yok", "label": "Satış personeli doğrudan onaylayabiliyor", "allow_note": false, "is_other": false },
+        { "value": "belirli_limit", "label": "Belirli tutarın üzerinde yönetici onayı gerekiyor", "allow_note": true, "is_other": false },
+        { "value": "her_siparis", "label": "Her sipariş için onay gerekiyor", "allow_note": true, "is_other": false },
+        { "value": "cok_seviye", "label": "Çok kademeli onay süreci var", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-017",
+      "process": "Satış Siparişi",
+      "order": 17,
+      "question": "Müşteriye teslim tarihi nasıl iletiliyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "uretim_teyit", "label": "Üretim veya depodan teyit alınarak", "allow_note": true, "is_other": false },
+        { "value": "standart_sure", "label": "Standart teslim süresine göre (örn. 10 iş günü)", "allow_note": true, "is_other": false },
+        { "value": "satis_tahmini", "label": "Satış personeli tahmin ederek", "allow_note": true, "is_other": false },
+        { "value": "musteri_talep", "label": "Müşterinin istediği tarih esas alınıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-018",
+      "process": "Satış Siparişi",
+      "order": 18,
+      "question": "Sipariş değişikliği veya iptali nasıl yönetiliyor?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_uzerinden", "label": "Sistem üzerinden resmi bir süreçle", "allow_note": true, "is_other": false },
+        { "value": "eposta_telefon", "label": "E-posta veya telefonla, sonra sisteme yansıtılıyor", "allow_note": true, "is_other": false },
+        { "value": "surecsel_yok", "label": "Tanımlı bir süreç yok", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-019",
+      "process": "Stok ve Üretim Etkileşimi",
+      "order": 19,
+      "question": "Satış temsilcisi sipariş verirken hangi bilgileri görebiliyor?",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "guncel_stok", "label": "Güncel stok miktarı", "allow_note": false, "is_other": false },
+        { "value": "rezerve_stok", "label": "Rezerve edilmiş stok", "allow_note": false, "is_other": false },
+        { "value": "satin_alma_beklenti", "label": "Bekleyen satın alma siparişleri", "allow_note": false, "is_other": false },
+        { "value": "uretim_miktar", "label": "Üretimdeki miktar", "allow_note": false, "is_other": false },
+        { "value": "hazir_tarih", "label": "Tahmini hazır olma tarihi", "allow_note": false, "is_other": false },
+        { "value": "hicbir", "label": "Hiçbirini göremiyor", "allow_note": true, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-020",
+      "process": "Stok ve Üretim Etkileşimi",
+      "order": 20,
+      "question": "Satışlar stoktan mı yapılıyor yoksa siparişe özel üretim mi var?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "stoktan", "label": "Ağırlıklı olarak stoktan satış", "allow_note": true, "is_other": false },
+        { "value": "siparise_uretim", "label": "Ağırlıklı olarak siparişe özel üretim", "allow_note": true, "is_other": false },
+        { "value": "karma", "label": "İkisi de var, ürüne göre değişiyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-021",
+      "process": "Stok ve Üretim Etkileşimi",
+      "order": 21,
+      "question": "Stok yetersizliği durumunda satış nasıl hareket ediyor?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "beklet", "label": "Müşteri üretim/temin tarihine kadar bekletiliyor", "allow_note": true, "is_other": false },
+        { "value": "alternatif", "label": "Alternatif ürün öneriliyor", "allow_note": true, "is_other": false },
+        { "value": "kismi_teslimat", "label": "Mevcut stokla kısmi teslimat yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "iptal", "label": "Sipariş iptal ediliyor", "allow_note": false, "is_other": false },
+        { "value": "sistematik_yok", "label": "Tanımlı bir yöntem yok, duruma göre karar veriliyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-022",
+      "process": "Sevkiyat Etkileşimi",
+      "order": 22,
+      "question": "Satış departmanı sevkiyat sürecini nasıl takip ediyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_anlık", "label": "Sistem üzerinden anlık olarak görebiliyor", "allow_note": false, "is_other": false },
+        { "value": "sevkiyat_bildirim", "label": "Sevkiyat gerçekleşince bildirim alıyor", "allow_note": true, "is_other": false },
+        { "value": "manuel_soru", "label": "Manuel olarak ilgili departmanı arayarak öğreniyor", "allow_note": false, "is_other": false },
+        { "value": "takip_yok", "label": "Satış sevkiyatı doğrudan takip etmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-023",
+      "process": "Sevkiyat Etkileşimi",
+      "order": 23,
+      "question": "Müşterinin birden fazla teslimat adresi olabiliyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "evet_sistem", "label": "Evet, sistem üzerinde kayıtlı adresler var", "allow_note": false, "is_other": false },
+        { "value": "evet_manuel", "label": "Evet, ama her seferinde manuel yazılıyor", "allow_note": true, "is_other": false },
+        { "value": "hayir_tek", "label": "Hayır, tek teslimat adresi kullanılıyor", "allow_note": false, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-024",
+      "process": "Sevkiyat Etkileşimi",
+      "order": 24,
+      "question": "Kısmi sevkiyat yapılabiliyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_rutin", "label": "Evet, rutin olarak yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "evet_istisnai", "label": "Evet, ama müşteri onayıyla istisnai olarak", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, tam sevkiyat bekleniyor", "allow_note": false, "is_other": false },
+        { "value": "urun_bazli", "label": "Ürüne göre değişiyor", "allow_note": true, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-025",
+      "process": "Faturalama Etkileşimi",
+      "order": 25,
+      "question": "Müşteri faturası ne zaman ve nasıl oluşturuluyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sevkiyat_sonrasi", "label": "Sevkiyat gerçekleşince otomatik veya manuel olarak", "allow_note": true, "is_other": false },
+        { "value": "siparis_aninda", "label": "Sipariş onayında", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_manuel", "label": "Muhasebe departmanı ayrıca manuel oluşturuyor", "allow_note": true, "is_other": false },
+        { "value": "periyodik", "label": "Periyodik (aylık, haftalık) toplu faturalama", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-026",
+      "process": "Faturalama Etkileşimi",
+      "order": 26,
+      "question": "Müşterilere özel fatura gereksinimleri var mı?",
+      "description": "Örneğin logo, farklı dil, özel alanlar, e-fatura zorunluluğu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_cok", "label": "Evet, müşteriden müşteriye özel gereksinimler var", "allow_note": true, "is_other": false },
+        { "value": "evet_standart", "label": "Evet, ama standart gereksinimler (e-fatura vb.)", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, standart fatura yeterli", "allow_note": false, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-027",
+      "process": "Tahsilat ve Risk Etkileşimi",
+      "order": 27,
+      "question": "Satış temsilcisi sipariş alırken müşterinin cari bakiyesini görebiliyor mu?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_sistem", "label": "Evet, sistem üzerinden anlık görebiliyor", "allow_note": false, "is_other": false },
+        { "value": "evet_sorarak", "label": "Evet, muhasebeden sorarak öğrenebiliyor", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, bu bilgiye erişimi yok", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-028",
+      "process": "Tahsilat ve Risk Etkileşimi",
+      "order": 28,
+      "question": "Vadesi geçmiş borcu olan müşteriye sipariş alınıyor mu?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "bloke_otomatik", "label": "Hayır, sistem otomatik olarak engelliyor", "allow_note": true, "is_other": false },
+        { "value": "uyari_devam", "label": "Uyarı veriliyor ama devam edilebiliyor", "allow_note": true, "is_other": false },
+        { "value": "yonetici_onay", "label": "Yönetici onayıyla devam edilebiliyor", "allow_note": true, "is_other": false },
+        { "value": "kontrol_yok", "label": "Kontrol yapılmıyor, serbestçe sipariş alınıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-029",
+      "process": "Satış Performansı",
+      "order": 29,
+      "question": "Satış hedefleri nasıl belirleniyor ve takip ediliyor?",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "ciro_hedef", "label": "Ciro hedefi var ve takip ediliyor", "allow_note": true, "is_other": false },
+        { "value": "adet_hedef", "label": "Adet/miktar hedefi var", "allow_note": true, "is_other": false },
+        { "value": "temsilci_hedef", "label": "Satış temsilcisi bazında bireysel hedefler var", "allow_note": true, "is_other": false },
+        { "value": "urun_hedef", "label": "Ürün/model bazında hedef var", "allow_note": true, "is_other": false },
+        { "value": "hedef_yok", "label": "Yazılı hedef tanımlanmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-030",
+      "process": "Satış Performansı",
+      "order": 30,
+      "question": "Satış performansı raporları nasıl hazırlanıyor?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_otomatik", "label": "Sistem otomatik raporları hazırlıyor", "allow_note": false, "is_other": false },
+        { "value": "excel_manuel", "label": "Veriler dışa alınıp Excel'de hazırlanıyor", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_hazırlar", "label": "Muhasebe veya finans departmanı hazırlıyor", "allow_note": true, "is_other": false },
+        { "value": "rapor_yok", "label": "Düzenli performans raporu hazırlanmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-031",
+      "process": "Satış Performansı",
+      "order": 31,
+      "question": "Satış kârlılığı sipariş veya müşteri bazında görülebiliyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_anlık", "label": "Evet, anlık olarak sistem üzerinden", "allow_note": false, "is_other": false },
+        { "value": "evet_periyodik", "label": "Evet, periyodik raporlarla", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, kârlılık görünür değil", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-032",
+      "process": "Satış Performansı",
+      "order": 32,
+      "question": "Bütçe-gerçekleşen karşılaştırması yapılıyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "evet_duzenli", "label": "Evet, düzenli olarak yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "evet_nadiren", "label": "Nadiren yapılıyor", "allow_note": false, "is_other": false },
+        { "value": "hayir", "label": "Hayır, yapılmıyor", "allow_note": false, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-033",
+      "process": "Teklif Yönetimi",
+      "order": 13,
+      "question": "Teklifin geçerlilik süresi takip ediliyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "sistem_uyarı", "label": "Sistem süre dolunca uyarı veriyor", "allow_note": false, "is_other": false },
+        { "value": "manuel_takip", "label": "Manuel takip ediliyor", "allow_note": true, "is_other": false },
+        { "value": "takip_yok", "label": "Takip edilmiyor", "allow_note": false, "is_other": false }
+      ]
+    },
+    {
+      "id": "SALES-034",
+      "process": "Satış Siparişi",
+      "order": 18,
+      "question": "Müşteriye özel fiyat veya indirim siparişe yansıtılabiliyor mu?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_sistem", "label": "Evet, sistem müşteri bazlı özel fiyatları destekliyor", "allow_note": false, "is_other": false },
+        { "value": "evet_manuel", "label": "Evet, ama manuel olarak girilmesi gerekiyor", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, özel fiyat uygulanamıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-035",
+      "process": "Fırsat Yönetimi",
+      "order": 10,
+      "question": "Satış tahmini (forecast) yapılıyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_sistem", "label": "Evet, sistem üzerinden yapılandırılmış tahminleme var", "allow_note": true, "is_other": false },
+        { "value": "evet_excel", "label": "Evet, Excel veya manuel yöntemle", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, satış tahmini yapılmıyor", "allow_note": false, "is_other": false }
+      ],
+      "condition": {
+        "question_id": "SALES-006",
+        "operator": "not_equals",
+        "value": "takip_yok"
+      }
+    },
+    {
+      "id": "SALES-036",
+      "process": "Müşteri ve Potansiyel Müşteri Yönetimi",
+      "order": 6,
+      "question": "Müşteri iletişim geçmişi (telefon, e-posta, toplantı) kaydediliyor mu?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "evet_crm", "label": "Evet, CRM/ERP üzerinde kayıt var", "allow_note": false, "is_other": false },
+        { "value": "evet_eposta", "label": "Evet, e-postalarda takip ediliyor", "allow_note": false, "is_other": false },
+        { "value": "hayir", "label": "Hayır, iletişim geçmişi kaydedilmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-037",
+      "process": "Sevkiyat Etkileşimi",
+      "order": 25,
+      "question": "Müşteriye teslimat teyidi nasıl yapılıyor?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "imza_tutanak", "label": "İrsaliye imzalatılıyor", "allow_note": false, "is_other": false },
+        { "value": "eposta_teyit", "label": "E-posta ile teyit alınıyor", "allow_note": false, "is_other": false },
+        { "value": "sistem_kapama", "label": "Sistem üzerinde teslimat kapatılıyor", "allow_note": false, "is_other": false },
+        { "value": "teyit_yok", "label": "Teyit alınmıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "SALES-038",
+      "process": "Tahsilat ve Risk Etkileşimi",
+      "order": 29,
+      "question": "Müşterinin kredi limiti tanımlanmış mı?",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_sistem", "label": "Evet, sistem üzerinde tanımlı ve kontrol ediliyor", "allow_note": false, "is_other": false },
+        { "value": "evet_gayri", "label": "Evet ama gayrı resmi, sistemde tanımlı değil", "allow_note": true, "is_other": false },
+        { "value": "hayir", "label": "Hayır, kredi limiti tanımlanmamış", "allow_note": true, "is_other": false }
+      ]
+    }
+  ]
+}

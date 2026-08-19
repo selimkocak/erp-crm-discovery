@@ -1,0 +1,312 @@
+[
+  {
+    "code": "MANAGEMENT",
+    "legacy_code": "GENEL_YNT",
+    "name_tr": "Genel Yönetim",
+    "name_en": "General Management",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 1,
+    "is_active": true
+  },
+  {
+    "code": "STRATEGY",
+    "legacy_code": "STRTJK_PLN",
+    "name_tr": "Stratejik Planlama",
+    "name_en": "Strategic Planning",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 2,
+    "is_active": true
+  },
+  {
+    "code": "HUMAN_RESOURCES",
+    "legacy_code": "IK_YNT",
+    "name_tr": "İnsan Kaynakları Yönetimi",
+    "name_en": "Human Resources Management",
+    "category_tr": "İnsan Kaynakları",
+    "category_en": "Human Resources",
+    "sort_order": 3,
+    "is_active": true
+  },
+  {
+    "code": "PAYROLL",
+    "legacy_code": "BRDJ_PLN",
+    "name_tr": "Bordro ve Maaş",
+    "name_en": "Payroll & Salary",
+    "category_tr": "İnsan Kaynakları",
+    "category_en": "Human Resources",
+    "sort_order": 4,
+    "is_active": true
+  },
+  {
+    "code": "TRAINING",
+    "legacy_code": "EGITIM_GLS",
+    "name_tr": "Eğitim ve Gelişim",
+    "name_en": "Training & Development",
+    "category_tr": "İnsan Kaynakları",
+    "category_en": "Human Resources",
+    "sort_order": 5,
+    "is_active": true
+  },
+  {
+    "code": "ACCOUNTING",
+    "legacy_code": "MUH_GNL",
+    "name_tr": "Muhasebe (Genel)",
+    "name_en": "General Accounting",
+    "category_tr": "Muhasebe & Finans",
+    "category_en": "Accounting & Finance",
+    "sort_order": 6,
+    "is_active": true
+  },
+  {
+    "code": "BUDGET_REPORTING",
+    "legacy_code": "BGJL_YNT",
+    "name_tr": "Bütçe ve Raporlama",
+    "name_en": "Budget & Reporting",
+    "category_tr": "Muhasebe & Finans",
+    "category_en": "Accounting & Finance",
+    "sort_order": 7,
+    "is_active": true
+  },
+  {
+    "code": "TREASURY",
+    "legacy_code": "KAS_YNT",
+    "name_tr": "Kasa ve Banka",
+    "name_en": "Cash & Bank Management",
+    "category_tr": "Muhasebe & Finans",
+    "category_en": "Accounting & Finance",
+    "sort_order": 8,
+    "is_active": true
+  },
+  {
+    "code": "INVENTORY",
+    "legacy_code": "STOK_YNT",
+    "name_tr": "Stok Yönetimi",
+    "name_en": "Inventory Management",
+    "category_tr": "Lojistik & Depo",
+    "category_en": "Logistics & Warehouse",
+    "sort_order": 9,
+    "is_active": true
+  },
+  {
+    "code": "WAREHOUSE",
+    "legacy_code": "DEPO_YNT",
+    "name_tr": "Depo Yönetimi",
+    "name_en": "Warehouse Management",
+    "category_tr": "Lojistik & Depo",
+    "category_en": "Logistics & Warehouse",
+    "sort_order": 10,
+    "is_active": true
+  },
+  {
+    "code": "LOGISTICS",
+    "legacy_code": "SEVK_YNT",
+    "name_tr": "Sevkiyat ve Lojistik",
+    "name_en": "Shipping & Logistics",
+    "category_tr": "Lojistik & Depo",
+    "category_en": "Logistics & Warehouse",
+    "sort_order": 11,
+    "is_active": true
+  },
+  {
+    "code": "PROCUREMENT",
+    "legacy_code": "SATIN_YNT",
+    "name_tr": "Satın Alma",
+    "name_en": "Procurement",
+    "category_tr": "Satın Alma",
+    "category_en": "Procurement",
+    "sort_order": 12,
+    "is_active": true
+  },
+  {
+    "code": "SUPPLIER_MANAGEMENT",
+    "legacy_code": "TEDR_YNT",
+    "name_tr": "Tedarikçi Yönetimi",
+    "name_en": "Supplier Management",
+    "category_tr": "Satın Alma",
+    "category_en": "Procurement",
+    "sort_order": 13,
+    "is_active": true
+  },
+  {
+    "code": "SALES",
+    "legacy_code": "SATIS_YNT",
+    "name_tr": "Satış Yönetimi",
+    "name_en": "Sales Management",
+    "category_tr": "Satış & Pazarlama",
+    "category_en": "Sales & Marketing",
+    "sort_order": 14,
+    "is_active": true
+  },
+  {
+    "code": "CRM",
+    "legacy_code": "MJT_YNT",
+    "name_tr": "Müşteri Yönetimi (CRM)",
+    "name_en": "Customer Management (CRM)",
+    "category_tr": "Satış & Pazarlama",
+    "category_en": "Sales & Marketing",
+    "sort_order": 15,
+    "is_active": true
+  },
+  {
+    "code": "PROPOSALS",
+    "legacy_code": "TKF_YNT",
+    "name_tr": "Teklif ve Fiyatlandırma",
+    "name_en": "Quotation & Pricing",
+    "category_tr": "Satış & Pazarlama",
+    "category_en": "Sales & Marketing",
+    "sort_order": 16,
+    "is_active": true
+  },
+  {
+    "code": "MARKETING",
+    "legacy_code": "PZRLM_YNT",
+    "name_tr": "Pazarlama ve Kampanya",
+    "name_en": "Marketing & Campaigns",
+    "category_tr": "Satış & Pazarlama",
+    "category_en": "Sales & Marketing",
+    "sort_order": 17,
+    "is_active": true
+  },
+  {
+    "code": "PRODUCTION_PLANNING",
+    "legacy_code": "URETIM_PLN",
+    "name_tr": "Üretim Planlama",
+    "name_en": "Production Planning",
+    "category_tr": "Üretim",
+    "category_en": "Production",
+    "sort_order": 18,
+    "is_active": true
+  },
+  {
+    "code": "WORK_ORDERS",
+    "legacy_code": "IS_EMR",
+    "name_tr": "İş Emirleri",
+    "name_en": "Work Orders",
+    "category_tr": "Üretim",
+    "category_en": "Production",
+    "sort_order": 19,
+    "is_active": true
+  },
+  {
+    "code": "QUALITY",
+    "legacy_code": "KAL_KNT",
+    "name_tr": "Kalite Kontrol",
+    "name_en": "Quality Control",
+    "category_tr": "Üretim",
+    "category_en": "Production",
+    "sort_order": 20,
+    "is_active": true
+  },
+  {
+    "code": "MAINTENANCE",
+    "legacy_code": "BKM_YNT",
+    "name_tr": "Bakım ve Onarım",
+    "name_en": "Maintenance & Repair",
+    "category_tr": "Üretim",
+    "category_en": "Production",
+    "sort_order": 21,
+    "is_active": true
+  },
+  {
+    "code": "INVOICING",
+    "legacy_code": "FATURA_GDR",
+    "name_tr": "Faturalama ve Gider",
+    "name_en": "Invoicing & Expenses",
+    "category_tr": "Muhasebe & Finans",
+    "category_en": "Accounting & Finance",
+    "sort_order": 22,
+    "is_active": true
+  },
+  {
+    "code": "PROJECT_MANAGEMENT",
+    "legacy_code": "PROJ_YNT",
+    "name_tr": "Proje Yönetimi",
+    "name_en": "Project Management",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 23,
+    "is_active": true
+  },
+  {
+    "code": "IMPORT",
+    "legacy_code": "ITHALAT",
+    "name_tr": "İthalat ve Gümrük",
+    "name_en": "Import & Customs",
+    "category_tr": "Lojistik & Depo",
+    "category_en": "Logistics & Warehouse",
+    "sort_order": 24,
+    "is_active": true
+  },
+  {
+    "code": "EXPORT",
+    "legacy_code": "IHRACAT",
+    "name_tr": "İhracat",
+    "name_en": "Export",
+    "category_tr": "Lojistik & Depo",
+    "category_en": "Logistics & Warehouse",
+    "sort_order": 25,
+    "is_active": true
+  },
+  {
+    "code": "ECOMMERCE",
+    "legacy_code": "E_TICARET",
+    "name_tr": "E-Ticaret",
+    "name_en": "E-Commerce",
+    "category_tr": "Satış & Pazarlama",
+    "category_en": "Sales & Marketing",
+    "sort_order": 26,
+    "is_active": true
+  },
+  {
+    "code": "ASSET_MANAGEMENT",
+    "legacy_code": "VARLIK_YNT",
+    "name_tr": "Varlık Yönetimi",
+    "name_en": "Asset Management",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 27,
+    "is_active": true
+  },
+  {
+    "code": "DOCUMENT_MANAGEMENT",
+    "legacy_code": "BELGE_YNT",
+    "name_tr": "Doküman Yönetimi",
+    "name_en": "Document Management",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 28,
+    "is_active": true
+  },
+  {
+    "code": "INFORMATION_TECHNOLOGY",
+    "legacy_code": "IT_ALTYAP",
+    "name_tr": "IT ve Altyapı",
+    "name_en": "IT & Infrastructure",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 29,
+    "is_active": true
+  },
+  {
+    "code": "LEGAL_COMPLIANCE",
+    "legacy_code": "HUKUK_UYM",
+    "name_tr": "Hukuk ve Uyumluluk",
+    "name_en": "Legal & Compliance",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 30,
+    "is_active": true
+  },
+  {
+    "code": "REPORTING_ANALYTICS",
+    "legacy_code": "RPRLY_ANL",
+    "name_tr": "Raporlama ve Analitik",
+    "name_en": "Reporting & Analytics",
+    "category_tr": "Yönetim",
+    "category_en": "Management",
+    "sort_order": 31,
+    "is_active": true
+  }
+]

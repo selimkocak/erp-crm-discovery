@@ -1,0 +1,12 @@
+LIBERATION FONT LICENSE
+=======================
+
+Copyright (c) 2007-2012 Red Hat, Inc.
+All rights reserved.
+
+This agreement governs the use of the Liberation font software and any updates to the software.
+Subject to the following terms, Red Hat, Inc. grants to the user a license to this work pursuant to the GNU General Public License v.2 with the Font Exception set forth below:
+
+As a special exception, if you create a document which uses this font, and embed this font or unaltered portions of this font into the document, this font does not by itself cause the resulting document to be covered by the GNU General Public License. This exception does not however invalidate any other reasons why the document might be covered by the GNU General Public License. If you modify this font, you may extend this exception to your version of the font, but you are not obligated to do so. If you do not wish to do so, delete this exception statement from your version.
+
+Full license text available at: https://pagure.io/liberation-fonts/

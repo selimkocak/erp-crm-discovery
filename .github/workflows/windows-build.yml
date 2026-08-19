@@ -1,0 +1,87 @@
+name: Windows Native Build & Artifact Packaging
+
+on:
+  push:
+    branches: [main, master]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build-windows-nsis:
+    name: Build Windows Native NSIS Installer
+    runs-on: windows-latest
+
+    permissions:
+      contents: read
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Setup Rust Stable (MSVC Target)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Generate Canonical Business Functions
+        run: npm run generate
+
+      - name: Run Complete Test Suite
+        run: npm test
+
+      - name: Build Web Application Frontend
+        run: npm run build
+
+      - name: Cargo Check Tauri Backend
+        run: cargo check --manifest-path src-tauri/Cargo.toml
+
+      - name: Build Tauri Windows NSIS Bundle
+        run: npm run tauri build
+
+      - name: Calculate SHA-256 Hash of Artifacts
+        shell: pwsh
+        run: |
+          $artifacts = Get-ChildItem -Path "src-tauri/target" -Filter "*setup.exe" -Recurse
+          if ($artifacts.Count -eq 0) {
+            $artifacts = Get-ChildItem -Path "src-tauri/target" -Filter "*.exe" -Recurse | Where-Object { $_.DirectoryName -like "*bundle*nsis*" }
+          }
+          if ($artifacts.Count -eq 0) {
+            Write-Error "No NSIS installer EXE artifact found in src-tauri/target/"
+            exit 1
+          }
+          foreach ($file in $artifacts) {
+            $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash
+            Write-Host "ARTIFACT FOUND: $($file.FullName)"
+            Write-Host "FILENAME:       $($file.Name)"
+            Write-Host "SIZE:           $($file.Length) bytes"
+            Write-Host "SHA256:         $hash"
+            "$hash  $($file.Name)" | Out-File -FilePath "$($file.FullName).sha256" -Encoding utf8
+          }
+
+      - name: Upload Windows NSIS Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ERP-CRM-Discovery-Windows-Setup
+          path: |
+            src-tauri/target/**/bundle/nsis/*.exe
+            src-tauri/target/**/bundle/nsis/*.sha256
+          if-no-files-found: error
+
