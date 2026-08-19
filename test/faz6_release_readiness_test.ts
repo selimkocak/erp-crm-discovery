@@ -156,6 +156,8 @@ assert(buildContent.includes('npm run build'), 'Windows-build runs npm run build
 assert(buildContent.includes('cargo check'), 'Windows-build runs cargo check');
 assert(buildContent.includes('npm run tauri build'), 'Windows-build runs npm run tauri build');
 assert(buildContent.includes('upload-artifact'), 'Windows-build uploads installer artifact');
+assert(buildContent.includes('WINDOWS_KURULUM_YARDIMI.txt'), 'Windows-build packages WINDOWS_KURULUM_YARDIMI.txt into artifact');
+assert(buildContent.includes('path: windows-artifacts/'), 'Windows-build uploads windows-artifacts directory');
 
 const macosBuildPath = path.join(ROOT_DIR, '.github/workflows/macos-build.yml');
 assert(fs.existsSync(macosBuildPath), '.github/workflows/macos-build.yml exists');
@@ -178,6 +180,19 @@ assert(macosHelpContent.includes('xattr -dr com.apple.quarantine "/Applications/
 assert(macosHelpContent.includes('open "/Applications/ERP CRM Discovery.app"'), 'Kurulum belgesinde open komutu mevcut');
 assert(macosHelpContent.includes('ERP CRM Discovery_0.1.0_aarch64.dmg'), 'Kurulum belgesinde DMG dosya adı doğru');
 assert(macosHelpContent.includes('Apple Developer ID') || macosHelpContent.includes('Apple Notarization'), 'Kurulum belgesinde imzalama/notarization açıklaması mevcut');
+
+// ── T08: Windows Artifact Kurulum Yardım Belgesi (FAZ-9.2) ──
+console.log('\n=== T08: Windows Artifact Kurulum Yardım Belgesi (FAZ-9.2) ===');
+const winHelpPath = path.join(ROOT_DIR, 'WINDOWS_KURULUM_YARDIMI.txt');
+assert(fs.existsSync(winHelpPath), 'WINDOWS_KURULUM_YARDIMI.txt exists in repository root');
+const winHelpContent = fs.readFileSync(winHelpPath, 'utf-8');
+assert(winHelpContent.includes('ERP-CRM-Discovery_0.1.0_x64-setup.exe'), 'Windows yardım belgesinde Setup EXE adı mevcut');
+assert(winHelpContent.includes('Ek Bilgi') && winHelpContent.includes('Yine de Çalıştır'), 'SmartScreen Ek Bilgi -> Yine de Çalıştır kılavuzu mevcut');
+assert(winHelpContent.includes('CurrentUser') || winHelpContent.includes('yönetici parolası'), 'Standart kullanıcı / CurrentUser kurulum açıklaması mevcut');
+assert(winHelpContent.includes('offline-first') || winHelpContent.includes('çevrimdışı'), 'Offline-first ve yerel gizlilik açıklaması mevcut');
+assert(winHelpContent.includes('erp_discovery.db'), 'SQLite yerel veritabanı dosya adı mevcut');
+assert(winHelpContent.includes('kaldırıldığında') && winHelpContent.includes('silinmez'), 'Program kaldırıldığında veri koruma garantisi mevcut');
+assert(winHelpContent.includes('GitHub Issues') || winHelpContent.includes('issues'), 'Antivirüs yanlış pozitifleri için GitHub Issue bildirim adresi mevcut');
 
 
 

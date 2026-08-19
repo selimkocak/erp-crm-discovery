@@ -1,0 +1,70 @@
+====================================================================
+ERP CRM Discovery — Windows 10 / 11 Kurulum ve Başlatma Kılavuzu
+====================================================================
+
+Bu sürüm (v0.1.0), Windows 10 ve Windows 11 (64-bit x64) işletim
+sistemleri için derlenmiş yerel masaüstü kurulum paketidir.
+
+--------------------------------------------------------------------
+1. ADIM: KURULUMUN BAŞLATILMASI
+--------------------------------------------------------------------
+1. Bu klasördeki "ERP-CRM-Discovery_0.1.0_x64-setup.exe" dosyasını
+   çift tıklayarak çalıştırın.
+2. Kurulum sihirbazındaki adımları (İleri -> Kur -> Bitir) takip edin.
+
+--------------------------------------------------------------------
+2. ADIM: MICROSOFT DEFENDER SMARTSCREEN UYARISI
+--------------------------------------------------------------------
+Bu paket açık kaynaklı bir test/pilot sürümüdür ve henüz ücretli
+bir kurumsal EV Kod İmzalama (Code Signing) sertifikası ile
+imzalanmamıştır.
+
+Bu nedenle Windows Defender SmartScreen ilk açılışta:
+"Windows kişisel bilgisayarınızı korudu"
+"Bilinmeyen Yayıncı"
+şeklinde mavi bir güvenlik uyarısı gösterebilir.
+
+Bu uyarıyı aşmak ve kuruluma devam etmek için:
+
+1. Açılan penceredeki "Ek Bilgi" (More Info) bağlantısına tıklayın.
+2. Altta beliren "Yine de Çalıştır" (Run anyway) butonuna tıklayın.
+
+Kurulum sihirbazı başlayacaktır.
+
+--------------------------------------------------------------------
+3. KURULUM YETKİSİ VE YÖNETİCİ HESABI
+--------------------------------------------------------------------
+- Kurulum doğrudan geçerli kullanıcı profiline (CurrentUser modu) yapılır.
+- Şirket bilgisayarlarında yönetici parolası (Administrator / UAC)
+  gerekmeden standart kullanıcı hesabıyla kurulabilir.
+
+--------------------------------------------------------------------
+4. GİZLİLİK VE VERİ GÜVENLİĞİ (OFFLINE-FIRST)
+--------------------------------------------------------------------
+- ERP CRM Discovery %100 çevrimdışı (offline-first) çalışır.
+- İnternet bağlantısı gerektirmez; dış sunuculara hiçbir keşif verisi,
+  müşteri bilgisi veya telemetri göndermez.
+- Tüm keşif soruları, cevaplar, bulgular, riskler ve ara raporlar
+  yalnızca kendi bilgisayarınızdaki yerel SQLite dosyasında saklanır:
+  %LOCALAPPDATA%\com.erpcrm.discovery\erp_discovery.db
+
+--------------------------------------------------------------------
+5. PROGRAMIN KALDIRILMASI VE VERİ KORUMA
+--------------------------------------------------------------------
+- Uygulama Windows "Ayarlar -> Yüklü Uygulamalar" veya Denetim Masası
+  üzerinden kaldırıldığında (uninstall), analiz projeleriniz silinmez.
+  Veritabanınız %LOCALAPPDATA% altında güvenle korunur.
+- Uygulamayı ileride tekrar kurduğunuzda önceki analiz projeleriniz
+  kaldığı yerden aynen açılır.
+
+--------------------------------------------------------------------
+6. DESTEK VE GERİ BİLDİRİM
+--------------------------------------------------------------------
+- Windows Defender veya kurumsal bir antivirüs yazılımı uygulamayı
+  engeller veya karantinaya alırsa lütfen bunu normal kabul etmeyin
+  ve GitHub Issues üzerinden bildirin:
+  https://github.com/selimkocak/erp-crm-discovery/issues
+
+--------------------------------------------------------------------
+ERP CRM Discovery Ekibi — https://github.com/selimkocak/erp-crm-discovery
+====================================================================

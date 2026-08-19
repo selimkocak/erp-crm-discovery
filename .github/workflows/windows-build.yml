@@ -58,31 +58,33 @@ jobs:
       - name: Build Tauri Windows NSIS Bundle
         run: npm run tauri build
 
-      - name: Calculate SHA-256 Hash of Artifacts
+      - name: Prepare Artifacts & Calculate SHA-256
         shell: pwsh
         run: |
-          $artifacts = Get-ChildItem -Path "src-tauri/target" -Filter "*setup.exe" -Recurse
-          if ($artifacts.Count -eq 0) {
-            $artifacts = Get-ChildItem -Path "src-tauri/target" -Filter "*.exe" -Recurse | Where-Object { $_.DirectoryName -like "*bundle*nsis*" }
+          New-Item -ItemType Directory -Force -Path "windows-artifacts" | Out-Null
+          $installer = Get-ChildItem -Path "src-tauri/target" -Filter "*setup.exe" -Recurse | Select-Object -First 1
+          if (-not $installer) {
+            $installer = Get-ChildItem -Path "src-tauri/target" -Filter "*.exe" -Recurse | Where-Object { $_.DirectoryName -like "*bundle*nsis*" } | Select-Object -First 1
           }
-          if ($artifacts.Count -eq 0) {
+          if (-not $installer) {
             Write-Error "No NSIS installer EXE artifact found in src-tauri/target/"
             exit 1
           }
-          foreach ($file in $artifacts) {
-            $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash
-            Write-Host "ARTIFACT FOUND: $($file.FullName)"
-            Write-Host "FILENAME:       $($file.Name)"
-            Write-Host "SIZE:           $($file.Length) bytes"
-            Write-Host "SHA256:         $hash"
-            "$hash  $($file.Name)" | Out-File -FilePath "$($file.FullName).sha256" -Encoding utf8
+          Copy-Item -Path $installer.FullName -Destination "windows-artifacts\"
+          Copy-Item -Path "WINDOWS_KURULUM_YARDIMI.txt" -Destination "windows-artifacts\"
+          
+          # Generate SHA256SUMS.txt
+          $files = Get-ChildItem -Path "windows-artifacts" -File
+          $hashes = foreach ($f in $files) {
+            $h = (Get-FileHash -Path $f.FullName -Algorithm SHA256).Hash
+            "$h  $($f.Name)"
           }
+          $hashes | Out-File -FilePath "windows-artifacts/SHA256SUMS.txt" -Encoding utf8
+          Get-ChildItem -Path "windows-artifacts"
 
       - name: Upload Windows NSIS Installer Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ERP-CRM-Discovery-Windows-Setup
-          path: |
-            src-tauri/target/**/bundle/nsis/*.exe
-            src-tauri/target/**/bundle/nsis/*.sha256
+          path: windows-artifacts/
           if-no-files-found: error
