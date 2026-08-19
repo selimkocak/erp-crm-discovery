@@ -2,9 +2,12 @@
  * ERP CRM Discovery — QuestionScreen
  *
  * Step-by-step soru ekranı. Tek anda bir soru gösterir.
- * Autosave: cevap değiştiğinde 800ms debounce ile kaydeder.
- * Resume: son kaldığı sorudan devam eder.
- * FAZ-3: Soruya bağlı bulgu, gereksinim, risk ve not ekleme / listeleme entegrasyonu.
+ * FAZ-7: Resumable Analysis & Autosave Guarantee & Ara Rapor Entegrasyonu.
+ *
+ * 1. Autosave Guarantee: Her cevap anında hafızaya, kısa debounce ile SQLite'a yazılır.
+ * 2. Exit Anytime & Flush: "Kaydet ve Çık" veya navigasyonda bekleyen tüm kayıtlar anında diske yazılır.
+ * 3. Session State: Son kalınan soru ID'si kaydedilir; sonraki gelişte aynı sorudan devam edilir.
+ * 4. Ara Rapor (Interim Report): İstendiği an mevcut ilerleme ile ara rapor görüntülenebilir/dışa aktarılabilir.
  */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -17,6 +20,8 @@ import {
   CheckSquare,
   AlertTriangle,
   StickyNote,
+  Save,
+  FileText,
 } from "lucide-react";
 import type { QuestionPack, AnswerData, Question } from "../engine/types";
 import type { SemanticRecordType, Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -44,9 +49,10 @@ interface QuestionScreenProps {
   bfNameTr: string;
   pack: QuestionPack;
   onBack: () => void;
+  onOpenReport?: () => void;
 }
 
-const AUTOSAVE_DEBOUNCE_MS = 800;
+const AUTOSAVE_DEBOUNCE_MS = 600;
 
 export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   projectId,
@@ -54,13 +60,17 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   bfNameTr,
   pack,
   onBack,
+  onOpenReport,
 }) => {
   const [answers, setAnswers] = useState<Map<string, AnswerData>>(new Map());
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [showValidation, setShowValidation] = useState<boolean>(false);
+
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSaveRef = useRef<{ qId: string; data: AnswerData } | null>(null);
 
   // Soruya bağlı semantik kayıtlar
   const [questionFindings, setQuestionFindings] = useState<Finding[]>([]);
@@ -83,7 +93,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         ]);
         setAnswers(existingAnswers);
 
-        // Kaldığı yerden devam
+        // Kaldığı yerden devam (Resume)
         if (lastQId) {
           const visible = getVisibleQuestions(pack.questions, existingAnswers);
           const idx = visible.findIndex((q) => q.id === lastQId);
@@ -96,8 +106,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       }
     };
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projectId, bfCode]);
+  }, [projectId, bfCode, pack.questions]);
 
   // ── Görünür sorular (branching) ────────────────────────────────────────
   const visibleQuestions: Question[] = getVisibleQuestions(pack.questions, answers);
@@ -130,33 +139,77 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   // ── İlerleme ───────────────────────────────────────────────────────────
   const progress = calculateProgress(visibleQuestions, answers);
 
-  // ── Autosave ───────────────────────────────────────────────────────────
-  const scheduleSave = useCallback(
-    (qId: string, data: AnswerData) => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
-      setSaveStatus("saving");
-      saveTimerRef.current = setTimeout(async () => {
-        try {
-          await saveAnswer(
-            projectId,
-            bfCode,
-            pack.meta.pack_id,
-            pack.meta.version,
-            qId,
-            data
-          );
-          // Status güncelle
-          const newStatus = progressToStatus(progress.answered, progress.total);
-          await updateFunctionStatusByCode(projectId, bfCode, newStatus);
-          setSaveStatus("saved");
-        } catch (err) {
-          console.error("Cevap kaydedilemedi:", err);
-          setSaveStatus("error");
-        }
-      }, AUTOSAVE_DEBOUNCE_MS);
+  // ── Gerçek DB Kayıt İcrası ─────────────────────────────────────────────
+  const executeDbSave = useCallback(
+    async (qId: string, data: AnswerData) => {
+      try {
+        setSaveStatus("saving");
+        await saveAnswer(
+          projectId,
+          bfCode,
+          pack.meta.pack_id,
+          pack.meta.version,
+          qId,
+          data
+        );
+        // Durumu güncelle
+        const newStatus = progressToStatus(progress.answered, progress.total);
+        await updateFunctionStatusByCode(projectId, bfCode, newStatus);
+        setSaveStatus("saved");
+        setLastSavedAt(new Date());
+        pendingSaveRef.current = null;
+      } catch (err) {
+        console.error("Cevap kaydedilemedi:", err);
+        setSaveStatus("error");
+      }
     },
     [projectId, bfCode, pack.meta, progress.answered, progress.total]
   );
+
+  // ── Autosave Tetikleyici ────────────────────────────────────────────────
+  const scheduleSave = useCallback(
+    (qId: string, data: AnswerData) => {
+      pendingSaveRef.current = { qId, data };
+      setSaveStatus("saving");
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = setTimeout(async () => {
+        await executeDbSave(qId, data);
+      }, AUTOSAVE_DEBOUNCE_MS);
+    },
+    [executeDbSave]
+  );
+
+  // ── Bekleyen Kaydı Anında Diske Yazma (Flush) ──────────────────────────
+  const flushPendingSave = useCallback(async () => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    if (pendingSaveRef.current) {
+      const { qId, data } = pendingSaveRef.current;
+      await executeDbSave(qId, data);
+    }
+    if (currentQuestion) {
+      try {
+        await saveLastQuestionId(projectId, bfCode, currentQuestion.id);
+      } catch {
+        // Hata bastırma
+      }
+    }
+  }, [executeDbSave, currentQuestion, projectId, bfCode]);
+
+  // Window unload sırasında bekleyen varsa flush et
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (pendingSaveRef.current) {
+        flushPendingSave();
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [flushPendingSave]);
 
   // ── Cevap değişimi ─────────────────────────────────────────────────────
   const handleAnswerChange = (updated: AnswerData) => {
@@ -173,6 +226,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const goTo = async (idx: number) => {
     if (!currentQuestion) return;
     setShowValidation(false);
+    await flushPendingSave();
+
     const targetIdx = Math.max(0, Math.min(idx, visibleQuestions.length - 1));
     setCurrentIndex(targetIdx);
 
@@ -181,13 +236,15 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     if (targetQ) {
       try {
         await saveLastQuestionId(projectId, bfCode, targetQ.id);
-      } catch {/* görmezden gel */}
+      } catch {
+        // Hata bastırma
+      }
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (!currentQuestion) return;
-    // Zorunlu soru geçilmeye çalışılıyor ama cevaplanmamış
+    // Zorunlu soru kontrolü
     if (
       currentQuestion.required &&
       !isQuestionAnswered(currentQuestion, answers.get(currentQuestion.id))
@@ -197,12 +254,24 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     }
     setShowValidation(false);
     if (safeIndex < visibleQuestions.length - 1) {
-      goTo(safeIndex + 1);
+      await goTo(safeIndex + 1);
     }
   };
 
-  const handlePrev = () => {
-    if (safeIndex > 0) goTo(safeIndex - 1);
+  const handlePrev = async () => {
+    if (safeIndex > 0) await goTo(safeIndex - 1);
+  };
+
+  const handleSaveAndExit = async () => {
+    await flushPendingSave();
+    onBack();
+  };
+
+  const handleOpenReportClick = async () => {
+    await flushPendingSave();
+    if (onOpenReport) {
+      onOpenReport();
+    }
   };
 
   const handleOpenModal = (t: SemanticRecordType) => {
@@ -224,7 +293,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     return (
       <div className="question-screen question-screen--empty">
         <p>Bu soru paketinde henüz soru bulunmuyor.</p>
-        <button className="btn btn--secondary" onClick={onBack}>← Geri Dön</button>
+        <button className="btn btn--secondary" onClick={handleSaveAndExit}>← Geri Dön</button>
       </div>
     );
   }
@@ -242,23 +311,49 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     <div className="question-screen">
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="question-screen__header">
-        <button
-          className="question-screen__back-btn"
-          onClick={onBack}
-          title="Analiz özeline dön"
-        >
-          <ChevronLeft size={16} />
-          {bfNameTr}
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <button
+            className="question-screen__back-btn"
+            onClick={handleSaveAndExit}
+            title="Analiz detayına dön (Kayıtlar saklanır)"
+          >
+            <ChevronLeft size={16} />
+            {bfNameTr}
+          </button>
 
-        <div className="question-screen__meta">
-          <span className="question-screen__process">{currentQuestion?.process}</span>
-          <span className="question-screen__position">
-            Soru {safeIndex + 1} / {visibleQuestions.length}
-          </span>
+          <div className="question-screen__meta">
+            <span className="question-screen__process">{currentQuestion?.process}</span>
+            <span className="question-screen__position">
+              Soru {safeIndex + 1} / {visibleQuestions.length}
+            </span>
+          </div>
         </div>
 
-        <SaveStatusIndicator status={saveStatus} lastSavedAt={null} />
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
+
+          {onOpenReport && (
+            <button
+              type="button"
+              className="btn btn--outline btn--sm"
+              onClick={handleOpenReportClick}
+              title="Mevcut durum ara raporunu incele / dışa aktar"
+            >
+              <FileText size={14} />
+              Ara Rapor
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="btn btn--secondary btn--sm"
+            onClick={handleSaveAndExit}
+            title="Değişiklikleri doğrula ve proje ekranına dön"
+          >
+            <Save size={14} />
+            Kaydet ve Çık
+          </button>
+        </div>
       </div>
 
       {/* ── Progress bar ────────────────────────────────────────────────── */}
@@ -273,7 +368,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       {isCompleted && (
         <div className="question-screen__completed-banner">
           <CheckCircle2 size={18} />
-          Tüm zorunlu sorular tamamlandı!
+          Tüm zorunlu sorular tamamlandı! (Tamamlandı — %100)
         </div>
       )}
 
@@ -388,23 +483,35 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           )}
         </div>
 
-        {isLast ? (
+        <div style={{ display: "flex", gap: "0.5rem" }}>
           <button
-            className="btn btn--primary question-screen__nav-btn"
-            onClick={onBack}
+            type="button"
+            className="btn btn--secondary question-screen__nav-btn"
+            onClick={handleSaveAndExit}
+            title="Analizden ayrıl (Kaldığınız soru saklanır)"
           >
-            Tamamla
-            <CheckCircle2 size={16} />
+            <Save size={15} />
+            Kaydet ve Çık
           </button>
-        ) : (
-          <button
-            className="btn btn--primary question-screen__nav-btn"
-            onClick={handleNext}
-          >
-            Sonraki
-            <ArrowRight size={16} />
-          </button>
-        )}
+
+          {isLast ? (
+            <button
+              className="btn btn--primary question-screen__nav-btn"
+              onClick={handleSaveAndExit}
+            >
+              Tamamla
+              <CheckCircle2 size={16} />
+            </button>
+          ) : (
+            <button
+              className="btn btn--primary question-screen__nav-btn"
+              onClick={handleNext}
+            >
+              Sonraki
+              <ArrowRight size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Modal ───────────────────────────────────────────────────────── */}

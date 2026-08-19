@@ -53,7 +53,17 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139); // Slate 500
   doc.text(`${company.companyName} • ${metadata.generatedAt} • ${metadata.projectStatus.toUpperCase()}`, pageWidth / 2, currentY, { align: "center" });
-  currentY += 10;
+  currentY += 7;
+
+  if (!metadata.isComplete) {
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(10.5);
+    doc.setTextColor(217, 119, 6); // Amber 600
+    doc.text(`ARA RAPOR — Analiz %${metadata.progressPercent} tamamlandı (Taslak)`, pageWidth / 2, currentY, { align: "center" });
+    currentY += 7;
+  } else {
+    currentY += 3;
+  }
 
   // KPI Summary Band Table
   autoTable(doc, {

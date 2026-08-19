@@ -25,7 +25,10 @@ export async function exportReport(
   const filename = getSanitizedReportFilename(
     report.company.companyName,
     report.metadata.projectName,
-    format
+    format,
+    new Date(),
+    report.metadata.isComplete,
+    report.metadata.progressPercent
   );
 
   let buffer: Uint8Array;

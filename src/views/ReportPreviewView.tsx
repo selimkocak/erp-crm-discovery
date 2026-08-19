@@ -266,7 +266,9 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
         <main className="report-document">
           {/* ── Document Cover / Header ─────────────────────────────────── */}
           <section className="report-cover">
-            <div className="report-cover__badge">ÖN ANALİZ RAPORU</div>
+            <div className={`report-cover__badge ${!metadata.isComplete ? "badge--warning font-bold" : ""}`}>
+              {metadata.isComplete ? "ÖN ANALİZ RAPORU (FİNAL)" : `ARA ANALİZ RAPORU — %${metadata.progressPercent} TAMAMLANDI (TASLAK)`}
+            </div>
             <h1 className="report-cover__title">{metadata.title}</h1>
             <div className="report-cover__project-name">{metadata.projectName}</div>
 

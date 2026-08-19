@@ -2,7 +2,8 @@
  * ERP CRM Discovery — Report Filename Sanitizer
  *
  * Deterministic helper for generating safe, standard report filenames.
- * Example: ABC_Mobilya_ERP_CRM_On_Analiz_2026-08-19.docx
+ * Example Final:   ABC_Mobilya_ERP_CRM_On_Analiz_2026-08-19.docx
+ * Example Interim: ABC_Mobilya_ERP_CRM_Ara_Analiz_48pct_2026-08-19.docx
  */
 
 import type { ExportFormat } from "./types";
@@ -19,7 +20,9 @@ export function getSanitizedReportFilename(
   companyName: string | null | undefined,
   projectName: string | null | undefined,
   format: ExportFormat,
-  date: Date = new Date()
+  date: Date = new Date(),
+  isComplete: boolean = true,
+  progressPercent?: number
 ): string {
   const baseRaw = (companyName?.trim() || projectName?.trim() || "ERP_CRM").trim();
   const sanitizedBase = sanitizeFilename(baseRaw);
@@ -29,8 +32,15 @@ export function getSanitizedReportFilename(
   const day = String(date.getDate()).padStart(2, "0");
   const dateStr = `${year}-${month}-${day}`;
 
-  const cleanName = sanitizedBase ? `${sanitizedBase}_ERP_CRM_On_Analiz_${dateStr}` : `ERP_CRM_On_Analiz_${dateStr}`;
+  const typeSuffix = isComplete
+    ? "On_Analiz"
+    : progressPercent !== undefined
+    ? `Ara_Analiz_${progressPercent}pct`
+    : "Ara_Analiz";
+
+  const cleanName = sanitizedBase
+    ? `${sanitizedBase}_ERP_CRM_${typeSuffix}_${dateStr}`
+    : `ERP_CRM_${typeSuffix}_${dateStr}`;
 
   return `${cleanName}.${format}`;
 }
-

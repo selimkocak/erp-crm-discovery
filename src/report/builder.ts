@@ -330,6 +330,21 @@ export async function buildReportModel(
     totalQuestions: totalQuestionsCount,
   };
 
+  const progressPercent =
+    totalQuestionsCount > 0
+      ? Math.round((answeredQuestionsCount / totalQuestionsCount) * 100)
+      : 0;
+
+  const isComplete =
+    totalQuestionsCount > 0
+      ? (answeredQuestionsCount >= totalQuestionsCount && notStartedFunctions === 0 && inProgressFunctions === 0)
+      : (notStartedFunctions === 0);
+
+  const reportType: "interim" | "final" = isComplete ? "final" : "interim";
+  const draftLabel = isComplete
+    ? "FİNAL RAPOR"
+    : `ARA RAPOR — Analiz %${progressPercent} tamamlandı`;
+
   const metadata: ReportMetadata = {
     title: "ERP / CRM Ön Analiz Raporu",
     projectName: project.name,
@@ -337,6 +352,12 @@ export async function buildReportModel(
     generatedAt,
     projectStatus: project.status,
     packVersions,
+    isComplete,
+    progressPercent,
+    requiredAnswered: answeredQuestionsCount,
+    requiredTotal: totalQuestionsCount,
+    reportType,
+    draftLabel,
   };
 
   const reportCompany: ReportCompany = {

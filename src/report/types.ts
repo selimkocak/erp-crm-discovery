@@ -22,6 +22,12 @@ export interface ReportMetadata {
   generatedAt: string;
   projectStatus: string;
   packVersions: Record<string, string>;
+  isComplete: boolean;
+  progressPercent: number;
+  requiredAnswered: number;
+  requiredTotal: number;
+  reportType: "interim" | "final";
+  draftLabel: string;
 }
 
 export interface ReportCompany {

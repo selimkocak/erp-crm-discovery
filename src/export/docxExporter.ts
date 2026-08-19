@@ -159,6 +159,18 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     })
   );
 
+  // Draft / Interim Banner
+  if (!metadata.isComplete) {
+    docChildren.push(
+      createCalloutBox(
+        `ARA RAPOR — Analiz %${metadata.progressPercent} tamamlandı`,
+        "Bu doküman taslak niteliğindedir ve henüz tamamlanmamış süreç değerlendirmeleri içerebilir.",
+        COLOR_WARNING
+      ),
+      new Paragraph({ spacing: { after: 200 } })
+    );
+  }
+
   // Cover Meta Table
   docChildren.push(
     new Table({

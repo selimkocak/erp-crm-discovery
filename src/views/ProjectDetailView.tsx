@@ -188,6 +188,10 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         bfNameTr={activeBfName}
         pack={activePack}
         onBack={handleCloseQuestionScreen}
+        onOpenReport={() => {
+          handleCloseQuestionScreen();
+          setIsViewingReport(true);
+        }}
       />
     );
   }
