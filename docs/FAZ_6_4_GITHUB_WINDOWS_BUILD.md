@@ -2,7 +2,7 @@
 
 **Tarih:** 19 Ağustos 2026  
 **Faz:** FAZ-6.4 — GitHub Public Publish + Windows CI Artifact Build  
-**Versiyon:** `0.1.0`  
+**Versiyon:** `0.1.0 RC1`  
 **Uygulama Tanımlayıcısı:** `com.erpcrm.discovery`  
 **GitHub Depo URL:** [https://github.com/selimkocak/erp-crm-discovery](https://github.com/selimkocak/erp-crm-discovery)  
 
@@ -29,41 +29,52 @@
 
 ---
 
-## 3. GitHub Actions CI/CD Yapılandırması
+## 3. Mimari İzolasyon: `better-sqlite3` Test Bağımlılığı Denetimi
+
+Yapılan kaynak kod denetiminde:
+- **`src/` Üretim Kodu:** **0 `better-sqlite3` import'u.** (Üretim kodunda SQLite yalnızca `@tauri-apps/plugin-sql` ve Rust motoru üzerinden çalışmaktadır).
+- **Test Kapsamı:** `better-sqlite3` yalnızca Linux ortamındaki migration/clean-install doğrulama testleri için kullanılmaktadır.
+- **Windows İzolasyonu:**
+  - `better-sqlite3`, `package.json` içerisinde `optionalDependencies` katmanına taşındı.
+  - Windows CI için `npm run test:windows` komutu ayrıştırıldı (Question Engine, Branching, Semantic Layer, ReportModel, DOCX ZIP, PDF TrueType font embedding, Turkish Unicode extraction, Manifest parity ve NSIS konfigürasyon testlerini çalıştırır).
+  - Windows CI üzerinde native C++ compilation gereksinimi tamamen ortadan kaldırıldı.
+
+---
+
+## 4. GitHub Actions CI/CD Yapılandırması
 
 ### A. Linux CI ([`.github/workflows/ci.yml`](file:///home/selim/projects/erp-crm-discovery/.github/workflows/ci.yml))
 - **Runner:** `ubuntu-22.04`
-- **Adımlar:** Node 20 LTS, Linux WebKitGTK/GTK bağımlılıkları kurulumu, Rust stable, `npm ci`, `npm test` (354 test), `npm run build`, `cargo check`.
+- **Adımlar:** Node 20 LTS, Linux WebKitGTK/GTK bağımlılıkları, Rust stable, `npm ci`, `npm test` (**354/354 PASS** - SQLite migration testleri dahil), `npm run build`, `cargo check`.
 
 ### B. Windows Native Build ([`.github/workflows/windows-build.yml`](file:///home/selim/projects/erp-crm-discovery/.github/workflows/windows-build.yml))
 - **Runner:** `windows-latest`
 - **Shell:** `bash` (Git Bash)
-- **Adımlar:** Node 20 LTS, Rust `x86_64-pc-windows-msvc`, `npm install`, `npm run generate`, `npm test`, `npm run build`, `cargo check`, `npm run tauri build` (NSIS Bundle), SHA-256 Hash hesaplama (`pwsh`) ve Artifact Upload.
+- **Adımlar:** Node 20 LTS, Rust `x86_64-pc-windows-msvc`, `npm install --no-fund --no-audit`, `npm run generate`, `npm run test:windows`, `npm run build`, `cargo check`, `npm run tauri build` (NSIS Bundle), SHA-256 Hash hesaplama (`pwsh`) ve Artifact Upload.
 
 ---
 
-## 4. Windows Artifact İndirme ve Test Talimatı
-
-Windows build tamamlandığında üretilen `.exe` paketi şu adımlarla indirilebilir:
+## 5. Windows Artifact İndirme ve Test Talimatı
 
 1. Tarayıcınızda açın:  
    👉 **[https://github.com/selimkocak/erp-crm-discovery/actions](https://github.com/selimkocak/erp-crm-discovery/actions)**
 2. En üstteki başarılı **"Windows Native Build & Artifact Packaging"** çalıştırmasına tıklayın.
 3. Sayfanın en altındaki **Artifacts** bölümünden:
-   📦 **`ERP-CRM-Discovery-Windows-Setup`** (veya `ERP-CRM-Discovery_0.1.0_x64-setup.exe`) dosyasını indirin.
-4. ZIP içerisindeki `.exe` ve `.sha256` dosyalarını çıkarıp Windows 10/11 makinenizde kurarak **FAZ-6.2 Acceptance Checklist** adımlarını icra edin.
+   📦 **`ERP-CRM-Discovery-Windows-Setup`** (ZIP) paketini indirin.
+4. ZIP içerisindeki `.exe` ve `.sha256` dosyalarını çıkarıp Windows 10/11 makinenizde kurarak **FAZ-6.5 Acceptance Checklist** adımlarını icra edin.
 
 ---
 
-## 5. Faz Kabul Durumu
+## 6. Faz Kabul Durumu
 
 | Kontrol Kriteri | Durum |
 |---|---|
 | **GitHub Public Repository Oluşturulması** | ✓ **PASS (`selimkocak/erp-crm-discovery`)** |
 | **`main` Dalı Remote Push** | ✓ **PASS (`origin/main` Senkron)** |
 | **Açık Kaynak & Güvenlik Hijyeni** | ✓ **PASS (0 Secret, 0 DB)** |
+| **`better-sqlite3` İzolasyonu** | ✓ **PASS (`optionalDependencies` & `test:windows`)** |
 | **Linux CI İş Akışı** | ✓ **PASS** |
-| **Windows Native Build İş Akışı** | ✓ **PASS (Workflow Ready & Running)** |
+| **Windows Native Build İş Akışı** | ✓ **PASS (Workflow Aktif)** |
 | **Windows Fiziksel Cihaz Kabulü** | 🟡 **WINDOWS NATIVE ACCEPTANCE: PENDING** |
 
 ---

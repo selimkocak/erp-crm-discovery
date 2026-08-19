@@ -9,7 +9,22 @@
 
 ---
 
-## 1. Standart Kabul Test Veri Seti (Acceptance Dataset)
+## 1. Fiziksel Test Gözlemleri ve Olay Günlüğü
+
+### İlk Fiziksel Doğrulama (Build #7):
+- **PASS:** NSIS installer (`.exe`) başarıyla açıldı.
+- **PASS:** Windows SmartScreen imzasız RC uyarısı (`Ek Bilgi` → `Yine de Çalıştır`) beklendiği gibi oluştu ve geçildi (`EXPECTED WARNING`).
+- **PASS:** Kurulum `%LOCALAPPDATA%\Programs\ERP CRM Discovery\` konumuna tamamlandı.
+- **PASS:** Native Tauri 2 masaüstü penceresi beyaz ekran (blank screen) olmadan başarıyla açıldı.
+- **FAIL (Kök Neden & Çözüm):** 
+  - *Hata:* `[ERP Discovery] Tauri SQL plugin başlatılamadı. Hata: Command plugin:sql|execute not allowed by ACL`
+  - *Kök Neden:* Tauri 2 SQL plugin yetki modelinde `sql:default` yalnız load/select/close izinlerini vermektedir; migration ve INSERT/UPDATE/DELETE işlemleri için `sql:allow-execute` yetkisi zorunludur.
+  - *Düzeltme:* `src-tauri/capabilities/default.json` dosyasına `"sql:allow-execute"` capability izni eklendi.
+  - *Durum:* **RETEST REQUIRED (Yeni Windows derlemesi ile)**
+
+---
+
+## 2. Standart Kabul Test Veri Seti (Acceptance Dataset)
 
 - **Firma Künyesi:** `FAZ-6 Test A.Ş.` (İstanbul / Türkiye / 250 Çalışan)
 - **Proje:** `Windows Native Acceptance` (Hedef: `ERP_AND_CRM`)
@@ -21,18 +36,18 @@
 
 ---
 
-## 2. 36 Maddelik Fiziksel Kabul Test Matrisi
+## 3. 36 Maddelik Fiziksel Kabul Test Matrisi
 
 | # | Test Maddesi | Hedef / Beklenen Davranış | Durum | Gözlem / Kanıt |
 |---|---|---|---|---|
-| **1** | Installer Çalışması | `.exe` çift tıklandığında kurulum sihirbazının açılması | `NOT TESTED` | Bekleniyor |
-| **2** | SmartScreen Davranışı | İmzasız açık kaynak RC uyarısı (`Ek Bilgi` → `Yine de Çalıştır`) | `EXPECTED WARNING` | Bekleniyor |
-| **3** | Kurulum Tamamlanması | UAC istemeden `%LOCALAPPDATA%\Programs\ERP CRM Discovery\` kurulumu | `NOT TESTED` | Bekleniyor |
-| **4** | Uygulama Açılışı | Masaüstü/Başlat kısayolu ile açılış | `NOT TESTED` | Bekleniyor |
-| **5** | Crash / White Screen Kontrolü | WebView2 render hatası veya beyaz ekran olmaması | `NOT TESTED` | Bekleniyor |
-| **6** | SQLite Otomatik Oluşumu | `%APPDATA%\com.erpcrm.discovery\erp_discovery.db` (11 tablo + 31 fonksiyon) | `NOT TESTED` | Bekleniyor |
-| **7** | Firma Oluşturma | `FAZ-6 Test A.Ş.` oluşturulması ve listelenmesi | `NOT TESTED` | Bekleniyor |
-| **8** | İş Fonksiyonu Seçimi | `Sales` (Satış Yönetimi) fonksiyonunun seçilmesi | `NOT TESTED` | Bekleniyor |
+| **1** | Installer Çalışması | `.exe` çift tıklandığında kurulum sihirbazının açılması | ✓ **PASS** | Kurulum sihirbazı sorunsuz açıldı |
+| **2** | SmartScreen Davranışı | İmzasız açık kaynak RC uyarısı (`Ek Bilgi` → `Yine de Çalıştır`) | ✓ **EXPECTED WARNING** | Beklenen SmartScreen uyarısı çıktı ve geçildi |
+| **3** | Kurulum Tamamlanması | UAC istemeden `%LOCALAPPDATA%\Programs\ERP CRM Discovery\` kurulumu | ✓ **PASS** | Kurulum başarıyla tamamlandı |
+| **4** | Uygulama Açılışı | Masaüstü/Başlat kısayolu ile açılış | ✓ **PASS** | Masaüstü kısayolundan açıldı |
+| **5** | Crash / White Screen Kontrolü | WebView2 render hatası veya beyaz ekran olmaması | ✓ **PASS** | Beyaz ekran yok, UI render oldu |
+| **6** | SQLite Otomatik Oluşumu | `%APPDATA%\com.erpcrm.discovery\erp_discovery.db` (11 tablo + 31 fonksiyon) | 🟡 **RETEST REQUIRED** | `sql:allow-execute` eklendi; yeni artifact ile doğrulanacak |
+| **7** | Firma Oluşturma | `FAZ-6 Test A.Ş.` oluşturulması ve listelenmesi | `NOT TESTED` | DB ACL düzeltmesi sonrası test edilecek |
+| **8** | İş Fonksiyonu Seçimi | `Sales` (Satış Yönetimi) fonksiyonunun seçilmesi | `NOT TESTED` | DB ACL düzeltmesi sonrası test edilecek |
 | **9** | Proje Kalıcılığı (Restart) | Uygulamayı kapatıp açınca projenin korunması | `NOT TESTED` | Bekleniyor |
 | **10** | Sales Question Engine | Soru ekranının açılması (`SALES-001`) | `NOT TESTED` | Bekleniyor |
 | **11** | Single Choice | Tekli seçim şıkkının işaretlenmesi ve kaydedilmesi | `NOT TESTED` | Bekleniyor |
@@ -58,16 +73,14 @@
 | **31** | Offline Çalışma | Wi-Fi / Ethernet kapalıyken uygulamanın açılması ve veri girişi | `NOT TESTED` | Bekleniyor |
 | **32** | Offline DOCX/PDF Üretimi | İnternetsiz ortamda DOCX ve PDF üretilebilmesi | `NOT TESTED` | Bekleniyor |
 | **33** | Windows Defender Davranışı | Gerçek zamanlı korumanın engelleme yapmaması | `NOT TESTED` | Bekleniyor |
-| **34** | Uninstall | Windows Ayarlar / Denetim Masası üzerinden kaldırma | `NOT TESTED` | Bekleniyor |
-| **35** | Veritabanı Korunumu | Uninstall sonrası `%APPDATA%\com.erpcrm.discovery\erp_discovery.db` silinmemesi | `NOT TESTED` | Bekleniyor |
-| **36** | Reinstall & Veri Geri Gelmesi | Tekrar kurulduğunda önceki `FAZ-6 Test A.Ş.` verilerinin geri gelmesi | `NOT TESTED` | Bekleniyor |
+| **34** | Standart Kullanıcı Yetkisi | Admin / Administrator yetkisi olmadan çalışma | `NOT TESTED` | Bekleniyor |
+| **35** | Kaldırma (Uninstall) | Program Ekle/Kaldır ile silinmesi | `NOT TESTED` | Bekleniyor |
+| **36** | Kaldırma Sonrası DB Korunumu | `%APPDATA%\com.erpcrm.discovery\` SQLite DB'nin silinmediğinin teyidi | `NOT TESTED` | Bekleniyor |
 
 ---
 
-## 3. Faz Kabul Durumu
+## 4. Sonuç ve Durum
 
-```text
-WINDOWS BUILD: PASS
-WINDOWS NATIVE ACCEPTANCE: PENDING (Physical Test in Progress)
-ERP CRM Discovery v0.1.0 RC1: PENDING ACCEPTANCE
-```
+- **Windows Build:** `PASS`
+- **Windows Physical Acceptance:** `RETEST REQUIRED (SQL ACL Fix Applied)`
+- **Sıradaki İşlem:** Yeni üretilen Windows NSIS Installer `.exe` artifact'inin indirilip kurulması ve DB başlatma testinin doğrulanması.

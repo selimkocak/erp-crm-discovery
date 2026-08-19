@@ -74,10 +74,15 @@ const permissions: string[] = defaultCap.permissions || [];
 
 assert(permissions.includes('core:default'), 'Capability: core:default present');
 assert(permissions.includes('sql:default'), 'Capability: sql:default present');
+assert(permissions.includes('sql:allow-execute'), 'Capability: sql:allow-execute present (Required for SQLite migrations & writes)');
 assert(permissions.includes('dialog:default'), 'Capability: dialog:default present');
 assert(permissions.includes('fs:default'), 'Capability: fs:default present');
 assert(!permissions.some(p => p.includes('http') || p.includes('fetch')), 'Zero remote network permissions enforced');
 assert(tauriConf.plugins?.sql?.preload?.includes('sqlite:erp_discovery.db'), 'SQLite DB preload configured');
+
+const clientSrc = fs.readFileSync(path.join(ROOT_DIR, 'src/db/client.ts'), 'utf-8');
+const migrationsSrc = fs.readFileSync(path.join(ROOT_DIR, 'src/db/migrations.ts'), 'utf-8');
+assert(clientSrc.includes('db.execute') && migrationsSrc.includes('db.execute'), 'Production SQL client and migrations require execute capability');
 
 // ── T04: Icon & Packaging Assets Integrity ──────
 console.log('\n=== T04: Icon & Packaging Assets Integrity ===');
