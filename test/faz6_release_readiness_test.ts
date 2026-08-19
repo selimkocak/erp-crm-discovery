@@ -147,6 +147,17 @@ assert(buildContent.includes('cargo check'), 'Windows-build runs cargo check');
 assert(buildContent.includes('npm run tauri build'), 'Windows-build runs npm run tauri build');
 assert(buildContent.includes('upload-artifact'), 'Windows-build uploads installer artifact');
 
+const macosBuildPath = path.join(ROOT_DIR, '.github/workflows/macos-build.yml');
+assert(fs.existsSync(macosBuildPath), '.github/workflows/macos-build.yml exists');
+const macosContent = fs.readFileSync(macosBuildPath, 'utf-8');
+assert(macosContent.includes('runs-on: macos-latest'), 'macOS-build runs on macos-latest runner');
+assert(macosContent.includes('npm run generate'), 'macOS-build runs npm run generate');
+assert(macosContent.includes('npm run test') || macosContent.includes('npm run test:windows'), 'macOS-build runs test suite');
+assert(macosContent.includes('npm run build'), 'macOS-build runs npm run build');
+assert(macosContent.includes('cargo check'), 'macOS-build runs cargo check');
+assert(macosContent.includes('npm run tauri build'), 'macOS-build runs npm run tauri build');
+assert(macosContent.includes('upload-artifact'), 'macOS-build uploads macOS artifact');
+
 
 
 // ── Sonuç ───────────────────────────────────────

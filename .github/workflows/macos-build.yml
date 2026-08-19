@@ -1,0 +1,78 @@
+name: macOS Apple Silicon Build & Artifact Packaging
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-macos:
+    name: macOS Apple Silicon (aarch64-apple-darwin) Native Build
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust Stable (Apple Silicon Target)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - name: Rust Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri'
+
+      - name: Install Node Dependencies
+        run: npm install --no-fund --no-audit
+
+      - name: Generate Canonical Business Functions
+        run: npm run generate
+
+      - name: Run Test Suite
+        run: npm run test:windows
+
+      - name: Build Web Application Frontend
+        run: npm run build
+
+      - name: Cargo Check Tauri Backend
+        run: cargo check --manifest-path src-tauri/Cargo.toml
+
+      - name: Build Tauri macOS Bundle (.app and .dmg)
+        run: npm run tauri build -- --bundles app,dmg
+
+      - name: Prepare Artifacts & Calculate SHA-256
+        run: |
+          mkdir -p macos-artifacts
+          if [ -d "src-tauri/target/release/bundle/dmg" ]; then
+            cp src-tauri/target/release/bundle/dmg/*.dmg macos-artifacts/ 2>/dev/null || true
+          fi
+          if [ -d "src-tauri/target/release/bundle/macos" ]; then
+            cd src-tauri/target/release/bundle/macos
+            tar -czf ../../../../../macos-artifacts/ERP-CRM-Discovery.app.tar.gz "ERP CRM Discovery.app"
+            cd ../../../../..
+          fi
+          cd macos-artifacts
+          shasum -a 256 * > SHA256SUMS.txt 2>/dev/null || true
+          ls -la
+
+      - name: Upload macOS Apple Silicon Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ERP-CRM-Discovery-macOS-Apple-Silicon
+          path: macos-artifacts/
+          if-no-files-found: error

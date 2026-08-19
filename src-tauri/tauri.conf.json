@@ -50,6 +50,10 @@
         "languages": ["Turkish", "English"],
         "displayLanguageSelector": true
       }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13"
     }
   },
   "plugins": {
