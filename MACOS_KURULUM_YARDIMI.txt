@@ -1,0 +1,53 @@
+====================================================================
+ERP CRM Discovery — macOS Apple Silicon Kurulum ve Başlatma Kılavuzu
+====================================================================
+
+Bu sürüm (v0.1.0), Apple Silicon (M1 / M2 / M3 / M4 / M5) işlemcili
+Mac bilgisayarlar için derlenmiş yerel masaüstü test/RC sürümüdür.
+
+--------------------------------------------------------------------
+1. ADIM: UYGULAMANIN YÜKLENMESİ
+--------------------------------------------------------------------
+1. Bu klasördeki "ERP CRM Discovery_0.1.0_aarch64.dmg" dosyasını
+   çift tıklayarak açın.
+2. Açılan pencerede "ERP CRM Discovery.app" uygulamasını
+   "Applications" (Uygulamalar) klasörünüze sürükleyip bırakın.
+
+--------------------------------------------------------------------
+2. ADIM: MACOS GATEKEEPER / GÜVENLİK İZNİ
+--------------------------------------------------------------------
+Bu paket bir şirket içi test ve ön analiz sürümü olduğu için henüz
+Apple Developer ID sertifikası ile imzalanıp Apple Notarization
+işleminden geçirilmemiştir.
+
+Bu nedenle macOS Gatekeeper ilk açılışta:
+"Uygulama açılamıyor çünkü geliştiricisi doğrulanamıyor" veya
+"Uygulama hasarlı olduğu için çöp kutusuna taşınmalı"
+şeklinde bir güvenlik uyarısı verebilir.
+
+Bu güvenlik uyarısını aşmak için aşağıdaki 2 adımı uygulayın:
+
+1. macOS "Terminal" uygulamasını açın (Spotlight'a Terminal yazabilirsiniz).
+2. Aşağıdaki komutu yapıştırıp Enter tuşuna basın:
+
+xattr -dr com.apple.quarantine "/Applications/ERP CRM Discovery.app"
+
+3. Ardından uygulamayı başlatmak için şu komutu çalıştırın:
+
+open "/Applications/ERP CRM Discovery.app"
+
+(veya Launchpad / Uygulamalar klasöründen normal şekilde tıklayarak açabilirsiniz).
+
+--------------------------------------------------------------------
+3. NOT VE GÜVENLİK BİLGİSİ
+--------------------------------------------------------------------
+- Yukarıdaki "xattr" komutu, internet üzerinden indirilen test
+  ikililerine macOS tarafından otomatik konulan karantina etiketini
+  kaldırır ve uygulamanın yerel olarak çalışmasına izin verir.
+- Bu işlem yalnızca test/pilot aşamasındaki geçici bir kurulum adımıdır.
+- Nihai genel dağıtım sürümünde resmi "Apple Developer ID signing +
+  Apple Notarization + Ticket Stapling" otomatik olarak sağlanacaktır.
+
+--------------------------------------------------------------------
+ERP CRM Discovery Ekibi — https://github.com/selimkocak/erp-crm-discovery
+====================================================================

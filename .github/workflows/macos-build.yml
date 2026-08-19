@@ -66,6 +66,7 @@ jobs:
             tar -czf ../../../../../macos-artifacts/ERP-CRM-Discovery.app.tar.gz "ERP CRM Discovery.app"
             cd ../../../../..
           fi
+          cp MACOS_KURULUM_YARDIMI.txt macos-artifacts/
           cd macos-artifacts
           shasum -a 256 * > SHA256SUMS.txt 2>/dev/null || true
           ls -la
