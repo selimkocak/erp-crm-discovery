@@ -23,7 +23,7 @@ import {
   Footer,
   PageNumber,
 } from "docx";
-import type { ReportModel } from "../report/types";
+import { formatStatusLabel, type ReportModel } from "../report/types";
 
 // Design Tokens (Word Hex)
 const COLOR_PRIMARY = "0284C7";    // Sky Blue 600
@@ -163,10 +163,11 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
 
   // Draft / Interim Banner
   if (!metadata.isComplete) {
+    const draftText = metadata.draftLabel || `ARA RAPOR — Analiz %${metadata.progressPercent ?? 0} tamamlandı`;
     docChildren.push(
       createCalloutBox(
-        `ARA RAPOR — Analiz %${metadata.progressPercent} tamamlandı`,
-        "Bu doküman taslak niteliğindedir ve henüz tamamlanmamış süreç değerlendirmeleri içerebilir.",
+        draftText,
+        "Bu doküman ara/taslak niteliğindedir ve henüz tamamlanmamış süreç değerlendirmeleri içerebilir.",
         COLOR_WARNING
       ),
       new Paragraph({ spacing: { after: 200 } })
@@ -365,14 +366,15 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
   ];
 
   for (const s of scope) {
+    const statusLabel = formatStatusLabel(s.status);
     const statusText = s.hasPack
-      ? `${s.status.toUpperCase()} (%${s.progressPercentage})`
-      : `${s.status.toUpperCase()} (Soru paketi yok)`;
+      ? `${statusLabel} (%${s.progressPercentage})`
+      : `${statusLabel} (Soru paketi yok)`;
 
     scopeRows.push(
       new TableRow({
         children: [
-          createTableCell(`${s.nameTr} (${s.code})`, { bold: true }),
+          createTableCell(s.nameTr, { bold: true }),
           createTableCell(s.category),
           createTableCell(s.departmentName || "—"),
           createTableCell(statusText),
@@ -417,7 +419,7 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         spacing: { before: 240, after: 100 },
         children: [
           new TextRun({
-            text: `4.${fIdx + 1} ${fn.nameTr} (${fn.code})`,
+            text: `4.${fIdx + 1} ${fn.nameTr}`,
             bold: true,
             size: 24,
             color: COLOR_PRIMARY,
@@ -433,7 +435,7 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         spacing: { after: 140 },
         children: [
           new TextRun({
-            text: `Firma Departmanı: ${fn.departmentName || "—"} | Sorumlu: ${fn.responsiblePerson || "—"} | Durum: ${fn.status.toUpperCase()} | İlerleme: %${fn.progressPercentage}`,
+            text: `Firma Departmanı: ${fn.departmentName || "—"} | Sorumlu: ${fn.responsiblePerson || "—"} | Durum: ${formatStatusLabel(fn.status)} | İlerleme: %${fn.progressPercentage}`,
             size: 18,
             color: COLOR_MUTED,
             italics: true,

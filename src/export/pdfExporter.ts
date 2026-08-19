@@ -9,7 +9,7 @@
 
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import type { ReportModel } from "../report/types";
+import { formatStatusLabel, type ReportModel } from "../report/types";
 import { registerPdfFonts, PDF_FONT_FAMILY } from "./fonts/fontBundle";
 
 export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
@@ -56,10 +56,11 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   currentY += 7;
 
   if (!metadata.isComplete) {
+    const draftText = metadata.draftLabel || `ARA RAPOR — Analiz %${metadata.progressPercent ?? 0} tamamlandı`;
     doc.setFont(PDF_FONT_FAMILY, "bold");
     doc.setFontSize(10.5);
     doc.setTextColor(217, 119, 6); // Amber 600
-    doc.text(`ARA RAPOR — Analiz %${metadata.progressPercent} tamamlandı (Taslak)`, pageWidth / 2, currentY, { align: "center" });
+    doc.text(draftText, pageWidth / 2, currentY, { align: "center" });
     currentY += 7;
   } else {
     currentY += 3;
@@ -206,12 +207,15 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   doc.text("3. Analiz Kapsamı & İlerleme", marginX, currentY);
   currentY += 6;
 
-  const scopeBody: string[][] = scope.map((s) => [
-    `${s.nameTr} (${s.code})`,
-    s.category,
-    s.departmentName || "—",
-    s.hasPack ? `${s.status.toUpperCase()} (%${s.progressPercentage})` : `${s.status.toUpperCase()} (Paket yok)`,
-  ]);
+  const scopeBody: string[][] = scope.map((s) => {
+    const statusLabel = formatStatusLabel(s.status);
+    return [
+      s.nameTr,
+      s.category,
+      s.departmentName || "—",
+      s.hasPack ? `${statusLabel} (%${s.progressPercentage})` : `${statusLabel} (Paket yok)`,
+    ];
+  });
 
   autoTable(doc, {
     startY: currentY,
@@ -242,13 +246,13 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     doc.setFont(PDF_FONT_FAMILY, "bold");
     doc.setFontSize(11.5);
     doc.setTextColor(15, 23, 42);
-    doc.text(`4.${fIdx + 1} ${fn.nameTr} (${fn.code})`, marginX, currentY);
+    doc.text(`4.${fIdx + 1} ${fn.nameTr}`, marginX, currentY);
     currentY += 5;
 
     doc.setFont(PDF_FONT_FAMILY, "normal");
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text(`Departman: ${fn.departmentName || "—"} | Sorumlu: ${fn.responsiblePerson || "—"} | Durum: ${fn.status.toUpperCase()} | İlerleme: %${fn.progressPercentage}`, marginX, currentY);
+    doc.text(`Departman: ${fn.departmentName || "—"} | Sorumlu: ${fn.responsiblePerson || "—"} | Durum: ${formatStatusLabel(fn.status)} | İlerleme: %${fn.progressPercentage}`, marginX, currentY);
     currentY += 6;
 
     // Processes and Questions

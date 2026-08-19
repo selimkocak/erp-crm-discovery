@@ -54,6 +54,43 @@ export async function writeExportFile(
 }
 
 /**
+ * Converts raw native runtime/ACL/filesystem errors into user-friendly localized messages.
+ */
+export function formatUserFriendlyError(err: any): string {
+  const msg = err instanceof Error ? err.message : String(err || "");
+
+  if (
+    msg.includes("not allowed by ACL") ||
+    msg.includes("plugin:fs|write_file") ||
+    msg.includes("fs:allow-write-file")
+  ) {
+    return "Dosya kaydedilemedi. Lütfen uygulamanın dosya yazma izinlerini veya hedef klasör yetkisini kontrol edin.";
+  }
+
+  if (msg.includes("plugin:dialog") || msg.includes("dialog|save")) {
+    return "Dosya kaydetme penceresi açılamadı. Lütfen sistem izinlerini kontrol edin.";
+  }
+
+  if (
+    msg.includes("EBUSY") ||
+    msg.includes("locked") ||
+    msg.includes("used by another process")
+  ) {
+    return "Dosya başka bir program (örn. Microsoft Word veya Adobe Acrobat) tarafından açık tutulduğu için üzerine yazılamadı. Lütfen açık dosyayı kapatıp tekrar deneyin.";
+  }
+
+  if (
+    msg.includes("EACCES") ||
+    msg.includes("Permission denied") ||
+    msg.includes("Access is denied")
+  ) {
+    return "Seçilen konuma dosya yazma izni bulunmuyor. Lütfen Masaüstü veya Belgeler klasörünü seçin.";
+  }
+
+  return msg || "Dosya kaydedilirken beklenmeyen bir hata oluştu.";
+}
+
+/**
  * Main export file save orchestrator.
  * Handles native dialog prompt, write operation, and clean cancellation.
  */
@@ -84,7 +121,7 @@ export async function saveReportBuffer(
   } catch (err: any) {
     return {
       success: false,
-      error: err instanceof Error ? err.message : String(err),
+      error: formatUserFriendlyError(err),
     };
   }
 }

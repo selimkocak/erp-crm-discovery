@@ -147,7 +147,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
       } else if (result.cancelled) {
         setExportStatusMsg(null);
       } else if (result.error) {
-        setExportError(`Dosya kaydedilemedi: ${result.error}`);
+        setExportError(result.error);
       }
     } catch (err: any) {
       console.error("Export hatası:", err);
@@ -231,6 +231,13 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
         </div>
       )}
 
+      {!profile.executive_summary && (
+        <div className="report-warning-banner" style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1.25rem", background: "var(--warning-light, #fef3c7)", color: "#92400e", borderRadius: "8px", margin: "1rem 1.5rem 0", fontSize: "0.875rem" }}>
+          <AlertCircle size={16} />
+          <span>Final rapor öncesinde <strong>Yönetici Özeti</strong> henüz girilmedi. İsterseniz "Notları Düzenle" butonundan ekleyebilirsiniz.</span>
+        </div>
+      )}
+
       <div className="report-layout">
         {/* ── Table of Contents (TOC Navigation) ────────────────────────── */}
         <aside className="report-toc">
@@ -267,7 +274,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
           {/* ── Document Cover / Header ─────────────────────────────────── */}
           <section className="report-cover">
             <div className={`report-cover__badge ${!metadata.isComplete ? "badge--warning font-bold" : ""}`}>
-              {metadata.isComplete ? "ÖN ANALİZ RAPORU (FİNAL)" : `ARA ANALİZ RAPORU — %${metadata.progressPercent} TAMAMLANDI (TASLAK)`}
+              {metadata.isComplete ? "ÖN ANALİZ RAPORU (FİNAL)" : metadata.draftLabel.toUpperCase()}
             </div>
             <h1 className="report-cover__title">{metadata.title}</h1>
             <div className="report-cover__project-name">{metadata.projectName}</div>

@@ -268,26 +268,38 @@ export async function buildReportModel(
       }))
       .sort((a, b) => a.order - b.order);
 
-    reportFunctions.push({
-      code: fn.code,
-      nameTr: fn.name_tr,
-      nameEn: fn.name_en,
-      category: fn.category,
-      sortOrder: fn.sort_order,
-      departmentName: fn.company_department_name || null,
-      responsiblePerson: fn.responsible_person || null,
-      status: fn.status,
-      packId: loadedPack?.meta.pack_id || null,
-      packVersion: loadedPack?.meta.version || null,
-      progressPercentage: progress.percentage,
-      answeredCount: progress.answered,
-      totalQuestionCount: progress.total,
-      processes: reportProcesses,
-      findings: fnFindings,
-      requirements: fnRequirements,
-      risks: fnRisks,
-      notes: fnNotes,
-    });
+    const hasDetailContent =
+      fn.status !== "not_started" ||
+      !!loadedPack ||
+      reportProcesses.length > 0 ||
+      fnFindings.length > 0 ||
+      fnRequirements.length > 0 ||
+      fnRisks.length > 0 ||
+      fnNotes.length > 0 ||
+      fnFollowupsMap.size > 0;
+
+    if (hasDetailContent) {
+      reportFunctions.push({
+        code: fn.code,
+        nameTr: fn.name_tr,
+        nameEn: fn.name_en,
+        category: fn.category,
+        sortOrder: fn.sort_order,
+        departmentName: fn.company_department_name || null,
+        responsiblePerson: fn.responsible_person || null,
+        status: fn.status,
+        packId: loadedPack?.meta.pack_id || null,
+        packVersion: loadedPack?.meta.version || null,
+        progressPercentage: progress.percentage,
+        answeredCount: progress.answered,
+        totalQuestionCount: progress.total,
+        processes: reportProcesses,
+        findings: fnFindings,
+        requirements: fnRequirements,
+        risks: fnRisks,
+        notes: fnNotes,
+      });
+    }
   }
 
   // Sort business functions deterministically by sortOrder
@@ -343,18 +355,18 @@ export async function buildReportModel(
     createdAt: n.created_at,
   });
 
-  const globalFindings = findings.map(mapFinding);
-  const globalRequirements = requirements.map(mapRequirement);
-  const globalRisks = risks.map(mapRisk);
+  const globalFindings = findings.filter((f) => !f.business_function_code).map(mapFinding);
+  const globalRequirements = requirements.filter((r) => !r.business_function_code).map(mapRequirement);
+  const globalRisks = risks.filter((r) => !r.business_function_code).map(mapRisk);
   const projectNotes = notes.map(mapNote);
 
-  // Assemble ReportFollowupItem[]
+  // Build report followups list (FAZ-9)
   const reportFollowups: ReportFollowupItem[] = dbFollowups.map((f) => {
-    const fnObj = functions.find((fn) => fn.code === f.business_function_code);
+    const bf = functions.find((fn) => fn.code === f.business_function_code);
     return {
       id: f.id,
       businessFunctionCode: f.business_function_code,
-      businessFunctionNameTr: fnObj?.name_tr || f.business_function_code,
+      businessFunctionNameTr: bf ? bf.name_tr : f.business_function_code,
       processName: questionProcessMap.get(f.question_id) || "Genel Süreç",
       questionId: f.question_id,
       questionText: questionTextMap.get(f.question_id) || f.question_id,
@@ -395,15 +407,30 @@ export async function buildReportModel(
       ? Math.round((answeredQuestionsCount / totalQuestionsCount) * 100)
       : 0;
 
-  const isComplete =
-    totalQuestionsCount > 0
-      ? (answeredQuestionsCount >= totalQuestionsCount && notStartedFunctions === 0 && inProgressFunctions === 0 && dbFollowups.length === 0)
-      : (notStartedFunctions === 0 && dbFollowups.length === 0);
+  // Honest project-wide scope metrics (FAZ-10)
+  const selectedFunctionCount = functions.length;
+  const completedFunctionCount = completedFunctions;
+  const projectProgressPercent =
+    selectedFunctionCount > 0
+      ? Math.round((completedFunctionCount / selectedFunctionCount) * 100)
+      : 0;
 
+  const isProjectComplete =
+    selectedFunctionCount > 0
+      ? (completedFunctionCount === selectedFunctionCount && notStartedFunctions === 0 && inProgressFunctions === 0 && dbFollowups.length === 0)
+      : false;
+
+  const isComplete = isProjectComplete;
   const reportType: "interim" | "final" = isComplete ? "final" : "interim";
-  const draftLabel = isComplete
-    ? "FİNAL RAPOR"
-    : `ARA RAPOR — Analiz %${progressPercent} tamamlandı`;
+
+  let draftLabel = "FİNAL RAPOR";
+  if (!isComplete) {
+    if (completedFunctionCount > 0) {
+      draftLabel = `ARA RAPOR — ${selectedFunctionCount} iş fonksiyonundan ${completedFunctionCount}'i tamamlandı (Soru İlerlemesi: %${progressPercent})`;
+    } else {
+      draftLabel = `ARA RAPOR — Analiz devam ediyor (%${progressPercent})`;
+    }
+  }
 
   const metadata: ReportMetadata = {
     title: "ERP / CRM Ön Analiz Raporu",
@@ -418,6 +445,10 @@ export async function buildReportModel(
     requiredTotal: totalQuestionsCount,
     reportType,
     draftLabel,
+    projectProgressPercent,
+    completedFunctionCount,
+    selectedFunctionCount,
+    isProjectComplete,
   };
 
   const reportCompany: ReportCompany = {

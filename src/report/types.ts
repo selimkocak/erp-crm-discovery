@@ -28,6 +28,25 @@ export interface ReportMetadata {
   requiredTotal: number;
   reportType: "interim" | "final";
   draftLabel: string;
+  projectProgressPercent: number;
+  completedFunctionCount: number;
+  selectedFunctionCount: number;
+  isProjectComplete: boolean;
+}
+
+/**
+ * Localizes business function and project status codes into clean Turkish labels for executive reporting.
+ */
+export function formatStatusLabel(status: string): string {
+  switch (status?.toLowerCase()) {
+    case "completed":
+      return "Tamamlandı";
+    case "in_progress":
+      return "Devam Ediyor";
+    case "not_started":
+    default:
+      return "Başlanmadı";
+  }
 }
 
 export interface ReportCompany {
