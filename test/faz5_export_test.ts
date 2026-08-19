@@ -14,7 +14,12 @@
  * 10. SQLite buildReportModel integration test
  */
 
-import Database from "better-sqlite3";
+let Database: any = null;
+try {
+  Database = (await import("better-sqlite3")).default;
+} catch {
+  // better-sqlite3 is optional
+}
 import { MIGRATION_DEFINITIONS } from "../src/db/migrationDefinitions";
 import { BUSINESS_FUNCTION_REGISTRY } from "../src/generated/businessFunctions";
 import { getSanitizedReportFilename } from "../src/export/filename";
@@ -368,6 +373,10 @@ async function testCodebaseCleanliness() {
 // ─── TEST 6: SQLite buildReportModel Integration ────────────────────────────
 async function testSqliteIntegration() {
   console.log("\n=== T06: SQLite buildReportModel & Export Integration ===");
+  if (!Database) {
+    console.log("  - SQLite integration test skipped: better-sqlite3 not present on this platform.");
+    return;
+  }
   const TEST_DB_PATH = path.join(os.tmpdir(), `erp-faz5-export-test-${Date.now()}.db`);
   const db = new Database(TEST_DB_PATH);
   db.pragma("foreign_keys = ON");

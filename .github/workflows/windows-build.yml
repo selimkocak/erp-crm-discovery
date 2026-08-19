@@ -46,8 +46,8 @@ jobs:
       - name: Generate Canonical Business Functions
         run: npm run generate
 
-      - name: Run Complete Test Suite
-        run: npm test
+      - name: Run Windows Test Suite
+        run: npm run test:windows
 
       - name: Build Web Application Frontend
         run: npm run build

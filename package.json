@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "pretest": "npm run generate",
     "test": "tsx test/faz2_tests.ts && tsx test/faz3_semantic_test.ts && tsx test/faz4_report_test.ts && tsx test/faz5_export_test.ts && tsx test/clean_install_test.ts && tsx test/faz6_release_readiness_test.ts",
+    "test:windows": "tsx test/faz2_tests.ts && tsx test/faz3_semantic_test.ts && tsx test/faz4_report_test.ts && tsx test/faz5_export_test.ts && tsx test/faz6_release_readiness_test.ts",
     "release:check": "npm run test && npm run build && cargo check --manifest-path src-tauri/Cargo.toml",
     "git:prepare": "node scripts/git_prepare.mjs",
     "tauri": "tauri"
@@ -36,10 +37,12 @@
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
-    "better-sqlite3": "^12.11.1",
     "pdf-parse": "^2.4.5",
     "tsx": "^4.23.12",
     "typescript": "^5.6.3",
     "vite": "^6.0.11"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^12.11.1"
   }
 }

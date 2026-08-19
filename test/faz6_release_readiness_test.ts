@@ -136,7 +136,7 @@ assert(fs.existsSync(buildPath), '.github/workflows/windows-build.yml exists');
 const buildContent = fs.readFileSync(buildPath, 'utf-8');
 assert(buildContent.includes('runs-on: windows-latest'), 'Windows-build runs on windows-latest runner');
 assert(buildContent.includes('npm run generate'), 'Windows-build runs npm run generate');
-assert(buildContent.includes('npm test'), 'Windows-build runs npm test');
+assert(buildContent.includes('npm run test') || buildContent.includes('npm run test:windows') || buildContent.includes('npm test'), 'Windows-build runs test suite');
 assert(buildContent.includes('npm run build'), 'Windows-build runs npm run build');
 assert(buildContent.includes('cargo check'), 'Windows-build runs cargo check');
 assert(buildContent.includes('npm run tauri build'), 'Windows-build runs npm run tauri build');
