@@ -174,5 +174,51 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       );`,
       `CREATE INDEX IF NOT EXISTS idx_report_profiles_project ON analysis_report_profiles(analysis_project_id);`
     ]
+  },
+  {
+    version: 5,
+    description: "Project Custom Questions, Options, and Answers (FAZ-8)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS project_custom_questions (
+        id                     TEXT PRIMARY KEY,
+        analysis_project_id    TEXT NOT NULL,
+        business_function_code TEXT NOT NULL,
+        process_name           TEXT NOT NULL,
+        question_text          TEXT NOT NULL,
+        description            TEXT,
+        question_type          TEXT NOT NULL,
+        is_required            INTEGER NOT NULL DEFAULT 0,
+        sort_order             INTEGER NOT NULL DEFAULT 100,
+        is_active              INTEGER NOT NULL DEFAULT 1,
+        created_at             TEXT NOT NULL,
+        updated_at             TEXT NOT NULL,
+        FOREIGN KEY (analysis_project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE
+      );`,
+      `CREATE TABLE IF NOT EXISTS project_custom_question_options (
+        id                     TEXT PRIMARY KEY,
+        custom_question_id     TEXT NOT NULL,
+        value                  TEXT NOT NULL,
+        label                  TEXT NOT NULL,
+        sort_order             INTEGER NOT NULL DEFAULT 0,
+        is_other               INTEGER NOT NULL DEFAULT 0,
+        created_at             TEXT NOT NULL,
+        FOREIGN KEY (custom_question_id) REFERENCES project_custom_questions(id) ON DELETE CASCADE
+      );`,
+      `CREATE TABLE IF NOT EXISTS project_custom_question_answers (
+        id                     TEXT PRIMARY KEY,
+        analysis_project_id    TEXT NOT NULL,
+        business_function_code TEXT NOT NULL,
+        custom_question_id     TEXT NOT NULL,
+        answer_data            TEXT NOT NULL DEFAULT '{}',
+        created_at             TEXT NOT NULL,
+        updated_at             TEXT NOT NULL,
+        FOREIGN KEY (analysis_project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE,
+        FOREIGN KEY (custom_question_id) REFERENCES project_custom_questions(id) ON DELETE CASCADE,
+        UNIQUE (analysis_project_id, custom_question_id)
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_pcq_project_bf ON project_custom_questions(analysis_project_id, business_function_code);`,
+      `CREATE INDEX IF NOT EXISTS idx_pcqo_question ON project_custom_question_options(custom_question_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_pcqa_project ON project_custom_question_answers(analysis_project_id);`
+    ]
   }
 ] as const;

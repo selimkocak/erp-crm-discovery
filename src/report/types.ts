@@ -123,6 +123,7 @@ export interface ReportQuestionItem {
   description?: string;
   answerType: string;
   criticality: string;
+  isCustom?: boolean;
   formattedAnswer: ReportFormattedAnswer;
   findings: ReportFinding[];
   requirements: ReportRequirement[];

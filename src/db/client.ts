@@ -24,6 +24,9 @@ import type {
   Risk,
   ProjectNote,
   SemanticSummaryCounts,
+  ProjectCustomQuestion,
+  ProjectCustomQuestionOption,
+  CustomQuestionType,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -808,5 +811,216 @@ export async function saveReportProfile(
       now,
     ]
   );
+}
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-8: Project Custom Questions & Options & Answers CRUD
+// ─────────────────────────────────────────────────────────────
+
+export interface CreateCustomQuestionPayload {
+  analysis_project_id: string;
+  business_function_code: string;
+  process_name: string;
+  question_text: string;
+  description?: string | null;
+  question_type: CustomQuestionType;
+  is_required?: boolean;
+  sort_order?: number;
+  options?: { value: string; label: string; is_other?: boolean }[];
+}
+
+export async function createCustomQuestion(
+  payload: CreateCustomQuestionPayload
+): Promise<string> {
+  const db = await getDb();
+  const id = generateId(`cq_${payload.business_function_code.toLowerCase()}`);
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO project_custom_questions
+      (id, analysis_project_id, business_function_code, process_name, question_text, description, question_type, is_required, sort_order, is_active, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 1, $10, $10)`,
+    [
+      id,
+      payload.analysis_project_id,
+      payload.business_function_code,
+      payload.process_name,
+      payload.question_text,
+      payload.description ?? null,
+      payload.question_type,
+      payload.is_required ? 1 : 0,
+      payload.sort_order ?? 100,
+      now,
+    ]
+  );
+
+  if (payload.options && payload.options.length > 0) {
+    for (let i = 0; i < payload.options.length; i++) {
+      const opt = payload.options[i];
+      const optId = generateId("cqo");
+      await db.execute(
+        `INSERT INTO project_custom_question_options
+          (id, custom_question_id, value, label, sort_order, is_other, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [optId, id, opt.value, opt.label, i + 1, opt.is_other ? 1 : 0, now]
+      );
+    }
+  }
+
+  return id;
+}
+
+export async function getCustomQuestions(
+  projectId: string,
+  bfCode?: string
+): Promise<ProjectCustomQuestion[]> {
+  const db = await getDb();
+  let questions: ProjectCustomQuestion[];
+
+  if (bfCode) {
+    questions = await db.select<ProjectCustomQuestion[]>(
+      `SELECT id, analysis_project_id, business_function_code, process_name, question_text, description, question_type, is_required, sort_order, is_active, created_at, updated_at
+       FROM project_custom_questions
+       WHERE analysis_project_id = $1 AND business_function_code = $2 AND is_active = 1
+       ORDER BY sort_order ASC, created_at ASC`,
+      [projectId, bfCode]
+    );
+  } else {
+    questions = await db.select<ProjectCustomQuestion[]>(
+      `SELECT id, analysis_project_id, business_function_code, process_name, question_text, description, question_type, is_required, sort_order, is_active, created_at, updated_at
+       FROM project_custom_questions
+       WHERE analysis_project_id = $1 AND is_active = 1
+       ORDER BY sort_order ASC, created_at ASC`,
+      [projectId]
+    );
+  }
+
+  if (questions.length === 0) return [];
+
+  const qIds = questions.map((q) => q.id);
+  const placeholders = qIds.map((_, i) => `$${i + 1}`).join(", ");
+  const options = await db.select<ProjectCustomQuestionOption[]>(
+    `SELECT id, custom_question_id, value, label, sort_order, is_other, created_at
+     FROM project_custom_question_options
+     WHERE custom_question_id IN (${placeholders})
+     ORDER BY sort_order ASC`,
+    qIds
+  );
+
+  const optionsMap = new Map<string, ProjectCustomQuestionOption[]>();
+  for (const opt of options) {
+    if (!optionsMap.has(opt.custom_question_id)) {
+      optionsMap.set(opt.custom_question_id, []);
+    }
+    optionsMap.get(opt.custom_question_id)!.push(opt);
+  }
+
+  for (const q of questions) {
+    q.options = optionsMap.get(q.id) || [];
+  }
+
+  return questions;
+}
+
+export async function updateCustomQuestion(
+  id: string,
+  payload: Partial<CreateCustomQuestionPayload>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE project_custom_questions
+     SET question_text = COALESCE($2, question_text),
+         description = CASE WHEN $3 IS NOT NULL THEN $3 ELSE description END,
+         process_name = COALESCE($4, process_name),
+         question_type = COALESCE($5, question_type),
+         is_required = CASE WHEN $6 IS NOT NULL THEN $6 ELSE is_required END,
+         updated_at = $7
+     WHERE id = $1`,
+    [
+      id,
+      payload.question_text ?? null,
+      payload.description !== undefined ? payload.description : null,
+      payload.process_name ?? null,
+      payload.question_type ?? null,
+      payload.is_required !== undefined ? (payload.is_required ? 1 : 0) : null,
+      now,
+    ]
+  );
+
+  if (payload.options) {
+    await db.execute(`DELETE FROM project_custom_question_options WHERE custom_question_id = $1`, [id]);
+    for (let i = 0; i < payload.options.length; i++) {
+      const opt = payload.options[i];
+      const optId = generateId("cqo");
+      await db.execute(
+        `INSERT INTO project_custom_question_options
+          (id, custom_question_id, value, label, sort_order, is_other, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [optId, id, opt.value, opt.label, i + 1, opt.is_other ? 1 : 0, now]
+      );
+    }
+  }
+}
+
+export async function deleteCustomQuestion(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM project_custom_questions WHERE id = $1`, [id]);
+}
+
+export async function saveCustomAnswer(
+  projectId: string,
+  bfCode: string,
+  customQuestionId: string,
+  answerData: AnswerData
+): Promise<void> {
+  const db = await getDb();
+  const id = generateId("cqa");
+  const now = new Date().toISOString();
+  const rawJson = JSON.stringify(answerData);
+
+  await db.execute(
+    `INSERT INTO project_custom_question_answers
+       (id, analysis_project_id, business_function_code, custom_question_id, answer_data, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $6)
+     ON CONFLICT(analysis_project_id, custom_question_id)
+     DO UPDATE SET answer_data = $5, updated_at = $6`,
+    [id, projectId, bfCode, customQuestionId, rawJson, now]
+  );
+}
+
+export async function getCustomAnswers(
+  projectId: string,
+  bfCode?: string
+): Promise<Map<string, AnswerData>> {
+  const db = await getDb();
+  let rows: { custom_question_id: string; answer_data: string }[];
+
+  if (bfCode) {
+    rows = await db.select<{ custom_question_id: string; answer_data: string }[]>(
+      `SELECT custom_question_id, answer_data
+       FROM project_custom_question_answers
+       WHERE analysis_project_id = $1 AND business_function_code = $2`,
+      [projectId, bfCode]
+    );
+  } else {
+    rows = await db.select<{ custom_question_id: string; answer_data: string }[]>(
+      `SELECT custom_question_id, answer_data
+       FROM project_custom_question_answers
+       WHERE analysis_project_id = $1`,
+      [projectId]
+    );
+  }
+
+  const map = new Map<string, AnswerData>();
+  for (const r of rows) {
+    try {
+      map.set(r.custom_question_id, JSON.parse(r.answer_data));
+    } catch {
+      map.set(r.custom_question_id, {});
+    }
+  }
+  return map;
 }
 

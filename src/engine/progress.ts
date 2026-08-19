@@ -23,7 +23,7 @@ export function isQuestionAnswered(
 
   const { answer_type } = question;
 
-  if (answer_type === "single_choice" || answer_type === "multiple_choice") {
+  if (answer_type === "single_choice" || answer_type === "multiple_choice" || answer_type === "yes_no") {
     const selected = answerData.selected ?? [];
     if (selected.length === 0) return false;
 
@@ -42,7 +42,13 @@ export function isQuestionAnswered(
     return true;
   }
 
-  if (answer_type === "short_text" || answer_type === "long_text" || answer_type === "number") {
+  if (
+    answer_type === "short_text" ||
+    answer_type === "long_text" ||
+    answer_type === "text" ||
+    answer_type === "textarea" ||
+    answer_type === "number"
+  ) {
     return (answerData.text ?? "").trim().length > 0;
   }
 

@@ -2,14 +2,16 @@
  * ERP CRM Discovery — QuestionCard bileşeni
  *
  * Tek bir soruyu tüm etkileşim seçenekleriyle render eder:
- * - single_choice / multiple_choice
- * - short_text / long_text / number
+ * - single_choice / multiple_choice / yes_no
+ * - short_text / text / long_text / textarea / number
  * - allow_note (per-option)
  * - is_other (zorunlu note)
  * - Genel ek açıklama / not alanı
+ * - [Özel Soru] rozeti ve Proje Yöneticisi Düzenle/Sil aksiyonları
  */
 
 import React, { useState } from "react";
+import { Edit2, Trash2, Sparkles } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
 import { ChoiceOption } from "./ChoiceOption";
 import { isQuestionAnswered } from "../engine/progress";
@@ -19,6 +21,8 @@ interface QuestionCardProps {
   answerData: AnswerData;
   onChange: (updated: AnswerData) => void;
   showValidation?: boolean;
+  onEditCustom?: (question: Question) => void;
+  onDeleteCustom?: (question: Question) => void;
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -26,6 +30,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   answerData,
   onChange,
   showValidation = false,
+  onEditCustom,
+  onDeleteCustom,
 }) => {
   const [generalNoteOpen, setGeneralNoteOpen] = useState<boolean>(
     (answerData.general_note ?? "").length > 0
@@ -37,8 +43,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   // ── Toggle seçenek ─────────────────────────────────────────────────────
   const handleToggle = (value: string) => {
-    if (question.answer_type === "single_choice") {
-      // Radio: diğer seçeneklerin notlarını temizle
+    if (question.answer_type === "single_choice" || question.answer_type === "yes_no") {
+      // Radio / Single: diğer seçeneklerin notlarını temizle
       onChange({
         ...answerData,
         selected: [{ value, note: getExistingNote(value) }],
@@ -88,11 +94,62 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     return selected.some((s) => s.value === value);
   };
 
+  const isChoice =
+    question.answer_type === "single_choice" ||
+    question.answer_type === "multiple_choice" ||
+    question.answer_type === "yes_no";
+
+  const isShortText =
+    question.answer_type === "short_text" || question.answer_type === "text";
+
+  const isLongText =
+    question.answer_type === "long_text" || question.answer_type === "textarea";
+
   // ── Render ──────────────────────────────────────────────────────────────
   return (
     <div className={`question-card ${showError ? "question-card--error" : ""}`}>
-      {/* Soru başlığı */}
+      {/* Soru başlığı ve Custom Question Yönetimi */}
       <div className="question-card__header">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.5rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 600 }}>
+              {question.process}
+            </span>
+            {question.is_custom && (
+              <span className="badge badge--info" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", fontSize: "0.6875rem" }}>
+                <Sparkles size={10} /> Özel Soru
+              </span>
+            )}
+          </div>
+
+          {question.is_custom && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              {onEditCustom && (
+                <button
+                  type="button"
+                  className="btn btn--outline btn--xs"
+                  onClick={() => onEditCustom(question)}
+                  title="Özel soruyu düzenle"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+                >
+                  <Edit2 size={12} /> Düzenle
+                </button>
+              )}
+              {onDeleteCustom && (
+                <button
+                  type="button"
+                  className="btn btn--outline btn--xs"
+                  onClick={() => onDeleteCustom(question)}
+                  title="Özel soruyu sil"
+                  style={{ color: "var(--danger)", borderColor: "var(--danger-border)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+                >
+                  <Trash2 size={12} /> Sil
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         <h2 className="question-card__question">
           {question.question}
           {question.required && <span className="question-card__required" title="Zorunlu soru">*</span>}
@@ -114,8 +171,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
       {/* Cevap alanı */}
       <div className="question-card__body">
-        {/* Choice (single / multiple) */}
-        {(question.answer_type === "single_choice" || question.answer_type === "multiple_choice") && (
+        {/* Choice (single / multiple / yes_no) */}
+        {isChoice && (
           <div className="question-card__options">
             {question.answer_type === "multiple_choice" && (
               <p className="question-card__multi-hint">Birden fazla seçenek seçebilirsiniz.</p>
@@ -124,7 +181,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
               <ChoiceOption
                 key={opt.value}
                 option={opt}
-                answerType={question.answer_type as "single_choice" | "multiple_choice"}
+                answerType={question.answer_type === "multiple_choice" ? "multiple_choice" : "single_choice"}
                 isSelected={isOptionSelected(opt.value)}
                 noteValue={getExistingNote(opt.value)}
                 onToggle={handleToggle}
@@ -134,8 +191,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
         )}
 
-        {/* Short text */}
-        {question.answer_type === "short_text" && (
+        {/* Short text / text */}
+        {isShortText && (
           <input
             type="text"
             className="question-card__text-input"
@@ -145,8 +202,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           />
         )}
 
-        {/* Long text */}
-        {question.answer_type === "long_text" && (
+        {/* Long text / textarea */}
+        {isLongText && (
           <textarea
             className="question-card__textarea"
             value={answerData.text ?? ""}

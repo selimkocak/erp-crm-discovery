@@ -498,6 +498,11 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                             <div key={q.id} className="report-question-item">
                               <div className="report-question-item__header">
                                 <span className="report-question-item__id">{q.id}</span>
+                                {q.isCustom && (
+                                  <span className="badge badge--info" style={{ fontSize: "0.6875rem", display: "inline-flex", alignItems: "center", gap: "0.2rem", marginLeft: "0.25rem" }}>
+                                    Özel Soru
+                                  </span>
+                                )}
                                 <div className="report-question-item__text">
                                   <strong>{q.questionText}</strong>
                                   {q.description && (

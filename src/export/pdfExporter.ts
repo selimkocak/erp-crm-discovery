@@ -276,11 +276,13 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
           doc.setFont(PDF_FONT_FAMILY, "bold");
           doc.setFontSize(8.5);
           doc.setTextColor(2, 132, 199);
-          doc.text(`[${q.id}]`, marginX + 4, currentY);
+          const qPrefix = q.isCustom ? `[${q.id}] [Özel Soru]` : `[${q.id}]`;
+          doc.text(qPrefix, marginX + 4, currentY);
 
           doc.setTextColor(15, 23, 42);
-          const qLines = doc.splitTextToSize(q.questionText, pageWidth - marginX * 2 - 25);
-          doc.text(qLines, marginX + 22, currentY);
+          const qPrefixWidth = q.isCustom ? 38 : 22;
+          const qLines = doc.splitTextToSize(q.questionText, pageWidth - marginX * 2 - qPrefixWidth - 3);
+          doc.text(qLines, marginX + qPrefixWidth, currentY);
           currentY += qLines.length * 4 + 1;
 
           // Cevaplar

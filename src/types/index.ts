@@ -157,3 +157,51 @@ export interface SemanticSummaryCounts {
   totalRiskCount: number;
   noteCount: number;
 }
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-8: Project Custom Questions & Options Types
+// ─────────────────────────────────────────────────────────────
+
+export type CustomQuestionType =
+  | 'single_choice'
+  | 'multiple_choice'
+  | 'yes_no'
+  | 'text'
+  | 'textarea'
+  | 'number';
+
+export interface ProjectCustomQuestionOption {
+  id: string;
+  custom_question_id: string;
+  value: string;
+  label: string;
+  sort_order: number;
+  is_other: number; // 0 or 1
+  created_at: string;
+}
+
+export interface ProjectCustomQuestion {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  process_name: string;
+  question_text: string;
+  description: string | null;
+  question_type: CustomQuestionType;
+  is_required: number; // 0 or 1
+  sort_order: number;
+  is_active: number; // 0 or 1
+  created_at: string;
+  updated_at: string;
+  options?: ProjectCustomQuestionOption[];
+}
+
+export interface ProjectCustomQuestionAnswer {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  custom_question_id: string;
+  answer_data: string; // JSON string
+  created_at: string;
+  updated_at: string;
+}

@@ -24,7 +24,10 @@ export type AnswerType =
   | "multiple_choice"
   | "short_text"
   | "long_text"
-  | "number";
+  | "text"
+  | "textarea"
+  | "number"
+  | "yes_no";
 
 // ── Criticality ─────────────────────────────────────────────────────────────
 
@@ -52,7 +55,7 @@ export interface QuestionOption {
 // ── Question ────────────────────────────────────────────────────────────────
 
 export interface Question {
-  id: string;                       // "SALES-001"
+  id: string;                       // "SALES-001" or "CUSTOM-SALES-001"
   process: string;                  // "Müşteri ve Potansiyel Müşteri Yönetimi"
   sub_process?: string;
   order: number;
@@ -65,6 +68,8 @@ export interface Question {
   options?: QuestionOption[];
   condition?: QuestionCondition;    // Bu soru hangi koşulda görünür
   tags?: string[];
+  is_custom?: boolean;              // Proje yöneticisi özel sorusu mu?
+  custom_question_id?: string;      // project_custom_questions tablosundaki ID
 }
 
 // ── Pack ────────────────────────────────────────────────────────────────────

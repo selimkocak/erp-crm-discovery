@@ -2,15 +2,17 @@
  * ERP CRM Discovery — QuestionScreen
  *
  * Step-by-step soru ekranı. Tek anda bir soru gösterir.
- * FAZ-7: Resumable Analysis & Autosave Guarantee & Ara Rapor Entegrasyonu.
+ * FAZ-7 + FAZ-8: Resumable Analysis, Question Navigator & Project Custom Questions.
  *
  * 1. Autosave Guarantee: Her cevap anında hafızaya, kısa debounce ile SQLite'a yazılır.
- * 2. Exit Anytime & Flush: "Kaydet ve Çık" veya navigasyonda bekleyen tüm kayıtlar anında diske yazılır.
- * 3. Session State: Son kalınan soru ID'si kaydedilir; sonraki gelişte aynı sorudan devam edilir.
- * 4. Ara Rapor (Interim Report): İstendiği an mevcut ilerleme ile ara rapor görüntülenebilir/dışa aktarılabilir.
+ * 2. Question Navigator: Sol tarafta gizlenebilir çekmece/sidebar ile soruları listeler ve doğrudan atlama sağlar.
+ * 3. Project Custom Questions: Proje yöneticisinin bu analize özel soru ekleyebilmesini sağlar (Canonical paketler dokunulmazdır).
+ * 4. Exit Anytime & Flush: "Kaydet ve Çık" veya navigasyonda bekleyen tüm kayıtlar anında diske yazılır.
+ * 5. Session State: Son kalınan soru ID'si kaydedilir; sonraki gelişte aynı sorudan devam edilir.
+ * 6. Ara Rapor (Interim Report): İstendiği an mevcut ilerleme ile ara rapor görüntülenebilir/dışa aktarılabilir.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,9 +24,11 @@ import {
   StickyNote,
   Save,
   FileText,
+  Layers,
+  PlusCircle,
 } from "lucide-react";
 import type { QuestionPack, AnswerData, Question } from "../engine/types";
-import type { SemanticRecordType, Finding, Requirement, Risk, ProjectNote } from "../types";
+import type { SemanticRecordType, Finding, Requirement, Risk, ProjectNote, ProjectCustomQuestion } from "../types";
 import {
   saveAnswer,
   getAllAnswers,
@@ -35,13 +39,20 @@ import {
   getRequirements,
   getRisks,
   getProjectNotes,
+  getCustomQuestions,
+  getCustomAnswers,
+  saveCustomAnswer,
+  deleteCustomQuestion,
 } from "../db/client";
 import { getVisibleQuestions } from "../engine/branching";
+import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
 import { calculateProgress, isQuestionAnswered, progressToStatus } from "../engine/progress";
 import { QuestionCard } from "../components/QuestionCard";
 import { ProgressBar } from "../components/ProgressBar";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticModal } from "../components/SemanticModal";
+import { QuestionNavigator } from "../components/QuestionNavigator";
+import { CustomQuestionModal } from "../components/CustomQuestionModal";
 
 interface QuestionScreenProps {
   projectId: string;
@@ -63,14 +74,22 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   onOpenReport,
 }) => {
   const [answers, setAnswers] = useState<Map<string, AnswerData>>(new Map());
+  const [customQuestions, setCustomQuestions] = useState<ProjectCustomQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [showValidation, setShowValidation] = useState<boolean>(false);
 
+  // Navigator Sidebar State
+  const [isNavigatorOpen, setIsNavigatorOpen] = useState<boolean>(false);
+
+  // Custom Question Modal State
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState<boolean>(false);
+  const [editingCustomQuestion, setEditingCustomQuestion] = useState<ProjectCustomQuestion | null>(null);
+
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingSaveRef = useRef<{ qId: string; data: AnswerData } | null>(null);
+  const pendingSaveRef = useRef<{ qId: string; data: AnswerData; isCustom?: boolean } | null>(null);
 
   // Soruya bağlı semantik kayıtlar
   const [questionFindings, setQuestionFindings] = useState<Finding[]>([]);
@@ -78,38 +97,63 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [questionRisks, setQuestionRisks] = useState<Risk[]>([]);
   const [questionNotes, setQuestionNotes] = useState<ProjectNote[]>([]);
 
-  // Modal State
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  // Semantic Modal State
+  const [isSemanticModalOpen, setIsSemanticModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<SemanticRecordType>("finding");
 
   // ── Başlangıç yüklemesi ────────────────────────────────────────────────
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setIsLoading(true);
-        const [existingAnswers, lastQId] = await Promise.all([
+  const loadData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const [existingCanonicalAnswers, existingCustomAnswers, dbCustomQuestions, lastQId] =
+        await Promise.all([
           getAllAnswers(projectId, bfCode),
+          getCustomAnswers(projectId, bfCode),
+          getCustomQuestions(projectId, bfCode),
           getLastQuestionId(projectId, bfCode),
         ]);
-        setAnswers(existingAnswers);
 
-        // Kaldığı yerden devam (Resume)
-        if (lastQId) {
-          const visible = getVisibleQuestions(pack.questions, existingAnswers);
-          const idx = visible.findIndex((q) => q.id === lastQId);
-          if (idx >= 0) setCurrentIndex(idx);
-        }
-      } catch (err) {
-        console.error("Cevaplar yüklenemedi:", err);
-      } finally {
-        setIsLoading(false);
+      // Merge canonical and custom answers into unified map
+      const mergedAnswers = new Map<string, AnswerData>(existingCanonicalAnswers);
+      for (const [qId, ans] of existingCustomAnswers.entries()) {
+        mergedAnswers.set(qId, ans);
       }
-    };
-    load();
+
+      setAnswers(mergedAnswers);
+      setCustomQuestions(dbCustomQuestions);
+
+      // Build initial question list to resolve lastQId
+      const canonicalVisible = getVisibleQuestions(pack.questions, mergedAnswers);
+      const adaptedCustom = dbCustomQuestions.map((cq, idx) =>
+        adaptCustomQuestionToQuestion(cq, pack.questions.length + idx + 1)
+      );
+      const allQuestions = [...canonicalVisible, ...adaptedCustom];
+
+      // Kaldığı yerden devam (Resume)
+      if (lastQId) {
+        const idx = allQuestions.findIndex((q) => q.id === lastQId);
+        if (idx >= 0) setCurrentIndex(idx);
+      }
+    } catch (err) {
+      console.error("Sorular ve cevaplar yüklenemedi:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [projectId, bfCode, pack.questions]);
 
-  // ── Görünür sorular (branching) ────────────────────────────────────────
-  const visibleQuestions: Question[] = getVisibleQuestions(pack.questions, answers);
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // ── Görünür sorular (Canonical branching + Custom Questions) ───────────
+  const visibleQuestions: Question[] = useMemo(() => {
+    const canonicalVisible = getVisibleQuestions(pack.questions, answers);
+    const adaptedCustom = customQuestions.map((cq, idx) =>
+      adaptCustomQuestionToQuestion(cq, pack.questions.length + idx + 1)
+    );
+    return [...canonicalVisible, ...adaptedCustom];
+  }, [pack.questions, answers, customQuestions]);
+
   const safeIndex = Math.min(currentIndex, Math.max(0, visibleQuestions.length - 1));
   const currentQuestion = visibleQuestions[safeIndex] ?? null;
 
@@ -141,17 +185,21 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
   // ── Gerçek DB Kayıt İcrası ─────────────────────────────────────────────
   const executeDbSave = useCallback(
-    async (qId: string, data: AnswerData) => {
+    async (qId: string, data: AnswerData, isCustom?: boolean) => {
       try {
         setSaveStatus("saving");
-        await saveAnswer(
-          projectId,
-          bfCode,
-          pack.meta.pack_id,
-          pack.meta.version,
-          qId,
-          data
-        );
+        if (isCustom) {
+          await saveCustomAnswer(projectId, bfCode, qId, data);
+        } else {
+          await saveAnswer(
+            projectId,
+            bfCode,
+            pack.meta.pack_id,
+            pack.meta.version,
+            qId,
+            data
+          );
+        }
         // Durumu güncelle
         const newStatus = progressToStatus(progress.answered, progress.total);
         await updateFunctionStatusByCode(projectId, bfCode, newStatus);
@@ -168,12 +216,12 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
   // ── Autosave Tetikleyici ────────────────────────────────────────────────
   const scheduleSave = useCallback(
-    (qId: string, data: AnswerData) => {
-      pendingSaveRef.current = { qId, data };
+    (qId: string, data: AnswerData, isCustom?: boolean) => {
+      pendingSaveRef.current = { qId, data, isCustom };
       setSaveStatus("saving");
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(async () => {
-        await executeDbSave(qId, data);
+        await executeDbSave(qId, data, isCustom);
       }, AUTOSAVE_DEBOUNCE_MS);
     },
     [executeDbSave]
@@ -186,8 +234,8 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       saveTimerRef.current = null;
     }
     if (pendingSaveRef.current) {
-      const { qId, data } = pendingSaveRef.current;
-      await executeDbSave(qId, data);
+      const { qId, data, isCustom } = pendingSaveRef.current;
+      await executeDbSave(qId, data, isCustom);
     }
     if (currentQuestion) {
       try {
@@ -219,10 +267,22 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       next.set(currentQuestion.id, updated);
       return next;
     });
-    scheduleSave(currentQuestion.id, updated);
+    scheduleSave(currentQuestion.id, updated, currentQuestion.is_custom);
   };
 
-  // ── Navigasyon ─────────────────────────────────────────────────────────
+  // ── Tekil Navigasyon Fonksiyonu (Canonical Jump) ───────────────────────
+  const jumpToQuestion = async (questionId: string) => {
+    const targetIdx = visibleQuestions.findIndex((q) => q.id === questionId);
+    if (targetIdx >= 0) {
+      setShowValidation(false);
+      await flushPendingSave();
+      setCurrentIndex(targetIdx);
+      try {
+        await saveLastQuestionId(projectId, bfCode, questionId);
+      } catch {}
+    }
+  };
+
   const goTo = async (idx: number) => {
     if (!currentQuestion) return;
     setShowValidation(false);
@@ -231,20 +291,16 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     const targetIdx = Math.max(0, Math.min(idx, visibleQuestions.length - 1));
     setCurrentIndex(targetIdx);
 
-    // Session state kaydet
     const targetQ = visibleQuestions[targetIdx];
     if (targetQ) {
       try {
         await saveLastQuestionId(projectId, bfCode, targetQ.id);
-      } catch {
-        // Hata bastırma
-      }
+      } catch {}
     }
   };
 
   const handleNext = async () => {
     if (!currentQuestion) return;
-    // Zorunlu soru kontrolü
     if (
       currentQuestion.required &&
       !isQuestionAnswered(currentQuestion, answers.get(currentQuestion.id))
@@ -274,17 +330,54 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     }
   };
 
-  const handleOpenModal = (t: SemanticRecordType) => {
-    setModalType(t);
-    setIsModalOpen(true);
+  // ── Özel Soru Yönetim Aksiyonları ──────────────────────────────────────
+  const handleAddCustomQuestion = () => {
+    setEditingCustomQuestion(null);
+    setIsCustomModalOpen(true);
   };
+
+  const handleEditCustomQuestion = (q: Question) => {
+    const found = customQuestions.find((cq) => cq.id === q.id);
+    if (found) {
+      setEditingCustomQuestion(found);
+      setIsCustomModalOpen(true);
+    }
+  };
+
+  const handleDeleteCustomQuestion = async (q: Question) => {
+    if (!window.confirm(`"${q.question}" özel sorusunu silmek istediğinizden emin misiniz?`)) {
+      return;
+    }
+    try {
+      await deleteCustomQuestion(q.id);
+      await loadData();
+      if (safeIndex >= visibleQuestions.length - 1) {
+        setCurrentIndex(Math.max(0, safeIndex - 1));
+      }
+    } catch (err) {
+      console.error("Özel soru silinemedi:", err);
+    }
+  };
+
+  const handleOpenSemanticModal = (t: SemanticRecordType) => {
+    setModalType(t);
+    setIsSemanticModalOpen(true);
+  };
+
+  // Extract unique process names for the custom question modal
+  const existingProcesses = useMemo(() => {
+    const set = new Set<string>();
+    for (const q of pack.questions) set.add(q.process);
+    for (const cq of customQuestions) set.add(cq.process_name);
+    return Array.from(set);
+  }, [pack.questions, customQuestions]);
 
   // ── Loading ────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div className="question-screen question-screen--loading">
         <div className="question-screen__spinner" />
-        <p>Cevaplar yükleniyor…</p>
+        <p>Sorular ve cevaplar yükleniyor…</p>
       </div>
     );
   }
@@ -308,224 +401,279 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     questionNotes.length;
 
   return (
-    <div className="question-screen">
-      {/* ── Header ──────────────────────────────────────────────────────── */}
-      <div className="question-screen__header">
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <button
-            className="question-screen__back-btn"
-            onClick={handleSaveAndExit}
-            title="Analiz detayına dön (Kayıtlar saklanır)"
-          >
-            <ChevronLeft size={16} />
-            {bfNameTr}
-          </button>
+    <div style={{ display: "flex", width: "100%", position: "relative" }}>
+      {/* ── Question Navigator Drawer / Sidebar ─────────────────────────── */}
+      <QuestionNavigator
+        isOpen={isNavigatorOpen}
+        onToggle={() => setIsNavigatorOpen((prev) => !prev)}
+        questions={visibleQuestions}
+        answers={answers}
+        currentQuestionId={currentQuestion?.id ?? null}
+        onSelectQuestion={jumpToQuestion}
+        onAddCustomQuestion={handleAddCustomQuestion}
+        bfNameTr={bfNameTr}
+      />
 
-          <div className="question-screen__meta">
-            <span className="question-screen__process">{currentQuestion?.process}</span>
-            <span className="question-screen__position">
-              Soru {safeIndex + 1} / {visibleQuestions.length}
-            </span>
+      {/* ── Main Question Content ────────────────────────────────────────── */}
+      <div className="question-screen" style={{ flex: 1, minWidth: 0 }}>
+        {/* ── Header ──────────────────────────────────────────────────────── */}
+        <div className="question-screen__header">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <button
+              className="question-screen__back-btn"
+              onClick={handleSaveAndExit}
+              title="Analiz detayına dön (Kayıtlar saklanır)"
+            >
+              <ChevronLeft size={16} />
+              {bfNameTr}
+            </button>
+
+            <button
+              type="button"
+              className={`btn btn--sm ${isNavigatorOpen ? "btn--primary" : "btn--secondary"}`}
+              onClick={() => setIsNavigatorOpen((prev) => !prev)}
+              title="Soru Listesi / Navigatörü Aç/Kapat"
+              style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}
+            >
+              <Layers size={14} />
+              <span>Sorular ({visibleQuestions.length})</span>
+            </button>
+
+            <div className="question-screen__meta">
+              <span className="question-screen__process">{currentQuestion?.process}</span>
+              <span className="question-screen__position">
+                Soru {safeIndex + 1} / {visibleQuestions.length}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
-
-          {onOpenReport && (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <button
               type="button"
               className="btn btn--outline btn--sm"
-              onClick={handleOpenReportClick}
-              title="Mevcut durum ara raporunu incele / dışa aktar"
+              onClick={handleAddCustomQuestion}
+              title="Bu iş fonksiyonuna yeni bir özel soru ekle"
             >
-              <FileText size={14} />
-              Ara Rapor
+              <PlusCircle size={14} />
+              + Özel Soru
             </button>
-          )}
 
-          <button
-            type="button"
-            className="btn btn--secondary btn--sm"
-            onClick={handleSaveAndExit}
-            title="Değişiklikleri doğrula ve proje ekranına dön"
-          >
-            <Save size={14} />
-            Kaydet ve Çık
-          </button>
+            <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
+
+            {onOpenReport && (
+              <button
+                type="button"
+                className="btn btn--outline btn--sm"
+                onClick={handleOpenReportClick}
+                title="Mevcut durum ara raporunu incele / dışa aktar"
+              >
+                <FileText size={14} />
+                Ara Rapor
+              </button>
+            )}
+
+            <button
+              type="button"
+              className="btn btn--secondary btn--sm"
+              onClick={handleSaveAndExit}
+              title="Değişiklikleri doğrula ve proje ekranına dön"
+            >
+              <Save size={14} />
+              Kaydet ve Çık
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* ── Progress bar ────────────────────────────────────────────────── */}
-      <ProgressBar
-        answered={progress.answered}
-        total={progress.total}
-        percentage={progress.percentage}
-        className="question-screen__progress"
-      />
+        {/* ── Progress bar ────────────────────────────────────────────────── */}
+        <ProgressBar
+          answered={progress.answered}
+          total={progress.total}
+          percentage={progress.percentage}
+          className="question-screen__progress"
+        />
 
-      {/* ── Tamamlandı banner ────────────────────────────────────────────── */}
-      {isCompleted && (
-        <div className="question-screen__completed-banner">
-          <CheckCircle2 size={18} />
-          Tüm zorunlu sorular tamamlandı! (Tamamlandı — %100)
-        </div>
-      )}
+        {/* ── Tamamlandı banner ────────────────────────────────────────────── */}
+        {isCompleted && (
+          <div className="question-screen__completed-banner">
+            <CheckCircle2 size={18} />
+            Tüm zorunlu sorular tamamlandı! (Tamamlandı — %100)
+          </div>
+        )}
 
-      {/* ── Soru kartı ──────────────────────────────────────────────────── */}
-      {currentQuestion && (
-        <div className="question-screen__card-container">
-          <QuestionCard
-            key={currentQuestion.id}
-            question={currentQuestion}
-            answerData={answers.get(currentQuestion.id) ?? {}}
-            onChange={handleAnswerChange}
-            showValidation={showValidation}
-          />
+        {/* ── Soru kartı ──────────────────────────────────────────────────── */}
+        {currentQuestion && (
+          <div className="question-screen__card-container">
+            <QuestionCard
+              key={currentQuestion.id}
+              question={currentQuestion}
+              answerData={answers.get(currentQuestion.id) ?? {}}
+              onChange={handleAnswerChange}
+              showValidation={showValidation}
+              onEditCustom={handleEditCustomQuestion}
+              onDeleteCustom={handleDeleteCustomQuestion}
+            />
 
-          {/* ── FAZ-3: Semantic Analysis Actions Toolbar ───────────────────── */}
-          <div className="question-semantic-bar">
-            <div className="question-semantic-bar__header">
-              <span className="question-semantic-bar__title">Analiz Notları & Çıkarımları:</span>
-              <div className="question-semantic-bar__actions">
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => handleOpenModal("finding")}
-                  title="Bu soruya bir bulgu ekle"
-                >
-                  <Search size={13} /> + Bulgu
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => handleOpenModal("requirement")}
-                  title="Bu soruya bir gereksinim ekle"
-                >
-                  <CheckSquare size={13} /> + Gereksinim
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => handleOpenModal("risk")}
-                  title="Bu soruya bir risk ekle"
-                >
-                  <AlertTriangle size={13} /> + Risk
-                </button>
-                <button
-                  type="button"
-                  className="btn btn--outline btn--xs"
-                  onClick={() => handleOpenModal("note")}
-                  title="Bu soruya bir proje notu ekle"
-                >
-                  <StickyNote size={13} /> + Not
-                </button>
+            {/* ── FAZ-3: Semantic Analysis Actions Toolbar ───────────────────── */}
+            <div className="question-semantic-bar">
+              <div className="question-semantic-bar__header">
+                <span className="question-semantic-bar__title">Analiz Notları & Çıkarımları:</span>
+                <div className="question-semantic-bar__actions">
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--xs"
+                    onClick={() => handleOpenSemanticModal("finding")}
+                    title="Bu soruya bir bulgu ekle"
+                  >
+                    <Search size={13} /> + Bulgu
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--xs"
+                    onClick={() => handleOpenSemanticModal("requirement")}
+                    title="Bu soruya bir gereksinim ekle"
+                  >
+                    <CheckSquare size={13} /> + Gereksinim
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--xs"
+                    onClick={() => handleOpenSemanticModal("risk")}
+                    title="Bu soruya bir risk ekle"
+                  >
+                    <AlertTriangle size={13} /> + Risk
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--outline btn--xs"
+                    onClick={() => handleOpenSemanticModal("note")}
+                    title="Bu soruya bir proje notu ekle"
+                  >
+                    <StickyNote size={13} /> + Not
+                  </button>
+                </div>
               </div>
+
+              {/* Mevcut bağlı kayıt rozetleri */}
+              {totalSemanticItems > 0 && (
+                <div className="question-semantic-bar__badges">
+                  {questionFindings.map((f) => (
+                    <span key={f.id} className="badge badge--outline-primary text-xs">
+                      <Search size={11} /> {f.title}
+                    </span>
+                  ))}
+                  {questionRequirements.map((r) => (
+                    <span key={r.id} className="badge badge--outline-success text-xs">
+                      <CheckSquare size={11} /> {r.title}
+                    </span>
+                  ))}
+                  {questionRisks.map((rsk) => (
+                    <span key={rsk.id} className="badge badge--outline-danger text-xs">
+                      <AlertTriangle size={11} /> {rsk.title}
+                    </span>
+                  ))}
+                  {questionNotes.map((n) => (
+                    <span key={n.id} className="badge badge--outline-secondary text-xs">
+                      <StickyNote size={11} /> {n.note.substring(0, 25)}...
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
+          </div>
+        )}
 
-            {/* Mevcut bağlı kayıt rozetleri */}
-            {totalSemanticItems > 0 && (
-              <div className="question-semantic-bar__badges">
-                {questionFindings.map((f) => (
-                  <span key={f.id} className="badge badge--outline-primary text-xs">
-                    <Search size={11} /> {f.title}
-                  </span>
-                ))}
-                {questionRequirements.map((r) => (
-                  <span key={r.id} className="badge badge--outline-success text-xs">
-                    <CheckSquare size={11} /> {r.title}
-                  </span>
-                ))}
-                {questionRisks.map((rsk) => (
-                  <span key={rsk.id} className="badge badge--outline-danger text-xs">
-                    <AlertTriangle size={11} /> {rsk.title}
-                  </span>
-                ))}
-                {questionNotes.map((n) => (
-                  <span key={n.id} className="badge badge--outline-secondary text-xs">
-                    <StickyNote size={11} /> {n.note.substring(0, 25)}...
-                  </span>
-                ))}
-              </div>
+        {/* ── Navigasyon ──────────────────────────────────────────────────── */}
+        <div className="question-screen__nav">
+          <button
+            className="btn btn--secondary question-screen__nav-btn"
+            onClick={handlePrev}
+            disabled={isFirst}
+          >
+            <ArrowLeft size={16} />
+            Önceki
+          </button>
+
+          <div className="question-screen__nav-dots">
+            {visibleQuestions.slice(0, 10).map((q, i) => (
+              <button
+                key={q.id}
+                className={`question-screen__nav-dot ${
+                  i === safeIndex ? "question-screen__nav-dot--current" : ""
+                } ${
+                  isQuestionAnswered(q, answers.get(q.id))
+                    ? "question-screen__nav-dot--answered"
+                    : ""
+                }`}
+                onClick={() => goTo(i)}
+                title={`Soru ${i + 1}`}
+              />
+            ))}
+            {visibleQuestions.length > 10 && (
+              <span className="question-screen__nav-more">+{visibleQuestions.length - 10}</span>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              type="button"
+              className="btn btn--secondary question-screen__nav-btn"
+              onClick={handleSaveAndExit}
+              title="Analizden ayrıl (Kaldığınız soru saklanır)"
+            >
+              <Save size={15} />
+              Kaydet ve Çık
+            </button>
+
+            {isLast ? (
+              <button
+                className="btn btn--primary question-screen__nav-btn"
+                onClick={handleSaveAndExit}
+              >
+                Tamamla
+                <CheckCircle2 size={16} />
+              </button>
+            ) : (
+              <button
+                className="btn btn--primary question-screen__nav-btn"
+                onClick={handleNext}
+              >
+                Sonraki
+                <ArrowRight size={16} />
+              </button>
             )}
           </div>
         </div>
-      )}
 
-      {/* ── Navigasyon ──────────────────────────────────────────────────── */}
-      <div className="question-screen__nav">
-        <button
-          className="btn btn--secondary question-screen__nav-btn"
-          onClick={handlePrev}
-          disabled={isFirst}
-        >
-          <ArrowLeft size={16} />
-          Önceki
-        </button>
+        {/* ── Semantic Modal ──────────────────────────────────────────────── */}
+        {isSemanticModalOpen && currentQuestion && (
+          <SemanticModal
+            isOpen={isSemanticModalOpen}
+            onClose={() => setIsSemanticModalOpen(false)}
+            onSaved={loadQuestionSemanticItems}
+            projectId={projectId}
+            defaultType={modalType}
+            defaultBfCode={bfCode}
+            defaultQuestionId={currentQuestion.id}
+          />
+        )}
 
-        <div className="question-screen__nav-dots">
-          {visibleQuestions.slice(0, 10).map((q, i) => (
-            <button
-              key={q.id}
-              className={`question-screen__nav-dot ${
-                i === safeIndex ? "question-screen__nav-dot--current" : ""
-              } ${
-                isQuestionAnswered(q, answers.get(q.id))
-                  ? "question-screen__nav-dot--answered"
-                  : ""
-              }`}
-              onClick={() => goTo(i)}
-              title={`Soru ${i + 1}`}
-            />
-          ))}
-          {visibleQuestions.length > 10 && (
-            <span className="question-screen__nav-more">+{visibleQuestions.length - 10}</span>
-          )}
-        </div>
-
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          <button
-            type="button"
-            className="btn btn--secondary question-screen__nav-btn"
-            onClick={handleSaveAndExit}
-            title="Analizden ayrıl (Kaldığınız soru saklanır)"
-          >
-            <Save size={15} />
-            Kaydet ve Çık
-          </button>
-
-          {isLast ? (
-            <button
-              className="btn btn--primary question-screen__nav-btn"
-              onClick={handleSaveAndExit}
-            >
-              Tamamla
-              <CheckCircle2 size={16} />
-            </button>
-          ) : (
-            <button
-              className="btn btn--primary question-screen__nav-btn"
-              onClick={handleNext}
-            >
-              Sonraki
-              <ArrowRight size={16} />
-            </button>
-          )}
-        </div>
+        {/* ── Custom Question Modal ───────────────────────────────────────── */}
+        {isCustomModalOpen && (
+          <CustomQuestionModal
+            isOpen={isCustomModalOpen}
+            onClose={() => {
+              setIsCustomModalOpen(false);
+              setEditingCustomQuestion(null);
+            }}
+            onSaved={loadData}
+            projectId={projectId}
+            bfCode={bfCode}
+            bfNameTr={bfNameTr}
+            existingQuestion={editingCustomQuestion}
+            existingProcesses={existingProcesses}
+          />
+        )}
       </div>
-
-      {/* ── Modal ───────────────────────────────────────────────────────── */}
-      {isModalOpen && currentQuestion && (
-        <SemanticModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSaved={loadQuestionSemanticItems}
-          projectId={projectId}
-          defaultType={modalType}
-          defaultBfCode={bfCode}
-          defaultQuestionId={currentQuestion.id}
-        />
-      )}
     </div>
   );
 };

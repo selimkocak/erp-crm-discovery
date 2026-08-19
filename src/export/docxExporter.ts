@@ -481,25 +481,42 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
 
         for (const q of proc.questions) {
           // Question Header
+          const questionHeaderRuns: TextRun[] = [
+            new TextRun({
+              text: `[${q.id}] `,
+              bold: true,
+              size: 19,
+              color: COLOR_PRIMARY,
+              font: FONT_FAMILY,
+            }),
+          ];
+
+          if (q.isCustom) {
+            questionHeaderRuns.push(
+              new TextRun({
+                text: `[Özel Soru] `,
+                bold: true,
+                size: 17,
+                color: COLOR_WARNING,
+                font: FONT_FAMILY,
+              })
+            );
+          }
+
+          questionHeaderRuns.push(
+            new TextRun({
+              text: q.questionText,
+              bold: true,
+              size: 19,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            })
+          );
+
           docChildren.push(
             new Paragraph({
               spacing: { before: 80, after: 40 },
-              children: [
-                new TextRun({
-                  text: `[${q.id}] `,
-                  bold: true,
-                  size: 19,
-                  color: COLOR_PRIMARY,
-                  font: FONT_FAMILY,
-                }),
-                new TextRun({
-                  text: q.questionText,
-                  bold: true,
-                  size: 19,
-                  color: COLOR_DARK,
-                  font: FONT_FAMILY,
-                }),
-              ],
+              children: questionHeaderRuns,
             })
           );
 

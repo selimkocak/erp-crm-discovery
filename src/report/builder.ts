@@ -13,9 +13,12 @@ import {
   getRisks,
   getProjectNotes,
   getReportProfile,
+  getCustomQuestions,
+  getCustomAnswers,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
+import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
 import { calculateProgress } from "../engine/progress";
 import { formatAnswer } from "./formatters";
 import type {
@@ -97,15 +100,33 @@ export async function buildReportModel(
       }
     }
 
-    // Answers
-    const answersMap = loadedPack
-      ? await getAllAnswers(projectId, fn.code)
-      : new Map();
+    // Answers (Canonical + Custom)
+    const [canonicalAnswersMap, customQuestionsList, customAnswersMap] = await Promise.all([
+      loadedPack ? getAllAnswers(projectId, fn.code) : Promise.resolve(new Map()),
+      getCustomQuestions(projectId, fn.code),
+      getCustomAnswers(projectId, fn.code),
+    ]);
 
-    // Visibility (Branching)
-    const visibleQuestions: Question[] = loadedPack
-      ? getVisibleQuestions(loadedPack.questions, answersMap)
+    const answersMap = new Map<string, any>(canonicalAnswersMap);
+    for (const [qId, aData] of customAnswersMap.entries()) {
+      answersMap.set(qId, aData);
+    }
+
+    for (const cq of customQuestionsList) {
+      questionTextMap.set(cq.id, cq.question_text);
+    }
+
+    // Visibility (Branching) + Adapted Custom Questions
+    const canonicalVisible: Question[] = loadedPack
+      ? getVisibleQuestions(loadedPack.questions, canonicalAnswersMap)
       : [];
+
+    const baseOrder = (loadedPack?.questions.length ?? 0) + 1;
+    const adaptedCustomQuestions: Question[] = customQuestionsList.map((cq, idx) =>
+      adaptCustomQuestionToQuestion(cq, baseOrder + idx)
+    );
+
+    const visibleQuestions: Question[] = [...canonicalVisible, ...adaptedCustomQuestions];
 
     const progress = loadedPack
       ? calculateProgress(visibleQuestions, answersMap)
@@ -208,6 +229,7 @@ export async function buildReportModel(
         description: q.description,
         answerType: q.answer_type,
         criticality: q.criticality,
+        isCustom: q.is_custom,
         formattedAnswer: formattedAns,
         findings: qFindings,
         requirements: qRequirements,
