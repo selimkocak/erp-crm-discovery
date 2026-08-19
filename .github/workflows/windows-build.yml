@@ -26,7 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
       - name: Setup Rust Stable (MSVC Target)
         uses: dtolnay/rust-toolchain@stable
@@ -84,4 +83,3 @@ jobs:
             src-tauri/target/**/bundle/nsis/*.exe
             src-tauri/target/**/bundle/nsis/*.sha256
           if-no-files-found: error
-
