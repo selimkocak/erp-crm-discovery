@@ -70,19 +70,29 @@ assert(nsis?.displayLanguageSelector === true, 'NSIS displayLanguageSelector ena
 // ── T03: Security & Capability Permissions ──────
 console.log('\n=== T03: Security & Capabilities Validation ===');
 const defaultCap = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'src-tauri/capabilities/default.json'), 'utf-8'));
-const permissions: string[] = defaultCap.permissions || [];
+const rawPermissions: any[] = defaultCap.permissions || [];
 
-assert(permissions.includes('core:default'), 'Capability: core:default present');
-assert(permissions.includes('sql:default'), 'Capability: sql:default present');
-assert(permissions.includes('sql:allow-execute'), 'Capability: sql:allow-execute present (Required for SQLite migrations & writes)');
-assert(permissions.includes('dialog:default'), 'Capability: dialog:default present');
-assert(permissions.includes('fs:default'), 'Capability: fs:default present');
-assert(!permissions.some(p => p.includes('http') || p.includes('fetch')), 'Zero remote network permissions enforced');
+const stringPermissions: string[] = rawPermissions.filter((p: any) => typeof p === 'string');
+const objectPermissions: any[] = rawPermissions.filter((p: any) => typeof p === 'object' && p !== null);
+
+assert(stringPermissions.includes('core:default'), 'Capability: core:default present');
+assert(stringPermissions.includes('sql:default'), 'Capability: sql:default present');
+assert(stringPermissions.includes('sql:allow-execute'), 'Capability: sql:allow-execute present (Required for SQLite migrations & writes)');
+assert(stringPermissions.includes('dialog:default'), 'Capability: dialog:default present');
+assert(stringPermissions.includes('fs:default'), 'Capability: fs:default present');
+
+const hasFsWrite = stringPermissions.includes('fs:allow-write-file') || objectPermissions.some((p: any) => p.identifier === 'fs:allow-write-file');
+assert(hasFsWrite, 'Capability: fs:allow-write-file present (Required for DOCX & PDF native export)');
+
+assert(!rawPermissions.some((p: any) => typeof p === 'string' && (p.includes('http') || p.includes('fetch'))), 'Zero remote network permissions enforced');
 assert(tauriConf.plugins?.sql?.preload?.includes('sqlite:erp_discovery.db'), 'SQLite DB preload configured');
 
 const clientSrc = fs.readFileSync(path.join(ROOT_DIR, 'src/db/client.ts'), 'utf-8');
 const migrationsSrc = fs.readFileSync(path.join(ROOT_DIR, 'src/db/migrations.ts'), 'utf-8');
 assert(clientSrc.includes('db.execute') && migrationsSrc.includes('db.execute'), 'Production SQL client and migrations require execute capability');
+
+const fileSaverSrc = fs.readFileSync(path.join(ROOT_DIR, 'src/export/fileSaver.ts'), 'utf-8');
+assert(fileSaverSrc.includes('writeFile'), 'Production export client requires fs:allow-write-file capability');
 
 // ── T04: Icon & Packaging Assets Integrity ──────
 console.log('\n=== T04: Icon & Packaging Assets Integrity ===');
