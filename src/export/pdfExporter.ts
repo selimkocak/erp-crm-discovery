@@ -322,6 +322,18 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
             currentY += 4;
           }
 
+          if (q.attachments && q.attachments.length > 0) {
+            checkPageBreak(8);
+            doc.setFont(PDF_FONT_FAMILY, "normal");
+            doc.setFontSize(7.5);
+            doc.setTextColor(15, 118, 110);
+            const attStr = `Ek Kanıtlar (${q.attachments.length}): ` +
+              q.attachments.map((a) => `${a.originalFileName} [${a.fileExtension.toUpperCase()}]`).join(", ");
+            const attLines = doc.splitTextToSize(attStr, pageWidth - marginX * 2 - 30);
+            doc.text(attLines, marginX + 26, currentY);
+            currentY += attLines.length * 3.5;
+          }
+
           currentY += 2;
         }
       }
@@ -454,6 +466,47 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
       styles: { font: PDF_FONT_FAMILY },
       headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 9 },
       bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 8.5, cellPadding: 2 },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 4;
+  }
+
+  // 6. Kanıt Dokümanları ve Ekler Dizini (FAZ-33)
+  if (report.attachments && report.attachments.length > 0) {
+    checkPageBreak(25);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(15, 118, 110);
+    doc.text(`6. Kanıt Dokümanları ve Ekler Dizini (${report.attachments.length})`, marginX, currentY);
+    currentY += 5;
+
+    const attRows = report.attachments.map((a) => {
+      const sizeStr =
+        a.fileSize < 1024 * 1024
+          ? `${(a.fileSize / 1024).toFixed(1)} KB`
+          : `${(a.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+      return [
+        `${a.businessFunctionNameTr}\n(${a.processName})`,
+        `[${a.questionId}]\n${a.questionText}`,
+        `${a.originalFileName}\n[${a.fileExtension.toUpperCase()} • ${sizeStr}]`,
+        a.description || "—",
+      ];
+    });
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      head: [["İş Fonksiyonu / Süreç", "Soru", "Dosya Adı & Tür", "Açıklama"]],
+      body: attRows,
+      theme: "grid",
+      styles: { font: PDF_FONT_FAMILY },
+      headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [240, 253, 250], textColor: [15, 118, 110], fontSize: 8 },
+      bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 35 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 50 },
+        3: { cellWidth: "auto" },
+      },
     });
     currentY = (doc as any).lastAutoTable.finalY + 4;
   }

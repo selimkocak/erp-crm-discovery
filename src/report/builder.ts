@@ -16,6 +16,7 @@ import {
   getCustomQuestions,
   getCustomAnswers,
   getAllProjectFollowups,
+  getProjectAttachments,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -37,6 +38,7 @@ import type {
   ReportProfile,
   ReportSummaryStats,
   ReportFollowupItem,
+  ReportAttachmentItem,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -52,7 +54,7 @@ export async function buildReportModel(
   const includeUnanswered = options.includeUnanswered ?? false;
 
   // 1. Fetch core data in parallel
-  const [detailData, reportProfile, findings, requirements, risks, notes, dbFollowups] = await Promise.all([
+  const [detailData, reportProfile, findings, requirements, risks, notes, dbFollowups, dbAttachments] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
     getFindings(projectId),
@@ -60,6 +62,7 @@ export async function buildReportModel(
     getRisks(projectId),
     getProjectNotes(projectId),
     getAllProjectFollowups(projectId),
+    getProjectAttachments(projectId),
   ]);
 
   if (!detailData) {
@@ -235,6 +238,27 @@ export async function buildReportModel(
       const qRisks = fnRisks.filter((r) => r.questionId === q.id);
       const qNotes = fnNotes.filter((n) => n.questionId === q.id);
 
+      // Find attachment items linked to this specific question (FAZ-33)
+      const qAttachments: ReportAttachmentItem[] = dbAttachments
+        .filter((a) => a.business_function_code === fn.code && a.question_id === q.id)
+        .map((a) => ({
+          id: a.id,
+          businessFunctionCode: a.business_function_code,
+          businessFunctionNameTr: fn.name_tr,
+          processName: q.process,
+          questionId: a.question_id,
+          questionText: q.question,
+          originalFileName: a.original_file_name,
+          storedFileName: a.stored_file_name,
+          relativePath: a.relative_path,
+          mimeType: a.mime_type,
+          fileExtension: a.file_extension,
+          fileSize: a.file_size,
+          sha256: a.sha256,
+          description: a.description || null,
+          createdAt: a.created_at,
+        }));
+
       const qItem: ReportQuestionItem = {
         id: q.id,
         order: q.order,
@@ -246,6 +270,7 @@ export async function buildReportModel(
         criticality: q.criticality,
         isCustom: q.is_custom,
         followup: fol ? { flagType: fol.flag_type, note: fol.note } : null,
+        attachments: qAttachments.length > 0 ? qAttachments : undefined,
         formattedAnswer: formattedAns,
         findings: qFindings,
         requirements: qRequirements,
@@ -385,6 +410,28 @@ export async function buildReportModel(
   const notStartedFunctions = functions.filter((f) => f.status === "not_started").length;
   const openRisks = risks.filter((r) => r.status === "open").length;
 
+  // Build report attachments list (FAZ-33)
+  const reportAttachments: ReportAttachmentItem[] = dbAttachments.map((a) => {
+    const bf = functions.find((fn) => fn.code === a.business_function_code);
+    return {
+      id: a.id,
+      businessFunctionCode: a.business_function_code,
+      businessFunctionNameTr: bf ? bf.name_tr : a.business_function_code,
+      processName: questionProcessMap.get(a.question_id) || "Genel Süreç",
+      questionId: a.question_id,
+      questionText: questionTextMap.get(a.question_id) || `Soru (${a.question_id})`,
+      originalFileName: a.original_file_name,
+      storedFileName: a.stored_file_name,
+      relativePath: a.relative_path,
+      mimeType: a.mime_type,
+      fileExtension: a.file_extension,
+      fileSize: a.file_size,
+      sha256: a.sha256,
+      description: a.description || null,
+      createdAt: a.created_at,
+    };
+  });
+
   const summaryStats: ReportSummaryStats = {
     totalFunctions: functions.length,
     completedFunctions,
@@ -400,6 +447,8 @@ export async function buildReportModel(
     openFollowupCount: dbFollowups.length,
     revisitCount,
     criticalFollowupCount,
+    totalAttachmentCount: dbAttachments.length,
+    totalAttachmentSizeBytes: dbAttachments.reduce((sum, a) => sum + (a.file_size || 0), 0),
   };
 
   const progressPercent =
@@ -477,6 +526,7 @@ export async function buildReportModel(
     scope: reportScope,
     businessFunctions: reportFunctions,
     followups: reportFollowups,
+    attachments: reportAttachments,
     globalFindings,
     globalRequirements,
     globalRisks,

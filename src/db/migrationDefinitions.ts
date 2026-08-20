@@ -242,5 +242,32 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_qf_project_bf ON question_followups(analysis_project_id, business_function_code);`,
       `CREATE INDEX IF NOT EXISTS idx_qf_flag ON question_followups(flag_type);`
     ]
+  },
+  {
+    version: 7,
+    description: "Question Evidence & Attachments Metadata (FAZ-33)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS question_attachments (
+        id                     TEXT PRIMARY KEY,
+        analysis_project_id    TEXT NOT NULL,
+        business_function_code TEXT NOT NULL,
+        question_id            TEXT NOT NULL,
+        answer_id              TEXT,
+        original_file_name     TEXT NOT NULL,
+        stored_file_name       TEXT NOT NULL,
+        relative_path          TEXT NOT NULL,
+        mime_type              TEXT NOT NULL,
+        file_extension         TEXT NOT NULL,
+        file_size              INTEGER NOT NULL,
+        sha256                 TEXT NOT NULL,
+        description            TEXT,
+        sort_order             INTEGER NOT NULL DEFAULT 0,
+        created_at             TEXT NOT NULL,
+        updated_at             TEXT NOT NULL,
+        FOREIGN KEY (analysis_project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_qa_project_bf_q ON question_attachments(analysis_project_id, business_function_code, question_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_qa_project_sha ON question_attachments(analysis_project_id, sha256);`
+    ]
   }
 ] as const;

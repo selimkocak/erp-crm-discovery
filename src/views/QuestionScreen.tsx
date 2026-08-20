@@ -37,6 +37,7 @@ import type {
   ProjectCustomQuestion,
   QuestionFollowup,
   FollowupFlagType,
+  QuestionAttachment,
 } from "../types";
 import {
   saveAnswer,
@@ -55,7 +56,20 @@ import {
   getQuestionFollowups,
   setQuestionFollowup,
   removeQuestionFollowup,
+  getProjectAttachments,
+  addQuestionAttachment,
+  deleteQuestionAttachment,
+  updateAttachmentDescription,
+  findAttachmentBySha256,
 } from "../db/client";
+import {
+  generateStoredFileName,
+  buildRelativePath,
+  calculateSha256,
+  getFileExtension,
+  saveAttachmentFile,
+  deleteAttachmentFile,
+} from "../storage/attachmentManager";
 import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
 import { calculateProgress, isQuestionAnswered, progressToStatus } from "../engine/progress";
@@ -89,6 +103,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   const [answers, setAnswers] = useState<Map<string, AnswerData>>(new Map());
   const [customQuestions, setCustomQuestions] = useState<ProjectCustomQuestion[]>([]);
   const [followups, setFollowups] = useState<Map<string, QuestionFollowup>>(new Map());
+  const [attachmentsMap, setAttachmentsMap] = useState<Map<string, QuestionAttachment[]>>(new Map());
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -131,12 +146,14 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         existingCustomAnswers,
         dbCustomQuestions,
         dbFollowups,
+        dbAttachments,
         lastQId,
       ] = await Promise.all([
         getAllAnswers(projectId, bfCode),
         getCustomAnswers(projectId, bfCode),
         getCustomQuestions(projectId, bfCode),
         getQuestionFollowups(projectId, bfCode),
+        getProjectAttachments(projectId),
         getLastQuestionId(projectId, bfCode),
       ]);
 
@@ -146,9 +163,20 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         mergedAnswers.set(qId, ans);
       }
 
+      // Group attachments by questionId for this business function
+      const attMap = new Map<string, QuestionAttachment[]>();
+      for (const a of dbAttachments) {
+        if (a.business_function_code === bfCode) {
+          const list = attMap.get(a.question_id) || [];
+          list.push(a);
+          attMap.set(a.question_id, list);
+        }
+      }
+
       setAnswers(mergedAnswers);
       setCustomQuestions(dbCustomQuestions);
       setFollowups(dbFollowups);
+      setAttachmentsMap(attMap);
 
       // Build initial question list to resolve lastQId
       const canonicalVisible = getVisibleQuestions(pack.questions, mergedAnswers);
@@ -426,6 +454,112 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     await updateFunctionStatusByCode(projectId, bfCode, newStatus);
   };
 
+  // ── FAZ-33: Attachment Action Handlers ─────────────────────────────────
+  const handleAddAttachment = async (
+    questionId: string,
+    file: { name: string; size: number; type: string; data: Uint8Array },
+    description?: string
+  ) => {
+    try {
+      setSaveStatus("saving");
+      const sha256 = await calculateSha256(file.data);
+
+      // Duplicate check across project
+      const duplicate = await findAttachmentBySha256(projectId, sha256);
+      if (duplicate) {
+        const confirmUse = window.confirm(
+          `Bu dosya ("${duplicate.original_file_name}") projede daha önce yüklenmiş (SHA-256 eşleşti). Yine de bu soruya kanıt olarak eklemek istiyor musunuz?`
+        );
+        if (!confirmUse) {
+          setSaveStatus("idle");
+          return;
+        }
+      }
+
+      const ext = getFileExtension(file.name);
+      const storedFileName = generateStoredFileName(file.name);
+      const relativePath = buildRelativePath(projectId, bfCode, questionId, storedFileName);
+
+      // Save physical file
+      await saveAttachmentFile(relativePath, file.data);
+
+      // Insert DB record
+      const saved = await addQuestionAttachment({
+        analysis_project_id: projectId,
+        business_function_code: bfCode,
+        question_id: questionId,
+        original_file_name: file.name,
+        stored_file_name: storedFileName,
+        relative_path: relativePath,
+        mime_type: file.type,
+        file_extension: ext,
+        file_size: file.size,
+        sha256,
+        description: description || null,
+      });
+
+      // Update state
+      setAttachmentsMap((prev) => {
+        const next = new Map(prev);
+        const list = [...(next.get(questionId) || []), saved];
+        next.set(questionId, list);
+        return next;
+      });
+
+      setSaveStatus("saved");
+      setLastSavedAt(new Date());
+    } catch (err: any) {
+      console.error("Kanıt eklenemedi:", err);
+      setSaveStatus("error");
+      throw err;
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId: string) => {
+    try {
+      setSaveStatus("saving");
+      const deleted = await deleteQuestionAttachment(attachmentId);
+      if (deleted) {
+        await deleteAttachmentFile(deleted.relative_path);
+        setAttachmentsMap((prev) => {
+          const next = new Map(prev);
+          const list = (next.get(deleted.question_id) || []).filter((a) => a.id !== attachmentId);
+          next.set(deleted.question_id, list);
+          return next;
+        });
+      }
+      setSaveStatus("saved");
+      setLastSavedAt(new Date());
+    } catch (err: any) {
+      console.error("Kanıt silinemedi:", err);
+      setSaveStatus("error");
+      throw err;
+    }
+  };
+
+  const handleUpdateAttachmentDescription = async (attachmentId: string, description: string) => {
+    try {
+      setSaveStatus("saving");
+      await updateAttachmentDescription(attachmentId, description);
+      setAttachmentsMap((prev) => {
+        const next = new Map<string, QuestionAttachment[]>();
+        for (const [qId, list] of prev.entries()) {
+          next.set(
+            qId,
+            list.map((a) => (a.id === attachmentId ? { ...a, description, updated_at: new Date().toISOString() } : a))
+          );
+        }
+        return next;
+      });
+      setSaveStatus("saved");
+      setLastSavedAt(new Date());
+    } catch (err: any) {
+      console.error("Kanıt açıklaması güncellenemedi:", err);
+      setSaveStatus("error");
+      throw err;
+    }
+  };
+
   // Extract unique process names for the custom question modal
   const existingProcesses = useMemo(() => {
     const set = new Set<string>();
@@ -576,6 +710,12 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               onOpenFollowup={handleOpenFollowup}
               onEditCustom={handleEditCustomQuestion}
               onDeleteCustom={handleDeleteCustomQuestion}
+              projectId={projectId}
+              businessFunctionCode={bfCode}
+              attachments={attachmentsMap.get(currentQuestion.id) || []}
+              onAddAttachment={(file, desc) => handleAddAttachment(currentQuestion.id, file, desc)}
+              onDeleteAttachment={handleDeleteAttachment}
+              onUpdateAttachmentDescription={handleUpdateAttachmentDescription}
             />
 
             {/* ── FAZ-3: Semantic Analysis Actions Toolbar ───────────────────── */}

@@ -30,6 +30,9 @@ import type {
   QuestionFollowup,
   FollowupFlagType,
   FollowupSummaryCounts,
+  QuestionAttachment,
+  CreateQuestionAttachmentPayload,
+  AttachmentSummaryStats,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -1180,4 +1183,158 @@ export async function getFollowupSummaryCounts(
     totalFollowupCount: revisitCount + criticalCount,
   };
 }
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-33: Question Evidence & Attachments Database Operations
+// ─────────────────────────────────────────────────────────────
+
+export async function addQuestionAttachment(
+  payload: CreateQuestionAttachmentPayload
+): Promise<QuestionAttachment> {
+  const db = await getDb();
+  const id = generateId("att");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO question_attachments (
+       id, analysis_project_id, business_function_code, question_id, answer_id,
+       original_file_name, stored_file_name, relative_path, mime_type,
+       file_extension, file_size, sha256, description, sort_order, created_at, updated_at
+     ) VALUES (
+       $1, $2, $3, $4, $5,
+       $6, $7, $8, $9,
+       $10, $11, $12, $13, $14, $15, $15
+     )`,
+    [
+      id,
+      payload.analysis_project_id,
+      payload.business_function_code,
+      payload.question_id,
+      payload.answer_id ?? null,
+      payload.original_file_name,
+      payload.stored_file_name,
+      payload.relative_path,
+      payload.mime_type,
+      payload.file_extension,
+      payload.file_size,
+      payload.sha256,
+      payload.description ?? null,
+      payload.sort_order ?? 0,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    analysis_project_id: payload.analysis_project_id,
+    business_function_code: payload.business_function_code,
+    question_id: payload.question_id,
+    answer_id: payload.answer_id ?? null,
+    original_file_name: payload.original_file_name,
+    stored_file_name: payload.stored_file_name,
+    relative_path: payload.relative_path,
+    mime_type: payload.mime_type,
+    file_extension: payload.file_extension,
+    file_size: payload.file_size,
+    sha256: payload.sha256,
+    description: payload.description ?? null,
+    sort_order: payload.sort_order ?? 0,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function getQuestionAttachments(
+  projectId: string,
+  bfCode: string,
+  questionId: string
+): Promise<QuestionAttachment[]> {
+  const db = await getDb();
+  const rows = await db.select<QuestionAttachment[]>(
+    `SELECT *
+     FROM question_attachments
+     WHERE analysis_project_id = $1 AND business_function_code = $2 AND question_id = $3
+     ORDER BY sort_order ASC, created_at ASC`,
+    [projectId, bfCode, questionId]
+  );
+  return rows;
+}
+
+export async function getProjectAttachments(
+  projectId: string
+): Promise<QuestionAttachment[]> {
+  const db = await getDb();
+  const rows = await db.select<QuestionAttachment[]>(
+    `SELECT *
+     FROM question_attachments
+     WHERE analysis_project_id = $1
+     ORDER BY business_function_code ASC, question_id ASC, sort_order ASC, created_at ASC`,
+    [projectId]
+  );
+  return rows;
+}
+
+export async function updateAttachmentDescription(
+  attachmentId: string,
+  description: string | null
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  await db.execute(
+    `UPDATE question_attachments
+     SET description = $1, updated_at = $2
+     WHERE id = $3`,
+    [description, now, attachmentId]
+  );
+}
+
+export async function deleteQuestionAttachment(
+  attachmentId: string
+): Promise<QuestionAttachment | null> {
+  const db = await getDb();
+  const existing = await db.select<QuestionAttachment[]>(
+    `SELECT * FROM question_attachments WHERE id = $1`,
+    [attachmentId]
+  );
+  if (existing.length === 0) return null;
+
+  await db.execute(
+    `DELETE FROM question_attachments WHERE id = $1`,
+    [attachmentId]
+  );
+  return existing[0];
+}
+
+export async function findAttachmentBySha256(
+  projectId: string,
+  sha256: string
+): Promise<QuestionAttachment | null> {
+  const db = await getDb();
+  const rows = await db.select<QuestionAttachment[]>(
+    `SELECT *
+     FROM question_attachments
+     WHERE analysis_project_id = $1 AND sha256 = $2
+     LIMIT 1`,
+    [projectId, sha256]
+  );
+  return rows[0] || null;
+}
+
+export async function getAttachmentSummaryStats(
+  projectId: string
+): Promise<AttachmentSummaryStats> {
+  const db = await getDb();
+  const rows = await db.select<{ count: number; total_bytes: number }[]>(
+    `SELECT COUNT(*) as count, COALESCE(SUM(file_size), 0) as total_bytes
+     FROM question_attachments
+     WHERE analysis_project_id = $1`,
+    [projectId]
+  );
+
+  return {
+    totalAttachmentCount: Number(rows[0]?.count || 0),
+    totalAttachmentSizeBytes: Number(rows[0]?.total_bytes || 0),
+  };
+}
+
 

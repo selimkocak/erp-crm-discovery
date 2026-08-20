@@ -609,6 +609,60 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
             );
           }
 
+          if (q.attachments && q.attachments.length > 0) {
+            docChildren.push(
+              new Paragraph({
+                spacing: { before: 40, after: 20 },
+                indent: { left: 300 },
+                children: [
+                  new TextRun({
+                    text: `Ek Kanıtlar (${q.attachments.length}):`,
+                    bold: true,
+                    size: 17,
+                    color: "0F766E",
+                    font: FONT_FAMILY,
+                  }),
+                ],
+              })
+            );
+            for (const att of q.attachments) {
+              const sizeStr =
+                att.fileSize < 1024 * 1024
+                  ? `${(att.fileSize / 1024).toFixed(1)} KB`
+                  : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+              docChildren.push(
+                new Paragraph({
+                  spacing: { after: 20 },
+                  indent: { left: 450 },
+                  children: [
+                    new TextRun({
+                      text: `📎 ${att.originalFileName} `,
+                      bold: true,
+                      size: 17,
+                      color: COLOR_DARK,
+                      font: FONT_FAMILY,
+                    }),
+                    new TextRun({
+                      text: `[${att.fileExtension.toUpperCase()}, ${sizeStr}]`,
+                      size: 16,
+                      color: COLOR_MUTED,
+                      font: FONT_FAMILY,
+                    }),
+                    att.description
+                      ? new TextRun({
+                          text: ` — ${att.description}`,
+                          italics: true,
+                          size: 16,
+                          color: "475569",
+                          font: FONT_FAMILY,
+                        })
+                      : new TextRun({ text: "" }),
+                  ],
+                })
+              );
+            }
+          }
+
           if (!q.formattedAnswer.isAnswered) {
             docChildren.push(
               new Paragraph({
@@ -875,6 +929,71 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         })
       );
     }
+  }
+
+  // 6. Kanıt Dokümanları ve Ekler Dizini (FAZ-33)
+  if (report.attachments && report.attachments.length > 0) {
+    docChildren.push(
+      new Paragraph({
+        spacing: { before: 240, after: 80 },
+        children: [
+          new TextRun({
+            text: `Kanıt Dokümanları ve Ekler Dizini (${report.attachments.length})`,
+            bold: true,
+            size: 22,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    const attachmentRows: TableRow[] = [
+      new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("İş Fonksiyonu / Süreç", { isHeader: true, widthPercent: 24 }),
+          createTableCell("Soru", { isHeader: true, widthPercent: 30 }),
+          createTableCell("Dosya Adı & Tür", { isHeader: true, widthPercent: 26 }),
+          createTableCell("Açıklama", { isHeader: true, widthPercent: 20 }),
+        ],
+      }),
+    ];
+
+    for (const att of report.attachments) {
+      const sizeStr =
+        att.fileSize < 1024 * 1024
+          ? `${(att.fileSize / 1024).toFixed(1)} KB`
+          : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+      attachmentRows.push(
+        new TableRow({
+          children: [
+            createTableCell(`${att.businessFunctionNameTr}\n(${att.processName})`, {
+              bgColor: "FFFFFF",
+            }),
+            createTableCell(`[${att.questionId}]\n${att.questionText}`, {
+              bgColor: "FFFFFF",
+              bold: true,
+            }),
+            createTableCell(`${att.originalFileName}\n[${att.fileExtension.toUpperCase()} • ${sizeStr}]`, {
+              bgColor: "FFFFFF",
+            }),
+            createTableCell(att.description || "Açıklama girilmedi.", {
+              bgColor: "FFFFFF",
+              italics: !att.description,
+            }),
+          ],
+        })
+      );
+    }
+
+    docChildren.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: attachmentRows,
+      }),
+      new Paragraph({ spacing: { after: 180 } })
+    );
   }
 
   // Document Assembly with Headers & Footers

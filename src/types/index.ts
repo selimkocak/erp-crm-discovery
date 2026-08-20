@@ -231,3 +231,69 @@ export interface FollowupSummaryCounts {
   criticalCount: number;
   totalFollowupCount: number;
 }
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-33: Question Evidence & Attachments Types
+// ─────────────────────────────────────────────────────────────
+
+export type AllowedAttachmentMimeType =
+  | 'image/png'
+  | 'image/jpeg'
+  | 'image/webp'
+  | 'application/pdf'
+  | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  | 'text/plain'
+  | 'text/csv';
+
+export type AllowedAttachmentExtension =
+  | 'png'
+  | 'jpg'
+  | 'jpeg'
+  | 'webp'
+  | 'pdf'
+  | 'docx'
+  | 'xlsx'
+  | 'csv'
+  | 'txt';
+
+export interface QuestionAttachment {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string;
+  answer_id?: string | null;
+  original_file_name: string;
+  stored_file_name: string;
+  relative_path: string;
+  mime_type: string;
+  file_extension: string;
+  file_size: number;
+  sha256: string;
+  description?: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateQuestionAttachmentPayload {
+  analysis_project_id: string;
+  business_function_code: string;
+  question_id: string;
+  answer_id?: string | null;
+  original_file_name: string;
+  stored_file_name: string;
+  relative_path: string;
+  mime_type: string;
+  file_extension: string;
+  file_size: number;
+  sha256: string;
+  description?: string | null;
+  sort_order?: number;
+}
+
+export interface AttachmentSummaryStats {
+  totalAttachmentCount: number;
+  totalAttachmentSizeBytes: number;
+}
+

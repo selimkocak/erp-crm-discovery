@@ -21,6 +21,7 @@ import {
   FileDown,
   Download,
   CheckCircle2,
+  Paperclip,
 } from "lucide-react";
 import { buildReportModel } from "../report/builder";
 import type { ReportModel } from "../report/types";
@@ -586,6 +587,30 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                                   ))}
                                 </div>
                               )}
+
+                              {/* Soruya bağlı kanıt ekleri (FAZ-33) */}
+                              {q.attachments && q.attachments.length > 0 && (
+                                <div className="report-question-attachments" style={{ marginTop: "0.5rem", display: "flex", flexWrap: "wrap", gap: "0.375rem" }}>
+                                  {q.attachments.map((att) => {
+                                    const sizeStr = att.fileSize < 1024 * 1024
+                                      ? `${(att.fileSize / 1024).toFixed(1)} KB`
+                                      : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+                                    return (
+                                      <span
+                                        key={att.id}
+                                        className="badge badge--outline-secondary text-xs"
+                                        style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "var(--color-neutral-50)", borderColor: "var(--color-secondary-300)" }}
+                                        title={att.description ? `${att.originalFileName} — ${att.description}` : att.originalFileName}
+                                      >
+                                        <Paperclip size={11} style={{ color: "var(--color-secondary-600)" }} />
+                                        <strong>{att.originalFileName}</strong>
+                                        <span style={{ color: "var(--text-muted)", fontSize: "0.6875rem" }}>({att.fileExtension.toUpperCase()} • {sizeStr})</span>
+                                        {att.description && <span style={{ fontStyle: "italic" }}>— {att.description}</span>}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -763,6 +788,64 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                           </td>
                         </tr>
                       ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Kanıt Dokümanları ve Ekler Dizini (FAZ-33) */}
+            {report.attachments && report.attachments.length > 0 && (
+              <div className="report-summary-box" style={{ marginTop: "1rem" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+                  <h3 className="report-summary-box__title" style={{ color: "var(--color-secondary-700)", display: "flex", alignItems: "center", gap: "0.5rem", margin: 0 }}>
+                    <Paperclip size={16} /> Kanıt Dokümanları ve Ekler Dizini
+                  </h3>
+                  <span className="badge badge--secondary">
+                    {report.attachments.length} Dosya ({(report.summaryStats.totalAttachmentSizeBytes ? (report.summaryStats.totalAttachmentSizeBytes / (1024 * 1024)).toFixed(1) : 0)} MB)
+                  </span>
+                </div>
+
+                <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                  <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ width: "160px" }}>İş Fonksiyonu / Süreç</th>
+                        <th style={{ width: "240px" }}>Soru</th>
+                        <th>Dosya Adı & Tür</th>
+                        <th>Açıklama</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.attachments.map((att) => {
+                        const sizeStr = att.fileSize < 1024 * 1024
+                          ? `${(att.fileSize / 1024).toFixed(1)} KB`
+                          : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+                        return (
+                          <tr key={att.id}>
+                            <td>
+                              <strong>{att.businessFunctionNameTr}</strong>
+                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block" }}>{att.processName}</span>
+                            </td>
+                            <td>
+                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block" }}>{att.questionId}</span>
+                              <strong>{att.questionText}</strong>
+                            </td>
+                            <td>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                <Paperclip size={13} style={{ color: "var(--color-secondary-600)" }} />
+                                <strong>{att.originalFileName}</strong>
+                              </div>
+                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                                {att.fileExtension.toUpperCase()} • {sizeStr}
+                              </span>
+                            </td>
+                            <td style={{ color: att.description ? "var(--text-color)" : "var(--text-muted)", fontStyle: att.description ? "normal" : "italic" }}>
+                              {att.description || "Açıklama girilmedi."}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

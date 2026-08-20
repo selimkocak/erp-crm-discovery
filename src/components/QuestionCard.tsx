@@ -13,9 +13,10 @@
 import React, { useState } from "react";
 import { Edit2, Trash2, Sparkles } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
-import type { QuestionFollowup, FollowupFlagType } from "../types";
+import type { QuestionFollowup, FollowupFlagType, QuestionAttachment } from "../types";
 import { ChoiceOption } from "./ChoiceOption";
 import { isQuestionAnswered } from "../engine/progress";
+import { QuestionAttachments } from "./QuestionAttachments";
 
 interface QuestionCardProps {
   question: Question;
@@ -26,6 +27,15 @@ interface QuestionCardProps {
   onOpenFollowup?: (question: Question, flagType?: FollowupFlagType) => void;
   onEditCustom?: (question: Question) => void;
   onDeleteCustom?: (question: Question) => void;
+  projectId?: string;
+  businessFunctionCode?: string;
+  attachments?: QuestionAttachment[];
+  onAddAttachment?: (
+    file: { name: string; size: number; type: string; data: Uint8Array },
+    description?: string
+  ) => Promise<void>;
+  onDeleteAttachment?: (attachmentId: string) => Promise<void>;
+  onUpdateAttachmentDescription?: (attachmentId: string, description: string) => Promise<void>;
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -37,6 +47,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   onOpenFollowup,
   onEditCustom,
   onDeleteCustom,
+  projectId,
+  businessFunctionCode,
+  attachments = [],
+  onAddAttachment,
+  onDeleteAttachment,
+  onUpdateAttachmentDescription,
 }) => {
   const [generalNoteOpen, setGeneralNoteOpen] = useState<boolean>(
     (answerData.general_note ?? "").length > 0
@@ -363,6 +379,19 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           />
         )}
       </div>
+
+      {/* Kanıt Dosyaları & Ekler (FAZ-33) */}
+      {projectId && businessFunctionCode && onAddAttachment && onDeleteAttachment && (
+        <QuestionAttachments
+          projectId={projectId}
+          businessFunctionCode={businessFunctionCode}
+          questionId={question.id}
+          attachments={attachments}
+          onAddAttachment={onAddAttachment}
+          onDeleteAttachment={onDeleteAttachment}
+          onUpdateDescription={onUpdateAttachmentDescription}
+        />
+      )}
     </div>
   );
 };

@@ -145,6 +145,24 @@ export interface ReportFollowupItem {
   createdAt: string;
 }
 
+export interface ReportAttachmentItem {
+  id: string;
+  businessFunctionCode: string;
+  businessFunctionNameTr: string;
+  processName: string;
+  questionId: string;
+  questionText: string;
+  originalFileName: string;
+  storedFileName: string;
+  relativePath: string;
+  mimeType: string;
+  fileExtension: string;
+  fileSize: number;
+  sha256: string;
+  description?: string | null;
+  createdAt: string;
+}
+
 export interface ReportQuestionItem {
   id: string;
   order: number;
@@ -159,6 +177,7 @@ export interface ReportQuestionItem {
     flagType: "revisit" | "critical";
     note?: string | null;
   } | null;
+  attachments?: ReportAttachmentItem[];
   formattedAnswer: ReportFormattedAnswer;
   findings: ReportFinding[];
   requirements: ReportRequirement[];
@@ -218,6 +237,8 @@ export interface ReportSummaryStats {
   openFollowupCount?: number;
   revisitCount?: number;
   criticalFollowupCount?: number;
+  totalAttachmentCount?: number;
+  totalAttachmentSizeBytes?: number;
 }
 
 export interface ReportModel {
@@ -227,9 +248,11 @@ export interface ReportModel {
   scope: ReportScopeItem[];
   businessFunctions: ReportBusinessFunction[];
   followups?: ReportFollowupItem[];
+  attachments?: ReportAttachmentItem[];
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];
   projectNotes: ReportProjectNote[];
   summaryStats: ReportSummaryStats;
 }
+
