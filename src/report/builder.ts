@@ -23,7 +23,7 @@ import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
 import { calculateProgress } from "../engine/progress";
 import { formatAnswer } from "./formatters";
-import { attachmentPathToFileUrl } from "../storage/attachmentLinks";
+import { resolveAttachmentFileUrl } from "../storage/attachmentLinks";
 import type {
   ReportModel,
   ReportMetadata,
@@ -46,6 +46,7 @@ import type { Finding, Requirement, Risk, ProjectNote } from "../types";
 
 export interface BuildReportOptions {
   includeUnanswered?: boolean;
+  baseDirOverride?: string;
 }
 
 export async function buildReportModel(
@@ -69,6 +70,15 @@ export async function buildReportModel(
   if (!detailData) {
     throw new Error(`Analiz projesi bulunamadı: ${projectId}`);
   }
+
+  // Pre-resolve managed vault file URLs for all attachments (FAZ-33)
+  const attachmentUrlMap = new Map<string, string>();
+  await Promise.all(
+    dbAttachments.map(async (a) => {
+      const url = await resolveAttachmentFileUrl(a.relative_path, options.baseDirOverride);
+      attachmentUrlMap.set(a.id, url);
+    })
+  );
 
   const { project, company, functions } = detailData;
 
@@ -252,7 +262,7 @@ export async function buildReportModel(
           originalFileName: a.original_file_name,
           storedFileName: a.stored_file_name,
           relativePath: a.relative_path,
-          fileUrl: attachmentPathToFileUrl(a.relative_path),
+          fileUrl: attachmentUrlMap.get(a.id) || "",
           mimeType: a.mime_type,
           fileExtension: a.file_extension,
           fileSize: a.file_size,
@@ -425,7 +435,7 @@ export async function buildReportModel(
       originalFileName: a.original_file_name,
       storedFileName: a.stored_file_name,
       relativePath: a.relative_path,
-      fileUrl: attachmentPathToFileUrl(a.relative_path),
+      fileUrl: attachmentUrlMap.get(a.id) || "",
       mimeType: a.mime_type,
       fileExtension: a.file_extension,
       fileSize: a.file_size,

@@ -31,11 +31,15 @@ interface QuestionCardProps {
   businessFunctionCode?: string;
   attachments?: QuestionAttachment[];
   onAddAttachment?: (
-    file: { name: string; size: number; type: string; data: Uint8Array },
+    file: { name: string; size: number; type: string; data: Uint8Array; sourcePath?: string },
     description?: string
   ) => Promise<void>;
   onDeleteAttachment?: (attachmentId: string) => Promise<void>;
   onUpdateAttachmentDescription?: (attachmentId: string, description: string) => Promise<void>;
+  onReimportAttachment?: (
+    attachmentId: string,
+    file: { name: string; size: number; type: string; data: Uint8Array; sourcePath?: string }
+  ) => Promise<void>;
 }
 
 export const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -53,6 +57,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   onAddAttachment,
   onDeleteAttachment,
   onUpdateAttachmentDescription,
+  onReimportAttachment,
 }) => {
   const [generalNoteOpen, setGeneralNoteOpen] = useState<boolean>(
     (answerData.general_note ?? "").length > 0
@@ -344,6 +349,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           onAddAttachment={onAddAttachment}
           onDeleteAttachment={onDeleteAttachment}
           onUpdateDescription={onUpdateAttachmentDescription}
+          onReimportAttachment={onReimportAttachment}
         />
       )}
     </div>

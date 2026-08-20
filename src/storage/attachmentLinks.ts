@@ -4,13 +4,18 @@
  * FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri - Tıklanabilir Hyperlink ve Native Dosya Açıcı
  *
  * Temel Özellikler:
- * 1. Native Path -> Standardized file:/// URL dönüşümü (Windows, macOS, Linux).
+ * 1. Managed Vault Path -> Standardized file:/// URL dönüşümü (Windows, macOS, Linux).
  * 2. UTF-8 RFC-3986 uyumlu Percent Encoding (Türkçe karakterler, boşluklar, parantezler).
  * 3. Tauri Native Opener & In-Memory / Web fallback köprüsü.
  * 4. Güvenlik: Path traversal koruması ve eksik dosya dostça hata yönetimi.
+ * 5. Yalnızca Managed Kopyayı Açma: Asla kaynak path veya ham dosya adı kullanılmaz.
  */
 
-import { validateRelativePath, readAttachmentFile } from "./attachmentManager";
+import {
+  validateRelativePath,
+  readAttachmentFile,
+  getManagedVaultBaseDir,
+} from "./attachmentManager";
 
 /**
  * Göreli yoldan platformun mutlak native işletim sistemi yolunu üretir.
@@ -21,15 +26,7 @@ export async function resolveAttachmentAbsolutePath(
 ): Promise<string> {
   validateRelativePath(relativePath);
 
-  let baseDir = baseDirOverride;
-  if (!baseDir) {
-    try {
-      const { appDataDir } = await import("@tauri-apps/api/path");
-      baseDir = await appDataDir();
-    } catch {
-      baseDir = "/app-data";
-    }
-  }
+  const baseDir = baseDirOverride || (await getManagedVaultBaseDir());
 
   // Normalize path separators
   const isWindows = /^[a-zA-Z]:[\\/]/.test(baseDir) || baseDir.includes("\\");
@@ -45,7 +42,7 @@ export async function resolveAttachmentAbsolutePath(
 /**
  * Mutlak veya göreli dosya yolunu standart `file:///...` URL formatına dönüştürür.
  *
- * Örnek macOS: /Users/selim/Library/App Data/test.pdf -> file:///Users/selim/Library/App%20Data/test.pdf
+ * Örnek macOS: /Users/selim/Library/Application Support/test.pdf -> file:///Users/selim/Library/Application%20Support/test.pdf
  * Örnek Windows: C:\Users\Selim\AppData\Local\test.xlsx -> file:///C:/Users/Selim/AppData/Local/test.xlsx
  * Türkçe karakterler: İskonto_Raporu.xlsx -> %C4%B0skonto_Raporu.xlsx
  */
@@ -100,7 +97,18 @@ export function attachmentPathToFileUrl(filePath: string): string {
 }
 
 /**
- * Dosyanın diskte veya sanal depoda var olup olmadığını kontrol eder.
+ * Göreli yoldan yönetilen kopyanın tam `file:///...` hyperlink URL'sini üretir.
+ */
+export async function resolveAttachmentFileUrl(
+  relativePath: string,
+  baseDirOverride?: string
+): Promise<string> {
+  const absPath = await resolveAttachmentAbsolutePath(relativePath, baseDirOverride);
+  return attachmentPathToFileUrl(absPath);
+}
+
+/**
+ * Dosyanın Managed Vault diskinde veya sanal depoda var olup olmadığını kontrol eder.
  */
 export async function attachmentExists(relativePath: string): Promise<boolean> {
   if (!validateRelativePath(relativePath)) {
@@ -121,16 +129,21 @@ export interface OpenAttachmentResult {
 }
 
 /**
- * Ek dosyayı işletim sisteminin varsayılan uygulamasıyla (veya web önizlemesiyle) açar.
+ * Ek dosyayı Managed Vault kopyasından işletim sisteminin varsayılan uygulamasıyla (veya web önizlemesiyle) açar.
  */
 export async function openAttachment(attachment: {
   relative_path?: string;
   relativePath?: string;
   original_name?: string;
   originalFileName?: string;
+  original_file_name?: string;
 }): Promise<OpenAttachmentResult> {
   const relPath = attachment.relative_path || attachment.relativePath || "";
-  const originalName = attachment.original_name || attachment.originalFileName || "Dosya";
+  const originalName =
+    attachment.original_name ||
+    attachment.originalFileName ||
+    attachment.original_file_name ||
+    "Dosya";
 
   if (!validateRelativePath(relPath)) {
     return {
@@ -150,29 +163,38 @@ export async function openAttachment(attachment: {
   try {
     const absPath = await resolveAttachmentAbsolutePath(relPath);
 
-    // 1. Tauri Invoke varsa çağır
-    try {
-      const { invoke } = await import("@tauri-apps/api/core");
-      await invoke("open_attachment_path", { path: absPath });
-      return { success: true };
-    } catch (invokeErr: any) {
-      // Eğer komut bulunamadıysa fallback'e geç
-      console.warn("Tauri open_attachment_path invoke fallback:", invokeErr);
+    // 1. Tauri Invoke varsa çağır (sadece Tauri runtime içinde)
+    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("open_attachment_path", { path: absPath });
+        return { success: true };
+      } catch (invokeErr: any) {
+        // Eğer komut bulunamadıysa fallback'e geç
+        console.warn("Tauri open_attachment_path invoke fallback:", invokeErr);
+      }
     }
 
     // 2. Web / Blob Fallback
     const buffer = await readAttachmentFile(relPath);
     if (buffer) {
-      const blob = new Blob([buffer as unknown as BlobPart]);
-      const blobUrl = URL.createObjectURL(blob);
-      const tempLink = document.createElement("a");
-      tempLink.href = blobUrl;
-      tempLink.download = originalName;
-      tempLink.target = "_blank";
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      document.body.removeChild(tempLink);
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      if (
+        typeof window !== "undefined" &&
+        typeof document !== "undefined" &&
+        typeof URL !== "undefined" &&
+        typeof URL.createObjectURL === "function"
+      ) {
+        const blob = new Blob([buffer as unknown as BlobPart]);
+        const blobUrl = URL.createObjectURL(blob);
+        const tempLink = document.createElement("a");
+        tempLink.href = blobUrl;
+        tempLink.download = originalName;
+        tempLink.target = "_blank";
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+      }
       return { success: true };
     }
 

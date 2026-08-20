@@ -57,17 +57,12 @@ import {
   setQuestionFollowup,
   removeQuestionFollowup,
   getProjectAttachments,
-  addQuestionAttachment,
   deleteQuestionAttachment,
   updateAttachmentDescription,
-  findAttachmentBySha256,
 } from "../db/client";
 import {
-  generateStoredFileName,
-  buildRelativePath,
-  calculateSha256,
-  getFileExtension,
-  saveAttachmentFile,
+  importFileToManagedVault,
+  reimportAttachmentFile,
   deleteAttachmentFile,
 } from "../storage/attachmentManager";
 import { getVisibleQuestions } from "../engine/branching";
@@ -480,54 +475,42 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     await updateFunctionStatusByCode(projectId, bfCode, newStatus);
   };
 
-  // ── FAZ-33: Attachment Action Handlers ─────────────────────────────────
+  // ── FAZ-33: Managed Attachment Vault Handlers ─────────────────────────
   const handleAddAttachment = async (
     questionId: string,
-    file: { name: string; size: number; type: string; data: Uint8Array },
+    file: { name: string; size: number; type: string; data: Uint8Array; sourcePath?: string },
     description?: string
   ) => {
     try {
       setSaveStatus("saving");
-      const sha256 = await calculateSha256(file.data);
+      const currentQAttachments = attachmentsMap.get(questionId) || [];
+      const currentQuestionBytes = currentQAttachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
 
-      // Duplicate check across project
-      const duplicate = await findAttachmentBySha256(projectId, sha256);
-      if (duplicate) {
+      const result = await importFileToManagedVault({
+        projectId,
+        businessFunctionCode: bfCode,
+        questionId,
+        file,
+        description,
+        currentQuestionBytes,
+      });
+
+      if (result.isDuplicate && result.duplicateOf) {
         const confirmUse = window.confirm(
-          `Bu dosya ("${duplicate.original_file_name}") projede daha önce yüklenmiş (SHA-256 eşleşti). Yine de bu soruya kanıt olarak eklemek istiyor musunuz?`
+          `Bu dosya ("${result.duplicateOf.original_file_name}") projede daha önce yüklenmiş (SHA-256 eşleşti). Yine de bu soruya kanıt olarak eklemek istiyor musunuz?`
         );
         if (!confirmUse) {
+          await deleteQuestionAttachment(result.attachment.id);
+          await deleteAttachmentFile(result.attachment.relative_path);
           setSaveStatus("idle");
           return;
         }
       }
 
-      const ext = getFileExtension(file.name);
-      const storedFileName = generateStoredFileName(file.name);
-      const relativePath = buildRelativePath(projectId, bfCode, questionId, storedFileName);
-
-      // Save physical file
-      await saveAttachmentFile(relativePath, file.data);
-
-      // Insert DB record
-      const saved = await addQuestionAttachment({
-        analysis_project_id: projectId,
-        business_function_code: bfCode,
-        question_id: questionId,
-        original_file_name: file.name,
-        stored_file_name: storedFileName,
-        relative_path: relativePath,
-        mime_type: file.type,
-        file_extension: ext,
-        file_size: file.size,
-        sha256,
-        description: description || null,
-      });
-
       // Update state
       setAttachmentsMap((prev) => {
         const next = new Map(prev);
-        const list = [...(next.get(questionId) || []), saved];
+        const list = [...(next.get(questionId) || []), result.attachment];
         next.set(questionId, list);
         return next;
       });
@@ -536,6 +519,41 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       setLastSavedAt(new Date());
     } catch (err: any) {
       console.error("Kanıt eklenemedi:", err);
+      setSaveStatus("error");
+      throw err;
+    }
+  };
+
+  const handleReimportAttachment = async (
+    attachmentId: string,
+    file: { name: string; size: number; type: string; data: Uint8Array; sourcePath?: string }
+  ) => {
+    if (!currentQuestion) return;
+    try {
+      setSaveStatus("saving");
+      const updated = await reimportAttachmentFile(
+        attachmentId,
+        projectId,
+        bfCode,
+        currentQuestion.id,
+        file
+      );
+
+      setAttachmentsMap((prev) => {
+        const next = new Map<string, QuestionAttachment[]>();
+        for (const [qId, list] of prev.entries()) {
+          next.set(
+            qId,
+            list.map((a) => (a.id === attachmentId ? updated : a))
+          );
+        }
+        return next;
+      });
+
+      setSaveStatus("saved");
+      setLastSavedAt(new Date());
+    } catch (err: any) {
+      console.error("Kanıt yeniden içe aktarılamadı:", err);
       setSaveStatus("error");
       throw err;
     }
@@ -774,6 +792,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               onAddAttachment={(file, desc) => handleAddAttachment(currentQuestion.id, file, desc)}
               onDeleteAttachment={handleDeleteAttachment}
               onUpdateAttachmentDescription={handleUpdateAttachmentDescription}
+              onReimportAttachment={handleReimportAttachment}
             />
 
             {/* ── FAZ-3: Semantic Analysis Actions Toolbar ───────────────────── */}

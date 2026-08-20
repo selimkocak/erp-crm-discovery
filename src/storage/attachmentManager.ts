@@ -1,20 +1,31 @@
 /**
- * ERP CRM Discovery — Question Evidence & Attachments Storage & Security Manager
+ * ERP CRM Discovery — Managed Attachment Vault Storage & Security Manager
  *
- * FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri
+ * FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri — Yönetilen Kanıt Kasası (Managed Attachment Vault)
  *
  * Temel Mimari Prensipler:
- * 1. Sıfır DB Binary: Dosyalar diskte tutulur, SQLite'a yalnızca göreli path ve metadata kaydedilir.
- * 2. Göreli Path: projects/{projectId}/attachments/{bfCode}/{questionId}/{uuid}_{safeFileName}
- * 3. Güvenlik: Path traversal koruması, uzantı & MIME allowlist, dosya adı sanitization.
- * 4. Boyut Sınırları: Tek dosya 25 MB, Soru 100 MB, Proje 1 GB.
- * 5. Çift Doğrulama: SHA-256 checksum ile mükerrer kontrolü.
+ * 1. Kaynak Bağımsızlığı: Kullanıcı dosyayı bilgisayarında nereden seçerse seçsin (Downloads, Desktop,
+ *    Documents, harici disk, ağ klasörü), uygulama orijinal dosyaya dokunmadan dosyanın fiziksel bir
+ *    kopyasını kendi kalıcı ve yönetilen attachment kasasına ({appLocalDataDir}/projects/...) alır.
+ * 2. Tek Gerçek Referans: Uygulama ve raporlar yalnız yönetilen kopyayı kullanır. Kaynak dosya silinse,
+ *    yeniden adlandırılsa veya taşınsa dahi kanıt dosyası ve raporlar etkilenmez.
+ * 3. Sıfır DB Binary & Sadece Managed Relative Path: SQLite'a yalnız kanonik göreli yol kaydedilir:
+ *    projects/{projectId}/attachments/{bfCode}/{questionId}/{uuid}_{safeFileName}
+ * 4. Boyut & Güvenlik Sınırları: Path traversal koruması, uzantı allowlist, tek dosya 25 MB, soru 100 MB, proje 1 GB.
+ * 5. Çift Doğrulama: Fiziksel kayıt ve exists kontrolü başarılı olmadan DB kaydı yazılmaz.
+ * 6. Kalıcılık: Uygulama güncellendiğinde veya yeni sürüm kurulduğunda appLocalDataDir klasörü korunur.
  */
 
 import type {
   AllowedAttachmentExtension,
   AllowedAttachmentMimeType,
+  QuestionAttachment,
 } from "../types";
+import {
+  addQuestionAttachment,
+  findAttachmentBySha256,
+  updateQuestionAttachmentReimport,
+} from "../db/client";
 
 // ─────────────────────────────────────────────────────────────
 // 1. Allowlist & Sınır Sabitleri
@@ -289,11 +300,39 @@ export function getFileCategory(extension: string): FileCategory {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 6. Tauri & Sandbox Dosya I/O Köprüsü
+// 6. Managed Attachment Vault — Kalıcı Yerel Kasa & I/O
 // ─────────────────────────────────────────────────────────────
 
 // Tarayıcı/In-memory sandbox (Tauri dışı geliştirme ve test ortamı için)
 const memoryStorage = new Map<string, Uint8Array>();
+
+/**
+ * Test ortamlarında in-memory depolamayı temizler.
+ */
+export function clearMemoryStorage(): void {
+  memoryStorage.clear();
+}
+
+/**
+ * Tauri'nin kalıcı yerel veri dizinini döner.
+ * macOS: ~/Library/Application Support/erp-crm-discovery
+ * Windows: C:\Users\<user>\AppData\Local\erp-crm-discovery
+ * Linux: ~/.local/share/erp-crm-discovery
+ */
+export async function getManagedVaultBaseDir(): Promise<string> {
+  try {
+    const { appLocalDataDir, appDataDir } = await import("@tauri-apps/api/path");
+    if (typeof appLocalDataDir === "function") {
+      return await appLocalDataDir();
+    }
+    if (typeof appDataDir === "function") {
+      return await appDataDir();
+    }
+  } catch {
+    // Tauri mevcut değilse fallback
+  }
+  return "/app-data";
+}
 
 export async function saveAttachmentFile(
   relativePath: string,
@@ -302,18 +341,15 @@ export async function saveAttachmentFile(
   validateRelativePath(relativePath);
 
   try {
-    // Tauri runtime tespiti
     const { writeFile, mkdir } = await import("@tauri-apps/plugin-fs");
-    const { appDataDir } = await import("@tauri-apps/api/path");
-
-    const baseDir = await appDataDir();
+    const baseDir = await getManagedVaultBaseDir();
     const fullPath = `${baseDir}/${relativePath}`.replace(/\/+/g, "/");
     const dirPath = fullPath.substring(0, fullPath.lastIndexOf("/"));
 
     await mkdir(dirPath, { recursive: true });
     await writeFile(fullPath, buffer);
   } catch {
-    // Tauri FS mevcut değilse veya Node/Test/Browser ortamındaysak memory storage kullanılır
+    // Memory storage fallback
     memoryStorage.set(relativePath, buffer);
   }
 }
@@ -325,9 +361,7 @@ export async function readAttachmentFile(
 
   try {
     const { readFile } = await import("@tauri-apps/plugin-fs");
-    const { appDataDir } = await import("@tauri-apps/api/path");
-
-    const baseDir = await appDataDir();
+    const baseDir = await getManagedVaultBaseDir();
     const fullPath = `${baseDir}/${relativePath}`.replace(/\/+/g, "/");
     return await readFile(fullPath);
   } catch {
@@ -342,9 +376,7 @@ export async function deleteAttachmentFile(
 
   try {
     const { remove } = await import("@tauri-apps/plugin-fs");
-    const { appDataDir } = await import("@tauri-apps/api/path");
-
-    const baseDir = await appDataDir();
+    const baseDir = await getManagedVaultBaseDir();
     const fullPath = `${baseDir}/${relativePath}`.replace(/\/+/g, "/");
     await remove(fullPath);
   } catch {
@@ -363,9 +395,7 @@ export async function deleteProjectAttachmentsDirectory(
 
   try {
     const { remove } = await import("@tauri-apps/plugin-fs");
-    const { appDataDir } = await import("@tauri-apps/api/path");
-
-    const baseDir = await appDataDir();
+    const baseDir = await getManagedVaultBaseDir();
     const fullPath = `${baseDir}/${relProjectDir}`.replace(/\/+/g, "/");
     await remove(fullPath, { recursive: true });
   } catch {
@@ -377,3 +407,170 @@ export async function deleteProjectAttachmentsDirectory(
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 7. Managed Attachment Vault — İçe Aktarma Orkestrasyonu
+// ─────────────────────────────────────────────────────────────
+
+export interface ImportAttachmentOptions {
+  projectId: string;
+  businessFunctionCode: string;
+  questionId: string;
+  file: {
+    name: string;
+    size: number;
+    type?: string;
+    data: Uint8Array;
+    sourcePath?: string;
+  };
+  description?: string;
+  currentQuestionBytes?: number;
+  currentProjectBytes?: number;
+}
+
+export interface ImportAttachmentResult {
+  attachment: QuestionAttachment;
+  isDuplicate: boolean;
+  duplicateOf?: QuestionAttachment;
+}
+
+/**
+ * Kaynak dosya nereden seçilirse seçilsin, dosyayı uygulamanın kalıcı Managed Vault'una
+ * ikiz kopya olarak kaydeder, varlığını teyit eder ve SQLite metadata kaydını oluşturur.
+ */
+export async function importFileToManagedVault(
+  options: ImportAttachmentOptions
+): Promise<ImportAttachmentResult> {
+  const {
+    projectId,
+    businessFunctionCode,
+    questionId,
+    file,
+    description = "",
+    currentQuestionBytes = 0,
+    currentProjectBytes = 0,
+  } = options;
+
+  // 1. Doğrulama
+  const validation = validateAttachment(file, currentQuestionBytes, currentProjectBytes);
+  if (!validation.valid) {
+    throw new Error(validation.error || "Geçersiz dosya.");
+  }
+
+  // 2. SHA-256 Checksum hesapla
+  const sha256 = await calculateSha256(file.data);
+
+  // 3. Proje içinde duplicate kontrolü
+  const existingDup = await findAttachmentBySha256(projectId, sha256);
+  const isDuplicate = Boolean(existingDup);
+
+  // 4. Managed depolama dosya adı ve göreli yolu oluştur
+  const ext = (file.name.split(".").pop()?.toLowerCase() || "") as keyof typeof EXTENSION_TO_MIME;
+  const storedFileName = generateStoredFileName(file.name);
+  const relativePath = buildRelativePath(projectId, businessFunctionCode, questionId, storedFileName);
+  const resolvedMime = file.type || EXTENSION_TO_MIME[ext] || "application/octet-stream";
+
+  // 5. Dosyayı fiziksel olarak Managed Vault'a kaydet (kopyala)
+  await saveAttachmentFile(relativePath, file.data);
+
+  // 6. Fiziksel varlığı doğrula (exists check)
+  const savedData = await readAttachmentFile(relativePath);
+  if (!savedData || savedData.byteLength !== file.data.byteLength) {
+    throw new Error("Yönetilen kanıt kasasına yazma işlemi doğrulanamadı.");
+  }
+
+  // 7. SQLite metadata kaydı oluştur
+  const now = new Date().toISOString();
+  const attachment = await addQuestionAttachment({
+    analysis_project_id: projectId,
+    business_function_code: businessFunctionCode,
+    question_id: questionId,
+    original_file_name: file.name,
+    stored_file_name: storedFileName,
+    relative_path: relativePath,
+    mime_type: resolvedMime,
+    file_extension: ext,
+    file_size: file.size,
+    sha256,
+    description: description || null,
+    source_file_name: file.name,
+    source_absolute_path: file.sourcePath || null,
+    imported_at: now,
+  });
+
+  return {
+    attachment,
+    isDuplicate,
+    duplicateOf: existingDup || undefined,
+  };
+}
+
+/**
+ * Eksik veya legacy bir kaydı, kullanıcının seçtiği yeni bir dosya ile Managed Vault'a yeniden yazar.
+ */
+export async function reimportAttachmentFile(
+  attachmentId: string,
+  projectId: string,
+  businessFunctionCode: string,
+  questionId: string,
+  file: {
+    name: string;
+    size: number;
+    type?: string;
+    data: Uint8Array;
+    sourcePath?: string;
+  }
+): Promise<QuestionAttachment> {
+  const validation = validateAttachment(file);
+  if (!validation.valid) {
+    throw new Error(validation.error || "Geçersiz dosya.");
+  }
+
+  const sha256 = await calculateSha256(file.data);
+  const ext = (file.name.split(".").pop()?.toLowerCase() || "") as keyof typeof EXTENSION_TO_MIME;
+  const storedFileName = generateStoredFileName(file.name);
+  const relativePath = buildRelativePath(projectId, businessFunctionCode, questionId, storedFileName);
+  const resolvedMime = file.type || EXTENSION_TO_MIME[ext] || "application/octet-stream";
+
+  // Fiziksel kasaya yaz
+  await saveAttachmentFile(relativePath, file.data);
+
+  // Varlık kontrolü
+  const savedData = await readAttachmentFile(relativePath);
+  if (!savedData || savedData.byteLength !== file.data.byteLength) {
+    throw new Error("Yeniden içe aktarma doğrulanamadı.");
+  }
+
+  // DB güncelle
+  await updateQuestionAttachmentReimport(attachmentId, {
+    original_file_name: file.name,
+    stored_file_name: storedFileName,
+    relative_path: relativePath,
+    mime_type: resolvedMime,
+    file_extension: ext,
+    file_size: file.size,
+    sha256,
+    source_file_name: file.name,
+    source_absolute_path: file.sourcePath || null,
+  });
+
+  return {
+    id: attachmentId,
+    analysis_project_id: projectId,
+    business_function_code: businessFunctionCode,
+    question_id: questionId,
+    original_file_name: file.name,
+    stored_file_name: storedFileName,
+    relative_path: relativePath,
+    mime_type: resolvedMime,
+    file_extension: ext,
+    file_size: file.size,
+    sha256,
+    source_file_name: file.name,
+    source_absolute_path: file.sourcePath || null,
+    imported_at: new Date().toISOString(),
+    status: "valid",
+    sort_order: 0,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+}

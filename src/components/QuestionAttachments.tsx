@@ -1,18 +1,20 @@
 /**
  * ERP CRM Discovery — Question Attachments UI Component
  *
- * FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri
+ * FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri — Managed Attachment Vault Entegrasyonu
  *
  * İşlevler:
  * - Native dosya seçici & Sürükle-bırak desteği
+ * - Yönetilen Kasa (Managed Vault) kopyalama ve SHA-256 doğrulama
  * - Dosya allowlist ve 25 MB boyut denetimi
- * - Dosya listesi (İkon, orijinal isim, boyut, uzantı)
+ * - Dosya listesi (İkon, orijinal isim, boyut, uzantı, kasa durumu)
+ * - Eksik / Legacy kayıt tespiti ve "Yeniden İçe Aktar" (Re-import) desteği
  * - Açıklama ekleme / düzenleme
- * - Önizleme / Dosyayı açma
+ * - Güvenli Önizleme / Managed Kopyayı Açma
  * - Güvenli silme (Onay ile)
  */
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Paperclip,
   UploadCloud,
@@ -25,6 +27,8 @@ import {
   AlertCircle,
   ExternalLink,
   Table,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 import type { QuestionAttachment } from "../types";
 import {
@@ -34,6 +38,7 @@ import {
   readAttachmentFile,
   EXTENSION_TO_MIME,
 } from "../storage/attachmentManager";
+import { openAttachment, attachmentExists } from "../storage/attachmentLinks";
 
 interface QuestionAttachmentsProps {
   projectId: string;
@@ -41,11 +46,15 @@ interface QuestionAttachmentsProps {
   questionId: string;
   attachments: QuestionAttachment[];
   onAddAttachment: (
-    file: { name: string; size: number; type: string; data: Uint8Array },
+    file: { name: string; size: number; type: string; data: Uint8Array; sourcePath?: string },
     description?: string
   ) => Promise<void>;
   onDeleteAttachment: (attachmentId: string) => Promise<void>;
   onUpdateDescription?: (attachmentId: string, description: string) => Promise<void>;
+  onReimportAttachment?: (
+    attachmentId: string,
+    file: { name: string; size: number; type: string; data: Uint8Array; sourcePath?: string }
+  ) => Promise<void>;
   readOnly?: boolean;
 }
 
@@ -54,27 +63,57 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
   onAddAttachment,
   onDeleteAttachment,
   onUpdateDescription,
+  onReimportAttachment,
   readOnly = false,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDescText, setEditDescText] = useState("");
+  const [missingMap, setMissingMap] = useState<Record<string, boolean>>({});
+  const [reimportingId, setReimportingId] = useState<string | null>(null);
   const [previewAttachment, setPreviewAttachment] = useState<{
     attachment: QuestionAttachment;
     url: string;
   } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const reimportInputRef = useRef<HTMLInputElement>(null);
 
   const currentQuestionBytes = attachments.reduce((sum, a) => sum + (a.file_size || 0), 0);
 
+  // Check physical file existence in Managed Vault for each attachment
+  useEffect(() => {
+    let isMounted = true;
+    async function checkFiles() {
+      const missing: Record<string, boolean> = {};
+      for (const att of attachments) {
+        const exists = await attachmentExists(att.relative_path);
+        missing[att.id] = !exists;
+      }
+      if (isMounted) {
+        setMissingMap(missing);
+      }
+    }
+    if (attachments.length > 0) {
+      checkFiles();
+    } else {
+      setMissingMap({});
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [attachments]);
+
   const processFiles = async (files: FileList | File[]) => {
     setErrorMessage(null);
+    setSuccessMessage(null);
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
+    let addedCount = 0;
     try {
       for (let i = 0; i < files.length; i++) {
         const f = files[i];
@@ -102,6 +141,16 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
           },
           ""
         );
+        addedCount++;
+      }
+
+      if (addedCount > 0) {
+        setSuccessMessage(
+          addedCount === 1
+            ? "Kanıt dosyası yönetilen kasaya başarıyla kopyalandı."
+            : `${addedCount} dosya yönetilen kasaya başarıyla kopyalandı.`
+        );
+        setTimeout(() => setSuccessMessage(null), 4000);
       }
     } catch (err: any) {
       console.error("Dosya yükleme hatası:", err);
@@ -137,6 +186,54 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
     }
   };
 
+  const handleStartReimport = (attId: string) => {
+    setReimportingId(attId);
+    if (reimportInputRef.current) {
+      reimportInputRef.current.click();
+    }
+  };
+
+  const handleReimportInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !reimportingId || !onReimportAttachment) {
+      setReimportingId(null);
+      return;
+    }
+
+    setIsUploading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    try {
+      const validation = validateAttachment({ name: file.name, size: file.size, type: file.type });
+      if (!validation.valid) {
+        setErrorMessage(validation.error || "Geçersiz dosya.");
+        return;
+      }
+
+      const arrayBuf = await file.arrayBuffer();
+      const data = new Uint8Array(arrayBuf);
+      const fileExt = (file.name.split(".").pop()?.toLowerCase() || "") as keyof typeof EXTENSION_TO_MIME;
+      const resolvedType = file.type || EXTENSION_TO_MIME[fileExt] || "application/octet-stream";
+
+      await onReimportAttachment(reimportingId, {
+        name: file.name,
+        size: file.size,
+        type: resolvedType,
+        data,
+      });
+
+      setSuccessMessage(`"${file.name}" dosyası yönetilen kasaya yeniden içe aktarıldı.`);
+      setTimeout(() => setSuccessMessage(null), 4000);
+    } catch (err: any) {
+      console.error("Yeniden içe aktarma hatası:", err);
+      setErrorMessage(err?.message || "Yeniden içe aktarma başarısız oldu.");
+    } finally {
+      setIsUploading(false);
+      setReimportingId(null);
+      if (reimportInputRef.current) reimportInputRef.current.value = "";
+    }
+  };
+
   const handleStartEdit = (att: QuestionAttachment) => {
     setEditingId(att.id);
     setEditDescText(att.description || "");
@@ -155,25 +252,25 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
 
   const handleOpenFile = async (att: QuestionAttachment) => {
     try {
-      const data = await readAttachmentFile(att.relative_path);
-      if (!data) {
-        alert("Dosya yerel depolamada bulunamadı.");
-        return;
+      // Görsel ise uygulama içi lightbox
+      if (att.mime_type.startsWith("image/")) {
+        const data = await readAttachmentFile(att.relative_path);
+        if (data) {
+          const blob = new Blob([data as unknown as BlobPart], { type: att.mime_type });
+          const url = URL.createObjectURL(blob);
+          setPreviewAttachment({ attachment: att, url });
+          return;
+        }
       }
 
-      const blob = new Blob([data as unknown as BlobPart], { type: att.mime_type });
-      const url = URL.createObjectURL(blob);
-
-      // Görsel ise uygulama içi hızlı modal göster
-      if (att.mime_type.startsWith("image/")) {
-        setPreviewAttachment({ attachment: att, url });
-      } else {
-        // PDF, DOCX, XLSX vb. için yeni sekmede/harici aç
-        window.open(url, "_blank");
+      // Diğer dosyalar veya native açıcı
+      const result = await openAttachment(att);
+      if (!result.success) {
+        setErrorMessage(result.error || "Dosya açılamadı.");
       }
     } catch (err: any) {
       console.error("Dosya açma hatası:", err);
-      alert(`Dosya açılamadı: ${err?.message || err}`);
+      setErrorMessage(`Dosya açılamadı: ${err?.message || err}`);
     }
   };
 
@@ -183,7 +280,7 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
         await onDeleteAttachment(att.id);
       } catch (err: any) {
         console.error("Dosya silme hatası:", err);
-        alert(`Dosya silinemedi: ${err?.message || err}`);
+        setErrorMessage(`Dosya silinemedi: ${err?.message || err}`);
       }
     }
   };
@@ -222,7 +319,7 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
         <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
           <Paperclip size={14} style={{ color: "var(--color-secondary-600, #0f766e)" }} />
           <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--text-color, #0f172a)" }}>
-            Kanıt Dosyaları & Ekler
+            Kanıt Dosyaları & Ekler (Yönetilen Kasa)
           </span>
           {attachments.length > 0 && (
             <span
@@ -244,6 +341,13 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
               style={{ display: "none" }}
               onChange={handleFileInputChange}
             />
+            <input
+              ref={reimportInputRef}
+              type="file"
+              accept=".png,.jpg,.jpeg,.webp,.pdf,.docx,.xlsx,.csv,.txt"
+              style={{ display: "none" }}
+              onChange={handleReimportInputChange}
+            />
             <button
               type="button"
               className="btn btn--outline btn--xs"
@@ -258,15 +362,35 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
         )}
       </div>
 
+      {successMessage && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.375rem",
+            color: "var(--color-success-700, #15803d)",
+            background: "var(--color-success-50, #f0fdf4)",
+            border: "1px solid var(--color-success-200, #bbf7d0)",
+            padding: "0.375rem 0.5rem",
+            borderRadius: "4px",
+            fontSize: "0.75rem",
+            marginBottom: "0.5rem",
+          }}
+        >
+          <Check size={13} />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
       {errorMessage && (
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: "0.375rem",
-            color: "var(--color-danger-700)",
+            color: "var(--color-danger-700, #b91c1c)",
             background: "var(--color-danger-50, #fef2f2)",
-            border: "1px solid var(--color-danger-200)",
+            border: "1px solid var(--color-danger-200, #fecaca)",
             padding: "0.375rem 0.5rem",
             borderRadius: "4px",
             fontSize: "0.75rem",
@@ -299,134 +423,173 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
         >
           <span>Bu soruya henüz kanıt dokümanı eklenmedi. Dosya seçebilir veya buraya sürükleyebilirsiniz.</span>
           <div style={{ fontSize: "0.6875rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
-            (Desteklenenler: PNG, JPG, PDF, DOCX, XLSX, CSV, TXT • Maks. 25 MB)
+            (Orijinal dosya korunur; güvenli ikiz kopya uygulamanın yerel kasasına alınır • Maks. 25 MB)
           </div>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
-          {attachments.map((att) => (
-            <div
-              key={att.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0.375rem 0.5rem",
-                background: "white",
-                border: "1px solid var(--border-color, #e2e8f0)",
-                borderRadius: "4px",
-                fontSize: "0.8125rem",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: 0, flex: 1 }}>
-                {renderFileIcon(att.file_extension)}
-                <div style={{ minWidth: 0, flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-                    <span
-                      style={{
-                        fontWeight: 600,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        maxWidth: "240px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleOpenFile(att)}
-                      title="Görüntülemek için tıklayın"
-                    >
-                      {att.original_file_name}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: "0.6875rem",
-                        color: "var(--text-muted)",
-                        background: "var(--color-neutral-100)",
-                        padding: "0.05rem 0.3rem",
-                        borderRadius: "3px",
-                      }}
-                    >
-                      {att.file_extension.toUpperCase()} • {formatFileSize(att.file_size)}
-                    </span>
-                  </div>
-
-                  {editingId === att.id ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem" }}>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={editDescText}
-                        onChange={(e) => setEditDescText(e.target.value)}
-                        placeholder="Kanıt açıklaması (örn. 2026 Prosedür Ek-1)..."
-                        style={{ fontSize: "0.75rem", padding: "0.2rem 0.4rem", height: "auto" }}
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleSaveEdit(att.id);
-                          if (e.key === "Escape") setEditingId(null);
+          {attachments.map((att) => {
+            const isMissing = Boolean(missingMap[att.id]);
+            return (
+              <div
+                key={att.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0.375rem 0.5rem",
+                  background: isMissing ? "var(--color-danger-50, #fff5f5)" : "white",
+                  border: isMissing
+                    ? "1px solid var(--color-danger-300, #fca5a5)"
+                    : "1px solid var(--border-color, #e2e8f0)",
+                  borderRadius: "4px",
+                  fontSize: "0.8125rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", minWidth: 0, flex: 1 }}>
+                  {renderFileIcon(att.file_extension)}
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          maxWidth: "240px",
+                          cursor: isMissing ? "default" : "pointer",
+                          color: isMissing ? "var(--color-danger-700)" : "inherit",
                         }}
-                      />
-                      <button
-                        type="button"
-                        className="btn btn--primary btn--xs"
-                        onClick={() => handleSaveEdit(att.id)}
-                        style={{ padding: "0.2rem 0.4rem" }}
+                        onClick={() => !isMissing && handleOpenFile(att)}
+                        title={isMissing ? "Dosya kasada bulunamadı" : "Görüntülemek için tıklayın"}
                       >
-                        <Check size={12} />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn--outline btn--xs"
-                        onClick={() => setEditingId(null)}
-                        style={{ padding: "0.2rem 0.4rem" }}
+                        {att.original_file_name}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "0.6875rem",
+                          color: "var(--text-muted)",
+                          background: "var(--color-neutral-100)",
+                          padding: "0.05rem 0.3rem",
+                          borderRadius: "3px",
+                        }}
                       >
-                        <X size={12} />
-                      </button>
+                        {att.file_extension.toUpperCase()} • {formatFileSize(att.file_size)}
+                      </span>
+                      {isMissing && (
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.2rem",
+                            fontSize: "0.6875rem",
+                            color: "var(--color-danger-700)",
+                            background: "var(--color-danger-100)",
+                            padding: "0.05rem 0.35rem",
+                            borderRadius: "3px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          <AlertTriangle size={11} />
+                          Kasada Yok
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    att.description && (
-                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic", marginTop: "0.1rem" }}>
-                        {att.description}
+
+                    {editingId === att.id ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", marginTop: "0.25rem" }}>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={editDescText}
+                          onChange={(e) => setEditDescText(e.target.value)}
+                          placeholder="Kanıt açıklaması (örn. 2026 Prosedür Ek-1)..."
+                          style={{ fontSize: "0.75rem", padding: "0.2rem 0.4rem", height: "auto" }}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleSaveEdit(att.id);
+                            if (e.key === "Escape") setEditingId(null);
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn--primary btn--xs"
+                          onClick={() => handleSaveEdit(att.id)}
+                          style={{ padding: "0.2rem 0.4rem" }}
+                        >
+                          <Check size={12} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn--outline btn--xs"
+                          onClick={() => setEditingId(null)}
+                          style={{ padding: "0.2rem 0.4rem" }}
+                        >
+                          <X size={12} />
+                        </button>
                       </div>
+                    ) : (
+                      att.description && (
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic", marginTop: "0.1rem" }}>
+                          {att.description}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", marginLeft: "0.5rem" }}>
+                  {isMissing ? (
+                    !readOnly && onReimportAttachment && (
+                      <button
+                        type="button"
+                        className="btn btn--warning btn--xs"
+                        onClick={() => handleStartReimport(att.id)}
+                        title="Dosyayı Yeniden İçe Aktar"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "0.2rem", padding: "0.2rem 0.4rem" }}
+                      >
+                        <RefreshCw size={11} />
+                        Yeniden İçe Aktar
+                      </button>
                     )
+                  ) : (
+                    <button
+                      type="button"
+                      className="btn btn--ghost btn--xs"
+                      onClick={() => handleOpenFile(att)}
+                      title="Dosyayı Görüntüle / Aç"
+                      style={{ padding: "0.2rem 0.35rem" }}
+                    >
+                      <ExternalLink size={13} />
+                    </button>
+                  )}
+
+                  {!readOnly && (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--xs"
+                        onClick={() => handleStartEdit(att)}
+                        title="Açıklama Düzenle"
+                        style={{ padding: "0.2rem 0.35rem" }}
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--xs"
+                        onClick={() => handleDelete(att)}
+                        title="Kanıt Dosyasını Sil"
+                        style={{ padding: "0.2rem 0.35rem", color: "var(--color-danger-600)" }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
-
-              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", marginLeft: "0.5rem" }}>
-                <button
-                  type="button"
-                  className="btn btn--ghost btn--xs"
-                  onClick={() => handleOpenFile(att)}
-                  title="Dosyayı Görüntüle / Aç"
-                  style={{ padding: "0.2rem 0.35rem" }}
-                >
-                  <ExternalLink size={13} />
-                </button>
-
-                {!readOnly && (
-                  <>
-                    <button
-                      type="button"
-                      className="btn btn--ghost btn--xs"
-                      onClick={() => handleStartEdit(att)}
-                      title="Açıklama Düzenle"
-                      style={{ padding: "0.2rem 0.35rem" }}
-                    >
-                      <Edit3 size={13} />
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn--ghost btn--xs"
-                      onClick={() => handleDelete(att)}
-                      title="Kanıt Dosyasını Sil"
-                      style={{ padding: "0.2rem 0.35rem", color: "var(--color-danger-600)" }}
-                    >
-                      <Trash2 size={13} />
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

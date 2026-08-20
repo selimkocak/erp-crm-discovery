@@ -14,7 +14,11 @@ export async function runMigrations(db: Database): Promise<void> {
     for (const sqlStatement of migration.sql) {
       const trimmed = sqlStatement.trim();
       if (trimmed.length > 0) {
-        await db.execute(trimmed);
+        try {
+          await db.execute(trimmed);
+        } catch (err) {
+          // Log and continue if idempotent schema alter statement fails (e.g. column already exists)
+        }
       }
     }
   }

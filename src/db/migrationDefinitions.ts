@@ -269,5 +269,14 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_qa_project_bf_q ON question_attachments(analysis_project_id, business_function_code, question_id);`,
       `CREATE INDEX IF NOT EXISTS idx_qa_project_sha ON question_attachments(analysis_project_id, sha256);`
     ]
+  },
+  {
+    version: 8,
+    description: "Managed Attachment Vault Metadata Extensions",
+    sql: [
+      `ALTER TABLE question_attachments ADD COLUMN source_file_name TEXT;`,
+      `ALTER TABLE question_attachments ADD COLUMN source_absolute_path TEXT;`,
+      `ALTER TABLE question_attachments ADD COLUMN imported_at TEXT;`
+    ]
   }
 ] as const;

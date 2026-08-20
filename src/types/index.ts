@@ -271,6 +271,10 @@ export interface QuestionAttachment {
   file_size: number;
   sha256: string;
   description?: string | null;
+  source_file_name?: string | null;
+  source_absolute_path?: string | null;
+  imported_at?: string | null;
+  status?: "valid" | "missing" | "legacy_invalid";
   sort_order: number;
   created_at: string;
   updated_at: string;
@@ -289,6 +293,9 @@ export interface CreateQuestionAttachmentPayload {
   file_size: number;
   sha256: string;
   description?: string | null;
+  source_file_name?: string | null;
+  source_absolute_path?: string | null;
+  imported_at?: string | null;
   sort_order?: number;
 }
 

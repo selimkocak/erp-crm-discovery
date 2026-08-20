@@ -1200,16 +1200,19 @@ export async function addQuestionAttachment(
   const db = await getDb();
   const id = generateId("att");
   const now = new Date().toISOString();
+  const importedAt = payload.imported_at || now;
 
   await db.execute(
     `INSERT INTO question_attachments (
        id, analysis_project_id, business_function_code, question_id, answer_id,
        original_file_name, stored_file_name, relative_path, mime_type,
-       file_extension, file_size, sha256, description, sort_order, created_at, updated_at
+       file_extension, file_size, sha256, description, source_file_name,
+       source_absolute_path, imported_at, sort_order, created_at, updated_at
      ) VALUES (
        $1, $2, $3, $4, $5,
        $6, $7, $8, $9,
-       $10, $11, $12, $13, $14, $15, $15
+       $10, $11, $12, $13, $14,
+       $15, $16, $17, $18, $18
      )`,
     [
       id,
@@ -1225,6 +1228,9 @@ export async function addQuestionAttachment(
       payload.file_size,
       payload.sha256,
       payload.description ?? null,
+      payload.source_file_name ?? payload.original_file_name,
+      payload.source_absolute_path ?? null,
+      importedAt,
       payload.sort_order ?? 0,
       now,
     ]
@@ -1244,10 +1250,52 @@ export async function addQuestionAttachment(
     file_size: payload.file_size,
     sha256: payload.sha256,
     description: payload.description ?? null,
+    source_file_name: payload.source_file_name ?? payload.original_file_name,
+    source_absolute_path: payload.source_absolute_path ?? null,
+    imported_at: importedAt,
+    status: "valid",
     sort_order: payload.sort_order ?? 0,
     created_at: now,
     updated_at: now,
   };
+}
+
+export async function updateQuestionAttachmentReimport(
+  attachmentId: string,
+  updates: {
+    original_file_name: string;
+    stored_file_name: string;
+    relative_path: string;
+    mime_type: string;
+    file_extension: string;
+    file_size: number;
+    sha256: string;
+    source_file_name?: string | null;
+    source_absolute_path?: string | null;
+  }
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  await db.execute(
+    `UPDATE question_attachments
+     SET original_file_name = $1, stored_file_name = $2, relative_path = $3,
+         mime_type = $4, file_extension = $5, file_size = $6, sha256 = $7,
+         source_file_name = $8, source_absolute_path = $9, imported_at = $10, updated_at = $10
+     WHERE id = $11`,
+    [
+      updates.original_file_name,
+      updates.stored_file_name,
+      updates.relative_path,
+      updates.mime_type,
+      updates.file_extension,
+      updates.file_size,
+      updates.sha256,
+      updates.source_file_name ?? updates.original_file_name,
+      updates.source_absolute_path ?? null,
+      now,
+      attachmentId,
+    ]
+  );
 }
 
 export async function getQuestionAttachments(

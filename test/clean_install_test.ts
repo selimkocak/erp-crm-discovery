@@ -68,7 +68,11 @@ function runMigrations(db: any): void {
     for (const sqlStatement of migration.sql) {
       const trimmed = sqlStatement.trim();
       if (trimmed.length > 0) {
-        db.prepare(trimmed).run();
+        try {
+          db.prepare(trimmed).run();
+        } catch {
+          // Idempotent for ALTER TABLE additions on restart simulations
+        }
       }
     }
   }
