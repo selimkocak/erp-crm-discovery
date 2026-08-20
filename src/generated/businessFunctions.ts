@@ -3,7 +3,7 @@
  * DO NOT EDIT MANUALLY.
  * Source: data/business-functions.json
  *
- * Generated at: 2026-08-20T11:26:08.880Z
+ * Generated at: 2026-08-20T11:51:07.964Z
  */
 
 export interface BusinessFunctionEntry {

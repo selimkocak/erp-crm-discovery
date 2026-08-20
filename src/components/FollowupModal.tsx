@@ -5,7 +5,7 @@
  * açıklama/neden notu girme veya mevcut bayrağı temizleme modalı.
  */
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AlertCircle, Clock, AlertTriangle, X, Trash2, Check } from "lucide-react";
 import type { FollowupFlagType, QuestionFollowup } from "../types";
 
@@ -35,6 +35,38 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
   );
   const [note, setNote] = useState<string>(existingFollowup?.note || initialNote || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Modal açıldığında veya yeniden render olduğunda textarea'ya otomatik focus
+  useEffect(() => {
+    const focusTimer = setTimeout(() => {
+      if (noteTextareaRef.current) {
+        noteTextareaRef.current.focus();
+        // İmleci mevcut metnin en sonuna konumlandır
+        const len = noteTextareaRef.current.value.length;
+        noteTextareaRef.current.setSelectionRange(len, len);
+      }
+    }, 30);
+
+    const rafId = requestAnimationFrame(() => {
+      if (noteTextareaRef.current) {
+        noteTextareaRef.current.focus();
+      }
+    });
+
+    return () => {
+      clearTimeout(focusTimer);
+      cancelAnimationFrame(rafId);
+    };
+  }, []);
+
+  const handleFlagTypeChange = (newType: FollowupFlagType) => {
+    setFlagType(newType);
+    // Bayrak türü değiştirildiğinde klavye odağını textarea'da tut
+    requestAnimationFrame(() => {
+      noteTextareaRef.current?.focus();
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +140,7 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                 <button
                   type="button"
-                  onClick={() => setFlagType("revisit")}
+                  onClick={() => handleFlagTypeChange("revisit")}
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -134,7 +166,7 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
 
                 <button
                   type="button"
-                  onClick={() => setFlagType("critical")}
+                  onClick={() => handleFlagTypeChange("critical")}
                   style={{
                     display: "flex",
                     alignItems: "flex-start",
@@ -163,9 +195,20 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
             {/* Neden / Açıklama Notu */}
             <div>
               <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.35rem" }}>
-                Neden / Takip Notu <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 400 }}>(Opsiyonel)</span>
+                Neden / Takip Notu{" "}
+                {flagType === "critical" ? (
+                  <span style={{ fontSize: "0.75rem", color: "var(--danger)", fontWeight: 500 }}>
+                    (Kritik takip için gerekçe yazılması önerilir)
+                  </span>
+                ) : (
+                  <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 400 }}>
+                    (Opsiyonel)
+                  </span>
+                )}
               </label>
               <textarea
+                ref={noteTextareaRef}
+                autoFocus
                 className="input input--textarea"
                 rows={3}
                 placeholder="Örn: Muhasebe müdüründen teyit alınacak, iskonto onay yetkisi sorulacak..."

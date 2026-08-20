@@ -437,9 +437,33 @@ async function testSqliteFollowups() {
   }
 }
 
+async function testFollowupModalFocusBehavior() {
+  console.log("\n=== T09: Followup Modal Textarea Focus & UX Integrity ===");
+  const modalSourcePath = path.join(path.dirname(new URL(import.meta.url).pathname), "../src/components/FollowupModal.tsx");
+  const modalCode = fs.readFileSync(modalSourcePath, "utf-8");
+
+  // 1. Ref and autoFocus presence
+  assert(modalCode.includes("noteTextareaRef = useRef<HTMLTextAreaElement>"), "FollowupModal noteTextareaRef referansı tanımlı");
+  assert(modalCode.includes("ref={noteTextareaRef}"), "textarea noteTextareaRef'e bağlı");
+  assert(modalCode.includes("autoFocus"), "textarea autoFocus niteliğine sahip");
+
+  // 2. useEffect auto-focus with requestAnimationFrame and setTimeout fallback
+  assert(modalCode.includes("requestAnimationFrame") && modalCode.includes("noteTextareaRef.current.focus()"), "Modal mount olduğunda requestAnimationFrame ile otomatik focus yapılıyor");
+  assert(modalCode.includes("setSelectionRange"), "Metin varsa imleç metnin sonuna konumlandırılıyor");
+
+  // 3. Focus preservation on flag type switch (Sonra Dön <-> Kritik Takip)
+  assert(modalCode.includes("handleFlagTypeChange"), "Bayrak türü değişiminde handleFlagTypeChange devrede");
+  assert(modalCode.includes("handleFlagTypeChange(\"revisit\")") && modalCode.includes("handleFlagTypeChange(\"critical\")"), "Sonra Dön ve Kritik Takip butonları focus korumalı tıklamaya bağlı");
+
+  // 4. UX Labeling Truth
+  assert(modalCode.includes("Kritik takip için gerekçe yazılması önerilir"), "Kritik takip seçildiğinde yönlendirici gerekçe etiketi gösteriliyor");
+  assert(modalCode.includes("(Opsiyonel)"), "Sonra Dön seçildiğinde (Opsiyonel) etiketi gösteriliyor");
+}
+
 async function runAll() {
   await testExports();
   await testSqliteFollowups();
+  await testFollowupModalFocusBehavior();
 
   console.log("\n" + "═".repeat(50));
   console.log(`FAZ-9 Question Followups Test Sonucu: ${passCount} PASS / ${failCount} FAIL`);
