@@ -1,24 +1,28 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.0 | Git HEAD: working_tree
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz31_closure_2026_08_20
-Doğrulama Durumu: 31 Test Paketinde 900+ Test %100 PASS, npm run build (0 Hata), cargo check (0 Hata)
+Mevcut Sürüm: v0.1.0 | Git HEAD: 9416532 (main)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_managed_attachment_vault_and_fixed_toolbar_closure_2026_08_20
+Doğrulama Durumu: 39 Test Paketinde 1200+ Test %100 PASS, npm run build (0 Hata), cargo check (0 Hata)
+Çoklu Platform Paketleri: macOS Apple Silicon (11.16 MB, ID: 9412445412) & Windows Native (3.93 MB, ID: 9412513418)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
 ======================================================================
 - Kabuk: Tauri 2 (Rust) + React 18 + TypeScript + Vite + Vanilla CSS (Design Tokens) + Lucide Icons
-- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 15 Kanonik Tablo, 6 Migrasyon (Tauri plugin-sql)
-- Soru Motoru: 32 Kanonik Fonksiyon kataloğu, 22 Kanonik Soru Paketi (928 Soru, ~462 Zorunlu, 116 Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 16 Kanonik Tablo, 8 Migrasyon (Tauri plugin-sql)
+- Soru Motoru: 32 Kanonik Fonksiyon kataloğu, 23 Kanonik Soru Paketi (975 Soru, ~488 Zorunlu, 120 Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
 - Semantik Katman: Bulgular (Findings), Gereksinimler (Requirements), Riskler (Risks), Proje Notları (Notes)
 - Takip & Navigasyon: 🟡 Sonra Dön (revisit) & 🔴 Kritik Takip (critical) Bayrakları, Proje Özel Soruları (project_custom_questions), Sol Soru Navigatörü, Autosave & Resumable Analiz
+- Soru Ekranı Üst Bar & Geometrik Simetri: .question-screen-toolbar 3-kolonlu CSS Grid (190px / 240px / auto), buton min-width sınırları (.btn-save-exit 142px zümrüt #047857 WCAG AA 5.48:1, .btn-nav-home 150px, .btn-custom-question 126px, .btn-interim-report 118px), .flag-actions 2-kolon simetrik grid, .active-flag-banner ve .followup-modal-container (560px max / 420px min)
+- Rapor Önizleme Özel Aksiyonu: Koyu indigo (#4f46e5, hover #4338ca) dolgu ve FileText ikonu ile ara rapordan ayrıştırılmış ana çıktı tasarımı
+- Managed Attachment Vault (Yönetilen Kanıt Kasası): Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/projects/{projectId}/attachments/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration v8: source_file_name, source_absolute_path, imported_at), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF file:///... hyperlink garantisi, eksik/legacy kayıtlar için re-import mekanizması
 - Raporlama Motoru (Tek Doğruluk Kaynağı): ReportModel üzerinden Rapor Önizleme, Word (.docx) ve Gömülü Liberation Sans TrueType Unicode PDF (.pdf) üretimi (Türkçe karakter garantili, sıfır ağ bağımlılığı)
 - Dağıtım Paketleri: Windows (x64 NSIS Setup .exe) ve macOS Apple Silicon (aarch64 DMG + .app)
 - Kurulum Rehberleri: Kök dizinde ve artifact ZIP'lerinde WINDOWS_KURULUM_YARDIMI.txt & MACOS_KURULUM_YARDIMI.txt
 
 ======================================================================
-2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-31)
+2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-33)
 ======================================================================
 - FAZ-1 / FAZ-2.2: 31/32 Fonksiyon, soru paketi motoru, SQLite tohumlama ve clean install
 - FAZ-3: Semantik analiz katmanı (Bulgu, Gereksinim, Risk, Not)
@@ -49,12 +53,14 @@ Doğrulama Durumu: 31 Test Paketinde 900+ Test %100 PASS, npm run build (0 Hata)
 - FAZ-28: ASSET_MANAGEMENT — Varlık Yönetimi Soru Paketi (tr.asset_management.core v0.1.0, 45 soru, 24 req, 24 süreç)
 - FAZ-29: HUMAN_RESOURCES — İnsan Kaynakları Soru Paketi (tr.human_resources.core v0.1.0, 46 soru, 25 req, 25 süreç)
 - FAZ-30: PAYROLL — Bordro ve Maaş Soru Paketi (tr.payroll.core v0.1.0, 47 soru, 26 req, 25 süreç)
-- FAZ-31: LEGAL_COMPLIANCE — Hukuk ve Mevzuat Uyum Soru Paketi (tr.legal_compliance.core v0.1.0, 46 soru, 25 req, 25 süreç, 82 test PASS)
+- FAZ-31: LEGAL_COMPLIANCE — Hukuk ve Mevzuat Uyum Soru Paketi (tr.legal_compliance.core v0.1.0, 46 soru, 25 req, 25 süreç)
+- FAZ-32: IT_INFRASTRUCTURE — Bilgi Teknolojileri Altyapısı Soru Paketi (tr.it_infrastructure.core v0.1.0, 47 soru, 26 req, 25 süreç)
+- FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri (Question Evidence & Attachments), Managed Attachment Vault (Yönetilen Kanıt Kasası), Tıklanabilir DOCX/PDF file:/// Hyperlink'leri, Soru Ekranı Sabit Grid Üst Bar & Simetrik Takip Bayrakları Düzeni
 
 ======================================================================
 3. AKTİF KÜLLİYAT VE MODÜL SIRASI
 ======================================================================
-- Mevcut Tamamlanan Külliyat (22 Modül / 928 Soru):
+- Mevcut Tamamlanan Külliyat (23 Modül / 975 Soru):
   1. SALES (38 Soru) [Kabul Edildi]
   2. PROCUREMENT (40 Soru) [Kabul Edildi]
   3. WAREHOUSE (38 Soru) [Kabul Edildi]
@@ -77,8 +83,9 @@ Doğrulama Durumu: 31 Test Paketinde 900+ Test %100 PASS, npm run build (0 Hata)
   20. HUMAN_RESOURCES (46 Soru) [Kabul Edildi]
   21. PAYROLL (47 Soru) [Kabul Edildi]
   22. LEGAL_COMPLIANCE (46 Soru) [Kabul Edildi]
+  23. IT_INFRASTRUCTURE (47 Soru) [Kabul Edildi]
 
-- Henüz Paketi Olmayan Kanonik Fonksiyonlar (10 Modül):
+- Henüz Paketi Olmayan Kanonik Fonksiyonlar (9 Modül):
   1. MANAGEMENT (Genel Yönetim)
   2. STRATEGY (Stratejik Planlama)
   3. TRAINING (Eğitim ve Gelişim)
@@ -88,18 +95,17 @@ Doğrulama Durumu: 31 Test Paketinde 900+ Test %100 PASS, npm run build (0 Hata)
   7. EXPORT (İhracat)
   8. ECOMMERCE (E-Ticaret)
   9. DOCUMENT_MANAGEMENT (Doküman Yönetimi)
-  10. INFORMATION_TECHNOLOGY (IT ve Altyapı)
 
 - Kural: Tek Modül = Tek Faz = Tek Kabul
-- Sıradaki Modül Adayı: INFORMATION_TECHNOLOGY (IT ve Altyapı) veya PROJECT_MANAGEMENT (Proje Yönetimi)
+- Sıradaki Modül / Faz Adayı: FAZ-34 MASTER_DATA_MANAGEMENT (Ana Veri Yönetimi) veya PROJECT_MANAGEMENT (Proje Yönetimi)
 - Çapraz Denetim Kuralı: Cross-Pack Duplication Audit (Kelimeleri değiştirip aynı soruyu tekrar sorma YASAK, net sınır ayrımı zorunlu)
 
 ======================================================================
 4. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- Tüm Testler (31 Suite): npm test
+- Tüm Testler (39 Suite): npm test
 - Windows Test Paritesi: npm run test:windows
-- Tekil Test Çalıştırma: ./node_modules/.bin/tsx test/faz31_legal_compliance_question_pack_test.ts
+- Tekil Test Çalıştırma: ./node_modules/.bin/tsx test/managed_attachment_vault_test.ts
 - Frontend Üretim Derlemesi: npm run build
 - Backend Rust Derlemesi: cargo check --manifest-path src-tauri/Cargo.toml
 
