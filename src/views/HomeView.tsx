@@ -154,16 +154,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <td style={{ textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: "0.375rem" }}>
                       <button
-                        className="btn btn-secondary"
-                        style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}
+                        className="btn btn--primary btn--sm"
                         onClick={() => onOpenProject(proj.id)}
                       >
                         <FolderOpen size={14} />
                         Aç
                       </button>
                       <button
-                        className="btn btn-danger-ghost"
-                        style={{ padding: "0.375rem 0.5rem" }}
+                        className="btn btn-danger-ghost btn--sm"
                         title="Analizi Sil"
                         onClick={() => handleDelete(proj.id, proj.name)}
                       >

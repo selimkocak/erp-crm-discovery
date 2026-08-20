@@ -221,7 +221,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <button
-            className="btn btn--primary btn--sm"
+            className="btn btn--secondary btn--sm"
             onClick={() => setIsViewingReport(true)}
             title="ERP/CRM Ön Analiz Raporunu İncele"
           >
@@ -428,9 +428,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                   <td>
                     {hasQuestionPack(fn.code) ? (
                       <button
-                        className={`btn btn--sm ${
-                          fn.status === "not_started" ? "btn--primary" : "btn--secondary"
-                        }`}
+                        className="btn btn--primary btn--sm"
                         disabled={packLoadingCode === fn.code}
                         onClick={() => handleStartAnalysis(fn.code, fn.name_tr)}
                         title={fn.status === "not_started" ? "Analizi Başlat" : "Analize Devam Et"}
@@ -438,24 +436,27 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                         {packLoadingCode === fn.code ? (
                           <span className="btn__spinner" />
                         ) : fn.status === "not_started" ? (
-                          <><Play size={12} /> Başlat</>
+                          <><Play size={13} /> Başlat</>
                         ) : (
-                          <><BookOpen size={12} /> Devam</>
+                          <><BookOpen size={13} /> Devam</>
                         )}
                       </button>
                     ) : (
                       <span
                         className="badge badge--neutral"
+                        title="Bu iş fonksiyonunun soru paketi hazırlanma aşamasındadır"
                         style={{
                           fontSize: "0.75rem",
                           padding: "0.25rem 0.5rem",
                           borderRadius: "4px",
-                          background: "var(--bg-subtle, #f1f5f9)",
-                          color: "var(--text-muted, #64748b)",
-                          display: "inline-block",
-                          fontWeight: 500,
+                          background: "var(--color-neutral-100)",
+                          color: "var(--color-neutral-500)",
+                          border: "1px solid var(--color-neutral-200)",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                          cursor: "default",
                         }}
-                        title="Bu iş fonksiyonu için soru paketi henüz geliştirme aşamasındadır"
                       >
                         Hazırlanıyor
                       </span>

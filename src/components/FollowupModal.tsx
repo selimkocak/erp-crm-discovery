@@ -251,7 +251,7 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <button
                 type="button"
-                className="btn btn-secondary btn-sm"
+                className="btn btn-outline btn-sm"
                 onClick={onClose}
                 disabled={isSubmitting}
               >

@@ -513,7 +513,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <button
               type="button"
-              className="btn btn--outline btn--sm"
+              className="btn btn--secondary btn--sm"
               onClick={handleAddCustomQuestion}
               title="Bu iş fonksiyonuna yeni bir özel soru ekle"
             >
@@ -526,7 +526,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             {onOpenReport && (
               <button
                 type="button"
-                className="btn btn--outline btn--sm"
+                className="btn btn--secondary btn--sm"
                 onClick={handleOpenReportClick}
                 title="Mevcut durum ara raporunu incele / dışa aktar"
               >
@@ -537,7 +537,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
             <button
               type="button"
-              className="btn btn--secondary btn--sm"
+              className="btn btn--outline btn--sm"
               onClick={handleSaveAndExit}
               title="Değişiklikleri doğrula ve proje ekranına dön"
             >
@@ -650,7 +650,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         {/* ── Navigasyon ──────────────────────────────────────────────────── */}
         <div className="question-screen__nav">
           <button
-            className="btn btn--secondary question-screen__nav-btn"
+            className="btn btn--outline question-screen__nav-btn"
             onClick={handlePrev}
             disabled={isFirst}
           >
@@ -681,7 +681,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button
               type="button"
-              className="btn btn--secondary question-screen__nav-btn"
+              className="btn btn--outline question-screen__nav-btn"
               onClick={handleSaveAndExit}
               title="Analizden ayrıl (Kaldığınız soru saklanır)"
             >

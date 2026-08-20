@@ -26,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           {currentView !== "home" ? (
-            <button className="btn btn-secondary" onClick={onNavigateHome}>
+            <button className="btn btn-outline" onClick={onNavigateHome}>
               <ArrowLeft size={16} />
               Ana Sayfaya Dön
             </button>

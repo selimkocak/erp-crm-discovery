@@ -329,7 +329,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
-            <button type="button" className="btn btn-secondary" onClick={onCancel}>
+            <button type="button" className="btn btn-outline" onClick={onCancel}>
               İptal
             </button>
             <button type="submit" className="btn btn-primary">
@@ -466,7 +466,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
             <button
               type="button"
-              className="btn btn-secondary"
+              className="btn btn-outline"
               onClick={() => setStep(1)}
               disabled={isSubmitting}
             >
