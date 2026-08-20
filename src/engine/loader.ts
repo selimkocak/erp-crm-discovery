@@ -53,6 +53,20 @@ const PACK_ID_TO_PATH: Record<string, string> = {
 };
 
 /**
+ * Belirli bir pack_id'nin çalışma zamanında kullanılabilir olup olmadığını denetler.
+ */
+export function isPackAvailable(packId: string): boolean {
+  const filePath = PACK_ID_TO_PATH[packId];
+  if (!filePath) return false;
+  // Vite ortamında glob listesi doluysa içindeki mevcudiyeti kontrol et
+  if (Object.keys(PACK_MODULES).length > 0) {
+    return typeof PACK_MODULES[filePath] === "function";
+  }
+  // Node.js test ortamında kayıt mevcudiyeti yeterlidir
+  return true;
+}
+
+/**
  * Verilen pack_id'ye göre soru paketini yükler ve doğrular.
  */
 export async function loadQuestionPack(packId: string): Promise<PackLoadResult> {
@@ -62,18 +76,18 @@ export async function loadQuestionPack(packId: string): Promise<PackLoadResult> 
     return {
       ok: false,
       packId,
-      error: `"${packId}" için kayıtlı dosya yolu bulunamadı.`,
+      error: `"${packId}" için kayıtlı soru paketi yolu tanımlı değil.`,
     };
   }
 
   const loader = PACK_MODULES[filePath];
 
   if (!loader) {
+    // Vite bundle içinde dosya yoksa veya henüz eklenmemişse
     return {
       ok: false,
       packId,
-      error: `Soru paketi glob'da bulunamadı: ${filePath}\n` +
-             `Dosya question-packs/ dizininde mevcut mu?`,
+      error: `"${packId}" soru paketi henüz bu sürüme dahil edilmemiştir veya hazırlanmaktadır.`,
     };
   }
 
@@ -143,4 +157,22 @@ export function getPackIdForFunction(bfCode: string): string | null {
     "IT_INFRASTRUCTURE": "tr.it_infrastructure.core", // Alias
   };
   return mapping[bfCode] ?? null;
+}
+
+/**
+ * İş fonksiyonunun soru paketinin mevcut ve kullanıma hazır olup olmadığını kontrol eder.
+ */
+export function hasQuestionPack(bfCode: string): boolean {
+  const packId = getPackIdForFunction(bfCode);
+  if (!packId) return false;
+  return isPackAvailable(packId);
+}
+
+/**
+ * İş fonksiyonunun soru paketi durumunu döner.
+ */
+export function getPackStatus(bfCode: string): "available" | "in_development" | "unmapped" {
+  const packId = getPackIdForFunction(bfCode);
+  if (!packId) return "in_development";
+  return isPackAvailable(packId) ? "available" : "in_development";
 }

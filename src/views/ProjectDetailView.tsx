@@ -18,7 +18,7 @@ import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
-import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
+import { loadQuestionPack, getPackIdForFunction, hasQuestionPack } from "../engine/loader";
 import type { QuestionPack } from "../engine/types";
 import type { FunctionStatus, ProjectDetailData } from "../types";
 
@@ -64,22 +64,28 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   };
 
   const handleStartAnalysis = async (bfCode: string, bfNameTr: string) => {
-    const packId = getPackIdForFunction(bfCode);
-    if (!packId) {
-      setPackError(`"${bfNameTr}" için soru paketi henüz hazırlanmadı.`);
+    if (!hasQuestionPack(bfCode)) {
+      setPackError(`"${bfNameTr}" için soru paketi henüz geliştirme aşamasındadır.`);
       return;
     }
+    const packId = getPackIdForFunction(bfCode)!;
     setPackLoadingCode(bfCode);
     setPackError(null);
-    const result = await loadQuestionPack(packId);
-    setPackLoadingCode(null);
-    if (!result.ok) {
-      setPackError(result.error);
-      return;
+    try {
+      const result = await loadQuestionPack(packId);
+      if (!result.ok) {
+        setPackError(result.error);
+        return;
+      }
+      setActivePack(result.pack);
+      setActiveBfCode(bfCode);
+      setActiveBfName(bfNameTr);
+    } catch (err: any) {
+      console.error(`Soru paketi yükleme hatası [${bfCode}]:`, err);
+      setPackError(`Soru paketi yüklenirken bir sorun oluştu.`);
+    } finally {
+      setPackLoadingCode(null);
     }
-    setActivePack(result.pack);
-    setActiveBfCode(bfCode);
-    setActiveBfName(bfNameTr);
   };
 
   const handleCloseQuestionScreen = () => {
@@ -420,7 +426,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                     </select>
                   </td>
                   <td>
-                    {getPackIdForFunction(fn.code) ? (
+                    {hasQuestionPack(fn.code) ? (
                       <button
                         className={`btn btn--sm ${
                           fn.status === "not_started" ? "btn--primary" : "btn--secondary"
@@ -438,8 +444,20 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                         )}
                       </button>
                     ) : (
-                      <span className="badge badge-no-pack" title="Soru paketi henüz hazırlanmadı">
-                        —
+                      <span
+                        className="badge badge--neutral"
+                        style={{
+                          fontSize: "0.75rem",
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "4px",
+                          background: "var(--bg-subtle, #f1f5f9)",
+                          color: "var(--text-muted, #64748b)",
+                          display: "inline-block",
+                          fontWeight: 500,
+                        }}
+                        title="Bu iş fonksiyonu için soru paketi henüz geliştirme aşamasındadır"
+                      >
+                        Hazırlanıyor
                       </span>
                     )}
                   </td>

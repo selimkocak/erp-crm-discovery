@@ -196,6 +196,23 @@ assert(winHelpContent.includes('GitHub Issues') || winHelpContent.includes('issu
 
 
 
+// ── T09: Soru Paketi Mevcudiyeti & Defansif UI Yükleyici ──
+console.log('\n=== T09: Pack Availability & Defensive UI Loader ===');
+const { hasQuestionPack, getPackStatus, getPackIdForFunction, isPackAvailable, loadQuestionPack } = await import('../src/engine/loader.js');
+
+assert(hasQuestionPack('SALES') === true, 'SALES soru paketi hazır (hasQuestionPack = true)');
+assert(hasQuestionPack('ACCOUNTING') === true, 'ACCOUNTING soru paketi hazır (hasQuestionPack = true)');
+assert(hasQuestionPack('INFORMATION_TECHNOLOGY') === true, 'INFORMATION_TECHNOLOGY soru paketi hazır (hasQuestionPack = true)');
+assert(hasQuestionPack('IT_INFRASTRUCTURE') === true, 'IT_INFRASTRUCTURE alias hazır (hasQuestionPack = true)');
+assert(hasQuestionPack('PROJECT_MANAGEMENT') === false, 'Henüz geliştirilmemiş PROJECT_MANAGEMENT hasQuestionPack = false');
+assert(getPackStatus('SALES') === 'available', 'SALES getPackStatus = available');
+assert(getPackStatus('PROJECT_MANAGEMENT') === 'in_development', 'PROJECT_MANAGEMENT getPackStatus = in_development');
+assert(getPackStatus('NON_EXISTENT_CODE') === 'in_development', 'Bilinmeyen fonksiyon getPackStatus = in_development');
+
+const unmappedResult = await loadQuestionPack('non.existent.pack');
+assert(unmappedResult.ok === false, 'Tanımsız pack yüklenirken ok=false döner');
+assert(unmappedResult.error?.includes('kayıtlı soru paketi yolu tanımlı değil'), 'Tanımsız pack için kullanıcı dostu hata mesajı döner');
+
 // ── Sonuç ───────────────────────────────────────
 console.log('\n══════════════════════════════════════════════════');
 console.log(`FAZ-6 Release Readiness Test Sonucu: ${passed} PASS / ${failed} FAIL`);

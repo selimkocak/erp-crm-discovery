@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckSquare, Square, Building, Briefcase } from "lucide-react";
 import { getMasterBusinessFunctions, createProject } from "../db/client";
+import { hasQuestionPack } from "../engine/loader";
 import type { BusinessFunction, CreateProjectPayload } from "../types";
 
 interface NewProjectViewProps {
@@ -433,7 +434,24 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
                       onChange={() => {}} // Handled by container onClick
                     />
                     <div className="function-info">
-                      <span className="function-name">{fn.name_tr}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", flexWrap: "wrap" }}>
+                        <span className="function-name">{fn.name_tr}</span>
+                        {!hasQuestionPack(fn.code) && (
+                          <span
+                            style={{
+                              fontSize: "0.6875rem",
+                              padding: "0.125rem 0.375rem",
+                              borderRadius: "3px",
+                              background: "var(--bg-subtle, #f1f5f9)",
+                              color: "var(--text-muted, #64748b)",
+                              fontWeight: 500,
+                            }}
+                            title="Soru paketi geliştirme aşamasındadır"
+                          >
+                            Hazırlanıyor
+                          </span>
+                        )}
+                      </div>
                       <span className="function-category">
                         {fn.category} • {fn.name_en}
                       </span>
