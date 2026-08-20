@@ -725,6 +725,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         {/* ── Followup Modal (FAZ-9) ────────────────────────────────────────── */}
         {isFollowupModalOpen && followupModalTarget && (
           <FollowupModal
+            key={`${followupModalTarget.question.id}-${followupModalTarget.initialFlagType}`}
             questionId={followupModalTarget.question.id}
             questionText={followupModalTarget.question.question}
             initialFlagType={followupModalTarget.initialFlagType}

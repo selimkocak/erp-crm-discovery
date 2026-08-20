@@ -461,10 +461,105 @@ async function testFollowupModalFocusBehavior() {
   assert(modalCode.includes("(Opsiyonel)"), "Sonra Dön seçildiğinde (Opsiyonel) etiketi gösteriliyor");
 }
 
+async function testFollowupStateTransitions() {
+  console.log("\n=== T10: Followup State Transitions & Zero Duplicate Guarantee ===");
+  if (!Database) {
+    console.log("  ℹ better-sqlite3 not available, skipping DB state transitions check");
+    return;
+  }
+
+  const TEST_DB_PATH = path.join(os.tmpdir(), `test_transitions_${Date.now()}.db`);
+  try {
+    const db = new Database(TEST_DB_PATH);
+    db.pragma("foreign_keys = ON");
+
+    // Apply migrations 1-6
+    for (const m of MIGRATION_DEFINITIONS) {
+      for (const sql of m.sql) {
+        db.exec(sql);
+      }
+    }
+
+    const PROJ_ID = "p_trans_test";
+    const now = new Date().toISOString();
+    db.prepare(`
+      INSERT INTO analysis_projects (id, name, status, created_at, updated_at)
+      VALUES (?, 'State Transition Test Projesi', 'draft', ?, ?)
+    `).run(PROJ_ID, now, now);
+
+    const Q_ID = "SALES-005";
+
+    // 1. Transition: null -> critical
+    db.prepare(`
+      INSERT INTO question_followups
+        (id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at)
+      VALUES ('qf_1', ?, 'SALES', ?, 'critical', 'Yönetim onayı bekleniyor', 'open', ?, ?)
+      ON CONFLICT(analysis_project_id, business_function_code, question_id)
+      DO UPDATE SET flag_type = excluded.flag_type, note = excluded.note, updated_at = excluded.updated_at
+    `).run(PROJ_ID, Q_ID, now, now);
+
+    let row = db.prepare("SELECT * FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").get(PROJ_ID, Q_ID) as any;
+    assert(row !== undefined && row.flag_type === "critical", "Geçiş 1: null -> critical başarılı");
+    assert(row.note === "Yönetim onayı bekleniyor", "Not doğru kaydedildi");
+
+    // 2. Transition: critical -> revisit (Switch flag, preserve note)
+    const updateTime1 = new Date().toISOString();
+    db.prepare(`
+      INSERT INTO question_followups
+        (id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at)
+      VALUES ('qf_new1', ?, 'SALES', ?, 'revisit', ?, 'open', ?, ?)
+      ON CONFLICT(analysis_project_id, business_function_code, question_id)
+      DO UPDATE SET flag_type = excluded.flag_type, note = excluded.note, updated_at = excluded.updated_at
+    `).run(PROJ_ID, Q_ID, row.note, updateTime1, updateTime1);
+
+    const count1 = db.prepare("SELECT COUNT(*) as c FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").get(PROJ_ID, Q_ID) as { c: number };
+    assert(count1.c === 1, "Geçiş 2: critical -> revisit tekil kayıt korundu (0 duplicate)");
+
+    row = db.prepare("SELECT * FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").get(PROJ_ID, Q_ID) as any;
+    assert(row.flag_type === "revisit", "Bayrak tipi revisit olarak güncellendi");
+    assert(row.note === "Yönetim onayı bekleniyor", "Eski açıklama korundu");
+
+    // 3. Transition: revisit -> critical (Switch flag, update note)
+    const updateTime2 = new Date().toISOString();
+    db.prepare(`
+      INSERT INTO question_followups
+        (id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at)
+      VALUES ('qf_new2', ?, 'SALES', ?, 'critical', 'Genel Müdür teyidi bekleniyor', 'open', ?, ?)
+      ON CONFLICT(analysis_project_id, business_function_code, question_id)
+      DO UPDATE SET flag_type = excluded.flag_type, note = excluded.note, updated_at = excluded.updated_at
+    `).run(PROJ_ID, Q_ID, updateTime2, updateTime2);
+
+    const count2 = db.prepare("SELECT COUNT(*) as c FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").get(PROJ_ID, Q_ID) as { c: number };
+    assert(count2.c === 1, "Geçiş 3: revisit -> critical tekil kayıt korundu (0 duplicate)");
+
+    row = db.prepare("SELECT * FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").get(PROJ_ID, Q_ID) as any;
+    assert(row.flag_type === "critical", "Bayrak tipi tekrar critical oldu");
+    assert(row.note === "Genel Müdür teyidi bekleniyor", "Açıklama başarıyla güncellendi");
+
+    // 4. Transition: critical -> null (Remove flag)
+    db.prepare("DELETE FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").run(PROJ_ID, Q_ID);
+    const count3 = db.prepare("SELECT COUNT(*) as c FROM question_followups WHERE analysis_project_id = ? AND question_id = ?").get(PROJ_ID, Q_ID) as { c: number };
+    assert(count3.c === 0, "Geçiş 4: critical -> null başarıyla kaldırıldı (Kayıt silindi)");
+
+    // 5. FollowupModal initial state computation check
+    const modalSourcePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "../src/components/FollowupModal.tsx");
+    const modalCode = fs.readFileSync(modalSourcePath, "utf-8");
+    assert(modalCode.includes("initialFlagType || existingFollowup?.flag_type"), "FollowupModal: Tıklanan initialFlagType mevcut bayraktan öncelikli başlatılıyor");
+
+    db.close();
+    fs.unlinkSync(TEST_DB_PATH);
+    assert(!fs.existsSync(TEST_DB_PATH), "Geçiş test veritabanı temizlendi");
+  } catch (err: any) {
+    console.error("testFollowupStateTransitions hatası:", err);
+    assert(false, `testFollowupStateTransitions fırlattı: ${err?.message}`);
+  }
+}
+
 async function runAll() {
   await testExports();
   await testSqliteFollowups();
   await testFollowupModalFocusBehavior();
+  await testFollowupStateTransitions();
 
   console.log("\n" + "═".repeat(50));
   console.log(`FAZ-9 Question Followups Test Sonucu: ${passCount} PASS / ${failCount} FAIL`);

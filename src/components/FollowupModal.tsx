@@ -31,11 +31,17 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
   onClose,
 }) => {
   const [flagType, setFlagType] = useState<FollowupFlagType>(
-    existingFollowup?.flag_type || initialFlagType
+    initialFlagType || existingFollowup?.flag_type || "revisit"
   );
   const [note, setNote] = useState<string>(existingFollowup?.note || initialNote || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const noteTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Sync state if initialFlagType or existingFollowup changes
+  useEffect(() => {
+    setFlagType(initialFlagType || existingFollowup?.flag_type || "revisit");
+    setNote(existingFollowup?.note || initialNote || "");
+  }, [initialFlagType, existingFollowup, initialNote]);
 
   // Modal açıldığında veya yeniden render olduğunda textarea'ya otomatik focus
   useEffect(() => {
@@ -58,7 +64,7 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
       clearTimeout(focusTimer);
       cancelAnimationFrame(rafId);
     };
-  }, []);
+  }, [initialFlagType]);
 
   const handleFlagTypeChange = (newType: FollowupFlagType) => {
     setFlagType(newType);
