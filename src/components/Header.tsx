@@ -1,5 +1,6 @@
 import React from "react";
-import { Layers, Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
+import { AppLogo } from "./AppLogo";
 
 interface HeaderProps {
   currentView: "home" | "new-project" | "project-detail";
@@ -16,9 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="app-header">
       <div className="header-inner">
         <div className="logo-area" onClick={onNavigateHome}>
-          <div className="logo-badge">
-            <Layers size={20} />
-          </div>
+          <AppLogo size={36} />
           <div className="logo-titles">
             <h1>ERP CRM Discovery</h1>
             <p>ERP / CRM Ön Analiz Yönetimi</p>
