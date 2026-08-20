@@ -12,21 +12,13 @@
 import type { Question, AnswerData, ProgressResult } from "./types";
 
 /**
- * Bir sorunun cevaplanmış sayılıp sayılmadığını döndürür.
- * 🟡 Sonra Dön veya 🔴 Kritik Takip bayrağı açık olan sorular "cevaplanmış" SAYILMAZ.
+ * Bir sorunun gerçek bir kullanıcı cevabına sahip olup olmadığını denetler (bayraklardan bağımsız).
  */
-export function isQuestionAnswered(
+export function hasProvidedAnswer(
   question: Question,
-  answerData: AnswerData | undefined,
-  followup?: { flag_type?: string; status?: string } | null
+  answerData: AnswerData | undefined
 ): boolean {
-  if (followup && (!followup.status || followup.status === "open")) {
-    return false;
-  }
-
-  if (!question.required) return true;
   if (!answerData) return false;
-
   const { answer_type } = question;
 
   if (answer_type === "single_choice" || answer_type === "multiple_choice" || answer_type === "yes_no") {
@@ -58,6 +50,47 @@ export function isQuestionAnswered(
     return (answerData.text ?? "").trim().length > 0;
   }
 
+  return false;
+}
+
+/**
+ * Bir sorunun cevaplanmış sayılıp sayılmadığını döndürür (İlerleme motoru için).
+ * 🟡 Sonra Dön veya 🔴 Kritik Takip bayrağı açık olan sorular "cevaplanmış" SAYILMAZ.
+ */
+export function isQuestionAnswered(
+  question: Question,
+  answerData: AnswerData | undefined,
+  followup?: { flag_type?: string; status?: string } | null
+): boolean {
+  if (followup && (!followup.status || followup.status === "open")) {
+    return false;
+  }
+
+  if (!question.required) return true;
+  return hasProvidedAnswer(question, answerData);
+}
+
+/**
+ * Kullanıcının "Sonraki" butonuyla ilerleyip ilerleyemeyeceğini döndürür (Navigasyon kuralı).
+ * - Soru cevaplanmışsa -> İzin ver
+ * - Soru opsiyonelse -> İzin ver
+ * - Soru cevapsız ama aktif 🟡 Sonra Dön veya 🔴 Kritik Takip bayrağı varsa -> İzin ver
+ * - Soru zorunlu, cevapsız ve bayraksızsa -> İzin verme
+ */
+export function canAdvanceToNextQuestion(
+  question: Question,
+  answerData: AnswerData | undefined,
+  followup?: { flag_type?: string; status?: string } | null
+): boolean {
+  if (!question.required) return true;
+  if (hasProvidedAnswer(question, answerData)) return true;
+  if (
+    followup &&
+    (!followup.status || followup.status === "open") &&
+    (followup.flag_type === "revisit" || followup.flag_type === "critical")
+  ) {
+    return true;
+  }
   return false;
 }
 

@@ -16,6 +16,10 @@ import {
   calculateSha256,
   formatFileSize,
   getFileCategory,
+  saveAttachmentFile,
+  readAttachmentFile,
+  deleteAttachmentFile,
+  deleteProjectAttachmentsDirectory,
   ALLOWED_EXTENSIONS,
   ALLOWED_MIME_TYPES,
   MAX_SINGLE_FILE_SIZE_BYTES,
@@ -385,6 +389,32 @@ assert(getFileCategory("pdf") === "pdf", "pdf -> pdf");
 assert(getFileCategory("xlsx") === "excel", "xlsx -> excel");
 assert(getFileCategory("docx") === "word", "docx -> word");
 assert(getFileCategory("txt") === "text", "txt -> text");
+
+// ─────────────────────────────────────────────────────────────
+// Physical Storage & Project Directory Cleanup Test
+// ─────────────────────────────────────────────────────────────
+console.log("\n=== Physical Storage & Project Directory Cleanup ===");
+const testRelPath1 = "projects/p_cleanup_test/attachments/SALES/SALES-001/uuid_test1.xlsx";
+const testRelPath2 = "projects/p_cleanup_test/attachments/SALES/SALES-002/uuid_test2.pdf";
+const testContent = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+
+await saveAttachmentFile(testRelPath1, testContent);
+await saveAttachmentFile(testRelPath2, testContent);
+
+const readBack1 = await readAttachmentFile(testRelPath1);
+assert(readBack1 !== null && readBack1.length === 8, "Fiziksel dosya 1 başarıyla kaydedildi ve okundu");
+
+await deleteAttachmentFile(testRelPath1);
+const readAfterSingleDel = await readAttachmentFile(testRelPath1);
+assert(readAfterSingleDel === null, "Tekil dosya silme sonrası dosya okunamadı (silindi)");
+
+// Project directory recursive cleanup
+const readBack2 = await readAttachmentFile(testRelPath2);
+assert(readBack2 !== null, "Dosya 2 silme öncesi mevcut");
+
+await deleteProjectAttachmentsDirectory("p_cleanup_test");
+const readAfterProjectDel = await readAttachmentFile(testRelPath2);
+assert(readAfterProjectDel === null, "deleteProjectAttachmentsDirectory sonrası projeye ait tüm fiziksel dosyalar temizlendi");
 
 // ─────────────────────────────────────────────────────────────
 // T19 & T20: ReportModel, Word (DOCX) & PDF Export Validation

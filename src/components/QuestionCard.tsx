@@ -15,7 +15,7 @@ import { Edit2, Trash2, Sparkles } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
 import type { QuestionFollowup, FollowupFlagType, QuestionAttachment } from "../types";
 import { ChoiceOption } from "./ChoiceOption";
-import { isQuestionAnswered } from "../engine/progress";
+import { canAdvanceToNextQuestion } from "../engine/progress";
 import { QuestionAttachments } from "./QuestionAttachments";
 
 interface QuestionCardProps {
@@ -59,8 +59,8 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   );
 
   const selected = answerData.selected ?? [];
-  const isAnswered = isQuestionAnswered(question, answerData, followup);
-  const showError = showValidation && question.required && !isAnswered && !followup;
+  const canAdvance = canAdvanceToNextQuestion(question, answerData, followup);
+  const showError = showValidation && !canAdvance;
 
   // ── Toggle seçenek ─────────────────────────────────────────────────────
   const handleToggle = (value: string) => {
@@ -352,10 +352,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           />
         )}
 
-        {/* Zorunlu ama boş uyarısı */}
+        {/* Zorunlu ama boş ve bayraksız uyarısı */}
         {showError && (
           <p className="question-card__error-msg">
-            Bu alan zorunludur. Lütfen bir cevap seçin veya girin.
+            Bu zorunlu soruya cevap vermeden ilerleyemezsiniz. Cevap verin veya soruyu takip bayrağıyla işaretleyin.
           </p>
         )}
       </div>

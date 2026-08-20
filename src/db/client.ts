@@ -237,11 +237,17 @@ export async function updateProjectBusinessFunction(
 }
 
 // ---------------------------------------------------------------
-// 6. Proje sil (cascade)
+// 6. Proje sil (cascade + physical storage cleanup)
 // ---------------------------------------------------------------
 export async function deleteProject(projectId: string): Promise<void> {
   const db = await getDb();
   await db.execute(`DELETE FROM analysis_projects WHERE id = $1`, [projectId]);
+  try {
+    const { deleteProjectAttachmentsDirectory } = await import("../storage/attachmentManager");
+    await deleteProjectAttachmentsDirectory(projectId);
+  } catch (err) {
+    console.error("Proje ekler klasörü temizlenirken hata:", err);
+  }
 }
 
 // ---------------------------------------------------------------

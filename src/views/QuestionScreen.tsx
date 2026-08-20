@@ -72,7 +72,7 @@ import {
 } from "../storage/attachmentManager";
 import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
-import { calculateProgress, isQuestionAnswered, progressToStatus } from "../engine/progress";
+import { calculateProgress, isQuestionAnswered, canAdvanceToNextQuestion, progressToStatus } from "../engine/progress";
 import { QuestionCard } from "../components/QuestionCard";
 import { ProgressBar } from "../components/ProgressBar";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
@@ -239,6 +239,22 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   // ── İlerleme (Bayraklı sorular tamamlandı sayılmaz) ──────────────────────
   const progress = calculateProgress(visibleQuestions, answers, followups);
 
+  const revisitCount = useMemo(() => {
+    let count = 0;
+    for (const fol of followups.values()) {
+      if ((!fol.status || fol.status === "open") && fol.flag_type === "revisit") count++;
+    }
+    return count;
+  }, [followups]);
+
+  const criticalCount = useMemo(() => {
+    let count = 0;
+    for (const fol of followups.values()) {
+      if ((!fol.status || fol.status === "open") && fol.flag_type === "critical") count++;
+    }
+    return count;
+  }, [followups]);
+
   // ── Gerçek DB Kayıt İcrası ─────────────────────────────────────────────
   const executeDbSave = useCallback(
     async (qId: string, data: AnswerData, isCustom?: boolean) => {
@@ -357,10 +373,12 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
   const handleNext = async () => {
     if (!currentQuestion) return;
-    if (
-      currentQuestion.required &&
-      !isQuestionAnswered(currentQuestion, answers.get(currentQuestion.id))
-    ) {
+    const canAdvance = canAdvanceToNextQuestion(
+      currentQuestion,
+      answers.get(currentQuestion.id),
+      followups.get(currentQuestion.id)
+    );
+    if (!canAdvance) {
       setShowValidation(true);
       return;
     }
@@ -686,16 +704,42 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           answered={progress.answered}
           total={progress.total}
           percentage={progress.percentage}
+          revisitCount={revisitCount}
+          criticalCount={criticalCount}
           className="question-screen__progress"
         />
 
-        {/* ── Tamamlandı banner ────────────────────────────────────────────── */}
-        {isCompleted && (
+        {/* ── Tamamlandı / Açık Konular banner ────────────────────────────── */}
+        {isCompleted && revisitCount === 0 && criticalCount === 0 && (
           <div className="question-screen__completed-banner">
             <CheckCircle2 size={18} />
             Tüm zorunlu sorular tamamlandı! (Tamamlandı — %100)
           </div>
         )}
+        {progress.answered + revisitCount + criticalCount >= progress.total &&
+          progress.total > 0 &&
+          (revisitCount > 0 || criticalCount > 0) && (
+            <div
+              className="question-screen__completed-banner"
+              style={{
+                background: "var(--color-warning-50, #fffbeb)",
+                color: "var(--color-warning-800, #92400e)",
+                border: "1px solid var(--color-warning-200, #fde68a)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <AlertTriangle size={18} style={{ flexShrink: 0 }} />
+              <span>
+                Tüm sorular incelendi. Ancak <strong>{revisitCount + criticalCount}</strong> açık takip konusu bulunuyor (
+                {revisitCount > 0 ? `${revisitCount} Sonra Dön` : ""}
+                {revisitCount > 0 && criticalCount > 0 ? ", " : ""}
+                {criticalCount > 0 ? `${criticalCount} Kritik Takip` : ""}
+                ). Bu konular raporda Açık Konular tablosunda listelenir.
+              </span>
+            </div>
+          )}
 
         {/* ── Soru kartı ──────────────────────────────────────────────────── */}
         {currentQuestion && (

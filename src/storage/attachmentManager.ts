@@ -351,3 +351,29 @@ export async function deleteAttachmentFile(
     memoryStorage.delete(relativePath);
   }
 }
+
+/**
+ * Proje silindiğinde projeye ait tüm fiziksel kanıt dosyalarını ve klasörünü disktan temizler.
+ */
+export async function deleteProjectAttachmentsDirectory(
+  projectId: string
+): Promise<void> {
+  const cleanProj = sanitizeFileName(projectId);
+  const relProjectDir = `projects/${cleanProj}`;
+
+  try {
+    const { remove } = await import("@tauri-apps/plugin-fs");
+    const { appDataDir } = await import("@tauri-apps/api/path");
+
+    const baseDir = await appDataDir();
+    const fullPath = `${baseDir}/${relProjectDir}`.replace(/\/+/g, "/");
+    await remove(fullPath, { recursive: true });
+  } catch {
+    for (const key of Array.from(memoryStorage.keys())) {
+      if (key.startsWith(`projects/${cleanProj}/`)) {
+        memoryStorage.delete(key);
+      }
+    }
+  }
+}
+
