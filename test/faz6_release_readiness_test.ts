@@ -198,20 +198,80 @@ assert(winHelpContent.includes('GitHub Issues') || winHelpContent.includes('issu
 
 // ── T09: Soru Paketi Mevcudiyeti & Defansif UI Yükleyici ──
 console.log('\n=== T09: Pack Availability & Defensive UI Loader ===');
-const { hasQuestionPack, getPackStatus, getPackIdForFunction, isPackAvailable, loadQuestionPack } = await import('../src/engine/loader.js');
+const {
+  hasQuestionPack,
+  getPackStatus,
+  getPackIdForFunction,
+  isPackAvailable,
+  loadQuestionPack,
+  getAvailablePackIds,
+} = await import('../src/engine/loader.js');
 
-assert(hasQuestionPack('SALES') === true, 'SALES soru paketi hazır (hasQuestionPack = true)');
-assert(hasQuestionPack('ACCOUNTING') === true, 'ACCOUNTING soru paketi hazır (hasQuestionPack = true)');
-assert(hasQuestionPack('INFORMATION_TECHNOLOGY') === true, 'INFORMATION_TECHNOLOGY soru paketi hazır (hasQuestionPack = true)');
-assert(hasQuestionPack('IT_INFRASTRUCTURE') === true, 'IT_INFRASTRUCTURE alias hazır (hasQuestionPack = true)');
-assert(hasQuestionPack('PROJECT_MANAGEMENT') === false, 'Henüz geliştirilmemiş PROJECT_MANAGEMENT hasQuestionPack = false');
-assert(getPackStatus('SALES') === 'available', 'SALES getPackStatus = available');
-assert(getPackStatus('PROJECT_MANAGEMENT') === 'in_development', 'PROJECT_MANAGEMENT getPackStatus = in_development');
-assert(getPackStatus('NON_EXISTENT_CODE') === 'in_development', 'Bilinmeyen fonksiyon getPackStatus = in_development');
+const {
+  AVAILABLE_PACK_IDS,
+  AVAILABLE_BUSINESS_FUNCTION_CODES,
+  CANONICAL_QUESTION_PACKS,
+} = await import('../src/generated/questionPacks.js');
 
+// 1. Pack ID listesi ve mevcudiyet
+assert(AVAILABLE_PACK_IDS.length === 23, `Tam 23 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
+assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 23, `Tam 23 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
+
+// 2. Tüm 23 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
+for (const bfCode of AVAILABLE_BUSINESS_FUNCTION_CODES) {
+  assert(hasQuestionPack(bfCode) === true, `hasQuestionPack("${bfCode}") === true`);
+  assert(getPackStatus(bfCode) === 'available', `getPackStatus("${bfCode}") === "available"`);
+
+  const packId = getPackIdForFunction(bfCode)!;
+  assert(isPackAvailable(packId) === true, `isPackAvailable("${packId}") === true`);
+
+  const loadRes = await loadQuestionPack(packId);
+  assert(loadRes.ok === true, `loadQuestionPack("${packId}") ok === true`);
+  if (loadRes.ok) {
+    assert(loadRes.pack.meta.pack_id === packId, `Pack ID eşleşti: ${packId}`);
+    assert(Array.isArray(loadRes.pack.questions) && loadRes.pack.questions.length > 0, `Pack sorular içeriyor (${loadRes.pack.questions.length} soru)`);
+  }
+}
+
+// 3. Henüz geliştirilmemiş 9 fonksiyon için hasQuestionPack === false ve in_development
+const unreadyCodes = [
+  'PROJECT_MANAGEMENT', 'MANAGEMENT', 'STRATEGY', 'TRAINING',
+  'INVOICING', 'IMPORT', 'EXPORT', 'ECOMMERCE', 'DOCUMENT_MANAGEMENT'
+];
+for (const code of unreadyCodes) {
+  assert(hasQuestionPack(code) === false, `Unready fonksiyon hasQuestionPack("${code}") === false`);
+  assert(getPackStatus(code) === 'in_development', `Unready fonksiyon getPackStatus("${code}") === "in_development"`);
+}
+
+// 4. Bilinmeyen kod ve tanımsız pack güvenliği
+assert(getPackStatus('UNKNOWN_CODE_XYZ') === 'in_development', 'Bilinmeyen fonksiyon getPackStatus = in_development');
 const unmappedResult = await loadQuestionPack('non.existent.pack');
 assert(unmappedResult.ok === false, 'Tanımsız pack yüklenirken ok=false döner');
-assert(unmappedResult.error?.includes('kayıtlı soru paketi yolu tanımlı değil'), 'Tanımsız pack için kullanıcı dostu hata mesajı döner');
+if (!unmappedResult.ok) {
+  assert(unmappedResult.error?.includes('geliştirme aşamasındadır'), 'Tanımsız pack için kullanıcı dostu hata mesajı döner');
+}
+
+// 5. Production Bundle İçi Gömülü Paket Denetimi
+console.log('\n=== T10: Production Bundle Embedded Pack Smoke Test ===');
+const distAssetsDir = path.join(ROOT_DIR, 'dist/assets');
+if (fs.existsSync(distAssetsDir)) {
+  const assetFiles = fs.readdirSync(distAssetsDir);
+  const jsFiles = assetFiles.filter(f => f.endsWith('.js'));
+  assert(jsFiles.length > 0, `dist/assets içinde derlenmiş JS dosyaları mevcut (${jsFiles.length} dosya)`);
+
+  let combinedBundleContent = '';
+  for (const jsFile of jsFiles) {
+    combinedBundleContent += fs.readFileSync(path.join(distAssetsDir, jsFile), 'utf-8');
+  }
+
+  // 5 kritik paket için bundle içi kontrol
+  const smokePacks = ['tr.sales.core', 'tr.accounting.core', 'tr.payroll.core', 'tr.legal_compliance.core', 'tr.it_infrastructure.core'];
+  for (const sp of smokePacks) {
+    assert(combinedBundleContent.includes(sp), `Production bundle "${sp}" içeriyor`);
+  }
+} else {
+  console.log('  ⚠ dist/assets bulunamadı (npm run build öncesi)');
+}
 
 // ── Sonuç ───────────────────────────────────────
 console.log('\n══════════════════════════════════════════════════');
