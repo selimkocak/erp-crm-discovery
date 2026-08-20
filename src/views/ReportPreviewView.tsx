@@ -22,11 +22,15 @@ import {
   Download,
   CheckCircle2,
   Paperclip,
+  ExternalLink,
+  X,
 } from "lucide-react";
 import { buildReportModel } from "../report/builder";
-import type { ReportModel } from "../report/types";
+import type { ReportModel, ReportAttachmentItem } from "../report/types";
 import { ReportProfileModal } from "../components/ReportProfileModal";
 import { exportReport } from "../export";
+import { openAttachment } from "../storage/attachmentLinks";
+import { readAttachmentFile, getFileCategory } from "../storage/attachmentManager";
 
 interface ReportPreviewViewProps {
   projectId: string;
@@ -47,6 +51,38 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportStatusMsg, setExportStatusMsg] = useState<string | null>(null);
   const [exportError, setExportError] = useState<string | null>(null);
+
+  // Attachment Lightbox & Error State
+  const [previewImage, setPreviewImage] = useState<{ url: string; name: string; size: string; att: ReportAttachmentItem } | null>(null);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
+
+  const handleOpenAttachment = async (att: ReportAttachmentItem) => {
+    setAttachmentError(null);
+    const category = getFileCategory(att.fileExtension);
+    if (category === "image") {
+      try {
+        const buffer = await readAttachmentFile(att.relativePath);
+        if (!buffer || buffer.byteLength === 0) {
+          setAttachmentError(`Dosya bulunamadı: "${att.originalFileName}". Dosya yerel depolamadan silinmiş olabilir.`);
+          return;
+        }
+        const blob = new Blob([buffer as unknown as BlobPart], { type: att.mimeType || "image/png" });
+        const url = URL.createObjectURL(blob);
+        const sizeStr = att.fileSize < 1024 * 1024
+          ? `${(att.fileSize / 1024).toFixed(1)} KB`
+          : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+        setPreviewImage({ url, name: att.originalFileName, size: sizeStr, att });
+        return;
+      } catch (err: any) {
+        console.warn("Görsel önizleme açılamadı, doğrudan açıcı deneniyor:", err);
+      }
+    }
+
+    const res = await openAttachment(att);
+    if (!res.success && res.error) {
+      setAttachmentError(res.error);
+    }
+  };
 
   const loadReport = useCallback(async () => {
     try {
@@ -229,6 +265,14 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
           <AlertCircle size={16} />
           <span>{exportError}</span>
           <button className="btn-icon text-xs" onClick={() => setExportError(null)}>×</button>
+        </div>
+      )}
+
+      {attachmentError && (
+        <div className="report-error-toast" style={{ background: "#fef2f2", borderColor: "#f87171", color: "#991b1b" }}>
+          <AlertCircle size={16} />
+          <span>{attachmentError}</span>
+          <button className="btn-icon text-xs" onClick={() => setAttachmentError(null)}>×</button>
         </div>
       )}
 
@@ -596,17 +640,28 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                                       ? `${(att.fileSize / 1024).toFixed(1)} KB`
                                       : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
                                     return (
-                                      <span
+                                      <button
                                         key={att.id}
+                                        type="button"
+                                        onClick={() => handleOpenAttachment(att)}
                                         className="badge badge--outline-secondary text-xs"
-                                        style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem", background: "var(--color-neutral-50)", borderColor: "var(--color-secondary-300)" }}
-                                        title={att.description ? `${att.originalFileName} — ${att.description}` : att.originalFileName}
+                                        style={{
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          gap: "0.25rem",
+                                          background: "var(--color-neutral-50)",
+                                          borderColor: "var(--color-secondary-300)",
+                                          cursor: "pointer",
+                                          textAlign: "left",
+                                        }}
+                                        title="Dosyayı aç / önizle"
                                       >
                                         <Paperclip size={11} style={{ color: "var(--color-secondary-600)" }} />
-                                        <strong>{att.originalFileName}</strong>
+                                        <strong style={{ color: "var(--color-primary-700)", textDecoration: "underline" }}>{att.originalFileName}</strong>
                                         <span style={{ color: "var(--text-muted)", fontSize: "0.6875rem" }}>({att.fileExtension.toUpperCase()} • {sizeStr})</span>
                                         {att.description && <span style={{ fontStyle: "italic" }}>— {att.description}</span>}
-                                      </span>
+                                        <ExternalLink size={10} style={{ opacity: 0.6, marginLeft: "0.15rem" }} />
+                                      </button>
                                     );
                                   })}
                                 </div>
@@ -832,12 +887,32 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                               <strong>{att.questionText}</strong>
                             </td>
                             <td>
-                              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-                                <Paperclip size={13} style={{ color: "var(--color-secondary-600)" }} />
-                                <strong>{att.originalFileName}</strong>
-                              </div>
-                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                              <button
+                                type="button"
+                                onClick={() => handleOpenAttachment(att)}
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  padding: 0,
+                                  cursor: "pointer",
+                                  textAlign: "left",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "0.35rem",
+                                }}
+                                title="Dosyayı aç / önizle"
+                              >
+                                <Paperclip size={13} style={{ color: "var(--color-secondary-600)", flexShrink: 0 }} />
+                                <strong style={{ color: "var(--color-primary-700)", textDecoration: "underline" }}>
+                                  {att.originalFileName}
+                                </strong>
+                                <ExternalLink size={11} style={{ opacity: 0.6, flexShrink: 0 }} />
+                              </button>
+                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block", marginTop: "0.15rem" }}>
                                 {att.fileExtension.toUpperCase()} • {sizeStr}
+                              </span>
+                              <span style={{ color: "var(--text-muted)", fontSize: "0.6875rem", display: "block", opacity: 0.8, fontStyle: "italic" }}>
+                                {att.relativePath}
                               </span>
                             </td>
                             <td style={{ color: att.description ? "var(--text-color)" : "var(--text-muted)", fontStyle: att.description ? "normal" : "italic" }}>
@@ -894,6 +969,71 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
           </footer>
         </main>
       </div>
+
+      {/* ── Image Lightbox Modal ────────────────────────────────────────── */}
+      {previewImage && (
+        <div
+          className="modal-overlay"
+          onClick={() => {
+            URL.revokeObjectURL(previewImage.url);
+            setPreviewImage(null);
+          }}
+          style={{ zIndex: 9999 }}
+        >
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "800px", width: "90%", padding: "1.25rem" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Paperclip size={16} style={{ color: "var(--color-primary-600)" }} />
+                <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>{previewImage.name}</h3>
+                <span className="badge badge--secondary text-xs">{previewImage.size}</span>
+              </div>
+              <button
+                type="button"
+                className="btn btn--icon"
+                onClick={() => {
+                  URL.revokeObjectURL(previewImage.url);
+                  setPreviewImage(null);
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ textAlign: "center", background: "#0f172a", borderRadius: "8px", padding: "0.75rem", maxHeight: "65vh", overflow: "auto" }}>
+              <img
+                src={previewImage.url}
+                alt={previewImage.name}
+                style={{ maxWidth: "100%", maxHeight: "60vh", objectFit: "contain", borderRadius: "4px" }}
+              />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem", marginTop: "0.75rem" }}>
+              <button
+                type="button"
+                className="btn btn--secondary btn--sm"
+                onClick={() => openAttachment(previewImage.att)}
+                title="İşletim sistemi varsayılan görüntüleyicisiyle aç"
+              >
+                <ExternalLink size={14} /> Sistemde Aç
+              </button>
+              <button
+                type="button"
+                className="btn btn--primary btn--sm"
+                onClick={() => {
+                  URL.revokeObjectURL(previewImage.url);
+                  setPreviewImage(null);
+                }}
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Edit Profile Modal ─────────────────────────────────────────── */}
       {isProfileModalOpen && (

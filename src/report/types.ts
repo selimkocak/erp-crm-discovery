@@ -155,6 +155,8 @@ export interface ReportAttachmentItem {
   originalFileName: string;
   storedFileName: string;
   relativePath: string;
+  fileUrl?: string;
+  absolutePath?: string;
   mimeType: string;
   fileExtension: string;
   fileSize: number;

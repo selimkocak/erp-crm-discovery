@@ -11,6 +11,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatStatusLabel, type ReportModel } from "../report/types";
 import { registerPdfFonts, PDF_FONT_FAMILY } from "./fonts/fontBundle";
+import { attachmentPathToFileUrl } from "../storage/attachmentLinks";
 
 export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   const { metadata, profile, company, scope, businessFunctions, projectNotes, summaryStats } = report;
@@ -52,7 +53,7 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   doc.setFont(PDF_FONT_FAMILY, "normal");
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139); // Slate 500
-  doc.text(`${company.companyName} • ${metadata.generatedAt} • ${metadata.projectStatus.toUpperCase()}`, pageWidth / 2, currentY, { align: "center" });
+  doc.text(`${company.companyName} • ${metadata.generatedAt} • ${(metadata.projectStatus || "in_progress").toUpperCase()}`, pageWidth / 2, currentY, { align: "center" });
   currentY += 7;
 
   if (!metadata.isComplete) {
@@ -479,15 +480,18 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     doc.text(`6. Kanıt Dokümanları ve Ekler Dizini (${report.attachments.length})`, marginX, currentY);
     currentY += 5;
 
-    const attRows = report.attachments.map((a) => {
+    const attachmentUrlMap = new Map<number, string>();
+    const attRows = report.attachments.map((a, idx) => {
       const sizeStr =
         a.fileSize < 1024 * 1024
           ? `${(a.fileSize / 1024).toFixed(1)} KB`
           : `${(a.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+      const fileUrl = a.fileUrl || attachmentPathToFileUrl(a.relativePath);
+      attachmentUrlMap.set(idx, fileUrl);
       return [
         `${a.businessFunctionNameTr}\n(${a.processName})`,
         `[${a.questionId}]\n${a.questionText}`,
-        `${a.originalFileName}\n[${a.fileExtension.toUpperCase()} • ${sizeStr}]`,
+        `📎 ${a.originalFileName}\n[${a.fileExtension.toUpperCase()} • ${sizeStr}]\n${a.relativePath}`,
         a.description || "—",
       ];
     });
@@ -495,7 +499,7 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     autoTable(doc, {
       startY: currentY,
       margin: { left: marginX, right: marginX },
-      head: [["İş Fonksiyonu / Süreç", "Soru", "Dosya Adı & Tür", "Açıklama"]],
+      head: [["İş Fonksiyonu / Süreç", "Soru", "Dosya Adı, Tür & Yol", "Açıklama"]],
       body: attRows,
       theme: "grid",
       styles: { font: PDF_FONT_FAMILY },
@@ -503,9 +507,19 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
       bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
       columnStyles: {
         0: { cellWidth: 35 },
-        1: { cellWidth: 50 },
-        2: { cellWidth: 50 },
+        1: { cellWidth: 48 },
+        2: { cellWidth: 55, textColor: [15, 118, 110] },
         3: { cellWidth: "auto" },
+      },
+      didDrawCell: (data: any) => {
+        if (data.section === "body" && data.column.index === 2) {
+          const url = attachmentUrlMap.get(data.row.index);
+          if (url) {
+            doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, {
+              url,
+            });
+          }
+        }
       },
     });
     currentY = (doc as any).lastAutoTable.finalY + 4;

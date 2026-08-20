@@ -23,6 +23,7 @@ import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
 import { calculateProgress } from "../engine/progress";
 import { formatAnswer } from "./formatters";
+import { attachmentPathToFileUrl } from "../storage/attachmentLinks";
 import type {
   ReportModel,
   ReportMetadata,
@@ -251,6 +252,7 @@ export async function buildReportModel(
           originalFileName: a.original_file_name,
           storedFileName: a.stored_file_name,
           relativePath: a.relative_path,
+          fileUrl: attachmentPathToFileUrl(a.relative_path),
           mimeType: a.mime_type,
           fileExtension: a.file_extension,
           fileSize: a.file_size,
@@ -423,6 +425,7 @@ export async function buildReportModel(
       originalFileName: a.original_file_name,
       storedFileName: a.stored_file_name,
       relativePath: a.relative_path,
+      fileUrl: attachmentPathToFileUrl(a.relative_path),
       mimeType: a.mime_type,
       fileExtension: a.file_extension,
       fileSize: a.file_size,

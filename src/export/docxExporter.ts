@@ -11,6 +11,7 @@ import {
   Packer,
   Paragraph,
   TextRun,
+  ExternalHyperlink,
   Table,
   TableRow,
   TableCell,
@@ -24,6 +25,7 @@ import {
   PageNumber,
 } from "docx";
 import { formatStatusLabel, type ReportModel } from "../report/types";
+import { attachmentPathToFileUrl } from "../storage/attachmentLinks";
 
 // Design Tokens (Word Hex)
 const COLOR_PRIMARY = "0284C7";    // Sky Blue 600
@@ -68,6 +70,67 @@ function createTableCell(
             italics,
             size: isHeader ? 20 : 19, // 10pt / 9.5pt
             color: isHeader ? "334155" : color,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+    ],
+  });
+}
+
+function createAttachmentTableCell(
+  originalFileName: string,
+  fileUrl: string,
+  fileExtension: string,
+  sizeStr: string,
+  relativePath: string
+): TableCell {
+  return new TableCell({
+    width: { size: 26, type: WidthType.PERCENTAGE },
+    margins: { top: 120, bottom: 120, left: 160, right: 160 },
+    borders: {
+      top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+      left: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+      right: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+    },
+    children: [
+      new Paragraph({
+        children: [
+          new ExternalHyperlink({
+            children: [
+              new TextRun({
+                text: `📎 ${originalFileName}`,
+                bold: true,
+                size: 19,
+                color: "0F766E", // Teal 700
+                underline: {},
+                font: FONT_FAMILY,
+              }),
+            ],
+            link: fileUrl,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: `[${fileExtension.toUpperCase()} • ${sizeStr}]`,
+            size: 16,
+            color: COLOR_MUTED,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 20 },
+        children: [
+          new TextRun({
+            text: relativePath,
+            size: 14,
+            italics: true,
+            color: "94A3B8",
             font: FONT_FAMILY,
           }),
         ],
@@ -190,7 +253,7 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         new TableRow({
           children: [
             createTableCell("Analiz Durumu:", { bold: true, widthPercent: 20 }),
-            createTableCell(metadata.projectStatus.toUpperCase(), { widthPercent: 30 }),
+            createTableCell((metadata.projectStatus || "in_progress").toUpperCase(), { widthPercent: 30 }),
             createTableCell("İş Fonksiyonları:", { bold: true, widthPercent: 20 }),
             createTableCell(`${summaryStats.totalFunctions} Fonksiyon (${summaryStats.completedFunctions} Tamamlandı)`, { widthPercent: 30 }),
           ],
@@ -630,17 +693,24 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
                 att.fileSize < 1024 * 1024
                   ? `${(att.fileSize / 1024).toFixed(1)} KB`
                   : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+              const fileUrl = att.fileUrl || attachmentPathToFileUrl(att.relativePath);
               docChildren.push(
                 new Paragraph({
                   spacing: { after: 20 },
                   indent: { left: 450 },
                   children: [
-                    new TextRun({
-                      text: `📎 ${att.originalFileName} `,
-                      bold: true,
-                      size: 17,
-                      color: COLOR_DARK,
-                      font: FONT_FAMILY,
+                    new ExternalHyperlink({
+                      children: [
+                        new TextRun({
+                          text: `📎 ${att.originalFileName} `,
+                          bold: true,
+                          size: 17,
+                          color: "0F766E",
+                          underline: {},
+                          font: FONT_FAMILY,
+                        }),
+                      ],
+                      link: fileUrl,
                     }),
                     new TextRun({
                       text: `[${att.fileExtension.toUpperCase()}, ${sizeStr}]`,
@@ -965,6 +1035,7 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         att.fileSize < 1024 * 1024
           ? `${(att.fileSize / 1024).toFixed(1)} KB`
           : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
+      const fileUrl = att.fileUrl || attachmentPathToFileUrl(att.relativePath);
       attachmentRows.push(
         new TableRow({
           children: [
@@ -975,9 +1046,13 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
               bgColor: "FFFFFF",
               bold: true,
             }),
-            createTableCell(`${att.originalFileName}\n[${att.fileExtension.toUpperCase()} • ${sizeStr}]`, {
-              bgColor: "FFFFFF",
-            }),
+            createAttachmentTableCell(
+              att.originalFileName,
+              fileUrl,
+              att.fileExtension,
+              sizeStr,
+              att.relativePath
+            ),
             createTableCell(att.description || "Açıklama girilmedi.", {
               bgColor: "FFFFFF",
               italics: !att.description,
