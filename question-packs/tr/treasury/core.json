@@ -1,0 +1,1648 @@
+{
+  "meta": {
+    "pack_id": "tr.treasury.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "TREASURY",
+    "name": "Kasa ve Banka Ön Analizi",
+    "description": "Banka hesapları, nakit kasa, tahsilat kanalları, tedarikçi ödeme planlama ve onay yetkileri, MT940/API banka ekstre entegrasyonu, toplu EFT/FAST, sanal/fiziki POS, çek/senet portföyü, dövizli nakit, konsolide nakit pozisyonu, dinamik nakit akış tahmini, banka kredi limitleri, masraf denetimi, likidite riski ve banka mutabakatı süreçlerinin AS-IS durumu ve ERP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "TRS-001",
+      "process": "Banka Hesapları ve Organizasyonu",
+      "order": 1,
+      "question": "Kaç farklı banka ile çalışılmaktadır ve banka hesaplarının (Vadesiz TL/Döviz, Vadeli, POS, Kredi) ERP içindeki tanımlama ve kodlama standardı nasıldır?",
+      "description": "Banka şube, IBAN, hesap türü ve para birimi bazında hesap tanımlarının standartlaştırılması ve çoklu banka yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cok_sayida_banka_standart_kodlama_ve_iban_bazli_tanim",
+          "label": "5 ve üzeri banka ile çalışılmaktadır; tüm hesaplar IBAN, şube, döviz cinsi ve hesap türüne göre merkezi standart kodlama ile yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "orta_olcek_banka_standart_kodlama",
+          "label": "2-4 banka ile çalışılmaktadır; hesaplar ERP'de banka ve hesap türü bazında ayrı ayrı tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_banka_veya_sinirli_hesap",
+          "label": "Yalnızca 1-2 bankada sınırlı sayıda temel hesap kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hesap_tanimlari_standart_degil_manuel_takip",
+          "label": "Banka hesap tanımları ERP'de dağınık ve standart dışıdır, hesap listesi Excel'de güncel tutulmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-002",
+      "process": "Banka Hesapları ve Organizasyonu",
+      "order": 2,
+      "question": "Şirket, şube ve grup şirketleri bazında banka hesap yetkileri ve günlük banka bakiyelerinin ERP üzerinden konsolide izlenebilirliği nasıldır?",
+      "description": "Çoklu tüzel kişilik ve şubeler arasında banka hesap bakiyelerinin merkezi veya ayrıştırılmış olarak izlenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_sirket_ve_subeler_tek_ekranda_anlik_konsolide_izlenir",
+          "label": "Tüm şirket, şube ve döviz hesap bakiyeleri tek bir merkezi hazine kokpitinden yetki bazlı anlık konsolide izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sirket_bazinda_ayri_ekranlardan_raporlanir",
+          "label": "Her şirket/şube kendi ERP ekranından izlenir; konsolide bakiye gün sonunda Excel ortamında birleştirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "erpden_degil_internet_bankaciligi_portallarindan_bakilir",
+          "label": "Günlük bakiyeler ERP'den değil, ilgili bankaların internet bankacılığı portallarına tek tek girilerek kontrol edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-003",
+      "process": "Kasa Yönetimi",
+      "order": 3,
+      "question": "Şirketinizde fiziki nakit kasa (Merkez Kasa, Şube/Mağaza Kasası, Döviz Kasası, Masraf/Avans Kasası) kullanılıyor mu ve kasa yapısı nasıldır?",
+      "description": "Fiziki nakit giriş-çıkışları, kasa türleri ve kasa sorumluluğu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_kasa_merkez_sube_doviz_ayri_sorumlular",
+          "label": "Evet; Merkez Kasa, Şube Kasaları, Döviz Kasaları ve Masraf Avans Kasası tanımlıdır; her kasanın zimmetli sorumlusu vardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_merkez_kasa_ve_masraf_kasasi",
+          "label": "Evet; sadece merkez ofiste tek bir ana nakit kasa ve küçük harcamalar için masraf avans kasası kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_kucuk_masraf_kasasi_petty_cash",
+          "label": "Ticari nakit tahsilat/ödeme yoktur; yalnızca ufak ofis giderleri için küçük harcama kasası (Petty Cash) tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "nakit_kasa_kullanilmamaktadir",
+          "label": "Hayır; tüm tahsilat ve ödemeler bankacılık kanallarıyla yürütülür, fiziki nakit kasa kullanılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-004",
+      "process": "Kasa Yönetimi",
+      "order": 4,
+      "question": "Fiziki kasalarda azami nakit bakiye limitleri, günlük kasa sayım/kapanış tutanakları ve kasa açık/fazla kontrolleri nasıl yönetilmektedir?",
+      "description": "Kasa iç kontrolü, nakit bakiye tavanı ve gün sonu fiili sayım mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "TRS-003",
+        "operator": "not_equals",
+        "value": "nakit_kasa_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "gunluk_sayim_tutanagi_ve_sistem_tavan_limiti_kontrolu",
+          "label": "Her gün sonu fiziki sayım yapılıp tutanakla kapatılır; sistemde tanımlı tavan nakit limiti aşıldığında bankaya yatırma zorunluluğu vardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gunluk_kapanis_yapilir_ancak_limit_kontrolu_manuel",
+          "label": "Günlük sayım ve fiş kapatması yapılır; ancak kasa tavan bakiye kontrolü sistemsel değil manuel yürütülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "periyodik_veya_ay_sonu_sayim_yapilir",
+          "label": "Günlük tutanak tutulmaz; haftalık veya ay sonlarında kasa sayımı yapılarak bakiye mutabakatı sağlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-005",
+      "process": "Müşteri Tahsilatları",
+      "order": 5,
+      "question": "Müşteri tahsilatları hangi kanallarla (Banka Havalesi/EFT/FAST, Doğrudan Borçlandırma Sistemi - DBS, Sanal POS, Fiziki POS, Çek/Senet, Nakit) tahsil edilmektedir?",
+      "description": "Nakit giriş kanallarının dağılımı ve operasyonel çeşitliliği.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "banka_havale_eft_fast",
+          "label": "Banka Havalesi / EFT / FAST",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dogrudan_borclandirma_sistemi_dbs",
+          "label": "Doğrudan Borçlandırma Sistemi (DBS / ATS)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sanal_pos_b2b_b2c_portal",
+          "label": "Sanal POS (Web Sitesi / B2B Bayi Tahsilat Portalı)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziki_pos_ve_kredi_karti",
+          "label": "Fiziki POS ve Mail Order Kredi Kartı",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_ceki_ve_senet",
+          "label": "Müşteri Çeki ve Senet",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "nakit_tahsilat",
+          "label": "Elden Nakit Tahsilat",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-006",
+      "process": "Müşteri Tahsilatları",
+      "order": 6,
+      "question": "Banka hesaplarına gelen müşteri tahsilatları, açık faturalar ve müşteri cari hesapları ile nasıl eşleştirilmektedir (Eşleştirme Referansı / Algoritması)?",
+      "description": "Gelen paranın doğru müşteri, sipariş veya fatura ile eşleştirilme mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "otomatik_vkn_fatura_no_veya_siparis_kodu_ile_eslesir",
+          "label": "Ekstre açıklamasındaki VKN/TCKN, Fatura No veya Sipariş Kodu algoritma ile okunur ve açık fatura otomatik kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cari_otomatik_bulunur_acik_fatura_fifo_veya_manuel_kapatilir",
+          "label": "Müşteri cari hesabı VKN/IBAN ile otomatik bulunur; ancak açık fatura kapatması FIFO esasına göre veya kullanıcı tarafından manuel yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tamamen_manuel_ekstre_kontrolu_ve_cari_eslestirme",
+          "label": "Finans personeli banka hareketini inceler, müşteriyi tespit eder ve cari tahsilat kaydını elle açar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-007",
+      "process": "Tedarikçi Ödemeleri",
+      "order": 7,
+      "question": "Tedarikçi ve hizmet satıcılarına yapılacak ödemelerin periyodu ve ödeme yöntemi dağılımı (Haftalık ödeme günü, EFT/Havale, Çek keşidesi, DBS) nasıldır?",
+      "description": "Tedarikçi ödeme periyotları, nakit çıkış ritmi ve kullanılan ödeme araçları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sabit_haftalik_odeme_gunu_toplu_eft_havale",
+          "label": "Haftanın belirlenen sabit gününde (örn. Cuma) vadesi gelen tüm borçlar için toplu banka EFT/Havale çalıştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "karma_yontem_nakit_eft_cek_ve_tedarikci_dbs",
+          "label": "Tedarikçi anlaşmasına göre vadeli çek keşidesi, tedarikçi DBS'si ve banka havalesi karma olarak kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fatura_vadesi_geldikce_gunluk_tekil_odeme",
+          "label": "Belirli bir ödeme günü yoktur; faturanın vadesi doldukça günlük olarak tek tek ödeme yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-008",
+      "process": "Tedarikçi Ödemeleri",
+      "order": 8,
+      "question": "Tedarikçi fatura vadeleri ve erken ödeme / nakit iskonto (Cash Discount) fırsatları finansal olarak nasıl takip edilmekte ve değerlendirilmektedir?",
+      "description": "Erken ödeme iskontolarının nakit getirisi ve vade optimizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "erp_erken_odeme_iskonto_firsatlarini_ve_vade_getirisini_otomatik_onerir",
+          "label": "ERP, erken ödeme nakit iskontosu sağlayan faturaları tespit eder ve finansal getiriye göre ödeme listesinde önceliklendirir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_manuel_degerlendirir_ve_yonetime_sunar",
+          "label": "İskonto teklifleri finans ekibi tarafından manuel hesaplanır; nakit durumuna göre yönetim onayıyla erken ödenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "erken_odeme_yapilmaz_kesin_fatura_vadesi_beklenir",
+          "label": "Erken ödeme iskontosu uygulanmaz; ödemeler daima sözleşmedeki net vade tarihinde gerçekleştirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-009",
+      "process": "Ödeme Planlama",
+      "order": 9,
+      "question": "Haftalık veya aylık tedarikçi ödeme listesi (Payment Proposal / Ödeme Öneri Listesi) nasıl hazırlanmakta ve vadesi gelen borçlar nasıl önceliklendirilmektedir?",
+      "description": "Ödeme teklif listesinin otomatik oluşturulması, blokajlar ve kritik tedarikçi önceliklendirmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_oneri_listesi_otomatik_olusturur_kullanici_revize_eder",
+          "label": "ERP, vadesi gelen onaylı faturalardan otomatik ödeme öneri listesi oluşturur; treasury uzmanı nakit durumuna göre revize eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_uzerinde_manuel_odeme_listesi_hazirlanir",
+          "label": "Muhasebeden açık fatura listesi çekilir; Excel tablosunda manuel elenerek haftalık ödeme listesi hazırlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_aramasi_ve_baski_durumuna_gore_anlik_odeme_listesi",
+          "label": "Sistematik planlama listesi yoktur; arayan ve teslimatı durduran kritik tedarikçilere öncelik verilerek liste oluşturulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-010",
+      "process": "Ödeme Planlama",
+      "order": 10,
+      "question": "Nakit sıkışıklığı veya likidite kısıtı durumunda tedarikçi ödemelerinin kısmi ödenmesi, ötelenmesi veya vadeli enstrümanlara (çek vb.) dönüştürülmesi kararı nasıl verilmektedir?",
+      "description": "Ödeme erteleme, kısmi tahsis ve vadeli ödeme kararlarının yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_nakit_simulasyonu_ve_tedarikci_oncelik_puanina_gore_karar_verilir",
+          "label": "ERP nakit simülasyonu çalıştırılır; tedarikçi kritiklik skoru ve açık sipariş durumuna göre kısmi ödeme veya çek teklifi kararı verilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cfo_ve_yonetim_kurulu_tarafindan_manuel_belirlenir",
+          "label": "Finans Direktörü (CFO) veya Şirket Yönetimi listeyi inceleyerek kimlere ne kadar ödeneceğini manuel belirler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tedarikcilerle_birebir_gorusulerek_vade_uzatimi_yapilir",
+          "label": "Satın alma birimi tedarikçilerle tek tek görüşerek ek vade veya çek kabulü konusunda mutabakat sağlar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-011",
+      "process": "Ödeme Onay Süreçleri",
+      "order": 11,
+      "question": "Tedarikçi ve masraf ödemelerinde Görevler Ayrılığı İlkesi (Segregation of Duties — Hazırlayan, Kontrol Eden, Onaylayan ve Bankadan Gönderen Yetkililer) nasıl işletilmektedir?",
+      "description": "İç kontrol, dolandırıcılık önleme ve ödeme sürecindeki rol ayrımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_gorevler_ayriligi_erp_ve_bankada_ayri_yetkililer",
+          "label": "Tam ayrılık vardır; listeyi hazırlayan uzman, onaylayan müdür ve bankadan transfer emrini veren/token sahibi kesinlikle farklı kişilerdir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "erp_onayi_var_ancak_banka_tokeni_tek_kiside",
+          "label": "ERP üzerinde hazırlama ve onay akışı vardır; ancak banka transfer yetkisi ve token tek bir imza yetkilisindedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "gorevler_ayriligi_yok_ayni_kisi_hazirlayip_oder",
+          "label": "Görevler ayrılığı işletilmemektedir; finans/muhasebe yetkilisi listeyi hazırlayıp doğrudan bankadan ödemeyi gerçekleştirir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-012",
+      "process": "Ödeme Onay Süreçleri",
+      "order": 12,
+      "question": "Ödeme onaylarında tutar bazlı hiyerarşik onay limitleri (Approval Limits) ve çift imza / çift onay yetki matrisi nasıl uygulanmaktadır?",
+      "description": "Tutar kademeleri, çift onay (4-eyes principle) ve yönetim onay eşikleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_sisteminde_tutar_kademeli_ve_cift_onay_matrisi_zorunludur",
+          "label": "Belirlenen tutar eşiklerine göre (örn. 250.000 TL üzeri Genel Müdür onayı, çift onay) ERP'de onaylanmadan banka ödeme dosyası üretilemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "erpde_tek_onay_bankada_cift_imza_kullanilir",
+          "label": "ERP'de tek kademe onay verilir; ancak banka internet şubesinde şirket imza sirkülerine uygun çift onay (1. ve 2. imza) işletilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tutar_limiti_ve_cift_onay_kurali_yoktur",
+          "label": "Tutar bazlı limit veya çift onay mekanizması yoktur; tek yetkili tüm ödemeleri serbest bırakabilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-013",
+      "process": "Banka Hareketleri ve Ekstre Entegrasyonu",
+      "order": 13,
+      "question": "Banka hesap hareketleri (Ekstre / Hesap Özeti) ERP sistemine hangi teknolojik yöntemle aktarılmaktadır?",
+      "description": "Açık bankacılık API, MT940, SFTP veya manuel ekstre aktarım altyapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "online_banka_api_veya_open_banking_ile_anlik_otomatik",
+          "label": "Banka Açık Bankacılık (Open Banking) API entegrasyonu ile hareketler ERP'ye anlık/gün içi otomatik akar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mt940_veya_camt053_sftp_ile_gunluk_otomatik",
+          "label": "Bankalardan her gece SFTP üzerinden gelen standart MT940 / CAMT.053 elektronik ekstre dosyaları ile otomatik yüklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "internet_subesinden_excel_csv_indirilip_ice_aktarilir",
+          "label": "Finans personeli her sabah internet bankacılığından Excel/CSV indirir ve ERP içe aktarma aracıyla sisteme yükler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tamamen_manuel_ekstreye_bakilarak_satir_satir_islenir",
+          "label": "Elektronik dosya aktarımı yoktur; banka ekstresi ekrandan okunarak hareketler tek tek elle sisteme girilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-014",
+      "process": "Banka Hareketleri ve Ekstre Entegrasyonu",
+      "order": 14,
+      "question": "Banka hareketlerinin (gelen havale, giden EFT, POS blokesi çözülmesi, kredi taksiti, masraf/faiz) cari, masraf ve finans hesaplarıyla otomatik eşleşme (Otomatik Mutabakat / Rule Engine) oranı nedir?",
+      "description": "Kural motoruyla hareketlerin otomatik tanınması ve manuel müdahale ihtiyacı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yuksek_otomasyon_yuzde_85_uzeri_kural_motoru_ile_eslesir",
+          "label": "Gelişmiş kural motoru (IBAN, VKN, açıklama anahtar kelimeleri) sayesinde hareketlerin %85'ten fazlası kullanıcı onayı gerekmeden otomatik eşleşir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "orta_otomasyon_yuzde_50_85_arasi_kullanici_onayli",
+          "label": "Hareketlerin %50-%85'i sistem tarafından önerilir, kullanıcı tek tıkla onaylayarak eşleştirir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dusuk_otomasyon_yuzde_50_alti_cogunlukla_manuel",
+          "label": "Kural motoru yetersizdir; hareketlerin yarısından fazlası kullanıcı tarafından manuel aranarak eşleştirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-015",
+      "process": "Havale / EFT / FAST / Toplu Ödeme",
+      "order": 15,
+      "question": "Onaylanan tedarikçi ve personel ödemeleri bankalara nasıl iletilmektedir (Toplu Ödeme Dosyası / Host-to-Host / API / Manuel Giriş)?",
+      "description": "Banka ödeme talimatlarının transfer yöntemi ve entegrasyon seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "host_to_host_veya_banka_api_ile_tek_tikla_gonderilir",
+          "label": "ERP'den bankaya doğrudan Host-to-Host (SFTP) veya API ile gönderilir; onaylanan ödemeler otomatik banka emrine dönüşür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_banka_odeme_dosyasi_iso20022_txt_yuklenir",
+          "label": "ERP'den bankanın istediği formatta toplu ödeme dosyası (ISO 20022 XML / Banka Özel TXT-Excel) üretilir ve internet şubesine yüklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "internet_subesinden_tek_tek_manuel_girilir",
+          "label": "Dosya transferi kullanılmaz; finans personeli banka internet şubesine girip her alıcı için tek tek EFT/Havale talimatı oluşturur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-016",
+      "process": "Havale / EFT / FAST / Toplu Ödeme",
+      "order": 16,
+      "question": "Acil ödemeler, 7/24 FAST transferleri ve tekil para transferi talimatlarının ERP üzerinde kaydı ve onay süreci nasıl yürütülmektedir?",
+      "description": "Plan dışı acil nakit çıkışları, FAST limitleri ve sonradan belge eşleştirme kontrolleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "erp_uzerinden_acil_onay_akisi_ile_fast_emri_verilir",
+          "label": "ERP üzerinde mobil onaylı acil ödeme akışı çalıştırılır, FAST emri sistem üzerinden kayıt altına alınarak gönderilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "bankadan_manuel_gonderilir_ayni_gun_erpye_kaydi_girilir",
+          "label": "Yetkili banka mobil/web şubesinden acil FAST yapar; dekont aynı gün içinde ERP'ye işlenip fatura/masraf ile kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ekstre_gelene_kadar_kayitsiz_kalir_sonradan_arastirilir",
+          "label": "Acil ödemeler anında sisteme girilmez; banka ekstresi geldiğinde fark edilip kaynağı araştırılarak kapatılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-017",
+      "process": "Otomatik Tahsilat ve Sanal POS Bağlantıları",
+      "order": 17,
+      "question": "Müşterilerden doğrudan tahsilat için Doğrudan Borçlandırma Sistemi (DBS), Sanal POS veya Bayi Tahsilat Portalı kullanılıyor mu?",
+      "description": "Otomatik tahsilat altyapıları, banka DBS limitleri ve Sanal POS entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hem_dbs_hem_sanal_pos_b2b_aktif_kullanilir",
+          "label": "Evet; hem banka Doğrudan Borçlandırma Sistemi (DBS) hem de B2B/B2C Sanal POS tahsilat altyapısı aktif olarak kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_dbs_kullanilmaktadir",
+          "label": "Evet; bayi ve distribütör tahsilatları için yalnızca banka DBS (Doğrudan Borçlandırma) sistemi kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_sanal_pos_b2b_b2c_kullanilmaktadir",
+          "label": "Evet; kredi kartı ile tahsilat için Sanal POS ve online ödeme geçidi (Payment Gateway) kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sanal_pos_veya_otomatik_tahsilat_yoktur",
+          "label": "Hayır; DBS veya Sanal POS kullanılmamaktadır; tüm tahsilatlar klasik havale veya çek ile yürütülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-018",
+      "process": "Otomatik Tahsilat ve Sanal POS Bağlantıları",
+      "order": 18,
+      "question": "Sanal POS veya DBS tahsilatlarında işlem komisyon oranları, taksit maliyetleri ve banka hesap entegrasyonu ERP'de nasıl yönetilmektedir?",
+      "description": "Komisyon kesintilerinin net tahsilat tutarından ayrıştırılması ve ERP mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRS-017",
+        "operator": "not_equals",
+        "value": "sanal_pos_veya_otomatik_tahsilat_yoktur"
+      },
+      "options": [
+        {
+          "value": "komisyon_otomatik_ayrisir_net_tutar_bankaya_brut_musteriye_islenir",
+          "label": "ERP/Ödeme Entegratörü brüt tahsilatı müşteri cariye, kesilen POS komisyonunu masrafa, net tutarı banka hesabına otomatik işler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "brut_tutar_islenir_komisyon_ay_sonu_toplu_fatura_ile_kaydedilir",
+          "label": "Tahsilat brüt tutar üzerinden kaydedilir; bankanın kestiği komisyonlar ay sonunda gelen dekont/fatura ile toplu muhasebeleştirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "komisyonlar_manuel_hesaplanip_ayri_mahsupla_girilir",
+          "label": "Otomatik ayrıştırma yoktur; her işlem veya gün sonu ekstresindeki komisyon tutarları elle girilerek düzeltilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-019",
+      "process": "Kredi Kartı / POS Süreçleri",
+      "order": 19,
+      "question": "Şirketinizde fiziki mağaza / saha tahsilatlarında Fiziki POS (Banka POS, Ortak POS, Mobil POS) cihazları kullanılıyor mu?",
+      "description": "Fiziki POS cihaz sayısı, banka dağılımı ve saha tahsilat operasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_banka_fiziki_ve_mobil_pos_aktif_kullanilir",
+          "label": "Evet; mağazalarda ve saha satış ekiplerinde birden fazla bankaya ait fiziki ve mobil POS cihazları kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_banka_veya_ortak_yazar_kasa_pos_kullanilir",
+          "label": "Evet; yalnızca merkezde/mağazada tek bir banka veya Ortak Yazar Kasa POS (ÖKC) kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziki_pos_kullanilmiyor",
+          "label": "Hayır; fiziki POS kullanılmamaktadır (tamamen B2B havale, çek veya sanal tahsilat yürütülür)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-020",
+      "process": "Kredi Kartı / POS Süreçleri",
+      "order": 20,
+      "question": "POS cihazlarından geçen tahsilatların bloke gün süreleri (Valör Tarihi), komisyon kesintileri ve banka hesabına fiili net geçiş tarihleri nasıl izlenmektedir?",
+      "description": "Bloke çözülme tarihleri (valör), nakit likiditeye dönüş zamanı ve POS mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRS-019",
+        "operator": "not_equals",
+        "value": "fiziki_pos_kullanilmiyor"
+      },
+      "options": [
+        {
+          "value": "erp_valor_ve_bloke_tarihlerini_otomatik_hesaplar_ve_nakit_akisa_alir",
+          "label": "ERP, banka sözleşmesindeki valör gününe (örn. T+28 gün veya ertesi gün komisyonlu) göre paranın hesaba geçeceği günü ve net tutarı otomatik hesaplar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gunluk_pos_gun_sonu_ve_ekstre_karsilastirmasi_manuel_yapilir",
+          "label": "POS gün sonu slip toplamları ile banka ekstresine yansıyan tutarlar finans personeli tarafından Excel'de manuel karşılaştırılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "valor_takibi_yapilmaz_para_hesaba_girdikce_kaydedilir",
+          "label": "Önceden valör ve bloke takibi yapılmaz; para banka hesabına yansıdığı gün tahsilat kaydı açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-021",
+      "process": "Çek ve Senet Yönetimi",
+      "order": 21,
+      "question": "Şirketinizin ticari operasyonlarında Müşteri Çeki, Kendi Çekimiz (Keşide Çek) veya Senet kullanılıyor mu?",
+      "description": "Kıymetli evrak ve vadeli ödeme araçlarının portföy büyüklüğü ve işlem hacmi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "hem_alinan_cek_hem_keside_cek_yogun_kullanilir",
+          "label": "Evet; hem müşterilerden alınan çekler hem de tedarikçilere keşide edilen kendi çeklerimiz yoğun şekilde kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_musteriden_alinan_cekler_kullanilir",
+          "label": "Evet; müşterilerden çek alınır, kendi keşide çekimiz kullanılmaz (alınan çekler ciro edilir veya bankaya tahsile verilir)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cek_ve_senet_nadir_istisnai_kullanilir",
+          "label": "Evet; ancak çok nadir ve istisnai durumlarda teminat veya özel tahsilat amacıyla kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "cek_ve_senet_hic_kullanilmaz",
+          "label": "Hayır; şirketimizde çek ve senet kesinlikle kullanılmamaktadır (tamamen nakit/banka çalışılır)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-022",
+      "process": "Çek ve Senet Yönetimi",
+      "order": 22,
+      "question": "Alınan müşteri çeklerinin portföydeki yaşam döngüsü (Portföyde, Bankaya Tahsile Verildi, Bankaya Teminata Verildi, Tedarikçiye Ciro Edildi, İade) ERP'de nasıl takip edilmektedir?",
+      "description": "Çek bordroları, statü değişiklikleri ve fiziki lokasyon takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRS-021",
+        "operator": "not_equals",
+        "value": "cek_ve_senet_hic_kullanilmaz"
+      },
+      "options": [
+        {
+          "value": "tam_bordro_ve_statu_takibi_erpde_anlik_izlenir",
+          "label": "Giriş, bankaya tahsil/teminat çıkışı, tedarikçiye ciro ve tahsilat adımları ERP çek bordroları ile statü bazında eksiksiz takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "giris_ve_cikis_kaydedilir_ancak_statu_degisimi_manuel",
+          "label": "Çekin girişi ve çıkışı ERP'ye kaydedilir; ancak bankadaki tahsil/teminat durumları ve takas akıbeti manuel takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "cek_kasasi_ve_portfoy_excelde_tutulur",
+          "label": "ERP'de çek modülü aktif kullanılmaz; çeklerin vadesi ve nerede olduğu Excel çek takip listesinde izlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-023",
+      "process": "Çek ve Senet Yönetimi",
+      "order": 23,
+      "question": "Çeklerin vade dağılımı (Çek Yaşlandırma / Ortalama Vade), karşılıksız çıkan veya protesto olan çeklerin takibi ve müşteri riskine etkisi nasıl izlenmektedir?",
+      "description": "Kıymetli evrak vade riski, karşılıksız çek ihbarları ve müşteri açık hesap riskine otomatik yansıma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRS-021",
+        "operator": "not_equals",
+        "value": "cek_ve_senet_hic_kullanilmaz"
+      },
+      "options": [
+        {
+          "value": "ortalama_vade_ve_karsiliksiz_riski_musteri_kredi_limitini_otomatik_etkiler",
+          "label": "Çeklerin ortalama vadesi sistemde anlık hesaplanır; karşılıksız çek durumu oluştuğunda müşterinin sipariş/sevkiyat onayı sistemce otomatik kilitlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "vade_dagilimi_gorulur_karsiliksiz_takibi_manuel_yapilir",
+          "label": "Çek vade listesi raporlanabilir; ancak karşılıksız çıkan çekler hukuk/finans tarafından manuel takip edilip cariye borç kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ortalama_vade_ve_risk_analizi_yapilamaz",
+          "label": "Sistemde ortalama vade veya karşılıksız çek risk analizi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-024",
+      "process": "Çek ve Senet Yönetimi",
+      "order": 24,
+      "question": "Alınan ve verilen senetlerin (Borç ve Alacak Senetleri) vade, tahsilat, ciro ve yasal takip (protesto/icra) süreçleri nasıl yürütülmektedir?",
+      "description": "Senet takibi, kefil bilgileri, protesto işlemleri ve tahsilat süreçleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "TRS-021",
+        "operator": "not_equals",
+        "value": "cek_ve_senet_hic_kullanilmaz"
+      },
+      "options": [
+        {
+          "value": "senetler_ayri_senet_modulunde_tum_hukuki_asamalariyla_takip_edilir",
+          "label": "Senetler ERP senet modülünde kefil, vade, protesto ve icra takip aşamalarıyla eksiksiz yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "senet_sayisi_azdir_manuel_makbuz_ve_excel_ile_takip_edilir",
+          "label": "İşlem hacmi düşüktür; senetler kasada fiziki saklanır, tahsilatı manuel makbuz ve Excel üzerinden yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "senet_kullanilmamaktadir_yalnizca_cek_vardir",
+          "label": "Şirketimizde senet kullanılmaz; kıymetli evrak olarak sadece çek ile işlem yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-025",
+      "process": "Dövizli Nakit Yönetimi",
+      "order": 25,
+      "question": "Şirketinizde döviz cinsinden (USD, EUR, GBP vb.) banka hesapları, dövizli tahsilat/ödeme veya döviz kredisi işlemleri bulunuyor mu?",
+      "description": "Çoklu para birimi nakit yönetimi, döviz hesapları ve döviz nakit akışı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yogun_dovizli_hesaplar_ihracat_ithalat_ve_doviz_kredileri_var",
+          "label": "Evet; yoğun dövizli tahsilat/ödeme, çoklu para birimli banka hesapları, ihracat bedelleri ve döviz kredileri yönetilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sinirli_dovizli_islemler_sadece_usd_eur_mevduat_var",
+          "label": "Evet; ancak sınırlı hacimde yalnızca temel USD ve EUR vadesiz hesapları kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dovizli_banka_hesabimiz_ve_islemimiz_yoktur",
+          "label": "Hayır; tüm ticari ve finansal operasyonlar yalnızca Türk Lirası (TL) üzerinden yürütülmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-026",
+      "process": "Dövizli Nakit Yönetimi",
+      "order": 26,
+      "question": "Döviz alış/satış (Arbitraj), forward/türev işlemler ve anlık döviz pozisyonu (Döviz Açık/Fazla Pozisyonu) treasury tarafında nasıl takip edilmektedir?",
+      "description": "Kur riski, döviz pozisyon dengesi ve bankalar arası döviz alım-satım işlemleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRS-025",
+        "operator": "not_equals",
+        "value": "dovizli_banka_hesabimiz_ve_islemimiz_yoktur"
+      },
+      "options": [
+        {
+          "value": "anlik_doviz_pozisyonu_ve_kur_riski_erp_hazine_ekraninda_izlenir",
+          "label": "Tüm bankalardaki döviz varlıkları ve dövizli yükümlülükler tek ekranda net döviz pozisyonu (Açık/Fazla) olarak anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "doviz_pozisyonu_excel_tablolarinda_gunluk_hesaplanir",
+          "label": "Döviz hesap bakiyeleri ERP'den alınıp Excel tablosuna aktarılır; net pozisyon ve arbitraj ihtiyacı manuel hesaplanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "doviz_pozisyon_takibi_yapilmaz_ihtiyac_oldukca_alim_satim_yapilir",
+          "label": "Net döviz pozisyonu hesaplanmaz; dövizli ödeme günü geldiğinde ihtiyaç duyulan tutar kadar piyasadan döviz alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-027",
+      "process": "Nakit Pozisyonu",
+      "order": 27,
+      "question": "Şirketin günlük konsolide nakit pozisyonu (Tüm bankalardaki serbest nakit, blokeli nakit, kasalar ve anlık kullanılabilir likidite toplamı) nasıl hesaplanmakta ve raporlanmaktadır?",
+      "description": "Bugün itibarıyla şirketin harcanabilir net nakit büyüklüğünün anlık tespiti.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_hazine_kokpiti_anlik_konsolide_serbest_nakit_gosterir",
+          "label": "ERP Hazine Kokpiti üzerinden tüm banka, kasa ve fonlardaki kullanılabilir serbest nakit ve blokeli tutarlar anlık konsolide görülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_sabah_finans_uzmani_excelde_nakit_durum_raporu_hazirlar",
+          "label": "Finans personeli her sabah tüm banka ve kasaları kontrol ederek Excel'de Günlük Nakit Durum tablosu hazırlar ve yönetime iletir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "konsolide_nakit_pozisyonu_cikarilamaz_parcali_bilgi_vardir",
+          "label": "Şirketin toplamda ne kadar net kullanılabilir nakdi olduğu anlık görülemez; ihtiyaç oldukça banka hesaplarına tek tek bakılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-028",
+      "process": "Nakit Pozisyonu",
+      "order": 28,
+      "question": "Bankalarda bloke olan mevduatlar (kredi teminat blokeleri, POS blokeleri, teminat mektubu karşılıkları) ile serbest kullanılabilir nakit ayrımı nasıl yapılmaktadır?",
+      "description": "Kullanımı kısıtlı nakit varlıkların operasyonel likiditeden arındırılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistem_blokeli_ve_serbest_bakiyeyi_otomatik_ayristirir",
+          "label": "ERP, kredi ve teminat karşılığı blokeli bakiyeleri serbest bakiyeden ayrı hesaplar; ödeme önerilerinde blokeli tutarı kullandırmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "blokeli_hesaplar_manuel_bilinir_ve_excelde_dusulur",
+          "label": "ERP hesap toplamını tek bakiye gösterir; hangi paranın blokeli olduğu finans uzmanının takibindedir ve Excel'de düşülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "hesaplarimizda_herhangi_bir_bloke_bulunmamaktadir",
+          "label": "Şirketimizin banka hesaplarında teminat veya kredi kaynaklı herhangi bir bloke nakit bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-029",
+      "process": "Nakit Akış Tahmini",
+      "order": 29,
+      "question": "Geleceğe dönük Dinamik Nakit Akış Tahmini (Haftalık / Aylık / 90 Günlük Cash Flow Forecast) yapılıyor mu ve hangi veri kaynaklarından beslenmektedir?",
+      "description": "Nakit giriş ve çıkışlarının ileriye dönük simülasyonu ve tahmin ufku.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_dinamik_nakit_akis_motoru_tum_modullerden_beslenir",
+          "label": "Evet; ERP Dinamik Nakit Akış Modülü faturalar, çekler, siparişler, maaş, vergi ve kredi planlarından beslenerek haftalık/aylık projeksiyon üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_uzerinde_haftalik_aylik_nakit_projeksiyonu_yapilir",
+          "label": "Evet; ancak ERP içinde değil, farklı departmanlardan toplanan verilerle Excel üzerinde manuel nakit akış modeli yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_kisa_vadeli_1_haftalik_tahmin_yapilabilmektedir",
+          "label": "Yalnızca önümüzdeki 1 haftalık acil ödeme ve tahsilat tahmini yapılabilir; orta/uzun vadeli nakit akış projeksiyonu yapılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "nakit_akis_tahmini_yapilmamaktadir",
+          "label": "Geleceğe dönük nakit akış tahmini yapılmamaktadır; ödemeler anlık bakiye durumuna göre yönetilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-030",
+      "process": "Nakit Akış Tahmini",
+      "order": 30,
+      "question": "Nakit akış projeksiyonunda beklenen müşteri tahsilatları, beklenen tedarikçi ödemeleri, personel maaşları, vergi/SGK ve kredi taksitleri nasıl modellenmektedir?",
+      "description": "Sabit ve değişken nakit kalemlerinin tahminde ağırlıklandırılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_kalemler_fatura_vadesi_ve_odeme_takvimlerine_gore_otomatik_modellenir",
+          "label": "Ticari faturalar vadesine göre, maaş/vergi/kira gibi periyodik giderler takvime göre, kredi taksitleri amortisman tablosuna göre otomatik modellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ticari_borc_alacak_sistemden_sabit_giderler_manuel_eklenir",
+          "label": "Faturalı borç ve alacaklar sistemden çekilir; maaş, SGK, vergi ve kredi gibi sabit giderler Excel'de manuel eklenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tahmin_sadece_tahmini_yuvarlak_rakamlarla_yapilir",
+          "label": "Kalem bazlı detaylı modelleme yoktur; geçmiş ayların ortalamalarına göre yaklaşık toplu bütçe tahminleri kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-031",
+      "process": "Nakit Akış Tahmini",
+      "order": 31,
+      "question": "Henüz faturalaşmamış açık satın alma siparişleri (PO) ve açık satış siparişleri (SO) nakit akış tahminine dahil edilmekte midir?",
+      "description": "Erken aşama taahhütlerin likidite projeksiyonuna etkisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "onayli_acik_siparisler_teslimat_ve_odeme_vadelerine_gore_tahmine_dahildir",
+          "label": "Evet; onaylanmış açık siparişler planlanan teslim tarihi ve ödeme vadesi hesaplanarak nakit akış simülasyonuna dahil edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_acik_satinalma_siparisleri_dahil_edilir",
+          "label": "Yalnızca gelecekteki nakit çıkışını görmek için onaylı satın alma siparişleri dahil edilir; satış siparişleri faturalanmadan alınmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "acik_siparisler_alinmaz_yalnizca_kesilmis_faturalar_dahildir",
+          "label": "Hayır; sipariş aşamasındaki taahhütler dikkate alınmaz, yalnızca kesinleşmiş ve muhasebeleşmiş açık faturalar nakit akışına girer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-032",
+      "process": "Banka Kredileri ve Limitler",
+      "order": 32,
+      "question": "Şirketinizde banka nakdi kredileri (BCH, Rotatif, Spot, Taksitli Ticari Kredi, Eximbank) veya gayrinakdi kredi limitleri kullanılmakta mıdır?",
+      "description": "Banka finansman enstrümanları, limit hacmi ve kredi kullanım yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hem_nakdi_krediler_hem_gayrinakdi_limitler_aktif_kullanilir",
+          "label": "Evet; rotatif/spot/taksitli nakdi krediler, Eximbank kredileri ve teminat mektubu gibi gayrinakdi limitler aktif kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_rotatif_veya_spot_kisa_vadeli_nakit_kredi_kullanilir",
+          "label": "Evet; yalnızca nakit ihtiyacı doğduğunda kullanılan kısa vadeli rotatif (BCH) veya spot krediler mevcuttur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_gayrinakdi_teminat_mektubu_limiti_kullanilir",
+          "label": "Nakdi kredi kullanılmaz; yalnızca ihaleler ve tedarikçi teminatları için gayrinakdi teminat mektubu limitleri kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "banka_kredisi_ve_kredi_limiti_kullanilmamaktadir",
+          "label": "Hayır; şirketimiz banka kredisi veya kredi limiti kullanmamaktadır (özkaynaklarla çalışılmaktadır)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-033",
+      "process": "Banka Kredileri ve Limitler",
+      "order": 33,
+      "question": "Kullanılan banka kredilerinin geri ödeme planları (Anapara, Faiz, BSMV, Taksit Vadeleri) ve kredi faiz giderleri ERP'de nasıl takip edilmektedir?",
+      "description": "Kredi itfa tabloları (amortization schedule), faiz tahakkukları ve taksit alarmları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRS-032",
+        "operator": "not_equals",
+        "value": "banka_kredisi_ve_kredi_limiti_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "kredi_itfa_tablolari_erpde_tanimlidir_taksitler_otomatik_odeme_planina_girer",
+          "label": "Kredi itfa planı anapara/faiz/BSMV kırılımıyla ERP'de tanımlıdır; taksit vadeleri nakit akışına ve ödeme önerilerine otomatik yansır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kredi_geri_odeme_tablosu_excelde_tutulur_taksit_gunu_manuel_odeme_yapilir",
+          "label": "Banka ödeme planı Excel'de takip edilir; taksit günü geldiğinde ilgili banka hesabına para aktarılıp manuel kapatılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kredi_takibi_muhasebe_fisleriyle_ay_sonlarinda_yapilir",
+          "label": "Gelecek taksitler takip edilmez; banka hesaptan faiz/anapara çektikçe ekstreden geriye dönük muhasebeleştirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-034",
+      "process": "Banka Kredileri ve Limitler",
+      "order": 34,
+      "question": "Bankalar nezdindeki gayrinakdi limitler, verilen/alınan teminat mektupları (Geçici, Kesin, Avans) ve mektup komisyonları treasury tarafından nasıl izlenmektedir?",
+      "description": "Teminat mektubu vadeleri, limit doluluk oranları, yenileme ve iade süreçleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "TRS-032",
+        "operator": "not_equals",
+        "value": "banka_kredisi_ve_kredi_limiti_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "teminat_mektubu_modulunde_limit_vade_ve_komisyonlar_eksiksiz_izlenir",
+          "label": "Banka bazında limit doluluğu, mektup vadeleri, muhatap kurum, mektup iadeleri ve dönemlik komisyon tahakkukları sistemde izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "teminat_mektuplari_excel_listesiyle_ve_fiziki_dosyayla_takip_edilir",
+          "label": "Teminat mektubu fotokopileri ve vadeleri Excel tablosunda tutulur; komisyonlar geldikçe masrafa yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "gayrinakdi_teminat_mektubu_islemi_bulunmamaktadir",
+          "label": "Şirketimizin bankalarda teminat mektubu veya gayrinakdi limit işlemi bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-035",
+      "process": "Banka Masraf / Komisyon Yönetimi",
+      "order": 35,
+      "question": "Bankaların kestiği EFT/havale masrafları, hesap işletim ücretleri, POS komisyonları ve kredi kullanım giderleri kontrol edilip banka sözleşme şartlarıyla karşılaştırılıyor mu?",
+      "description": "Banka giderlerinin denetimi, sözleşme tarife kontrolü ve maliyet azaltma.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sozlesme_oranlari_sistemde_tanimlidir_hatali_kesintiler_otomatik_tespit_edilir",
+          "label": "Bankalarla yapılan komisyon ve masraf sözleşmeleri sistemde kayıtlıdır; ekstredeki kesintiler bu oranlarla otomatik denetlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_ay_sonlarinda_ornekleme_ile_manuel_kontrol_eder",
+          "label": "Ay sonu ekstreleri incelenir; yüksek tutarlı POS komisyonu veya kredi masrafları sözleşmeyle manuel karşılaştırılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "banka_masraflari_kontrol_edilmez_ekstredeki_tutar_dogrudan_masrafa_yazilir",
+          "label": "Banka masraf ve komisyonları için tarife kontrolü yapılmaz; bankanın kestiği tutar doğrudan genel gidere işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-036",
+      "process": "Banka Masraf / Komisyon Yönetimi",
+      "order": 36,
+      "question": "Hatalı veya sözleşme oranlarının üzerinde kesilen banka masraf ve komisyonlarının tespiti, bankaya itirazı ve iade takibi süreci nasıl işletilmektedir?",
+      "description": "Haksız veya fazla kesintilerin iadesi ve finansal geri kazanım takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "itiraz_ve_iade_kayitlari_erpde_takip_edilir_iade_tutari_hesaba_alinarak_kapatilir",
+          "label": "Fazla kesintiler için bankaya itiraz kaydı açılır; iade gelen tutar ilgili masraf kalemiyle eşleştirilerek kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_muduru_banka_temsilcisiyle_gorusur_iade_manuel_takip_edilir",
+          "label": "Banka portföy yöneticisi ile e-posta/telefonla görüşülür; iade edilen tutar ekstrede takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "itiraz_ve_iade_sureci_isletilmemektedir",
+          "label": "Kesilen masraflara yönelik herhangi bir itiraz veya iade takip süreci yürütülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-037",
+      "process": "Likidite ve Finansal Risk",
+      "order": 37,
+      "question": "Olası kısa vadeli nakit açıkları (Cash Shortage) sistem üzerinden önceden tespit edilebiliyor mu ve açığın kapatılması için hangi finansman aksiyonları devreye alınıyor?",
+      "description": "Nakit açığı erken uyarıları, kredi kullanımı veya tahsilat hızlandırma aksiyonları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_erken_uyari_verir_rotatif_kredi_veya_cek_faktoring_tetiklenir",
+          "label": "Nakit açığı oluşacağı tarihten günler önce sistem uyarı verir; rotatif kredi kullanımı veya vadesi gelmemiş çeklerin iskonto/tahsili planlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_excelde_tahmin_eder_ve_odemeleri_oteler",
+          "label": "Nakit açığı Excel nakit tablosundan fark edilir; tedarikçi ödemeleri ötelenerek veya ortaklardan fon sağlanarak açık kapatılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "nakit_acigi_gununde_fark_edilir_anlik_kriz_yonetimi_yapilir",
+          "label": "Önceden alarm mekanizması yoktur; ödeme günü hesapta bakiye yetmediğinde acil kredi çekilerek veya ödeme bekletilerek yönetilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-038",
+      "process": "Likidite ve Finansal Risk",
+      "order": 38,
+      "question": "Gün içi veya dönemlik atıl / fazla nakdin (Excess Cash) getiri optimizasyonu (Gecelik Repo, Ters Repo, Vadeli Mevduat, Likit Fon) kararları nasıl verilmekte ve yönetilmektedir?",
+      "description": "Serbest nakit fazlasının değerlendirilmesi, nemalandırma ve hazine kârı optimizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "otomatik_gecelik_nemalandirma_veya_hazine_uzmani_ile_gunluk_mevduat_baglanir",
+          "label": "Gün sonu serbest bakiyeler banka otomatik fon/repo sistemine aktarılır veya treasury yöneticisi en yüksek oranlı vadeli mevduata bağlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "belirli_buyuklukte_nakit_birikince_yonetim_karariyla_degerlendirilir",
+          "label": "Günlük repo yapılmaz; hesaplarda yüklü nakit biriktiğinde yönetim onayıyla vadeli hesaba veya dövize aktarılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "nakit_vadesiz_hesapta_nemalanmadan_bekletilir",
+          "label": "Fazla nakit değerlendirilmez, ödemelere hazırlık amacıyla vadesiz hesapta faizsiz olarak bekletilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-039",
+      "process": "Banka Mutabakatı",
+      "order": 39,
+      "question": "ERP banka hesap bakiyeleri ile banka internet bankacılığı / ekstre fiili bakiyeleri arasındaki Banka Mutabakatı (Bank Reconciliation) hangi sıklıkla ve nasıl yapılmaktadır?",
+      "description": "Operasyonel banka bakiyesi ile banka fiili bakiyesinin denkleştirilmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gunluk_otomatik_ekstre_eslestirmesi_ile_anlik_mutabakat_saglanir",
+          "label": "Banka API / MT940 sistemiyle her gün sonu otomatik mutabakat çalışır; kuruş farkları ve açık kayıtlar anında listelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "haftalik_veya_ay_sonu_manuel_ekstre_karsilastirmasi_yapilir",
+          "label": "Haftalık veya ay sonlarında banka ekstre dökümü ile ERP muavin defteri satır satır karşılaştırılarak mutabık kalınır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sadece_yil_sonu_resmi_mizan_kapanisinda_mutabakat_yapilir",
+          "label": "Dönem içinde düzenli banka mutabakatı yapılmaz; sadece yıl sonu veya üç aylık geçici vergi dönemlerinde bakiye kontrol edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-040",
+      "process": "Banka Mutabakatı",
+      "order": 40,
+      "question": "Banka ile ERP arasındaki bakiye farkları (yoldaki transferler, henüz tahsil olmamış çekler, provizyondaki işlemler) nasıl tespit edilmekte ve mutabakat raporuna nasıl yansıtılmaktadır?",
+      "description": "Mutabakat fark kalemleri (Reconciling Items) ve askı kayıtlarının takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "erp_banka_mutabakat_raporunda_yoldaki_paralar_ve_farklar_ayri_listelenir",
+          "label": "ERP Banka Mutabakat Kokpiti yoldaki transferleri, takastaki çekleri ve provizyonları fark sebebi olarak ayrı kategoride raporlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "farklar_excel_uzerinde_arastirilip_not_olarak_yazilir",
+          "label": "Farkların neden kaynaklandığı muhasebe personeli tarafından araştırılır ve Excel mutabakat çalışma sayfasına not edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fark_kalemleri_detaylandirilmaz_dogrudan_duzeltme_kaydi_atilir",
+          "label": "Neden kaynaklandığı detaylı araştırılmaz; bakiye uyuşmadığında tek taraflı düzeltme fişi ile hesap eşitlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-041",
+      "process": "Treasury Raporlama ve KPI",
+      "order": 41,
+      "question": "Üst yönetim ve finans direktörlüğü için Günlük / Haftalık Hazine ve Likidite Yönetim Raporu (Treasury Dashboard) hazırlanıyor mu?",
+      "description": "Yönetici hazine raporlaması, serbest likidite özeti ve finansal durum paneli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_yonetici_kokpitinden_anlik_otomatik_raporlanir",
+          "label": "Evet; ERP Yönetici Paneli (Dashboard) ve mobil ekranlar üzerinden nakit, çek, kredi, döviz pozisyonu ve haftalık akış anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_her_sabah_standart_excel_raporu_hazirlar",
+          "label": "Evet; finans ekibi tarafından her sabah standart şablonda hazırlanan Hazine Durum Raporu e-posta ile yönetime sunulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "periyodik_hazine_raporu_yoktur_talep_edildikce_hazirlanir",
+          "label": "Düzenli bir hazine raporu yoktur; genel müdür veya patron talep ettikçe anlık durum özeti çıkarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "TRS-042",
+      "process": "Treasury Raporlama ve KPI",
+      "order": 42,
+      "question": "Hazine operasyonlarında hangi Finansal ve Likidite KPI'ları (DSO - Alacak Tahsil Süresi, DPO - Borç Ödeme Süresi, Nakit Döngüsü Süresi, Kredi Limit Kullanım Oranı) periyodik ölçülmektedir?",
+      "description": "Nakit yönetimi performans metrikleri ve finansal verimlilik göstergeleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "dso_alacak_tahsil_suresi",
+          "label": "DSO (Days Sales Outstanding — Ortalama Alacak Tahsilat Süresi)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dpo_borc_odeme_suresi",
+          "label": "DPO (Days Payable Outstanding — Ortalama Tedarikçi Ödeme Süresi)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ccc_nakit_donusum_dongusu",
+          "label": "CCC (Cash Conversion Cycle — Nakit Döngüsü Süresi)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kredi_limit_doluluk_orani",
+          "label": "Kredi Limit Doluluk ve Boş Limit Oranı (Credit Headroom)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "serbest_nakit_akisi_fcf",
+          "label": "Serbest Nakit Akışı (Free Cash Flow) ve Likidite Karşılama Oranı",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kpi_olculmemektedir",
+          "label": "Hazine KPI'ları şirketimizde düzenli olarak ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

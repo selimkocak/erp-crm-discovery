@@ -36,8 +36,8 @@ if (!Array.isArray(entries)) {
 }
 
 // ── Validations ──
-if (entries.length !== 31) {
-  console.error(`[generate] FAIL: Expected exactly 31 business functions, found ${entries.length}`);
+if (entries.length !== 32) {
+  console.error(`[generate] FAIL: Expected exactly 32 business functions, found ${entries.length}`);
   process.exit(1);
 }
 
@@ -101,7 +101,7 @@ if (!seenCodes.has("SALES")) {
   process.exit(1);
 }
 
-console.log(`[generate] Validated 31 canonical business functions successfully.`);
+console.log(`[generate] Validated ${entries.length} canonical business functions successfully.`);
 
 // ── Deterministic Code Generation ──
 mkdirSync(dirname(TS_PATH), { recursive: true });

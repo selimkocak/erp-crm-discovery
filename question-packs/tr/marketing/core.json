@@ -1,0 +1,1573 @@
+{
+  "meta": {
+    "pack_id": "tr.marketing.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "MARKETING",
+    "name": "Pazarlama ve Kampanya Ön Analizi",
+    "description": "Pazarlama organizasyonu ve ajans yönetimi, dönemsel pazarlama hedefleri ve satış kotalarıyla hizalanma, kurumsal kampanya planlama ve takvim yönetimi, hedef kitle segmentasyonu ve dinamik filtreler, kampanya listeleri ve mükerrer kayıt temizliği (de-duplication), izinli pazarlama veri tabanı ve kara liste (suppression list), omni-channel lead generation ve inbound web formları, lead kaynakları ve UTM parametreleri izlenebilirliği, dijital reklam kanalları (Google, LinkedIn, Meta) ve CRM API entegrasyonu, toplu e-posta pazarlama altyapısı ve teslim/açılma/tıklanma metrikleri, SMS/mesajlaşma ve İYS izin süreçleri, fiziksel/çevrimiçi etkinlik ve fuar yönetimi ile follow-up iş akışları, kampanya içerik ve onay mekanizmaları, kampanya bütçe planlaması ve gerçekleşen harcama takibi, lead nitelendirme (MQL/SQL) ve lead scoring puanlama modelleri, satışa lead dağıtımı (CRM handoff) ve SLA takibi, kampanya dönüşüm takibi ve kayıp nedenleri analizi, çoklu temas noktası gelir paylaşımı (attribution modelleme), müşteri edinme maliyeti (CAC), aday maliyeti (CPL), pazarlama ROI/ROAS ve pazarlama KPI kokpiti süreçlerinin AS-IS durumunu ve ERP/CRM/Marketing gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "MKT-001",
+      "process": "Pazarlama Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde pazarlama faaliyetleri (Kurumsal pazarlama, Dijital pazarlama, Ürün/Kategori pazarlaması, Etkinlik yönetimi) hangi organizasyonel yapıda ve ekip sorumluluğunda yürütülmektedir?",
+      "description": "Pazarlama departman yapısı, uzmanlık alanları ve organizasyonel olgunluk.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ayri_ve_uzmanlasmis_pazarlama_departmani_tarafindan_merkezi_yurutulur",
+          "label": "Ayrı bir Pazarlama Departmanı (Dijital, İletişim, Ürün Yöneticileri) tarafından merkezi olarak yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_departmani_altinda_pazarlama_sorumlulari_tarafindan_yurutulur",
+          "label": "Ayrı bir birim yoktur; Satış Departmanı içindeki personeller pazarlama görevlerini de üstlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sirket_ortaklari_veya_ust_yonetim_tarafindan_dogrudan_yonetilir",
+          "label": "Şirket ortakları veya genel yönetim pazarlama faaliyetlerini doğrudan organize eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-002",
+      "process": "Pazarlama Organizasyonu",
+      "order": 2,
+      "question": "Pazarlama operasyonlarında dış ajanslar (Reklam/Medya ajansı, Dijital performans ajansı, Etkinlik organizasyon firması, PR ajansı) ile iş birliği ve bilgi akışı nasıl yönetilmektedir?",
+      "description": "Ajans ekosistemi, dış hizmet sağlayıcılar ve veri paylaşım modeli.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "dis_ajanslarla_entegre_proje_ve_raporlama_araclari_uzerinden_duzenli_calisilir",
+          "label": "Evet; dijital reklam, kreatif veya etkinlik ajanslarıyla ortak paneller ve haftalık KPI toplantılarıyla çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ajanslarla_yalnizca_eposta_ve_donem_sonu_raporlari_ile_manuel_iletisim_kurulur",
+          "label": "Ajanslar bağımsız çalışır; sadece ay sonu harcama ve lead raporları e-posta ile alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dis_ajans_kullanilmamaktadir_tum_faaliyetler_ic_ekiple_yurutulur",
+          "label": "Dış ajans kullanılmamaktadır; tüm pazarlama ve kreatif işler şirket içi kaynaklarla yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-003",
+      "process": "Pazarlama Hedefleri",
+      "order": 3,
+      "question": "Şirketinizin dönemsel (Yıllık/Çeyreklik) pazarlama hedefleri (Yeni lead adedi, Marka bilinirliği, Web trafiği, Müşteri adayı yaratma, Pazarlama kaynaklı ciro payı) tanımlı mıdır?",
+      "description": "Pazarlama hedefleri, KPI çerçevesi ve hedef takip disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sayisal_ve_olculebilir_pazarlama_hedefleri_yillik_ceyrek_olarak_belirlenmistir",
+          "label": "Evet; yeni lead sayısı, MQL hedefi ve pazarlama kaynaklı ciro payı (%) net hedeflerle tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "genel_butce_ve_etkinlik_sayisi_vardir_ancak_net_lead_hedefi_yoktur",
+          "label": "Kaç fuara gidileceği veya ne kadar reklam bütçesi harcanacağı bellidir ancak net lead/ciro hedefi yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tanimlanmis_resmi_bir_pazarlama_hedefi_bulunmamaktadir",
+          "label": "Tanımlanmış resmi bir pazarlama hedefi yoktur; faaliyetler fırsat çıktıkça plansız yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-004",
+      "process": "Pazarlama Hedefleri",
+      "order": 4,
+      "question": "Belirlenen pazarlama hedefleri satış hedefleriyle (Sales Quota & Pipeline gereksinimleri) ne sıklıkla hizalanmakta ve gözden geçirilmektedir?",
+      "description": "Pazarlama ve satış hizalanması (SMarketing Alignment), ortak hedef paylaşımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "pazarlama_ve_satis_hedefleri_aylik_ortak_toplantilarla_hizalanir",
+          "label": "Evet; satışın pipeline ihtiyacına göre pazarlama hedefleri aylık/çeyreklik olarak senkronize edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_yil_basinda_butce_doneminde_konusulur_yil_ici_ayri_ilerler",
+          "label": "Yalnızca yıl başında bütçe yapılırken görüşülür; yıl içinde iki departman birbirinden bağımsız çalışır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_ve_pazarlama_arasinda_hedef_hizalanmasi_yapilmamaktadir",
+          "label": "İki departman arasında hedef paylaşımı yoktur; satış kendi hedefine, pazarlama kendi işine bakar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-005",
+      "process": "Kampanya Planlama",
+      "order": 5,
+      "question": "Pazarlama kampanyaları (Ürün lansmanı, Sezonluk indirim, Fuar/Etkinlik duyurusu, Sektörel talep yaratma) hangi ortamda (ERP/CRM kampanya modülü, Excel takvimi, Proje yönetim aracı) planlanmaktadır?",
+      "description": "Kampanya yönetim yazılımı, planlama altyapısı ve kampanya süreçleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_crm_marketing_modulunde_planlanir_ve_yonetilir",
+          "label": "Kampanyalar merkezi CRM/Marketing modülünde hedef, bütçe, kanal ve takvim detaylarıyla açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proje_yonetim_veya_gorev_takip_yazilimlarinda_planlanir",
+          "label": "Kampanya adımları genel proje/görev yönetim araçlarında (Trello, Asana vb.) takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "excel_tablolarinda_veya_ortak_takvimlerde_planlanir",
+          "label": "Sistemik kampanya modülü yoktur; kampanyalar Excel takviminde ve e-posta yazışmalarıyla planlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onceden_planlama_yapilmaz_anlik_kampanyalar_duzenlenir",
+          "label": "Önceden planlama yapılmaz; ihtiyaç duyuldukça anlık kararla kampanya yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-006",
+      "process": "Kampanya Planlama",
+      "order": 6,
+      "question": "Tüm pazarlama iletişimlerini ve kanallarını (E-posta, Sosyal medya, Dijital reklam, Fuar, Basın) gösteren merkezi bir Kurumsal Kampanya Takvimi kullanılmakta mıdır?",
+      "description": "Merkezi pazarlama takvimi, omni-channel iletişim planı ve çakışma kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tum_kanallari_ve_sorumlulari_gosteren_canli_merkezi_takvim_aktif",
+          "label": "Evet; tüm ekiplerin gördüğü dijital/fiziksel temasları içeren merkezi pazarlama takvimi kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_kanal_kendi_takvimini_ayri_excelde_tutar",
+          "label": "Merkezi takvim yoktur; dijital reklamcı ayrı, etkinlikçi ayrı Excel dosyası tutar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kurumsal_kampanya_takvimi_kullanilmamaktadir",
+          "label": "Kampanya takvimi tutulmamaktadır; ne zaman hangi iletişimin çıkacağı önceden görülmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-007",
+      "process": "Hedef Kitle ve Segmentasyon",
+      "order": 7,
+      "question": "Kampanyalarda hedef kitle (Sektör, Şirket ölçeği/ciro, Bölge, Satın alma geçmişi, Ürün ilgi grubu, Müşteri/Aday statüsü) nasıl belirlenmekte ve segmentlere ayrılmaktadır?",
+      "description": "Hedef kitle belirleme kriterleri, segmentasyon stratejisi ve veri filtreleme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "crm_ve_erp_verileri_uzerinden_cok_kriterli_akilli_segmentasyon_yapilir",
+          "label": "Evet; sektör, geçmiş ciro, son satın alma tarihi ve ürün grubu bazında hedef segmentler belirlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "genel_musteri_listesine_toplu_kampanya_cıkilir_ozel_segmentasyon_azdir",
+          "label": "Detaylı segmentasyon yapılmaz; tüm müşteri ve aday listesine genel toplu iletişim yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_temsilcilerinin_onerdigi_musteri_isimleri_toplanarak_olusturulur",
+          "label": "Sistemik filtreleme yoktur; satışçılardan 'Kimi arayalım?' diye liste istenir, birleştirilip kampanya yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-008",
+      "process": "Hedef Kitle ve Segmentasyon",
+      "order": 8,
+      "question": "Hedef kitle segmentasyonu CRM/ERP müşteri veritabanı üzerinden dinamik filtrelerle (Örn. 'Son 6 aydır sipariş vermeyen B2B müşteriler') otomatik oluşturulabilmekte midir?",
+      "description": "Dinamik segmentasyon filtreleri, otomatik güncellenen hedef listeler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "dinamik_filtrelerle_otomatik_guncellenen_akilli_listeler_kullanilir",
+          "label": "Evet; kural tanımlanır (Örn. 'Marmara Bölgesi + >1M TL Ciro') ve bu kritere uyanlar listeye otomatik eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_kampanya_oncesi_manuel_rapor_cekilip_statik_liste_olusturulur",
+          "label": "Dinamik liste yoktur; her kampanya için ERP'den Excel raporu çekilir, temizlenir ve statik liste yüklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "segment_bazli_hedefleme_yapilamamaktadir",
+          "label": "Segment filtreleme yapılamaz; veritabanı ayrıştırılamadığı için hedefleme yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-009",
+      "process": "Kampanya Listeleri",
+      "order": 9,
+      "question": "Kampanya hedef listeleri (İletişim kişileri, Aday havuzları, Fuar katılımcı listeleri) nasıl oluşturulmakta ve mükerrer kayıtlar (De-duplication) nasıl temizlenmektedir?",
+      "description": "Liste birleştirme, veri tekilleştirme (De-duplication) ve liste hijyeni.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistem_eposta_telefon_ve_vkn_bazinda_mukerrerleri_otomatik_birlestirir",
+          "label": "Evet; farklı kaynaklardan gelen listeler tekilleştirilir, mükerrer e-posta ve telefonlar elenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "listeler_excelde_manuel_birlestirilir_mukerrerler_gozle_temizlenir",
+          "label": "Sistemik temizlik yoktur; pazarlama sorumlusu Excel'de 'Yinelenenleri Kaldır' yaparak listeyi hazırlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mukerrer_kontrolu_yapilmaz_ayni_kisiye_birden_fazla_mesaj_gidebilir",
+          "label": "Mükerrer kontrolü yapılmaz; aynı müşteriye aynı anda birden fazla temsilciden veya kanaldan mesaj gidebilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-010",
+      "process": "Kampanya Listeleri",
+      "order": 10,
+      "question": "İletişim izni bulunmayan, abonelikten çıkan (Unsubscribe) veya kara listede (Suppression List) yer alan kişi/firmalar kampanya listelerinden otomatik ayıklanmakta mıdır?",
+      "description": "Kara liste yönetimi (Suppression List), abonelik iptali ve izinli gönderim garantisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_izin_ve_ret_listesini_kontrol_ederek_otomatik_engeller",
+          "label": "Evet; sistem izin durumunu ve ret listesini kontrol eder, izni olmayanlar gönderim listesinden otomatik düşürülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ret_talepleri_ayri_bir_excelde_tutulur_manuel_cikarilmaya_calisilir",
+          "label": "Otomatik engelleme yoktur; ayrılmak isteyenler bir Excel listesinde tutulur ve gönderimden önce elle silinir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kara_liste_veya_izin_kontrolu_yapilmamaktadir",
+          "label": "İzin veya ret kontrolü yapılmaz; eldeki tüm e-posta ve telefonlara doğrudan gönderim yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-011",
+      "process": "Lead Generation",
+      "order": 11,
+      "question": "Şirketinizde yeni müşteri adayı (Lead) yaratma süreçleri hangi yöntemlerle (Gelen inbound talepler, Dış kaynaklı outbound aramalar, İçerik pazarlaması, Etkinlikler, Dijital reklamlar) yürütülmektedir?",
+      "description": "Lead yaratma kanalları karması (Inbound / Outbound / Event / Digital).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cok_kanalli_inbound_ve_outbound_dijital_ve_fiziksel_birlikte_kullanilir",
+          "label": "Evet; web sitesi, dijital reklamlar, fuarlar, sektörel etkinlikler ve içerik indirmeleriyle çok kanallı lead toplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "agirlikli_olarak_fuarlar_ve_mevcut_musteri_referanslari_ile_lead_gelir",
+          "label": "Dijital kanallar zayıftır; ana lead kaynağımız yılda birkaç kez katıldığımız ihtisas fuarları ve referanslardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_temsilcilerinin_soguk_arama_ve_ziyaretleri_ile_aday_bulunur",
+          "label": "Pazarlama lead üretmez; satış personeli kendi çabasıyla sahada veya rehberden soğuk arama yaparak aday bulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-012",
+      "process": "Lead Generation",
+      "order": 12,
+      "question": "Web sitesi formlarından (İletişim, Teklif İste, Katalog İndir, Demo Talebi) gelen potansiyel müşteri talepleri anlık olarak merkezi sisteme (CRM/Marketing) otomatik düşmekte midir?",
+      "description": "Web formu entegrasyonu, anlık lead yakalama ve form-to-CRM akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "web_formlarindan_gelen_tum_talepler_crm_lead_havuzuna_anlik_akar",
+          "label": "Evet; form doldurulduğu saniye CRM'de yeni lead kartı açılır, bildirim üretilir ve temsilciye yönlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "formlar_genel_bir_info_eposta_adresine_duser_manuel_aktarilir",
+          "label": "Sisteme akmaz; form bilgisi info@ veya pazarlama e-postasına mail olarak gelir, personel bunu elle sisteme girer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "web_sitesinde_form_veya_online_talep_toplama_bulunmamaktadir",
+          "label": "Web sitesinde form entegrasyonu yoktur; müşteriler sadece sitedeki telefon numarasını arar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-013",
+      "process": "Lead Kaynakları",
+      "order": 13,
+      "question": "Sisteme giriş yapan her yeni müşteri adayının (Lead) geliş kaynağı (Web Formu, Google Arama/Reklam, LinkedIn/Sosyal Medya, Fuar/Etkinlik, Bayi/Referans, Doğrudan Telefon) zorunlu olarak kaydedilmekte midir?",
+      "description": "Lead kaynağı (Lead Source) takibi, zorunlu kaynak standardı ve kaynak analitiği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "lead_kaynagi_tum_kanallarda_standart_ve_zorunlu_olarak_kaydedilir",
+          "label": "Evet; her adayın sisteme nereden girdiği (Google Ads, Fuar, Web Form, Referans vb.) zorunlu seçilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lead_kaynagi_alani_vardir_ancak_istege_baglidir_genelde_bos_birakilir",
+          "label": "Sistemde alan vardır fakat zorunlu değildir; kullanıcılar genelde seçmeden geçer, veriler eksiktir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lead_kaynagi_takip_edilmemektedir",
+          "label": "Adayın nereden geldiği tutulmaz; satışın hangi kanaldan beslendiği bilinmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-014",
+      "process": "Lead Kaynakları",
+      "order": 14,
+      "question": "Dijital kanallardan gelen taleplerde kampanya izleme kodları (UTM Parametreleri — Source, Medium, Campaign, Term, Content) lead kaydına otomatik işlenmekte midir?",
+      "description": "UTM parametresi takibi, dijital reklam izlenebilirliği ve kampanya eşleştirme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_utm_parametreleri_lead_kartiyla_otomatik_eslestirilip_saklanir",
+          "label": "Evet; adayın tıkladığı reklam kampanyası (utm_source, utm_campaign vb.) CRM lead kartına otomatik yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_genel_siteye_geldigi_bilinir_kampanya_bazli_utm_tutulmaz",
+          "label": "Yalnızca 'Web' olarak kaydedilir; hangi Google veya LinkedIn reklamından geldiği bilinmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "utm_veya_dijital_kampanya_izleme_kullanilmamaktadir",
+          "label": "UTM takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-015",
+      "process": "Dijital Kanallar",
+      "order": 15,
+      "question": "Şirketiniz dijital pazarlama ve reklam kanallarını (Google Ads Arama/Görüntülü, LinkedIn B2B Reklamları, Meta/Instagram, YouTube, Sektörel Portallar) aktif olarak kullanmakta mıdır?",
+      "description": "Dijital reklam varlığı, kanal çeşitliliği ve dijital pazarlama bütçesi kullanımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_dijital_reklam_ve_sosyal_medya_kanallari_aktif_olarak_kullanilir",
+          "label": "Evet; Google Ads, LinkedIn B2B reklamları ve sektörel dijital platformlar bütçe ayrılarak aktif kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_temel_google_arama_reklamlari_veya_sosyal_medya_paylasimi_yapilir",
+          "label": "Kapsamlı reklam yapılmaz; sadece temel Google aramada görünürlük veya organik sosyal medya paylaşımları vardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dijital_reklam_ve_pazarlama_kanallari_kullanilmamaktadir",
+          "label": "Şirketimizde dijital reklam veya online pazarlama kanalları kullanılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-016",
+      "process": "Dijital Kanallar",
+      "order": 16,
+      "question": "Dijital reklam platformlarından elde edilen form/lead verileri API entegrasyonu (Webhook / CRM Connector) ile otomatik olarak CRM lead havuzuna aktarılmakta mıdır?",
+      "description": "Reklam formları entegrasyonu (LinkedIn Lead Gen Forms, Facebook Lead Ads, Google Lead Extensions).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MKT-015",
+        "operator": "not_equals",
+        "value": "dijital_reklam_ve_pazarlama_kanallari_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "reklam_formu_dolduran_adaylar_crm_sistemine_aninda_otomatik_duser",
+          "label": "Evet; LinkedIn/Google formunu dolduran kişinin bilgileri API ile saniyeler içinde CRM'e aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "haftalik_veya_aylik_olarak_reklam_panellerinden_excel_indirilip_yuklenir",
+          "label": "Entegrasyon yoktur; reklam panelinden (LinkedIn Ads/Meta) Excel listesi çekilir ve elle aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "reklam_formu_leadleri_sisteme_aktarilmamaktadir",
+          "label": "Reklam formlarından gelen veriler sisteme girilmez; ajans veya reklam yöneticisinde kalır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-017",
+      "process": "E-posta Pazarlama",
+      "order": 17,
+      "question": "Müşteri ve adaylara yönelik toplu e-posta gönderimleri (E-bülten, Ürün duyurusu, Özel kampanya, Fuar daveti) hangi altyapı üzerinden yapılmaktadır?",
+      "description": "E-posta pazarlama platformu, kurumsal mailing araçları ve sistem entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "crm_ile_entegre_profesyonel_eposta_pazarlama_platformu_kullanilir",
+          "label": "Evet; CRM ile entegre çalışan profesyonel bir e-posta platformu (Mailing Engine) üzerinden gönderilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "crmden_bagimsiz_harici_bir_mailing_yazilimi_uzerinden_yapilir",
+          "label": "Bağımsız harici bir mailing platformu kullanılır; listeler Excel ile yüklenir, CRM ile bağı yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "outlook_veya_standart_mail_istemcisinden_toplu_bcc_ile_gonderilir",
+          "label": "Özel bir platform yoktur; personelin Outlook hesabından yüzlerce kişi BCC'ye eklenerek mail atılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "toplu_eposta_pazarlamasi_yapilmamaktadir",
+          "label": "Şirketimizde toplu e-posta veya e-bülten çalışması yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-018",
+      "process": "E-posta Pazarlama",
+      "order": 18,
+      "question": "Gönderilen e-postaların teslim, açılma (Open Rate), tıklanma (Click-Through Rate), geri dönme (Bounce) ve üyelikten ayrılma oranları CRM/Pazarlama sisteminde izlenebilmekte midir?",
+      "description": "E-posta kampanya metrikleri, kişi bazında etkileşim kaydı ve geri dönüş analizi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MKT-017",
+        "operator": "not_equals",
+        "value": "toplu_eposta_pazarlamasi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "kampanya_ve_kisi_bazinda_acilma_tiklanma_ve_etkilesim_crmde_kaydedilir",
+          "label": "Evet; kimin maili açtığı, hangi linke tıkladığı CRM müşteri kartı zaman çizelgesine anlık yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_harici_mailing_panelinde_genel_toplu_yuzdeler_gorulur",
+          "label": "Yalnızca genel açılma yüzdesi (%25) panelde görülür; hangi müşterinin ne yaptığı CRM'de görünmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eposta_performans_metrikleri_takip_edilmemektedir",
+          "label": "E-postaların gidip gitmediği, açılıp açılmadığı takip edilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-019",
+      "process": "SMS / Mesajlaşma",
+      "order": 19,
+      "question": "Pazarlama ve bilgilendirme amacıyla toplu SMS veya anlık mesajlaşma kanalları (WhatsApp Business, SMS Gateway) kullanılmakta mıdır?",
+      "description": "SMS ve anlık mesajlaşma kanalları, toplu bildirim ve mobil pazarlama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "crm_ile_entegre_sms_ve_whatsapp_is_hesabi_aktif_kullanilir",
+          "label": "Evet; CRM içinden veya entegre gateway ile hedef listelere SMS veya kurumsal WhatsApp mesajı atılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "harici_sms_baslik_paneli_uzerinden_manuel_liste_yuklenerek_atilir",
+          "label": "Bağımsız SMS operatör panelinden Excel listesi yüklenerek gönderim yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sms_veya_mesajlasma_kampanyasi_yapilmamaktadir",
+          "label": "Şirketimizde toplu SMS veya pazarlama amaçlı mesajlaşma kullanılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-020",
+      "process": "SMS / Mesajlaşma",
+      "order": 20,
+      "question": "SMS ve mesajlaşma gönderimlerinde İYS (İleti Yönetim Sistemi) izin kontrolü, ret hakkı (Opt-out) kodu ve gönderim raporları sistemsel olarak işletilmekte midir?",
+      "description": "İYS izin doğrulaması, ret mekanizması ve yasal bildirim uyumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MKT-019",
+        "operator": "not_equals",
+        "value": "sms_veya_mesajlasma_kampanyasi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "iys_entegrasyonu_ve_ret_kodu_sistemden_otomatik_denetlenir",
+          "label": "Evet; İYS üzerinden izinli numaralar filtrelenir ve mesaj sonuna standart ret kodu otomatik eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iys_kontrolu_sms_operatoru_tarafindan_harici_yapilir",
+          "label": "Şirket sisteminde kontrol yoktur; gönderim yapılan SMS operatörünün kendi kontrolüne bırakılmıştır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iys_veya_ret_hakki_kontrolu_yapilmamaktadir",
+          "label": "İYS veya ret kontrolü yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-021",
+      "process": "Etkinlik / Fuar / Webinar",
+      "order": 21,
+      "question": "Şirketinizin katıldığı veya düzenlediği fiziksel/çevrimiçi etkinlikler (Yurt içi/Yurt dışı İhtisas Fuarları, Müşteri Seminerleri, Webinarlar, Lansmanlar) nasıl organize edilmektedir?",
+      "description": "Etkinlik yönetimi, fuar katılım süreçleri ve etkinlik organizasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yillik_etkinlik_takvimi_kapsaminda_butce_ve_hedef_lead_planiyla_yonetilir",
+          "label": "Evet; her fuar ve webinar için bütçe, stand alanı, hedef ziyaretçi/lead sayısı önceden belirlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "donemsel_olarak_onemli_sektorel_fuarlara_katilinir_ancak_net_hedef_yoktur",
+          "label": "Fuarlara düzenli katılım sağlanır ancak öncesinde sayısal lead hedefi veya kurgu yapılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziksel_veya_cevrimici_etkinlik_fuar_yapilmamaktadir",
+          "label": "Şirketimiz fuar, seminer veya webinar gibi etkinliklere katılmamakta ve düzenlememektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-022",
+      "process": "Etkinlik / Fuar / Webinar",
+      "order": 22,
+      "question": "Fuar veya etkinlik standında toplanan kartvizit, yaka kartı tarama (Badge Scan) ve ziyaretçi formları etkinlik bitiminde sisteme nasıl aktarılmakta ve takip süreci (Follow-up) nasıl başlatılmaktadır?",
+      "description": "Fuar leadlerinin toplanması, dijitalleştirilmesi ve hızlı satış takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MKT-021",
+        "operator": "not_equals",
+        "value": "fiziksel_veya_cevrimici_etkinlik_fuar_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "mobil_kartvizit_tarayici_veya_formla_aninda_crm_fuar_kampanyasina_eklenir",
+          "label": "Evet; standda mobilden taranan kartvizitler CRM fuar kampanyasına akar ve satışçıya anında arama görevi açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fuar_sonrasi_kartvizitler_toplanip_excel_yapilir_haftalar_sonra_dagitilir",
+          "label": "Standda toplanan kartvizitler ofise gelince bir asistan tarafından Excel'e yazılır, süreç yavaş ilerler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kartvizitler_temsilcilerin_cebinde_kalir_merkezi_sisteme_girilmez",
+          "label": "Merkezi sisteme girilmez; her satışçı kendi görüştüğü kişilerin kartını alır, takip kendi inisiyatifindedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-023",
+      "process": "Kampanya İçerik ve Materyal Yönetimi",
+      "order": 23,
+      "question": "Pazarlama materyalleri (E-kataloglar, Broşürler, Ürün sunumları, Tanıtım videoları, Vaka analizleri / Case Study, Sosyal medya görselleri) nerede depolanmakta ve satış ekibiyle nasıl paylaşılmaktadır?",
+      "description": "Dijital varlık yönetimi (DAM), satış destek dokümanları ve kurumsal kütüphane.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "crm_veya_bulut_kutuphanesinde_guncel_ve_kategorize_olarak_saklanir",
+          "label": "Evet; tüm ekiplerin eriştiği merkezi dijital kütüphanede en güncel onaylı dokümanlar kategorize tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ortak_klasor_veya_google_drive_klasorunde_tutulur",
+          "label": "Ağdaki paylaşımlı klasörde veya Drive'da tutulur; bazen eski ve yeni broşürler birbirine karışır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "merkezi_bir_arsiv_yoktur_materyaller_eposta_ile_istendikce_gonderilir",
+          "label": "Merkezi arşiv yoktur; satışçılar broşür veya sunum istedikçe pazarlama sorumlusu mail ile iletir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-024",
+      "process": "Kampanya İçerik ve Materyal Yönetimi",
+      "order": 24,
+      "question": "Pazarlama içeriklerinin kurumsal marka standartlarına uygunluğu, güncel logo/şablon kullanımı ve onaylı materyal versiyonları sistemde nasıl denetlenmektedir?",
+      "description": "Marka standartları denetimi, güncel logo kullanımı ve versiyon kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "onayli_kurumsal_kimlik_kilavuzu_ve_versiyon_kontrollu_sablonlar_vardir",
+          "label": "Evet; marka kılavuzuna uygun güncel şablonlar kilitlidir, yetkisiz eski logo/içerik kullanımı engellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kontrol_yoktur_satiscilar_kendi_sunum_ve_gorsellerini_kendileri_tasarlar",
+          "label": "Denetim yoktur; her temsilci internetten veya eski dosyalardan bulduğu görsellerle kendi sunumunu yapar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "marka_ve_icerik_standardi_takip_edilmemektedir",
+          "label": "Marka ve içerik standartları takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-025",
+      "process": "Kampanya Onay Süreci",
+      "order": 25,
+      "question": "Yeni bir pazarlama kampanyası, promosyon iletişimi veya büyük bütçeli reklam yayını başlatılmadan önce hangi Onay Süreçleri (Pazarlama Müdürü, Satış Direktörü, Hukuk/KVKK, Genel Müdür) işletilmektedir?",
+      "description": "Kampanya onay hiyerarşisi, bütçe onay sınırları ve çoklu onay mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "butce_ve_icerik_kriterine_gore_cok_kademeli_onay_is_akisi_vardir",
+          "label": "Evet; bütçe büyüklüğüne ve iletişim tipine göre Pazarlama Müdürü -> Satış Direktörü -> GM onayı gerekir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_pazarlama_muduru_veya_yonetim_sozlu_onay_verir",
+          "label": "Sistemik onay yoktur; Pazarlama Müdürü veya Genel Müdür sözlü ya da e-posta ile 'Başlatın' der",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onay_sureci_yoktur_pazarlama_sorumlusu_kampanyayi_serbestce_yayinlar",
+          "label": "Resmi bir onay süreci yoktur; pazarlama personeli kampanyayı doğrudan yayına alır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-026",
+      "process": "Kampanya Onay Süreci",
+      "order": 26,
+      "question": "Kampanya onay süreçleri ve içerik onay kayıtları sistem üzerinden iş akışı (Workflow) ile mi yoksa e-posta/sözlü olarak mı yürütülmektedir?",
+      "description": "Kampanya onay iş akışı, denetim izi (Audit Trail) ve onay geçmişi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sistem_uzerinden_zaman_damgali_onay_is_akisi_ile_yurutulur",
+          "label": "Evet; kampanya sistem üzerinden onaya gönderilir, kimin ne zaman onayladığı tarihçede saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eposta_yazismalari_veya_mesajlasma_uzerinden_yurutulur",
+          "label": "Sistemik iş akışı yoktur; e-posta zinciri veya WhatsApp üzerinden onaylaşılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onay_kayitlari_saklanmamaktadir",
+          "label": "Onay kayıtları saklanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-027",
+      "process": "Kampanya Bütçesi",
+      "order": 27,
+      "question": "Pazarlama kampanyaları için kampanya bazında ve kanal bazında (Dijital reklam, Fuar alanı, Baskı/Materyal, Ajans bedeli) Bütçe Planlaması yapılmakta mıdır?",
+      "description": "Kampanya bütçe tahsisi, kanal bazlı bütçe kırılımı ve finansal planlama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "her_kampanya_icin_kalem_bazinda_onayli_butce_tanimlanir",
+          "label": "Evet; her kampanya için dijital reklam, ajans, stand, materyal vb. kalem bazında bütçe açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_yillik_genel_pazarlama_butcesi_vardir_kampanya_bazli_ayrilmaz",
+          "label": "Şirketin yıllık toplam pazarlama bütçesi vardır; kampanyalar bu havuzdan rastgele harcama yapar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kampanya_butcesi_tutulmaz_harcamalar_genel_gider_yazilir",
+          "label": "Pazarlama bütçesi planlanmaz; faturalar geldikçe muhasebeye genel şirket gideri olarak işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-028",
+      "process": "Kampanya Bütçesi",
+      "order": 28,
+      "question": "Gerçekleşen ajans faturaları, reklam harcamaları ve etkinlik giderleri sistemde doğrudan ilgili kampanyaya bağlanarak bütçe aşım kontrolü yapılabilmekte midir?",
+      "description": "Fiili pazarlama harcaması, kampanya maliyet eşleştirmesi ve bütçe sapma kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MKT-027",
+        "operator": "not_equals",
+        "value": "kampanya_butcesi_tutulmaz_harcamalar_genel_gider_yazilir"
+      },
+      "options": [
+        {
+          "value": "harcamalar_kampanya_koduyla_eslestirilir_ve_butce_asimi_anlik_gorulur",
+          "label": "Evet; gelen faturalar kampanya koduyla işlenir, planlanan vs gerçekleşen bütçe anlık karşılaştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "harcamalar_pazarlamanin_kendi_excel_tablosunda_manuel_tutulur",
+          "label": "Sistemik eşleştirme yoktur; pazarlama sorumlusu faturaları kendi Excel tablosuna elle işler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kampanya_harcama_ve_butce_asimi_takip_edilememektedir",
+          "label": "Kampanya harcamaları ve bütçe aşımı takip edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-029",
+      "process": "Lead Nitelendirme / Scoring Kullanımı",
+      "order": 29,
+      "question": "Toplanan adayların (Lead) satışa hazır olup olmadığını belirlemek için Lead Nitelendirme (MQL - Marketing Qualified Lead / SQL - Sales Qualified Lead ayrımı) ve Lead Puanlama (Lead Scoring) kriterleri uygulanmakta mıdır?",
+      "description": "MQL / SQL ayrımı, aday olgunluk değerlendirmesi ve puanlama modeli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kural_ve_davranis_bazli_lead_scoring_kullanilarak_mql_sql_ayrimi_yapilir",
+          "label": "Evet; adayın firma büyüklüğü, unvanı, web etkileşimi puanlanır; puanı eşiği geçenler satışa iletilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "pazarlama_ekibi_adayi_telefonla_arar_uygunsa_satisa_yonlendirir",
+          "label": "Otomatik skorlama yoktur; pazarlama personeli adayı arayıp ihtiyacını sorar, uygunsa satışa devreder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lead_nitelendirme_yapilmaz_gelen_her_talep_dogrudan_satisa_yonlendirilir",
+          "label": "Nitelendirme yapılmaz; gelen tüm form ve iletişimler filtrelenmeden doğrudan satış ekibine aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lead_nitelendirme_ve_scoring_kullanilmamaktadir",
+          "label": "Şirketimizde lead nitelendirme ve scoring süreci bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-030",
+      "process": "Lead Nitelendirme / Scoring Kullanımı",
+      "order": 30,
+      "question": "Lead puanlaması hangi parametrelere (Demografik/Firma büyüklüğü, Bütçe yetkisi, Web sitesi ziyaret sıklığı, E-posta tıklaması, Form doldurma sayısı) göre ve nasıl hesaplanmaktadır?",
+      "description": "Skorlama bileşenleri (Demografik, Firma Ölçeği, BANT, Dijital Davranış).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MKT-029",
+        "operator": "not_equals",
+        "value": "lead_nitelendirme_ve_scoring_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "hem_firma_profili_hem_dijital_davranis_puanlari_birlikte_hesaplanir",
+          "label": "Evet; B2B firma ölçeği (+30 puan) ve e-posta/web etkileşimleri (+10 puan) toplanarak dinamik skor üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_adayi_giren_kisinin_tahmini_sicak_ilik_soguk_secimiyle_belirlenir",
+          "label": "Otomasyon yoktur; temsilci adayı sisteme girerken 'Sıcak', 'Ilık' veya 'Soğuk' etiketini elle seçer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "puanlama_kriterleri_standartlastirilmamistir",
+          "label": "Puanlama kriterleri standartlaştırılmamıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-031",
+      "process": "Lead Dağıtımı ve CRM Handoff",
+      "order": 31,
+      "question": "Nitelendirilen müşteri adayları (Lead) satış ekiplerine veya temsilcilere hangi kurallarla (Bölge/İl bazlı, Ürün uzmanlığı, Müşteri sektörü/büyüklüğü, Sırayla Round-Robin) atanmaktadır?",
+      "description": "Lead yönlendirme ve atama kuralları (Lead Routing Matrix), satışa devir yöntemi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bolge_urun_ve_sektor_kurallarina_gore_sistemden_otomatik_atanir",
+          "label": "Evet; adayın bulunduğu il, ilgilendiği ürün ve sektör kuralına göre sorumlu satış temsilcisine anında atanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_muduru_veya_koordinator_gelen_adaylari_inceleyip_manuel_dagitir",
+          "label": "Otomatik dağıtım yoktur; Satış Müdürü lead havuzuna bakar ve personellere elle paylaştırır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ortak_eposta_veya_havuza_duser_bosa_cikan_temsilci_kendisi_alir",
+          "label": "Ortak havuza düşer; ilk gören veya o an müsait olan satışçı adayı sahiplenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-032",
+      "process": "Lead Dağıtımı ve CRM Handoff",
+      "order": 32,
+      "question": "Satış temsilcisine aktarılan lead'in ilk aranma süresi (Lead Response Time SLA — Örn. '2 saat içinde aranmalı') ve satışçının lead'i kabul/red etme durumu izlenmekte midir?",
+      "description": "Adaya ilk temas SLA'sı, satış kabul/red döngüsü ve eskalasyon kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ilk_temas_sla_suresi_ve_satisa_kabul_durumu_sistemden_canli_izlenir",
+          "label": "Evet; temsilcinin adayı ne kadar sürede aradığı ölçülür, 24 saat aranmayan lead başka temsilciye aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "temsilciye_devredildikten_sonra_ne_zaman_arandigi_takip_edilmez",
+          "label": "Temsilciye iletilir ancak ne zaman aradığı veya arayıp aramadığı sistem üzerinden denetlenmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lead_yanit_suresi_ve_takip_mekanizmasi_bulunmamaktadir",
+          "label": "Lead yanıt süresi ve takip mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-033",
+      "process": "Kampanya Dönüşüm Takibi",
+      "order": 33,
+      "question": "Pazarlama kampanyasından gelen bir lead'in Satış Fırsatına (Opportunity), Teklife veya Satış Siparişine (Closed-Won Deal) dönüşümü uçtan uca izlenebilmekte midir?",
+      "description": "Uçtan uca dönüşüm hunisi (Full-Funnel Tracking: Lead -> Opportunity -> Quote -> Order).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "lead_den_siparis_ve_faturaya_kadar_tam_entegre_donusum_izlenebilir",
+          "label": "Evet; adayın hangi kampanyadan geldiği, ne zaman fırsata, teklife ve siparişe dönüştüğü eksiksiz izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_lead_adedi_bilinir_satisa_donusup_donusmedigi_kopuktur",
+          "label": "Kaç lead geldiği bilinir fakat satış ERP'de ayrı yürütüldüğü için hangi adayın sipariş verdiği görülemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kampanya_donusum_takibi_yapilamamaktadir",
+          "label": "Kampanyaların satışa dönüşümü takip edilemez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-034",
+      "process": "Kampanya Dönüşüm Takibi",
+      "order": 34,
+      "question": "Satış ekibinin sonuçlandıramadığı veya kaybettiği lead'lerin (Lost Lead) nedenleri (Bütçe yetersizliği, Yanlış kontak, Zamanlama uyuşmazlığı) pazarlama ekibine geri bildirilmekte midir?",
+      "description": "Kayıp aday nedenleri (Lead Disqualification Reasons) ve pazarlama geri bildirim döngüsü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "standart_red_sebepleri_sisteme_girilir_ve_pazarlama_hedeflemesini_iyilestirir",
+          "label": "Evet; satışçı adayı kapattığında nedenini seçer; pazarlama bu veriye bakarak hedef kitlesini ve reklamını düzeltir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_ekibi_adayi_sistemden_silmekte_veya_nedensiz_kapatmaktadir",
+          "label": "Gerekçe girilmez; satışçı olumsuz gördüğü adayı siler veya aramadığı halde sistemde açık bırakır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kayip_lead_nedenleri_takip_edilmemektedir",
+          "label": "Kayıp aday nedenleri takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-035",
+      "process": "Attribution / Kaynak Analizi",
+      "order": 35,
+      "question": "Bir müşterinin satışla sonuçlanan yolculuğunda birden fazla kampanya ve temas noktası (Örn. Önce web reklamı, sonra webinar, ardından fuar ziyareti) olduğunda Satış Gelir Paylaşımı (Attribution Modeli — First-touch, Last-touch, Multi-touch) nasıl analiz edilmektedir?",
+      "description": "Pazarlama attribution modelleri, çoklu temas noktası analitiği ve gelir paylaştırma.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_temas_noktalari_kaydedilir_ve_coklu_temas_attribution_analizi_yapilir",
+          "label": "Evet; müşterinin ilk teması, katıldığı etkinlikler ve son teklif öncesi teması kaydedilip ağırlıklı analiz edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_adayi_getiren_ilk_kaynak_veya_son_temas_noktasi_esas_alinir",
+          "label": "Yalnızca adayın ilk geldiği kanal (First-Touch) veya sipariş öncesi son dokunulan kanal esas alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "attribution_veya_temas_noktasi_analizi_yapilmamaktadir",
+          "label": "Attribution analizi yapılmaz; satışın hangi pazarlama çalışmasından doğduğu bilinemez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-036",
+      "process": "Attribution / Kaynak Analizi",
+      "order": 36,
+      "question": "Şirket genelinde hangi pazarlama kanalının (Google, LinkedIn, Fuarlar, Doğrudan Referanslar) en kaliteli müşteri adaylarını ve en yüksek kârlı satışları getirdiği raporlanabilmekte midir?",
+      "description": "Kanal verimlilik karşılaştırması ve en kârlı müşteri kaynaklarının tespiti.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kanal_bazli_lead_kalitesi_firsat_tutari_ve_kazanilan_ciro_raporlanir",
+          "label": "Evet; kanalların ürettiği ciro ve kârlılık karşılaştırılır, bütçe en verimli kanallara kaydırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_hangi_kanaldan_kac_adet_lead_geldigi_sayi_olarak_bilinir",
+          "label": "Yalnızca gelen lead sayısı bilinir; o kanalın şirkete ne kadar kâr getirdiği ölçülemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kanal_verimliligi_ve_kalite_karsilastirmasi_yapilamamaktadir",
+          "label": "Kanal verimliliği ve kalite karşılaştırması yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-037",
+      "process": "Pazarlama KPI ve ROI",
+      "order": 37,
+      "question": "Kampanya Yatırım Getirisi (Marketing ROI / ROAS — Harcanan pazarlama bütçesi vs Kampanyadan kazanılan net ciro/kâr) hesaplanmakta mıdır?",
+      "description": "Kampanya kârlılığı, pazarlama yatırım getirisi (ROI/ROAS) hesaplama yöntemi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kampanya_harcamasi_ile_kazanilan_ciro_karsilastirilarak_roi_otomatik_hesaplanir",
+          "label": "Evet; her kampanyanın maliyeti ile getirdiği ciro sistemde eşleştirilerek net ROI oranı (%) üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yil_sonlarinda_excelde_tahmini_ve_manuel_olarak_hesaplanmaya_calisilir",
+          "label": "Sistemik hesaplanmaz; yıl sonunda toplam pazarlama harcaması ile genel ciro Excel'de kabaca oranlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "pazarlama_kampanya_roi_hesabi_yapilmamaktadir",
+          "label": "Pazarlama harcamalarının geri dönüşü (ROI) hesaplanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-038",
+      "process": "Pazarlama KPI ve ROI",
+      "order": 38,
+      "question": "Aday Başına Maliyet (Cost Per Lead - CPL) ve Müşteri Edinme Maliyeti (Customer Acquisition Cost - CAC) kanal ve kampanya bazında ölçülmekte midir?",
+      "description": "Birim müşteri edinme maliyeti (CAC) ve aday maliyeti (CPL) metrikleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cpl_ve_cac_metrikleri_kanal_ve_kampanya_bazinda_duzenli_olculur",
+          "label": "Evet; 1 adet lead kazanmanın maliyeti (CPL) ve 1 yeni müşteri kazanmanın maliyeti (CAC) takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_dijital_reklamlarda_tiklama_maliyeti_cpc_gorulur",
+          "label": "Sadece Google/LinkedIn panelindeki tıklama maliyetine bakılır; gerçek müşteri edinme maliyeti bilinmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cpl_veya_cac_metrikleri_hesaplanmamaktadir",
+          "label": "Aday veya müşteri edinme maliyeti ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-039",
+      "process": "Pazarlama KPI ve ROI",
+      "order": 39,
+      "question": "Pazarlama liderleri ve üst yönetim için canlı Pazarlama Performans Gösterge Panelleri (Pazarlama Dashboard & KPI Raporları) kullanılmakta mıdır?",
+      "description": "Yönetim dashboardları, pazarlama KPI kokpiti ve canlı performans sunumu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "canli_pazarlama_ve_lead_kokpiti_yonetim_tarafindan_anlik_izlenir",
+          "label": "Evet; lead akışı, dönüşüm oranları, harcanan bütçe ve kampanya durumunu gösteren canlı kokpit kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_hazirlanan_statik_powerpoint_veya_excel_raporlari_sunulur",
+          "label": "Canlı panel yoktur; ay sonlarında hazırlanan PowerPoint sunumu veya Excel tablosu üzerinden raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "pazarlama_performans_raporlamasi_yapilmamaktadir",
+          "label": "Düzenli bir pazarlama performans raporlaması yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-040",
+      "process": "Pazarlama KPI ve ROI",
+      "order": 40,
+      "question": "Satışa aktarılan lead'lerin Fırsata Dönüşüm Oranı (Lead-to-Opportunity Conversion Rate %) düzenli olarak takip edilmekte midir?",
+      "description": "Adaydan fırsata dönüşüm oranı (Lead-to-Opp % Conversion Rate) takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "lead_firsat_donusum_orani_temsilci_ve_kampanya_bazinda_raporlanir",
+          "label": "Evet; gelen her 100 lead'in kaç tanesinin nitelikli satış fırsatına dönüştüğü düzenli raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "donem_sonlarinda_manuel_olarak_tahmin_edilir",
+          "label": "Sistemik oran yoktur; yıl sonunda kaç lead geldi kaç fırsat açıldı tahmini kıyaslanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "firsata_donusum_orani_olculmemektedir",
+          "label": "Lead dönüşüm oranı ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-041",
+      "process": "Pazarlama KPI ve ROI",
+      "order": 41,
+      "question": "Pazarlama verilerinin doğruluğu, iletişim veri tabanının güncelliği ve kampanya raporlarının güvenilirliği ne sıklıkla denetlenmektedir?",
+      "description": "Veri hijyeni denetimi, pazarlama veri kalitesi ve rapor güvenilirliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "veri_tabani_ve_kampanya_raporlari_duzenli_periyotlarla_denetlenir_ve_temizlenir",
+          "label": "Evet; hatalı e-postalar, kapanan şirketler ve geçersiz numaralar dönemsel temizlikten geçirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_kampanya_gonderimi_hata_verince_manuel_temizlik_yapilir",
+          "label": "Planlı denetim yoktur; e-posta geri döndükçe (Bounce) veya telefon açılmadıkça fark edilip silinir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "pazarlama_veri_kalitesi_denetimi_yapilmamaktadir",
+          "label": "Veri kalitesi denetimi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "MKT-042",
+      "process": "Pazarlama KPI ve ROI",
+      "order": 42,
+      "question": "ERP/CRM dönüşümü sonrasında hedeflenen Kurumsal Pazarlama ve Kampanya Yönetimi vizyonu ve temel önceliği nedir?",
+      "description": "Gelecek vizyonu (TO-BE), pazarlama ve talep yaratma yatırım hedefleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "omni_channel_lead_akisi_otomatik_scoring_ve_tam_entegre_roi_takibi",
+          "label": "Tüm kanallardan akan lead'lerin otomatik nitelendirilmesi, satışa hızlı devri ve net ROI ölçümü",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "duzenli_toplu_eposta_ve_fuar_ziyaretci_takibinin_disipline_edilmesi",
+          "label": "Fuarlardan ve webden toplanan kartvizitlerin kaybolmadan CRM'e girmesi ve e-bülten süreçleri önceliklidir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "pazarlama_ile_satis_arasindaki_iletisim_kopuklugunun_giderilmesi",
+          "label": "Pazarlamanın ürettiği lead'lerin satış tarafından neden aranmadığının şeffaflaşması hedeflenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

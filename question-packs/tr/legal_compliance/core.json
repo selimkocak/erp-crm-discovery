@@ -1,0 +1,1545 @@
+{
+  "meta": {
+    "pack_id": "tr.legal_compliance.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "LEGAL_COMPLIANCE",
+    "name": "Hukuk ve Mevzuat Uyum Ön Analizi",
+    "description": "Türkiye'deki orta ve büyük ölçekli işletmeler için Hukuk ve Mevzuat Uyum AS-IS keşif soru paketi. Yasal yükümlülüklerin nasıl takip edildiğini, departman sorumluluk matrisini, sözleşme yönetimini (Türleri, onay akışı, yenileme/fesih takibi), KVKK veri envanteri ve hukuki dayanak kayıtlarını, açık rıza ve aydınlatma süreçlerini, veri sahibi başvurularını, saklama ve imha politikalarını, üçüncü taraf ve yurtdışı veri aktarımını, elektronik kayıt bütünlüğünü, denetim izini, iç ve dış denetim süreçlerini, uygunsuzluk ve düzeltici aksiyon mekanizmalarını, yasal takvim ve bildirim yönetimini, lisans ve ruhsat takibini, etik kurallar ve ihbar kanallarını, dava/icra dosya takibini ve Legal & Compliance KPI'larının AS-IS durumunu keşfetmek amacıyla tasarlanmıştır. Sistem hukuki görüş üretmez, mevzuat yorumlamaz; yalnızca firmanın süreçlerini ve süreç varlığını keşfeder."
+  },
+  "questions": [
+    {
+      "id": "LEG-001",
+      "process": "Hukuk ve Uyum Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde hukuki konular ve mevzuat uyum süreçleri hangi organizasyon modeli ile yürütülmektedir?",
+      "description": "Şirket içi hukuk departmanı, dış hukuk bürosu, compliance sorumlusu ve KVKK sorumluluk yapısı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sirket_ici_hukuk_departmani_tam_zamanli_avukat_ve_ekibi_ile",
+          "label": "Şirket içi hukuk departmanı tam zamanlı avukat ve ekibi ile yönetilmektedir"
+        },
+        {
+          "value": "dış_hukuk_burosu_veya_smmm_avukatlık_bürosu_ile_retainer_veya_dava_bazında",
+          "label": "Dış hukuk bürosu / avukatlık bürosu ile retainer veya dava bazında çalışılmaktadır"
+        },
+        {
+          "value": "compliance_veya_uyum_sorumlusu_pozisyonu_aktif_olarak_atanmis",
+          "label": "Compliance / Uyum Sorumlusu pozisyonu aktif olarak atanmış ve çalışmaktadır"
+        },
+        {
+          "value": "kvkk_veri_sorumlusu_veya_irtibat_kisisi_resmi_olarak_atanmis",
+          "label": "KVKK kapsamında Veri Sorumlusu veya İrtibat Kişisi resmi olarak atanmıştır"
+        },
+        {
+          "value": "hukuki_konular_departman_muduru_veya_genel_mudur_tarafindan_dogrudan_yonetilir",
+          "label": "Hukuki konular ayrı bir uzman olmadan departman müdürü veya genel müdür tarafından yönetilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-002",
+      "process": "Hukuk ve Uyum Organizasyonu",
+      "order": 2,
+      "question": "Operasyonel departmanlar (Satış, İnsan Kaynakları, Satın Alma, Üretim, Finans) hukuki veya uyum konularında bir soru ya da sorun yaşadığında bu konuyu nasıl yönlendirmektedir?",
+      "description": "Hukuk departmanı yönlendirme kanalı, eskalasyon süreci ve sorumluluk aktarımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "belirlenmis_kanal_e_posta_portal_veya_ticket_ile_hukuk_departmanina_yonlendirilir",
+          "label": "Belirlenmiş bir kanal (e-posta, portal veya ticket sistemi) üzerinden hukuk departmanına yönlendirilir"
+        },
+        {
+          "value": "doğrudan_avukat_veya_uyum_sorumlusuyla_birebir_iletisim_kurulur",
+          "label": "Doğrudan avukat veya uyum sorumlusuyla birebir iletişim kurulur (Telefon, mesaj)"
+        },
+        {
+          "value": "dış_hukuk_bürosuyla_departman_muduru_veya_gm_doğrudan_iletisim_kurar",
+          "label": "Dış hukuk bürosuyla departman müdürü veya genel müdür doğrudan iletişim kurar"
+        },
+        {
+          "value": "tanimli_bir_yonlendirme_sureci_yoktur_sorunlar_ad_hoc_ele_alinir",
+          "label": "Tanımlı bir yönlendirme süreci yoktur; sorunlar duruma göre ad hoc ele alınır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-003",
+      "process": "Mevzuat Takibi",
+      "order": 3,
+      "question": "Şirketinizle ilgili yasal düzenlemeler, yönetmelikler ve mevzuat değişiklikleri (Vergi, SGK, KVKK, Çevre, İş Hukuku, Sektöre Özel Mevzuat) nasıl takip edilmektedir?",
+      "description": "Mevzuat izleme yöntemi, resmi kaynak kullanımı, danışman bülteni ve sektör derneği.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "hukuk_departmani_veya_avukat_resmi_gazete_ve_kurumsal_yayinlari_duzenli_izler",
+          "label": "Hukuk departmanı veya avukat Resmi Gazete ve kurumsal yayınları düzenli olarak izler ve raporlar"
+        },
+        {
+          "value": "mali_musavir_smmm_vergi_ve_sgk_mevzuatini_takip_edip_bildirir",
+          "label": "Mali müşavir / SMMM vergi ve SGK mevzuatını takip edip bildirmektedir"
+        },
+        {
+          "value": "sektor_dernegi_veya_meslek_odasi_uyelerine_duyuru_gönderir",
+          "label": "Sektör derneği veya meslek odası üyelerine mevzuat duyuruları gönderir"
+        },
+        {
+          "value": "bordro_erp_veya_muhasebe_yazilim_firmasi_yasal_guncelleme_paketi_gondeirer",
+          "label": "Bordro, ERP veya muhasebe yazılım firması yasal güncelleme paketleri ile uyarır"
+        },
+        {
+          "value": "e_posta_bulteni_veya_abonelik_hizmetinden_takip_edilir",
+          "label": "E-posta bülteni veya hukuk/vergi abonelik hizmetinden takip edilir"
+        },
+        {
+          "value": "mevzuat_degisiklikleri_sistematik_olarak_takip_edilmez",
+          "label": "Mevzuat değişiklikleri sistematik olarak takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-004",
+      "process": "Mevzuat Takibi",
+      "order": 4,
+      "question": "Yeni bir yasal düzenleme veya mevzuat değişikliği tespit edildiğinde bu bilginin ilgili departmanlara iletilmesi ve uyum aksiyon planına dönüştürülmesi nasıl yönetilmektedir?",
+      "description": "Mevzuat bildirim süreci, departman bilgilendirme mekanizması ve aksiyon planı takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hukuk_departmani_etkilenen_departmanlari_bilgilendirir_ve_aksiyon_plani_olusturulur",
+          "label": "Hukuk departmanı etkilenen departmanları e-posta/toplantıyla bilgilendirir ve aksiyon planı oluşturulur"
+        },
+        {
+          "value": "ilgili_mudur_veya_departman_direktifle_bilgilendirilir_uygulama_departmana_birakilir",
+          "label": "İlgili müdür direktifle bilgilendirilir; uygulamanın nasıl yapılacağı departmana bırakılır"
+        },
+        {
+          "value": "mevzuat_değisikliklerinin_departmanlara_bildirim_sureci_tanimli_degil",
+          "label": "Mevzuat değişikliklerinin departmanlara bildirim ve aksiyon süreci tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-005",
+      "process": "Uyum Sorumluluk Matrisi",
+      "order": 5,
+      "question": "Şirketinizde farklı uyum alanlarının (KVKK, İş Güvenliği, Çevre, Vergi, Sektörel Lisans) kim tarafından yönetildiği ve kimin onayladığı yazılı olarak tanımlanmış mıdır?",
+      "description": "RACI / Sorumluluk matrisi, uyum alanı sahipleri ve departman bazında yetki dağılımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "uyum_alanlari_icin_yazi_raci_veya_sorumluluk_matrisi_tanimli_ve_guncelleniyor",
+          "label": "Tüm uyum alanları için yazılı RACI veya sorumluluk matrisi tanımlı ve düzenli güncellenmektedir"
+        },
+        {
+          "value": "kismi_sorumluluk_tanimi_var_bazi_alanlar_tanimli_bazi_alanlar_belirsiz",
+          "label": "Kısmi sorumluluk tanımı mevcuttur; bazı uyum alanları tanımlı, bazıları belirsizdir"
+        },
+        {
+          "value": "yazili_sorumluluk_matrisi_yoktur_sorumluluklar_sozlu_veya_geleneksel_kabul_olarak_bilinir",
+          "label": "Yazılı sorumluluk matrisi yoktur; sorumluluklar sözlü veya geleneksel kabul olarak bilinmektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-006",
+      "process": "Uyum Sorumluluk Matrisi",
+      "order": 6,
+      "question": "Belirli bir uyum ihlali veya yasal risk ortaya çıktığında kime eskalasyon yapıldığı ve üst yönetim onay hiyerarşisi tanımlı mıdır?",
+      "description": "Risk eskalasyon hiyerarşisi, üst yönetim bildirimi ve yönetim kurulu raporlama.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yazili_eskalasyon_hiyerarsisi_var_ihlal_ciddigine_gore_gm_yk_veya_denetim_komitesine_ulasiyor",
+          "label": "Yazılı eskalasyon hiyerarşisi mevcuttur; ihlalin ciddiyetine göre GM, YK veya denetim komitesine ulaşır"
+        },
+        {
+          "value": "eskalasyon_yonetici_inisiyatifine_baglidir_standart_sure_ve_kriter_tanimli_degil",
+          "label": "Eskalasyon yönetici inisiyatifine bağlıdır; standart süre ve kriter tanımlı değildir"
+        },
+        {
+          "value": "tanimli_eskalasyon_sureci_yoktur_ihlaller_ad_hoc_ele_alinir",
+          "label": "Tanımlı bir eskalasyon süreci yoktur; ihlaller duruma göre ad hoc ele alınır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-007",
+      "process": "Politika ve Prosedür Yönetimi",
+      "order": 7,
+      "question": "Şirketinizde KVKK, Bilgi Güvenliği, Etik, Satın Alma, İnsan Kaynakları, Yetkilendirme, Saklama ve Gizlilik gibi temel politikalar versiyonlu ve onaylı biçimde saklanmakta ve dağıtılmakta mıdır?",
+      "description": "Politika yaşam döngüsü, versiyon kontrolü, onay mekanizması ve dağıtım kanalı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "politikalar_versiyonlanmis_ust_yonetim_onaylı_ve_calisanlara_ilan_edilmis",
+          "label": "Politikalar versiyonlanmış, üst yönetim onaylı; çalışanlara ilan edilmiş ve imzalı kabul alınmıştır"
+        },
+        {
+          "value": "politikalar_mevcut_ancak_versiyon_tarihlenmis_onay_ve_dagitim_tutarsiz",
+          "label": "Politikalar mevcuttur ancak versiyon tarihlendirmesi, onay ve dağıtım tutarsız yönetilmektedir"
+        },
+        {
+          "value": "politika_dokumanlari_yoktur_veya_guncel_degil",
+          "label": "Politika dokümanları yoktur veya güncel değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-008",
+      "process": "Politika ve Prosedür Yönetimi",
+      "order": 8,
+      "question": "Politikalar ne sıklıkla güncellenmekte ve güncelleme tetikleyicisi (Mevzuat değişikliği, iç denetim bulgusu, periyodik gözden geçirme) nasıl tanımlanmıştır?",
+      "description": "Politika gözden geçirme döngüsü, tetikleyiciler ve güncelleme onay akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yillik_periyodik_gozden_gecirme_ve_mevzuat_degisikliginde_ani_guncelleme_yapilir",
+          "label": "Yıllık periyodik gözden geçirme ve mevzuat değişikliğinde anlık güncelleme mekanizması mevcuttur"
+        },
+        {
+          "value": "ihtiyac_halinde_guncelleme_yapilir_periyodik_takvim_tanimli_degil",
+          "label": "İhtiyaç halinde güncelleme yapılmaktadır; periyodik gözden geçirme takvimi tanımlı değildir"
+        },
+        {
+          "value": "politika_guncelleme_sureci_tanimli_degil",
+          "label": "Politika güncelleme süreci tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-009",
+      "process": "Sözleşme Yönetimi",
+      "order": 9,
+      "question": "Şirketinizde müşteri, tedarikçi, iş ortağı, kira, lisans ve istihdam sözleşmeleri merkezi bir sistemde veya kayıtta yönetilmekte midir?",
+      "description": "Sözleşme yönetim sistemi, merkezi kayıt, sözleşme türleri ve dijital/fiziksel arşiv.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_sozlesmeler_merkezi_dijital_sozlesme_yonetim_sistemi_veya_erp_modulunde_kayitli",
+          "label": "Tüm sözleşmeler merkezi dijital sözleşme yönetim sistemi veya ERP modülünde kayıtlı ve takip edilir"
+        },
+        {
+          "value": "sozlesmeler_excel_listesi_veya_klasor_yapisi_ile_departman_bazinda_saklanir",
+          "label": "Sözleşmeler departman bazında Excel listesi veya klasör yapısıyla (Fiziksel/Dijital) saklanmaktadır"
+        },
+        {
+          "value": "merkezi_sozlesme_yonetim_sistemi_yoktur",
+          "label": "Sözleşmelerin merkezi yönetim sistemi bulunmamaktadır; her departman kendi yöntemini kullanmaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-010",
+      "process": "Sözleşme Yönetimi",
+      "order": 10,
+      "question": "Sözleşme kaydında hangi temel bilgiler tutulmaktadır (Taraf, Tür, Başlangıç/Bitiş Tarihi, Tutar, Sorumlu Departman, Para Birimi, Fesih Süresi, Otomatik Uzama, Gizlilik/NDA, İlgili Ekler)?",
+      "description": "Sözleşme master data alanları, sözleşme türleri ve minimum metadata gereksinimleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "LEG-009",
+        "operator": "not_equals",
+        "value": "merkezi_sozlesme_yonetim_sistemi_yoktur"
+      },
+      "options": [
+        {
+          "value": "taraf_bilgisi_sozlesme_turu_ve_departman_sorumlusu",
+          "label": "Taraf bilgisi, sözleşme türü ve sorumlu departman kaydı"
+        },
+        {
+          "value": "baslangic_bitis_tarihi_ve_yenileme_tarihi",
+          "label": "Başlangıç tarihi, bitiş tarihi ve yenileme/uzama tarihi"
+        },
+        {
+          "value": "sozlesme_tutari_ve_para_birimi",
+          "label": "Sözleşme tutarı ve para birimi"
+        },
+        {
+          "value": "fesih_bildirimi_suresi_ve_otomatik_uzama_kosullari",
+          "label": "Fesih bildirimi süresi ve otomatik uzama koşulları"
+        },
+        {
+          "value": "gizlilik_nda_ve_yargi_yeri",
+          "label": "Gizlilik (NDA) hükümleri ve yargı yeri"
+        },
+        {
+          "value": "ek_protokol_tadilat_ve_belge_baglantisi",
+          "label": "Ek protokol, tadilat ve ilgili ekler ile belge bağlantısı"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-011",
+      "process": "Sözleşme Onay Süreci",
+      "order": 11,
+      "question": "Yeni bir sözleşmenin imzalanmadan önce geçmesi gereken onay adımları (Hukuk İncelemesi, Finans Onayı, Satın Alma Onayı, Genel Müdür Onayı) tanımlı mıdır ve tutar/tür bazında onay eşiği var mıdır?",
+      "description": "Sözleşme onay hiyerarşisi, yetki limitleri ve imza yetkisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tutar_ve_tur_bazinda_onay_esikleri_tanimli_ve_yazili_delegasyon_tablolari_guncel",
+          "label": "Tutar ve türe göre onay eşikleri tanımlı; yazılı delegasyon matrisi güncel ve uygulanmaktadır"
+        },
+        {
+          "value": "tum_sozlesmeler_hukuk_ve_gm_onayına_gider_tutar_bazli_farklilik_yoktur",
+          "label": "Tüm sözleşmeler hukuk incelemesi ve genel müdür onayına gider; tutar bazlı ayrım uygulanmaz"
+        },
+        {
+          "value": "onay_sureci_tanimli_degil_yonetici_inisiyatifine_gore_sekillenmektedir",
+          "label": "Sözleşme onay süreci tanımlı değildir; hangi kademelere gideceği yönetici inisiyatifine göre şekillenir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-012",
+      "process": "Sözleşme Onay Süreci",
+      "order": 12,
+      "question": "Sözleşmelerin elektronik ortamda onaylanması, dijital imza veya e-imza uygulaması mevcut mudur?",
+      "description": "Dijital/elektronik imza kapasitesi, e-imza platformu ve hukuki geçerlilik.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "nitelikli_elektronik_imza_veya_e_imza_platformu_aktif_kullanilmaktadir",
+          "label": "Evet; nitelikli elektronik imza (e-imza) platformu aktif olarak kullanılmaktadır"
+        },
+        {
+          "value": "fiziksel_imza_esas_alinir_dijital_imza_kullaniilmamaktadir",
+          "label": "Sözleşmeler fiziksel imzayla sonuçlandırılmaktadır; dijital imza kullanılmamaktadır"
+        },
+        {
+          "value": "islak_imza_taranip_pdf_olarak_saklanir",
+          "label": "Islak imzalı sözleşmeler taranıp PDF olarak sisteme yüklenmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-013",
+      "process": "Sözleşme Versiyon ve Yenileme Takibi",
+      "order": 13,
+      "question": "Sözleşmelerin bitiş tarihleri, yenileme dönemleri ve fesih bildirimi süreleri için otomatik uyarı veya takvim bildirimi mekanizması çalışmakta mıdır?",
+      "description": "Sözleşme yenileme uyarıları, fesih bildirim süresi takibi ve bitiş tarihi hatırlatması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "LEG-009",
+        "operator": "not_equals",
+        "value": "merkezi_sozlesme_yonetim_sistemi_yoktur"
+      },
+      "options": [
+        {
+          "value": "sistem_bitis_ve_yenileme_tarihlerinden_onceden_otomatik_uyari_gonderiyor",
+          "label": "Sistem, bitiş ve yenileme tarihinden belirli süre öncesinde sorumluya otomatik uyarı göndermektedir"
+        },
+        {
+          "value": "excel_takvim_veya_outlook_hatirlatmasi_ile_manuel_takip_yapilir",
+          "label": "Excel, takvim veya Outlook hatırlatmasıyla manuel takip yapılmaktadır"
+        },
+        {
+          "value": "sozlesme_bitiş_tarihleri_sistematik_olarak_takip_edilmemektedir",
+          "label": "Sözleşme bitiş tarihleri sistematik olarak takip edilmemektedir; süre dolduğunda fark edilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-014",
+      "process": "KVKK Veri Envanteri",
+      "order": 14,
+      "question": "Şirketiniz hangi kişisel veri kategorilerini işlediğini ve bu verilerin nerede saklandığını kapsayan bir Veri Envanteri (VERBİS kaydı veya iç envanter) oluşturmuş mudur?",
+      "description": "KVKK veri envanteri, VERBİS kayıt durumu, veri kategorileri ve işleme faaliyetleri kaydı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "verbis_kaydı_tamamlanmis_ve_ic_veri_envanteri_guncel_tutulmaktadir",
+          "label": "VERBİS kaydı tamamlanmış ve şirket içi veri envanteri güncel olarak tutulmaktadır"
+        },
+        {
+          "value": "verbis_kaydi_yapilmis_ancak_ic_veri_envanteri_guncel_degil_veya_eksik",
+          "label": "VERBİS kaydı yapılmış ancak şirket içi veri envanteri güncel değil veya eksik kalmaktadır"
+        },
+        {
+          "value": "kvkk_veri_envanteri_tanimlanmamistir",
+          "label": "KVKK kapsamında veri envanteri oluşturulmamıştır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-015",
+      "process": "KVKK Veri Envanteri",
+      "order": 15,
+      "question": "Veri Envanterinde hangi kişisel veri grupları yer almaktadır ve bu veriler hangi ortamlarda (Şirket sunucuları, bulut, harici sistem, kağıt) işlenmektedir?",
+      "description": "Kişisel veri kategorileri (Çalışan, Müşteri, Aday, Ziyaretçi, Kamera, Web) ve işleme ortamları.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "LEG-014",
+        "operator": "not_equals",
+        "value": "kvkk_veri_envanteri_tanimlanmamistir"
+      },
+      "options": [
+        {
+          "value": "calisan_ozluk_ve_ikramiye_saglik_kayitlari",
+          "label": "Çalışan özlük, sağlık ve bordro kayıtları"
+        },
+        {
+          "value": "musteri_ve_potansiyel_musteri_kisisel_bilgileri",
+          "label": "Müşteri ve potansiyel müşteri kişisel bilgileri (Ad, iletişim, tercih)"
+        },
+        {
+          "value": "tedarikci_ve_is_ortagi_kontak_bilgileri",
+          "label": "Tedarikçi ve iş ortağı kontak kişileri kişisel bilgileri"
+        },
+        {
+          "value": "ziyaretci_kayitlari_ve_kamera_goruntuleri",
+          "label": "Ziyaretçi kayıtları ve güvenlik kamera görüntüleri"
+        },
+        {
+          "value": "web_sitesi_kullanici_davranisi_ve_cerez_verileri",
+          "label": "Web sitesi kullanıcı davranışı, çerez ve analitik verileri"
+        },
+        {
+          "value": "cagri_merkezi_ses_kayitlari",
+          "label": "Çağrı merkezi ses kayıtları"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-016",
+      "process": "Veri İşleme Amaçları ve Hukuki Dayanak",
+      "order": 16,
+      "question": "Kişisel veri işleme faaliyetlerinin KVKK kapsamındaki hukuki dayanakları (Açık rıza, Sözleşme gereği, Kanuni yükümlülük, Meşru menfaat) kayıt altına alınmış mıdır?",
+      "description": "Hukuki dayanak kayıt altyapısı, veri işleme amacı eşleştirmesi ve meşru menfaat değerlendirmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "her_veri_isleme_faaliyeti_icin_hukuki_dayanak_envanterde_kayitli_ve_eşlestirilmis",
+          "label": "Her veri işleme faaliyeti için hukuki dayanak envanterde kayıtlı ve belgelenmiştir"
+        },
+        {
+          "value": "ana_veri_isleme_faaliyetleri_icin_hukuki_dayanak_belirlenmis_ancak_tum_faaliyetler_kapsanmiyor",
+          "label": "Ana faaliyetler için hukuki dayanak belirlenmiş; ancak tüm veri işleme faaliyetleri kapsanmamaktadır"
+        },
+        {
+          "value": "hukuki_dayanak_kaydi_yapilmamistir",
+          "label": "Veri işleme faaliyetleri için hukuki dayanak kaydı yapılmamıştır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-017",
+      "process": "Veri İşleme Amaçları ve Hukuki Dayanak",
+      "order": 17,
+      "question": "Kişisel verilerin işlendiği amaçlar değiştiğinde (Örn. Müşteri verisinin pazarlama amacıyla kullanılmaya başlanması) bu değişikliğin kaydı nasıl yönetilmektedir?",
+      "description": "Amaç değişikliği bildirimi, ek hukuki dayanak veya rıza güncelleme süreci.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "amac_degisikligi_oncesinde_yeni_hukuki_dayanak_veya_riza_guncelleme_proseduru_uygulanir",
+          "label": "Amaç değişikliği öncesinde yeni hukuki dayanak veya rıza güncelleme prosedürü uygulanmaktadır"
+        },
+        {
+          "value": "amac_değisikligi_hukuk_departmanina_danisildiktan_sonra_manuel_degerlendirme_yapilir",
+          "label": "Amaç değişikliği durumunda hukuk departmanına danışılır ve manuel değerlendirme yapılır"
+        },
+        {
+          "value": "amac_degisikligi_kaydi_ve_sureci_tanimli_degil",
+          "label": "Veri işleme amacı değişikliği için kayıt veya süreç tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-018",
+      "process": "Açık Rıza ve Aydınlatma",
+      "order": 18,
+      "question": "Şirketinizde açık rızaya dayalı veri işleme faaliyetleri bulunmakta mıdır ve bunların alınma süreçleri kayıt altında mıdır?",
+      "description": "Açık rıza alınma mekanizmaları, rıza kanıtı, geri çekilme süreci ve versiyon takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "acik_riza_sureci_aktif_riza_kayitlari_sistem_veya_arşivde_kanıtlı",
+          "label": "Açık rıza alınmaktadır; tarih, metin versiyonu ve kanalıyla birlikte kayıt altındadır"
+        },
+        {
+          "value": "acik_riza_alinmaktadir_ancak_kayit_ve_kanitlama_tutarsiz",
+          "label": "Açık rıza alınmakta ancak kayıt mekanizması ve kanıtlama tutarsız yönetilmektedir"
+        },
+        {
+          "value": "acik_riza_sureci_uygulanmamaktadir",
+          "label": "Açık rızaya dayalı veri işleme yapılmamaktadır (Tüm faaliyetler diğer hukuki dayanaklara dayanır)"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-019",
+      "process": "Açık Rıza ve Aydınlatma",
+      "order": 19,
+      "question": "Rıza metinlerinin versiyonlanması, aydınlatma metinlerinin (Çalışan, Müşteri, Aday, Ziyaretçi, Web) güncellenmesi ve geri çekilme taleplerinin kayıt altına alınması nasıl yönetilmektedir?",
+      "description": "Rıza metni versiyon yönetimi, aydınlatma kategorileri ve geri çekilme kayıt süreci.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "LEG-018",
+        "operator": "not_equals",
+        "value": "acik_riza_sureci_uygulanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "riza_metni_versiyonlanmis_aydınlatma_kategori_bazli_ve_geri_çekme_kaydi_tutulmaktadir",
+          "label": "Rıza metinleri versiyonlanmış, kategorilere göre aydınlatma hazır ve geri çekilme kayıt altındadır"
+        },
+        {
+          "value": "riza_metinleri_var_ancak_versiyon_takibi_ve_geri_cekme_kaydi_eksik",
+          "label": "Rıza metinleri mevcuttur; ancak versiyon takibi ve geri çekilme kaydı eksiktir"
+        },
+        {
+          "value": "riza_versiyon_ve_geri_cekme_yonetim_sureci_tanimli_degil",
+          "label": "Rıza metni versiyonlama ve geri çekilme yönetim süreci tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-020",
+      "process": "Veri Sahibi Başvuruları",
+      "order": 20,
+      "question": "KVKK kapsamındaki veri sahibi başvuruları (Erişim, Silme, Düzeltme, İtiraz, Aktarım) nasıl alınmakta ve yanıtlanmaktadır?",
+      "description": "Veri sahibi başvuru kanalı, SLA takibi, sorumlu atama ve cevaplama süreci.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tanimli_basvuru_kanali_ve_30_gunluk_sla_takibi_kayitla_yonetilebilmektedir",
+          "label": "Tanımlı başvuru kanalı (e-posta, form, ıslak imzalı dilekçe) ve 30 günlük SLA takibi mevcuttur"
+        },
+        {
+          "value": "basvurular_alinmaktadir_ancak_sla_ve_kayit_takibi_tutarsiz",
+          "label": "Başvurular alınmakta ancak SLA takibi ve kayıt mekanizması tutarsız yönetilmektedir"
+        },
+        {
+          "value": "kvkk_veri_sahibi_basvuru_sureci_tanimli_degil",
+          "label": "KVKK veri sahibi başvuru süreci tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-021",
+      "process": "Veri Sahibi Başvuruları",
+      "order": 21,
+      "question": "Veri sahibi başvurularının sonuçları, verilen cevapların belgesi ve kapatılma kayıtları nasıl saklanmaktadır?",
+      "description": "Başvuru arşivi, cevap belgesi, kapatma tarihi ve Kurul bildirimi izlenebilirliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "basvuru_cevap_belge_ve_kapanma_kayitlari_arşivde_izlenebilir_sekilde_tutulmaktadir",
+          "label": "Başvuru, cevap belgesi ve kapatma tarihi arşivde izlenebilir biçimde kayıt altındadır"
+        },
+        {
+          "value": "basvurular_e_posta_arsivinde_saklanmaktadir_yapısal_kayit_yoktur",
+          "label": "Başvurular e-posta arşivinde saklanmakta; yapısal kayıt ve izlenebilirlik mevcut değildir"
+        },
+        {
+          "value": "basvuru_kayit_arşivi_tutulmamaktadir",
+          "label": "Başvuru kayıt arşivi tutulmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-022",
+      "process": "Veri Saklama ve İmha",
+      "order": 22,
+      "question": "Kişisel ve ticari verilerin saklama süreleri (Veri kategorisi bazında) ve saklama süresi dolan verilerin imha, silme veya anonimleştirme politikası tanımlı mıdır?",
+      "description": "Saklama politikası, kategori bazlı süreler, imha/silme prosedürü ve periyodik tarama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kategori_bazli_saklama_sureleri_yazili_ve_periyodik_imha_silme_uygulanmaktadir",
+          "label": "Kategori bazlı saklama süreleri yazılı olarak tanımlı; periyodik imha ve silme işlemleri uygulanmaktadır"
+        },
+        {
+          "value": "saklama_sureleri_kismi_tanimli_imha_sureci_tutarsiz",
+          "label": "Saklama süreleri kısmen tanımlıdır; imha ve silme prosedürü düzenli uygulanmamaktadır"
+        },
+        {
+          "value": "saklama_suresi_veya_imha_politikasi_tanimli_degil",
+          "label": "Saklama süresi veya imha/silme politikası tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-023",
+      "process": "Veri Saklama ve İmha",
+      "order": 23,
+      "question": "Yasal yükümlülük gereği uzun süre saklanması gereken belgeler (e-Defter, e-Fatura, iş sözleşmeleri, SGK kayıtları) ile kişisel verilerin imha edilmesi gereken kayıtlar arasındaki denge nasıl yönetilmektedir?",
+      "description": "Yasal saklama zorunluluğu ile KVKK imha yükümlülüğü çatışmasının yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yasal_saklama_zorunlulugu_ve_kvkk_imha_yukumlulugu_politikada_ayri_kategorilerle_yonetiliyor",
+          "label": "Yasal zorunluluk kapsamındaki belgeler ile imha edilecek kişisel veriler politikada ayrı kategorilerde tanımlıdır"
+        },
+        {
+          "value": "bu_cakisma_hukuk_ve_maliye_departmani_ile_ad_hoc_karara_baglanmaktadir",
+          "label": "Yasal saklama ve KVKK imha çakışması hukuk ve mali işler birlikte ad hoc değerlendirmektedir"
+        },
+        {
+          "value": "saklama_ve_imha_dengeleme_sureci_tanimli_degil",
+          "label": "Bu denge sistematik olarak yönetilmemekte; her durum ayrı ele alınmaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-024",
+      "process": "Kişisel Veri Erişim Yetkileri",
+      "order": 24,
+      "question": "Hassas kişisel verilere (Çalışan sağlık kayıtları, müşteri kimlik bilgileri, finansal veriler) erişim rol, departman ve kişi bazında yetkilendirilmekte ve erişim loglanmakta mıdır?",
+      "description": "Rol bazlı erişim kontrolü (RBAC), hassas veri erişim yetkilendirmesi ve erişim audit log.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "rol_ve_departman_bazinda_erisim_yetkileri_tanimli_ve_erisimler_loglanmaktadir",
+          "label": "Rol ve departman bazında erişim yetkileri tanımlı; tüm erişimler loglanmakta ve periyodik gözden geçirilmektedir"
+        },
+        {
+          "value": "erisim_yetkileri_tanimli_ancak_loglama_ve_periyodik_gozden_gecirme_eksik",
+          "label": "Erişim yetkileri tanımlıdır ancak erişim loglaması ve periyodik gözden geçirme eksiktir"
+        },
+        {
+          "value": "kisisel_veriler_genel_erisime_acik_rol_bazli_yetkilendirme_uygulanmamaktadir",
+          "label": "Hassas veriler geniş erişime açıktır; rol bazlı yetkilendirme uygulanmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-025",
+      "process": "Kişisel Veri Erişim Yetkileri",
+      "order": 25,
+      "question": "Çalışanlar işten ayrıldığında kişisel verilere ve kurumsal sistemlere erişimleri derhal sonlandırılmakta mıdır?",
+      "description": "İşten ayrılma offboarding prosedürü, erişim iptal süreci ve süre SLA'ı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "issizlik_gununde_tum_sistem_erisimlerinin_kapatilmasi_ik_ve_bt_koordinasyonuyla_yapilmaktadir",
+          "label": "Ayrılma günü tüm sistem erişimleri IT ve İK koordinasyonuyla kapatılmaktadır; checklist uygulanır"
+        },
+        {
+          "value": "erisim_iptali_yapilmaktadir_ancak_sure_ve_kapsam_tutarsiz",
+          "label": "Erişim iptali yapılmaktadır ancak süre ve kapsam tutarsız uygulanmaktadır"
+        },
+        {
+          "value": "ayrilma_sonrasi_erisim_iptali_icin_standart_offboarding_proseduru_tanimli_degil",
+          "label": "Ayrılma sonrası erişim iptali için standart offboarding prosedürü tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-026",
+      "process": "Üçüncü Taraf Veri Paylaşımı",
+      "order": 26,
+      "question": "Kişisel veya ticari verilerin üçüncü taraflarla (Bordro firması, Muhasebe danışmanı, Bulut sağlayıcı, Kargo şirketi, E-posta platformu, Banka, CRM) paylaşımı için Veri İşleme Sözleşmesi (VİS / DPA) imzalanmakta mıdır?",
+      "description": "Veri işleyen sözleşmesi kapsamı, DPA yönetimi ve veri aktarım envanter kaydı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_veri_isleme_hizmeti_alinan_taraflarla_vis_dpa_imzalanmis_ve_guncel",
+          "label": "Tüm veri işleyen üçüncü taraflarla VİS/DPA imzalanmış ve güncel tutulmaktadır"
+        },
+        {
+          "value": "buyuk_tedarikçilerle_dpa_var_kucuk_hizmet_alımlarinda_kapsamlı_sözlesme_yoktur",
+          "label": "Büyük tedarikçilerle DPA mevcuttur; küçük hizmet alımlarında kapsamlı sözleşme olmayabilir"
+        },
+        {
+          "value": "ucuncu_taraf_veri_paylasimi_icin_veri_isleme_sozlesmesi_yapilmamaktadir",
+          "label": "Üçüncü taraflarla veri paylaşımı için veri işleme sözleşmesi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-027",
+      "process": "Üçüncü Taraf Veri Paylaşımı",
+      "order": 27,
+      "question": "Şirketinizle veri paylaşan veya şirketten veri alan üçüncü tarafların listesi ve hangi verilerin paylaşıldığı kayıt altında mıdır?",
+      "description": "Veri aktarım envanteri, alıcı/gönderici kayıtları ve veri türü eşleştirmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "ucuncu_taraf_veri_aktarimi_envanteri_tutulmakta_ve_guncel_kalması_saglaniyor",
+          "label": "Üçüncü taraf veri aktarım envanteri tutulmakta; hangi verinin kiminle paylaşıldığı kayıtlıdır"
+        },
+        {
+          "value": "büyük_sistemler_biliniyor_ancak_tum_ucuncu_taraf_veri_akışları_envanterli_değil",
+          "label": "Büyük sistemler ve temel paylaşımlar bilinmektedir; tüm üçüncü taraf veri akışları envanterli değildir"
+        },
+        {
+          "value": "ucuncu_taraf_veri_aktarim_envanteri_tutulmamaktadir",
+          "label": "Üçüncü taraf veri aktarım envanteri tutulmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-028",
+      "process": "Yurtdışı Veri Aktarımı",
+      "order": 28,
+      "question": "Şirketiniz kişisel verileri yurt dışına aktarmakta mıdır (Global SaaS, Global ERP/CRM, Yurt dışı bulut yedekleme, Çok uluslu grup şirketi, E-posta platformu)?",
+      "description": "Yurtdışı veri aktarımı varlığı, hangi hizmetlere aktarım yapıldığı ve ülke/bölge bilgisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "evet_yurtdisi_veri_aktarimi_yapilmaktadir_saas_erp_bulut_veya_grup_sirketi",
+          "label": "Evet; SaaS yazılımı, bulut yedekleme, global ERP/CRM veya çok uluslu grup şirketine veri aktarımı yapılmaktadır"
+        },
+        {
+          "value": "yurtdisi_veri_aktarimi_yapilmamaktadir",
+          "label": "Yurt dışına kişisel veri aktarımı yapılmamaktadır; tüm sistemler yerli altyapıda çalışmaktadır"
+        },
+        {
+          "value": "yurtdisi_aktarim_olup_olmadigi_bilinmiyor",
+          "label": "Yurt dışı veri aktarımı olup olmadığı net bilinmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-029",
+      "process": "Bilgi Güvenliği Uyum Bağlantısı",
+      "order": 29,
+      "question": "KVKK ve sözleşmesel gizlilik yükümlülükleri kapsamında bilgi güvenliği önlemleri (Şifreleme, Erişim kontrolü, Yedekleme, Penetrasyon testi, ISO 27001 veya eşdeğer sertifika) ile uyum değerlendirmesi hangi birim tarafından yürütülmektedir?",
+      "description": "Bilgi güvenliği ve hukuki uyum entegrasyonu, sertifika varlığı ve sorumluluk.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "iso_27001_veya_esdeğer_bilgi_güvenliği_sertifikasi_aktif",
+          "label": "ISO 27001 veya eşdeğer bilgi güvenliği sertifikası aktif ve geçerlidir"
+        },
+        {
+          "value": "duzenli_penetrasyon_testi_veya_guvenlik_acigi_taramasi_yapilmaktadir",
+          "label": "Düzenli penetrasyon testi veya güvenlik açığı taraması yapılmaktadır"
+        },
+        {
+          "value": "bt_departmani_bilgi_guvenligi_ve_kvkk_teknik_onlemleri_koordineli_yurutuyor",
+          "label": "BT departmanı bilgi güvenliği ve KVKK teknik önlemlerini koordineli yürütmektedir"
+        },
+        {
+          "value": "bilgi_guvenligi_uyumu_bagimsiz_olarak_yonetilmektedir_hukuk_ile_koordinasyon_eksik",
+          "label": "Bilgi güvenliği bağımsız yönetilmektedir; hukuk/uyum birimiyle koordinasyon sınırlıdır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-030",
+      "process": "Elektronik Kayıt ve Delil",
+      "order": 30,
+      "question": "Kritik iş süreçlerindeki elektronik kayıtlar (Sözleşme versiyonları, Onay geçmişi, Fiyat değişiklikleri, Yetki delegasyonları) ne zaman oluşturulduğu, kim tarafından değiştirildiği ve önceki versiyonları izlenebilir biçimde saklanmakta mıdır?",
+      "description": "Elektronik kayıt bütünlüğü, versiyon izlenebilirliği ve değişiklik geçmişi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kritik_kayitlar_olusturan_kullanci_tarih_önceki_versiyon_ve_degisiklik_nedeniyle_tam_izlenebilir",
+          "label": "Kritik kayıtlar; oluşturan kullanıcı, tarih, önceki versiyon ve değişiklik nedeniyle tam izlenebilirdir"
+        },
+        {
+          "value": "bazi_sistemlerde_versiyon_gecmisi_var_ancak_tum_kritik_kayitlar_kapsanmiyor",
+          "label": "Bazı sistemlerde versiyon geçmişi mevcuttur; tüm kritik kayıtlar kapsanmamaktadır"
+        },
+        {
+          "value": "elektronik_kayitlar_degistirilebilir_versiyon_gecmisi_ve_degisiklik_logu_yoktur",
+          "label": "Elektronik kayıtlar değiştirilebilir; versiyon geçmişi ve değişiklik logu yoktur",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-031",
+      "process": "Elektronik Kayıt ve Delil",
+      "order": 31,
+      "question": "Hukuki bir ihtilaf veya denetim durumunda delil niteliği taşıyan elektronik kayıtların (Zaman damgası, Güvenli arşiv, e-İmza, Log) sunulması nasıl organize edilmektedir?",
+      "description": "Dijital delil sunma kapasitesi, zaman damgası, güvenli arşiv ve e-imzalı kayıtlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "zaman_damgali_e_imzali_veya_noterli_kayitlar_mevcuttur_gerektiginde_sunulabilir",
+          "label": "Zaman damgalı, e-imzalı veya onaylı kayıtlar düzenli arşivlenmekte; denetim/ihtilaflarda sunulabilmektedir"
+        },
+        {
+          "value": "elektronik_kayitlar_saklanmakta_ancak_delil_niteliginde_sunulabilirlik_test_edilmemis",
+          "label": "Kayıtlar saklanmaktadır ancak hukuki delil niteliğinde sunulabilirlik test edilmemiştir"
+        },
+        {
+          "value": "elektronik_delil_sunma_kapasitesi_tanimli_degil",
+          "label": "Hukuki durumda delil sunma kapasitesi değerlendirilmemiştir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-032",
+      "process": "Denetim İzi / Audit Trail",
+      "order": 32,
+      "question": "Kritik iş işlemlerinde (Sözleşme imzalama, Banka transferi, Fiyat değiştirme, Kullanıcı yetki değişikliği, Bordro onayı, Muhasebe mahsubu, Tedarikçi ekleme) otomatik ve değiştirilemez denetim izi (Audit Trail) tutulmakta mıdır?",
+      "description": "Audit trail kapsamı, değişmezlik garantisi ve kritik süreç kapsama alanı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "finans_ve_muhasebe_islemlerinde_audit_trail_aktif",
+          "label": "Finans ve muhasebe işlemlerinde (Fatura, ödeme, mahsup) audit trail aktiftir"
+        },
+        {
+          "value": "kullanici_yetki_degisiklikleri_ve_sistem_erisimlerinde_log_tutulmaktadir",
+          "label": "Kullanıcı yetki değişiklikleri ve sistem erişimlerinde log tutulmaktadır"
+        },
+        {
+          "value": "sozlesme_ve_ticari_islemlerde_audit_trail_aktif",
+          "label": "Sözleşme ve ticari işlemlerde (Teklif, sipariş, banka talimatı) audit trail aktiftir"
+        },
+        {
+          "value": "bordro_ve_ik_verisi_degisikliklerinde_log_tutulmaktadir",
+          "label": "Bordro ve İK verisi değişikliklerinde log tutulmaktadır"
+        },
+        {
+          "value": "audit_trail_kisitli_alanlarda_var_kapsamli_degil",
+          "label": "Audit trail sınırlı alanlarda mevcuttur; kapsamlı kritik işlem logu tutulmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-033",
+      "process": "Denetim İzi / Audit Trail",
+      "order": 33,
+      "question": "Audit trail kayıtlarına kimin erişebildiği, bu kayıtların ne kadar süre saklandığı ve periyodik olarak gözden geçirildiği tanımlı mıdır?",
+      "description": "Audit log erişim yetkileri, saklama süresi ve periyodik inceleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "audit_trail_yetkisi_kisitli_saklama_suresi_tanimli_periyodik_inceleme_yapılıyor",
+          "label": "Audit trail erişimi yetki bazlı kısıtlı; saklama süresi tanımlı ve periyodik inceleme yapılmaktadır"
+        },
+        {
+          "value": "audit_log_tutulmakta_ancak_saklama_ve_erisim_politikasi_tanimli_degil",
+          "label": "Audit log tutulmaktadır; ancak saklama süresi ve erişim politikası tanımlı değildir"
+        },
+        {
+          "value": "audit_trail_erisim_saklama_suresi_tanimli_degil",
+          "label": "Audit trail erişim yönetimi ve saklama politikası tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-034",
+      "process": "İç ve Dış Denetimler",
+      "order": 34,
+      "question": "Şirketiniz hangi denetim türlerine tabi olmakta veya hangilerini yürütmektedir (İç denetim, Bağımsız dış denetim, Müşteri/Tedarikçi denetimi, Sertifikasyon denetimi, Kamu kurumu denetimi)?",
+      "description": "Denetim türleri, denetim periyodu ve denetçi profili.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ic_denetim_birimi_veya_ic_denetçi_duzenli_denetim_yapmaktadir",
+          "label": "İç denetim birimi veya iç denetçi düzenli denetim yapmaktadır"
+        },
+        {
+          "value": "bagimsiz_dis_denetim_kpg_pwc_ey_gibi_yillik_yapilmaktadir",
+          "label": "Bağımsız dış denetim (Yeminli Mali Müşavir, Bağımsız Denetçi) yıllık yapılmaktadır"
+        },
+        {
+          "value": "musteri_veya_tedarikci_denetimi_gecirmekteyiz_ikinci_taraf_denetim",
+          "label": "Müşteri veya tedarikçi denetimi (İkinci taraf denetim) geçirmekteyiz"
+        },
+        {
+          "value": "iso_27001_iso_9001_gibi_sertifikasyon_denetimi_yapilmaktadir",
+          "label": "ISO 27001, ISO 9001 veya sektöre özel sertifikasyon denetimi yapılmaktadır"
+        },
+        {
+          "value": "kamu_kurumu_vergi_sgk_kurul_denetimlerine_tabi_olmaktayiz",
+          "label": "Vergi, SGK, BDDK, KVKK Kurulu veya diğer kamu kurumu denetimlerine tabi olmaktayız"
+        },
+        {
+          "value": "hicbir_formal_denetim_yapilmamaktadir",
+          "label": "Herhangi bir formal denetim yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-035",
+      "process": "İç ve Dış Denetimler",
+      "order": 35,
+      "question": "Denetim öncesinde kanıt ve belge hazırlama süreci ile denetim sırasında istenen belgelerin sunumu nasıl yönetilmektedir?",
+      "description": "Denetim hazırlık süreci, kanıt toplama, belge deposu ve denetim koordinasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "denetim_hazirlik_plani_ve_koordinator_atanir_belgeler_onceden_derlenir",
+          "label": "Denetim takvimi belirlince hazırlık planı ve koordinatör atanır; belgeler önceden derlenir"
+        },
+        {
+          "value": "denetim_baslayinca_ilgili_departmanlar_bilgilendirilir_belgeler_o_sirada_toplanir",
+          "label": "Denetim başladığında ilgili departmanlar bilgilendirilir; belgeler anlık toplanmaktadır"
+        },
+        {
+          "value": "denetim_hazirlik_sureci_tanimli_degil",
+          "label": "Denetim hazırlık süreci tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-036",
+      "process": "Uygunsuzluk ve Düzeltici Aksiyon",
+      "order": 36,
+      "question": "Denetim bulguları, mevzuat ihlalleri veya iç uyumsuzluklar için düzeltici aksiyon (CAR) süreci nasıl işletilmektedir?",
+      "description": "Düzeltici aksiyon yönetimi, sorumlu atama, termin takibi ve kapanış kanıtı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bulgu_sorumlu_aksiyon_termin_kanitla_kapanma_kaydi_sistematik_takip_edilmektedir",
+          "label": "Bulgu, sorumlu, aksiyon, termin ve kanıtlı kapanış sistematik biçimde kayıt altında takip edilmektedir"
+        },
+        {
+          "value": "aksiyonlar_takip_ediliyor_ancak_kapanis_kaniti_ve_dogrulama_tutarsiz",
+          "label": "Aksiyonlar takip edilmektedir ancak kapanış kanıtı ve doğrulama mekanizması tutarsızdır"
+        },
+        {
+          "value": "duzeltici_aksiyon_kayit_ve_takip_mekanizmasi_tanimli_degil",
+          "label": "Düzeltici aksiyon kayıt ve takip mekanizması tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-037",
+      "process": "Uygunsuzluk ve Düzeltici Aksiyon",
+      "order": 37,
+      "question": "Uygunsuzlukların kök neden analizi ve tekrarını önleme mekanizmaları uygulanmakta mıdır?",
+      "description": "Kök neden analizi, önleyici aksiyon (PAR), tekrar önleme ve bilgi paylaşımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kritik_bulgular_icin_kok_neden_analizi_ve_onleyici_aksiyon_sureci_uygulanmaktadir",
+          "label": "Kritik bulgular için kök neden analizi ve önleyici aksiyon süreci sistematik uygulanmaktadır"
+        },
+        {
+          "value": "duzeltici_aksiyon_uygulanir_kok_neden_analizi_standart_degil",
+          "label": "Düzeltici aksiyon uygulanmakta; ancak kök neden analizi standart süreç değildir"
+        },
+        {
+          "value": "kok_neden_analizi_ve_onleyici_aksiyon_sureci_uygulanmamaktadir",
+          "label": "Kök neden analizi ve önleyici aksiyon süreci uygulanmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-038",
+      "process": "Yasal Takvim ve Bildirimler",
+      "order": 38,
+      "question": "Periyodik yasal bildirimler (SGK aylık bildirgesi, Vergi beyannameleri, e-Defter tescili, KVKK Kurul bildirimleri, Çevre ve İSG raporları, Sertifika yenileme, Lisans başvurusu) için merkezi bir yasal takvim veya görev hatırlatma sistemi yönetilmekte midir?",
+      "description": "Yasal takvim yönetimi, sorumluluk atama ve bildirim takip mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_yasal_takvim_var_sorumlular_ve_tarihler_ile_hatirlatma_mekanizmasi_aktif",
+          "label": "Merkezi yasal takvim mevcuttur; sorumlular ve son tarihler atanmış, hatırlatma mekanizması aktiftir"
+        },
+        {
+          "value": "departmanlar_kendi_sorumlu_oldukları_yükümlülükleri_kendi_takvimlerinde_takip_ediyor",
+          "label": "Departmanlar kendi sorumluluklarını bağımsız takvimlerinde takip etmektedir; merkezi liste yoktur"
+        },
+        {
+          "value": "yasal_bildirim_takvimi_tanimli_degil_termin_asildiginda_anlasiliyor",
+          "label": "Yasal bildirim takvimi tanımlı değildir; termin aşıldığında fark edilmektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-039",
+      "process": "Lisans / Ruhsat / İzin Takibi",
+      "order": 39,
+      "question": "Şirketinizin faaliyetleri için gerekli ruhsat, lisans, işyeri açma izni, çevre izni, gıda sicili, ihracat/ithalat lisansı veya mesleki yeterlilik sertifikaları takip edilmekte midir?",
+      "description": "Lisans, ruhsat ve sertifika envanteri, geçerlilik takibi ve yenileme süreçleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_lisans_ruhsat_ve_sertifikalar_envanterde_gecerlilik_tarihleriyle_takip_ediliyor",
+          "label": "Tüm lisans, ruhsat ve sertifikalar merkezi envanterde geçerlilik tarihleriyle takip edilmektedir"
+        },
+        {
+          "value": "ana_ruhsat_ve_lisanslar_biliniyor_ancak_tum_belgelerin_envanter_takibi_eksik",
+          "label": "Ana ruhsat ve lisanslar bilinmektedir; ancak tüm belgelerin kapsamlı envanter takibi eksiktir"
+        },
+        {
+          "value": "lisans_ruhsat_takibi_sistematik_degil",
+          "label": "Lisans ve ruhsat takibi sistematik değildir; belge geçerlilik tarihi kontrolü düzensiz yapılmaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-040",
+      "process": "Lisans / Ruhsat / İzin Takibi",
+      "order": 40,
+      "question": "Yenilenmesi gereken ruhsat veya sertifikaların bitiş tarihinden önce başvuru sürecinin başlatılması için sorumluluk atama ve uyarı mekanizması var mıdır?",
+      "description": "Yenileme başvuru takvimi, sorumluluk atama ve öncelik uyarısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "bitis_oncesinde_otomatik_uyari_veya_sorumluluk_atamasi_mevcuttur",
+          "label": "Evet; bitiş tarihinden belirli süre önce sorumluya uyarı gönderilmekte veya görev atanmaktadır"
+        },
+        {
+          "value": "yenileme_sorumlulukları_biliniyor_ancak_otomatik_uyarı_mekanizmasi_yok",
+          "label": "Yenileme sorumlulukları bilinmektedir; ancak otomatik uyarı mekanizması bulunmamaktadır"
+        },
+        {
+          "value": "yenileme_hatirlatma_mekanizmasi_yoktur",
+          "label": "Yenileme hatırlatma mekanizması yoktur; süre dolunca fark edilmektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-041",
+      "process": "Etik / Çıkar Çatışması / İhbar",
+      "order": 41,
+      "question": "Şirketinizde çalışanların etik ihlal, usulsüzlük veya çıkar çatışması bildirebildiği bir ihbar kanalı (Beyaz hat, E-posta, Anonim portal, Öneri kutusu) bulunmakta mıdır?",
+      "description": "Whistleblowing / İhbar hattı kanalları, anonim bildirim kapasitesi ve koruma mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "anonim_dahil_resmi_ihbar_bildirme_kanali_ve_sorusturma_sureci_aktif",
+          "label": "Anonim dahil resmi ihbar/beyaz hat kanalı ve ihlal soruşturma süreci tanımlı ve aktiftir"
+        },
+        {
+          "value": "yonetici_veya_ik_departmanina_dogrudan_bildirim_yolu_mevcuttur_anonim_kanal_yoktur",
+          "label": "Yönetici veya İK departmanına doğrudan bildirim yolu mevcuttur; anonim kanal bulunmamaktadır"
+        },
+        {
+          "value": "ihbar_bildirme_mekanizmasi_yoktur",
+          "label": "Resmi ihbar veya etik ihlal bildirme mekanizması bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-042",
+      "process": "Etik / Çıkar Çatışması / İhbar",
+      "order": 42,
+      "question": "Gelen ihbar bildirimlerinin soruşturulması, sonuçlandırılması ve ihbarcının kimliğinin korunması süreci nasıl yönetilmektedir?",
+      "description": "Soruşturma süreci, ihbarcı koruma taahhüdü ve vakayı sonuçlandırma mekanizması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "LEG-041",
+        "operator": "not_equals",
+        "value": "ihbar_bildirme_mekanizmasi_yoktur"
+      },
+      "options": [
+        {
+          "value": "sorusturma_sureci_ihbarci_korumasi_ve_kapanis_dokümantasyonu_politikada_tanimli",
+          "label": "Soruşturma süreci, ihbarcı kimlik koruması ve kapanış dokümantasyonu politikada tanımlıdır"
+        },
+        {
+          "value": "sorusturma_yapilmaktadir_ancak_ihbarci_korumasi_ve_surec_dokumantasyonu_eksik",
+          "label": "Soruşturma yapılmaktadır; ancak ihbarcı koruma ve süreç dokümantasyonu tutarsızdır"
+        },
+        {
+          "value": "ihbar_sureci_ve_sorusturma_proseduru_tanimli_degil",
+          "label": "İhbar soruşturma süreci ve ihbarcı koruma prosedürü tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-043",
+      "process": "Dava / İcra / Hukuki Dosya Takibi",
+      "order": 43,
+      "question": "Şirketinizin taraf olduğu veya karşı taraf olarak dahil olduğu aktif dava, icra takibi veya hukuki uyuşmazlık dosyaları sistemli olarak takip edilmekte midir?",
+      "description": "Dava/icra dosya takibi, dosya sayısı, duruşma takvimi ve hukuki risk yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_aktif_davalar_icra_dosyalari_dosya_no_taraf_konu_avukat_ve_durusma_takvimi_ile_kayitli",
+          "label": "Aktif davalar ve icra dosyaları; dosya no, taraf, konu, avukat ve duruşma takvimi ile kayıtlı tutulmaktadır"
+        },
+        {
+          "value": "buyuk_davalar_hukuk_burosunda_takip_ediliyor_dahili_kayit_eksik",
+          "label": "Önemli davalar dış hukuk bürosu tarafından takip edilmektedir; dahili kayıt sistemi eksiktir"
+        },
+        {
+          "value": "dava_icra_veya_hukuki_dosya_yoktur",
+          "label": "Aktif dava, icra veya hukuki uyuşmazlık dosyası bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-044",
+      "process": "Dava / İcra / Hukuki Dosya Takibi",
+      "order": 44,
+      "question": "Dava süreçlerinde avukat masrafları, mahkeme harçları, karşı taraf alacak tutarları ve dava sonuçlarından doğabilecek finansal yükümlülükler raporlanmakta mıdır?",
+      "description": "Dava maliyet takibi, finansal risk karşılık hesaplama ve avukat fatura yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "LEG-043",
+        "operator": "not_equals",
+        "value": "dava_icra_veya_hukuki_dosya_yoktur"
+      },
+      "options": [
+        {
+          "value": "avukat_masrafi_risk_tutari_ve_finansal_yukumluluk_bütçe_ve_muhasebede_raporlanmaktadir",
+          "label": "Avukat masrafı, risk tutarı ve olası finansal yükümlülük muhasebe ve yönetim raporlarına yansıtılmaktadır"
+        },
+        {
+          "value": "avukat_masraflari_muhasebede_gorunuyor_dava_finansal_risk_tutari_raporlanmiyor",
+          "label": "Avukat masrafları muhasebede görünmektedir; dava kaynaklı finansal risk tutarı ayrıca raporlanmamaktadır"
+        },
+        {
+          "value": "dava_maliyet_ve_risk_tutarlari_raporlanmamaktadir",
+          "label": "Dava maliyet ve risk tutarları yönetim raporlarına yansıtılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-045",
+      "process": "Legal & Compliance KPI",
+      "order": 45,
+      "question": "Hukuk ve Mevzuat Uyum departmanı hangi KPI ve yönetim raporlarını düzenli olarak izlemektedir?",
+      "description": "Legal ve compliance KPI'ları, yönetim dashboard'u ve periyodik raporlama.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "acik_duzeltici_aksiyon_sayisi_ve_kapanma_suresi",
+          "label": "Açık düzeltici aksiyon sayısı ve ortalama kapanma süresi"
+        },
+        {
+          "value": "sozlesme_bitis_tarihi_ve_yenileme_donem_istatistigi",
+          "label": "Sözleşme bitiş tarihi ve yenileme dönem istatistiği"
+        },
+        {
+          "value": "kvkk_veri_sahibi_basvuru_sayisi_ve_sla_uyum_orani",
+          "label": "KVKK veri sahibi başvuru sayısı ve SLA uyum oranı"
+        },
+        {
+          "value": "aktif_dava_sayisi_ve_finansal_risk_toplami",
+          "label": "Aktif dava sayısı ve toplam finansal risk tutarı"
+        },
+        {
+          "value": "lisans_ruhsat_sertifika_son_kullanim_uyarisi_sayisi",
+          "label": "Son kullanım tarihi yaklaşan lisans, ruhsat veya sertifika sayısı"
+        },
+        {
+          "value": "duzenli_yonetim_raporu_veya_kpi_panosu_bulunmamaktadir",
+          "label": "Düzenli yönetim raporu veya KPI panosu bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "LEG-046",
+      "process": "Legal & Compliance KPI",
+      "order": 46,
+      "question": "Hukuki ve uyum konularındaki raporlar Yönetim Kurulu, Denetim Komitesi veya üst yönetime hangi sıklıkta ve formatta sunulmaktadır?",
+      "description": "Üst yönetime hukuk/uyum raporlama frekansı, format ve özet dashboard kapsamı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "aylik_veya_ceyreklik_yonetim_kurulu_veya_ust_yonetime_yazili_hukuk_uyum_raporu_sunulmaktadir",
+          "label": "Aylık veya çeyreklik YK veya üst yönetime yazılı hukuk ve uyum özet raporu sunulmaktadır"
+        },
+        {
+          "value": "kritik_gelişmelerde_raporlama_yapilmaktadir_duzenli_periyodik_rapor_yoktur",
+          "label": "Kritik gelişmelerde raporlama yapılmaktadır; düzenli periyodik raporlama mevcut değildir"
+        },
+        {
+          "value": "ust_yonetime_hukuk_ve_uyum_konularinda_duzenli_rapor_sunulmamaktadir",
+          "label": "Üst yönetime hukuk ve uyum konularında düzenli rapor sunulmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}

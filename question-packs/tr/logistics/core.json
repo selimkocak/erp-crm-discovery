@@ -1,0 +1,646 @@
+{
+  "meta": {
+    "pack_id": "tr.logistics.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "LOGISTICS",
+    "name": "Sevkiyat ve Lojistik Ön Analizi",
+    "description": "ERP implementasyonu öncesinde Sevkiyat ve Lojistik departmanının AS-IS süreçlerini, teslimat emri, araç/taşıyıcı yönetimi, rota planlama, randevulu teslimat, e-İrsaliye, dijital teslim kanıtı (POD), tersine lojistik, kargo entegrasyonu, navlun maliyetleri ve OTIF KPI operasyonlarını anlamaya yönelik temel discovery soru paketi."
+  },
+  "questions": [
+    {
+      "id": "LOG-001",
+      "process": "Sevkiyat Talebi ve Teslimat Emri Başlatma",
+      "order": 1,
+      "question": "Sevkiyat süreci sistemde hangi belge veya tetikleyici ile başlatılmaktadır?",
+      "description": "Satış siparişinden doğrudan sevk emri / teslimat belgesi (Outbound Delivery) üretilmesi vs. manuel sevk talebi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "otomatik_teslimat_emri", "label": "Onaylanan satış siparişinden sistem otomatik olarak 'Teslimat / Sevk Emri' oluşturur", "allow_note": false, "is_other": false },
+        { "value": "satis_ekibi_manuel_talep_acar", "label": "Satış temsilcisi siparişi hazırlatmak için sevkiyat/lojistik ekibine manuel sevk talebi girer", "allow_note": true, "is_other": false },
+        { "value": "depo_hazir_bildirimiyle_baslar", "label": "Üretim veya depo ürünün hazır olduğunu bildirdiğinde sevkiyat listesi oluşturulur", "allow_note": true, "is_other": false },
+        { "value": "belgesiz_telefon_whatsapp", "label": "Sistemde sevk emri yoktur, e-posta/telefon/WhatsApp ile sevk talimatı verilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-002",
+      "process": "Sevkiyat Talebi ve Teslimat Emri Başlatma",
+      "order": 2,
+      "question": "Sevkiyat öncesinde finansal onay (kredi limiti, vadesi geçmiş bakiye veya avans tahsilat kontrolü) yapılıyor mu?",
+      "description": "Finansal risk kontrolü sebebiyle sevkiyat blokajı konulması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_bloke_koyar", "label": "Evet, müşterinin kredi limiti aşılmışsa veya vadesi geçmiş borcu varsa sistem sevk irsaliyesi/teslimat kesilmesini otomatik engeller", "allow_note": false, "is_other": false },
+        { "value": "finans_ekibi_manuel_onay_verir", "label": "Her sevkiyat listesi önce Finans/Muhasebe onayına sunulur, onay gelince araç yüklenir", "allow_note": true, "is_other": false },
+        { "value": "sadece_pesin_musterilerde_kontrol", "label": "Sadece peşin çalışan müşterilerde dekont kontrol edilir, vadeli müşterilerde kısıt yoktur", "allow_note": false, "is_other": false },
+        { "value": "sevkiyatta_finans_kontrolu_yok", "label": "Sevkiyat aşamasında finans kontrolü yapılmaz, sipariş onayında biter", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-003",
+      "process": "Sevkiyat Planlama ve Önceliklendirme",
+      "order": 3,
+      "question": "Hangi siparişlerin hangi gün ve sırayla sevk edileceğine nasıl karar verilmektedir (Sevkiyat Planlama)?",
+      "description": "Sevkiyat planlama mekanizması (Teslim tarihi, bölge/rota, müşteri önceliği).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_teslim_tarihi_ve_rota_planlar", "label": "ERP sistemi sipariş teslim tarihi, rota bölgesi ve stok durumuna göre sevkiyat planı önerir", "allow_note": true, "is_other": false },
+        { "value": "lojistik_sorumlusu_excelde_planlar", "label": "Lojistik yöneticisi günlük/haftalık siparişleri Excel'e çekip araç ve teslimat planı yapar", "allow_note": true, "is_other": false },
+        { "value": "satis_ve_musteri_baskisina_gore", "label": "Önceden plan yapılmaz; satış ekibinin veya müşterinin aciliyet baskısına göre anlık sevk edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-004",
+      "process": "Sevkiyat Planlama ve Önceliklendirme",
+      "order": 4,
+      "question": "Araç kapasitesi veya stok yetersiz olduğunda sevkiyatlarda hangi önceliklendirme kuralı uygulanır?",
+      "description": "Sevkiyat kuyruğu öncelik kriterleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "musteri_segmenti_ve_sozlesme_cezasi", "label": "Müşteri önem derecesi (Key Account / VIP) ve gecikme cezası ilk sırayı alır", "allow_note": true, "is_other": false },
+        { "value": "kesin_siparis_ve_teslim_tarihi", "label": "İlk sipariş veren veya teslim tarihi en eski olan önceliklidir (FIFO Sevkiyat)", "allow_note": false, "is_other": false },
+        { "value": "tam_kamyon_tam_arac_dolulugu", "label": "Rotadaki aracı en yüksek hacim/ağırlık doluluğuna ulaştıran teslimatlar öne çekilir", "allow_note": false, "is_other": false },
+        { "value": "yonetim_anlik_karar_verir", "label": "Yönetim/Satış direktörü acil durumlarda hangi aracın kime gideceğini manuel belirler", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-005",
+      "process": "Kısmi ve Birleştirilmiş Sevkiyat Yönetimi",
+      "order": 5,
+      "question": "Siparişlerin kısmi olarak sevk edilmesine (parçalı teslimat) izin verilmekte midir?",
+      "description": "Kısmi sevkiyat izni, müşteri bazlı kısıtlar ve bakiye takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "musteri_veya_siparis_bazinda_parametre", "label": "Evet, ancak her müşterinin veya siparişin 'Kısmi Sevkiyat İzni / Toleransı' sözleşmesine göre parametrik yönetilir", "allow_note": true, "is_other": false },
+        { "value": "her_zaman_serbest_kismi_sevk", "label": "Evet, hazır olan kalem veya miktar anında sevk edilir, kalanlar sonraki sevkiyata bakiye kalır", "allow_note": false, "is_other": false },
+        { "value": "kesinlikle_yasak_tek_seferde_teslim", "label": "Hayır, siparişteki tüm kalemler ve miktarlar eksiksiz hazır olmadan asla sevk edilemez (Tek Seferde Teslim)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-006",
+      "process": "Kısmi ve Birleştirilmiş Sevkiyat Yönetimi",
+      "order": 6,
+      "question": "Aynı müşteriye ait birden fazla farklı satış siparişi tek bir sevkiyat/araç ve tek bir irsaliyede birleştirilebiliyor mu?",
+      "description": "Sipariş konsolidasyonu (Order Consolidation into Single Shipment).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_birlestirir", "label": "Evet, aynı teslimat adresine gidecek açık siparişler tek bir sevkiyat emrinde ve tek irsaliyede konsolide edilir", "allow_note": false, "is_other": false },
+        { "value": "kullanici_manuel_birlestirir", "label": "Kullanıcı irsaliye/sevk aşamasında ilgili siparişleri manuel seçerek birleştirir", "allow_note": true, "is_other": false },
+        { "value": "birlestirme_yapilmaz_her_siparis_ayri", "label": "Hayır, her sipariş için mutlaka ayrı bir sevkiyat ve ayrı bir irsaliye düzenlenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-007",
+      "process": "Araç, Filo ve Taşıyıcı Yönetimi",
+      "order": 7,
+      "question": "Sevkiyatlarda kullanılan araç ve taşıyıcı yapınız nasıldır?",
+      "description": "Özmal filo vs. Sözleşmeli nakliyeci vs. Kargo/Ambar kullanımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "karma_yapi", "label": "Karma; hem kendi özmal araçlarımız hem de sözleşmeli nakliyeciler ve kargo/ambar firmaları kullanılır", "allow_note": true, "is_other": false },
+        { "value": "sadece_dis_nakliye_ve_kargo", "label": "Kendi aracımız yoktur; tamamen dış nakliye firmaları, ambarlar ve kargo şirketleri kullanılır", "allow_note": true, "is_other": false },
+        { "value": "sadece_ozmal_filo", "label": "Sadece firmamıza ait özmal araç filosu ve kendi şoförlerimiz kullanılır", "allow_note": false, "is_other": false },
+        { "value": "musteri_kendi_araciyla_alir", "label": "Nakliye yapmıyoruz; müşteriler kendi araçlarıyla depomuzdan teslim alır (Ex-Works)", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-008",
+      "process": "Araç, Filo ve Taşıyıcı Yönetimi",
+      "order": 8,
+      "question": "Nakliye firması / taşıyıcı seçimi hangi kriterlere göre ve nasıl yapılmaktadır?",
+      "description": "Sabit sözleşmeli tarife vs. Spot nakliye teklif toplama.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_tanimli_bolge_fiyat_tarifesi", "label": "Sistemde her bölge ve araç tipi için taşıyıcıların sözleşmeli fiyat tarifeleri tanımlıdır, en uygunu seçilir", "allow_note": true, "is_other": false },
+        { "value": "spot_teklif_toplanarak_secilir", "label": "Her büyük sevkiyatta birkaç nakliyeciden spot fiyat teklifi alınarak en ucuzuna verilir", "allow_note": true, "is_other": false },
+        { "value": "tek_anlasmali_ana_tasiyici", "label": "Tüm nakliye işimiz tek bir lojistik firmasına veya ana kargo şirketine devredilmiştir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "LOG-007",
+        "operator": "not_equals",
+        "value": "musteri_kendi_araciyla_alir"
+      }
+    },
+    {
+      "id": "LOG-009",
+      "process": "Araç, Filo ve Taşıyıcı Yönetimi",
+      "order": 9,
+      "question": "Özmal araçlarınızın periyodik bakım, muayene, sigorta/kasko, yakıt tüketimi ve sürücü görevlendirmeleri sistemde takip ediliyor mu?",
+      "description": "Filo operasyonel bakım ve maliyet takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "erp_filo_modulunde_tam_takip", "label": "Evet, araçların tüm bakım, muayene, sigorta ve km/yakıt verileri ERP filo modülünde entegre izlenir", "allow_note": true, "is_other": false },
+        { "value": "excel_veya_harici_yazilimda", "label": "ERP dışında bağımsız bir filo yazılımı veya Excel tablolarında manuel takip edilir", "allow_note": false, "is_other": false },
+        { "value": "takip_edilmiyor_masraf_olarak_girilir", "label": "Sadece faturaları geldikçe muhasebeye genel gider olarak işlenir, operasyonel takip yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "LOG-007",
+        "operator": "equals",
+        "value": "karma_yapi"
+      }
+    },
+    {
+      "id": "LOG-010",
+      "process": "Rota, Dağıtım ve Randevu Planlama",
+      "order": 10,
+      "question": "Şehir içi ve şehirlerarası dağıtımlarda rota planlama ve durak sıralaması nasıl yapılmaktadır?",
+      "description": "Manuel rota vs. Dinamik rota optimizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_veya_harita_destekli_rota", "label": "Sistem/Yazılım adres konumlarına, trafik ve araç kapasitesine göre durak sırasını optimize eder", "allow_note": true, "is_other": false },
+        { "value": "sevkiyat_sorumlusu_ve_sofor_belirler", "label": "Sevkiyat sorumlusu ve şoför kendi tecrübesine göre güzergah ve teslimat sırasını belirler", "allow_note": false, "is_other": false },
+        { "value": "sabit_gunluk_dagitim_hatlari_var", "label": "Her bölge için sabit haftalık/günlük dağıtım hatlarımız vardır", "allow_note": false, "is_other": false },
+        { "value": "rota_planlama_ihtiyacimiz_yok", "label": "Çok duraklı rota ihtiyacımız yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-011",
+      "process": "Rota, Dağıtım ve Randevu Planlama",
+      "order": 11,
+      "question": "Müşterilerinizde veya teslimat noktalarında 'Randevulu Teslimat / Teslimat Zaman Penceresi' zorunluluğu var mı?",
+      "description": "Zincir marketler, büyük fabrikalar veya AVM teslimatlarında saatlik/günlük randevu alma zorunluluğu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_zincir_market_ve_buyuk_musteriler", "label": "Evet, özellikle zincir marketler ve kurumsal müşterilerde portal üzerinden randevu saati alınması zorunludur", "allow_note": true, "is_other": false },
+        { "value": "sadece_gun_belirlenir_saat_esnektir", "label": "Gün teyit edilir ancak gün içinde herhangi bir saatte teslimat yapılabilir", "allow_note": false, "is_other": false },
+        { "value": "randevu_zorunlulugu_yoktur", "label": "Randevu gerekmez, mesai saatleri içinde doğrudan teslim edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-012",
+      "process": "Yükleme Organizasyonu ve Kapasite Kontrolü",
+      "order": 12,
+      "question": "Araç yükleme öncesinde ağırlık (tonaj) ve hacim (desimetreküp / metreküp / palet sayısı) kapasite kontrolleri nasıl yapılır?",
+      "description": "Aşırı yükleme (aşırı tonaj) veya boş hacim kalmasının sistemde kontrol edilmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_hacim_ve_agirlik_kontrol_eder", "label": "ERP sistemi sipariş kalemlerinin ağırlık ve desilerini toplayarak araç kapasitesinin aşılıp aşılmadığını otomatik denetler", "allow_note": true, "is_other": false },
+        { "value": "depo_ve_sofor_goz_karari_yukler", "label": "Fiziksel olarak araca sığdığı kadar yüklenir, sistemde hacim/ağırlık kontrolü yapılmaz", "allow_note": false, "is_other": false },
+        { "value": "kantar_tartim_sonucuna_gore", "label": "Araç çıkışta kantara girer, tonaj aşımı varsa fazla yük geri indirilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-013",
+      "process": "Yükleme Organizasyonu ve Kapasite Kontrolü",
+      "order": 13,
+      "question": "Araç yüklemesi sırasında araç plakası, çekici/dorse no, sürücü kimlik ve telefon bilgileri sisteme kaydediliyor mu?",
+      "description": "Taşıma belgesi, kantar fişi ve e-İrsaliye taşıyıcı bilgileri doğrulaması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sevkiyat_aninda_sisteme_zorunlu_girilir", "label": "Evet, plaka, şoför adı-soyadı ve TC kimlik / pasaport no girilmeden irsaliye oluşturulamaz", "allow_note": false, "is_other": false },
+        { "value": "guvenlik_veya_kantar_kapida_kaydeder", "label": "Sisteme girilmez, fabrika nizamiyesinde güvenlik defterine veya kantar yazılımına yazılır", "allow_note": true, "is_other": false },
+        { "value": "sadece_ozmal_araclarda_bilinir", "label": "Özmal araçlarımızın plakası bellidir, dış nakliyede plaka kaydedilmez", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-014",
+      "process": "İrsaliye ve Sevk Belgeleri Yönetimi (e-İrsaliye)",
+      "order": 14,
+      "question": "Sevk İrsaliyesi / e-İrsaliye belgesi sevkiyat sürecinin hangi adımında oluşturulmakta ve onaylanmaktadır?",
+      "description": "Mal yüklenmeden önce mi, yükleme bittikten sonra mı, yoksa araç kapıdan çıkarken mi irsaliye kesilir?",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "yukleme_ve_kontrol_bittikten_hemen_sonra", "label": "Yükleme ve son kontrol tamamlandığı anda sistemden e-İrsaliye kesilir ve GİB'e iletilir", "allow_note": false, "is_other": false },
+        { "value": "siparis_hazirlanirken_onceden_kesilir", "label": "Depo hazırlığı başlamadan önce irsaliye kesilip depoya kâğıt çıktı verilir", "allow_note": true, "is_other": false },
+        { "value": "gun_sonunda_toplu_kesilir", "label": "Fiziksel sevk irsaliyesiz yapılır, e-İrsaliyeler gün veya hafta sonunda topluca kesilir", "allow_note": true, "is_other": false },
+        { "value": "kantar_cikisinda_otomatik_kesilir", "label": "Araç nizamiyedeki kantar çıkışından geçerken net ağırlığa göre otomatik kesilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-015",
+      "process": "İrsaliye ve Sevk Belgeleri Yönetimi (e-İrsaliye)",
+      "order": 15,
+      "question": "e-İrsaliye sürecinde iptal, red veya miktar düzeltme durumları nasıl yönetilmektedir?",
+      "description": "Yoldaki aracın e-İrsaliyesinin iptali, alıcının sistemden e-İrsaliyeyi kısmi/tam reddetmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistem_uzerinden_entegre_yanit_ve_fark_irsaliyesi", "label": "Alıcının e-İrsaliye uygulama yanıtı (Kabul/Kısmi Kabul/Red) ERP'ye düşer, reddedilen miktar için otomatik ters kayıt oluşur", "allow_note": true, "is_other": false },
+        { "value": "yeni_irsaliye_kesilir_eski_iptal_edilir", "label": "Muhasebe GİB portalından irsaliyeyi iptal eder veya yeni düzeltme irsaliyesi keser", "allow_note": true, "is_other": false },
+        { "value": "fatura_asamasinda_fark_duzeltilir", "label": "İrsaliye ellenmez, aradaki fark fatura kesilirken manuel düşülür", "allow_note": true, "is_other": false },
+        { "value": "e_irsaliye_kullanmiyoruz", "label": "e-İrsaliye mükellefi değiliz, matbu kâğıt irsaliye kullanıyoruz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-016",
+      "process": "İrsaliye ve Sevk Belgeleri Yönetimi (e-İrsaliye)",
+      "order": 16,
+      "question": "Sevkiyat sırasında irsaliye dışında hangi ek belgeler (Çeki Listesi / Packing List, Analiz Sertifikası, MSDS, Gümrük Beyannamesi vb.) zorunludur?",
+      "description": "Sevk paketi belgeleri ve otomatik belge basımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "ceki_listesi_ve_kalite_sertifikasi_zorunlu", "label": "Evet, her sevkiyatta sistemden otomatik üretilen Çeki Listesi ve Kalite Analiz Sertifikası eklenir", "allow_note": true, "is_other": false },
+        { "value": "ihracat_sevkiyatlarinda_tum_gumruk_evraklari", "label": "Yurtiçinde sadece irsaliye yeterlidir; ihracatta ATR/EUR1, Çeki Listesi ve Menşe Şahadetnamesi zorunludur", "allow_note": true, "is_other": false },
+        { "value": "sadece_sevk_irsaliyesi_yeterlidir", "label": "İrsaliye dışında herhangi bir ek belge düzenlenmez", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-017",
+      "process": "Teslimat Doğrulaması ve Teslim Kanıtı (POD)",
+      "order": 17,
+      "question": "Müşterinin malları teslim aldığına dair Teslim Kanıtı (POD - Proof of Delivery) sisteme nasıl işlenmektedir?",
+      "description": "Islak imzalı kâğıt irsaliye nüshası vs. Mobil cihazda dijital imza / fotoğraf kanıtı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "mobil_surucu_uygulamasi_dijital_imza_ve_foto", "label": "Sürücü teslim anında mobil uygulamadan müşteriye dijital imza attırır ve teslimat fotoğrafını sisteme yükler", "allow_note": true, "is_other": false },
+        { "value": "imzali_kagit_nusha_taranarak_sisteme_eklenir", "label": "Fiziksel imzalı/kaşeli irsaliye nüshası merkeze döner, taranarak ERP'deki sevkiyat kaydına arşivlenir", "allow_note": true, "is_other": false },
+        { "value": "kargo_veya_nakliyeci_portal_entegrasyonu", "label": "Kargo/nakliye firmasının online teslim API'sinden teslim edildi bilgisi otomatik çekilir", "allow_note": true, "is_other": false },
+        { "value": "sisteme_islenmez_fiziksel_arsivde_durur", "label": "Sistemde teslim teyit adımı yoktur; kâğıt nüshalar klasörde saklanır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-018",
+      "process": "Teslimat Doğrulaması ve Teslim Kanıtı (POD)",
+      "order": 18,
+      "question": "Satış faturasının kesilmesi için teslimatın müşteriye fiilen ulaşmış olması (Teslim Teyidi) şartı aranmakta mıdır?",
+      "description": "Sevk anında faturalama vs. Teslim kanıtı (POD) geldikten sonra faturalama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sevk_aninda_irsaliye_ile_birlikte_kesilir", "label": "Hayır, fatura sevk anında irsaliye ile birlikte doğrudan kesilir veya sevk günü faturalandırılır", "allow_note": false, "is_other": false },
+        { "value": "teslim_kaniti_gelmeden_fatura_kesilmez", "label": "Evet, özellikle konsinye veya onaylı teslimat gerektiren müşterilerde POD onaylanmadan fatura kesilemez", "allow_note": true, "is_other": false },
+        { "value": "ay_sonunda_toplu_faturalanir", "label": "Ay içinde sevk edilen tüm irsaliyeler ayın son günü topluca faturaya dönüştürülür", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-019",
+      "process": "Teslim Edilememe, Red ve İade Lojistiği",
+      "order": 19,
+      "question": "Müşterinin adreste bulunamaması, kapıdan tam red veya kısmi red durumunda sevkiyat süreci nasıl işlemektedir?",
+      "description": "Geri dönen yükün kabulü, red gerekçesi ve irsaliye eşleşmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistemde_red_nedeni_girilir_tersine_lojistik_baslar", "label": "Sistemde kayıtlı teslimat red gerekçesiyle kapatılır, geri gelen ürünler 'İade Mal Kabul / Karantina' deposuna otomatik yönlendirilir", "allow_note": true, "is_other": false },
+        { "value": "sofor_mallari_geri_getirir_manuel_tutanak_tutulur", "label": "Şoför malları depoya geri getirir, kâğıt tutanak tutulur; satış ekibi yeniden sevk planlar", "allow_note": true, "is_other": false },
+        { "value": "musteri_kendi_iade_irsaliyesini_keser", "label": "Müşteri teslim alıp beğenmediği ürün için kendi e-İrsaliyesini keserek nakliyeciyle geri yollar", "allow_note": true, "is_other": false },
+        { "value": "red_ve_iade_surecimiz_yoktur", "label": "Red ve iade sürecimiz yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-020",
+      "process": "Teslim Edilememe, Red ve İade Lojistiği",
+      "order": 20,
+      "question": "Teslimat sırasında oluşan hasar, kırılma veya eksiklik durumunda sorumluluk ve tazmin (hasar rücu) süreci nasıl yürütülür?",
+      "description": "Nakliyeci sigortası, hasar tutanağı ve hasarlı malın stoktan ayrıştırılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "aninda_hasar_tutanagi_ve_fotograf_sisteme_islenir", "label": "Müşteri ve şoför ortak Hasar Tespit Tutanağı imzalar, fotoğrafla birlikte sisteme girilir; nakliyeciye/sigortaya rücu edilir", "allow_note": true, "is_other": false },
+        { "value": "nakliyeci_kendi_karsilar_faturadan_kesilir", "label": "Hasar bedeli nakliye şirketinin hakediş faturasından doğrudan mahsup edilir", "allow_note": true, "is_other": false },
+        { "value": "firmamiz_hasari_zarar_yazar", "label": "Küçük hasarlar şirket tarafından fire/zarar yazılır, büyük hasarlarda sigorta devreye sokulur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-021",
+      "process": "Kargo ve Kurye Entegrasyonu",
+      "order": 21,
+      "question": "Anlaşmalı kargo firmaları (Yurtiçi, Aras, MNG, DHL, UPS vb.) ile doğrudan yazılımsal ERP entegrasyonu kullanılıyor mu?",
+      "description": "Otomatik barkod alma, kargo takip numarası (Tracking No) ve durum sorgulama.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tam_api_entegrasyonu", "label": "Evet, irsaliye kesildiği anda kargo API'sinden kargo barkodu ve takip no çekilir, müşteriye SMS/E-posta ile iletilir", "allow_note": true, "is_other": false },
+        { "value": "kargo_portalina_excel_aktarimi", "label": "ERP'den sevk listesi Excel formatında alınıp kargo firmasının web portalına manuel yüklenir", "allow_note": true, "is_other": false },
+        { "value": "kargo_subesinde_manuel_islem", "label": "Kargo personeli geldiğinde kâğıt irsaliyeden manuel barkod basar", "allow_note": false, "is_other": false },
+        { "value": "kargo_kullanmiyoruz", "label": "Kargo veya kurye firmalarıyla çalışmıyoruz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-022",
+      "process": "Kargo ve Kurye Entegrasyonu",
+      "order": 22,
+      "question": "Müşterilere kargo takip numarası ve canlı sevkiyat durum bildirimleri (SMS, E-posta, WhatsApp) otomatik gönderiliyor mu?",
+      "description": "Müşteri teslimat bilgilendirme otomasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_otomatik_sms_ve_eposta_atar", "label": "Evet, ürün kargoya verildiğinde ve teslim edildiğinde müşteriye anlık bilgilendirme gider", "allow_note": false, "is_other": false },
+        { "value": "musteri_temsilcisi_sorulursa_manuel_iletir", "label": "Otomatik bildirim gitmez, müşteri bilgi isterse kargo portalından bakılıp söylenir", "allow_note": true, "is_other": false },
+        { "value": "musteri_bildirimi_yapilmaz", "label": "Müşteriye takip bildirimi iletilmemektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "LOG-021",
+        "operator": "not_equals",
+        "value": "kargo_kullanmiyoruz"
+      }
+    },
+    {
+      "id": "LOG-023",
+      "process": "Müşteri Özel Sevkiyat ve Teslimat Şartları",
+      "order": 23,
+      "question": "Müşterilerinizin (özellikle zincir marketler, ihracat alıcıları veya otomotiv ana sanayi) talep ettiği özel teslimat şartları nelerdir?",
+      "description": "Euro Palet standardı, palet etiketleri, maksimum palet yüksekliği, araç özellikleri (liftli kamyon, tenteli vb.).",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "ozel_etiket_ve_sscc_barkod", "label": "Müşteri özel sevkiyat koli/palet etiketi ve SSCC barkod formatı", "allow_note": false, "is_other": false },
+        { "value": "standart_euro_palet_ve_strecleme", "label": "Sadece onaylı standardında Euro palet (EPAL) ve köşe koruyuculu streçleme kuralı", "allow_note": false, "is_other": false },
+        { "value": "maksimum_palet_yukseklik_ve_agirlik_siniri", "label": "Rampa kısıtları nedeniyle palet başı maksimum yükseklik ve ağırlık sınırı", "allow_note": false, "is_other": false },
+        { "value": "arac_kasa_ozelligi", "label": "Liftli araç, frigorifik kasa veya tenteli/açık kasa zorunluluğu", "allow_note": false, "is_other": false },
+        { "value": "ozel_teslimat_sartimiz_yok", "label": "Özel bir teslimat şartı bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-024",
+      "process": "Müşteri Özel Sevkiyat ve Teslimat Şartları",
+      "order": 24,
+      "question": "Aynı müşterinin birden fazla teslimat adresi, şantiyesi veya deposu sisteme nasıl tanımlanmakta ve yönetilmektedir?",
+      "description": "Müşteri cari kartı altında çoklu teslimat adresleri (Ship-to Parties).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "ana_cari_altinda_coklu_teslimat_adresi_secilir", "label": "Evet, tek bir cari hesap altında onlarca teslimat adresi tanımlıdır; siparişte doğru sevk adresi seçilir", "allow_note": false, "is_other": false },
+        { "value": "her_adrese_ayri_alt_cari_kart_acilir", "label": "Her teslimat yeri için bağımsız alt müşteri cari kartı açılarak yönetilir", "allow_note": true, "is_other": false },
+        { "value": "siparis_aciklamasina_manuel_yazilir", "label": "Sistemde tek adres vardır, farklı teslimat yerleri sipariş notuna manuel yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-025",
+      "process": "Navlun ve Lojistik Maliyetleri Yönetimi",
+      "order": 25,
+      "question": "Nakliye ve navlun bedeli ticari olarak kim tarafından karşılanmaktadır (Teslim Şekilleri / Incoterms)?",
+      "description": "Navlun dahil satış, alıcı ödemeli teslimat veya fatura bedeline navlun yansıtılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "siparis_veya_musteri_bazinda_degisir", "label": "Değişken; bazı müşterilere navlun dahil (C-şartları/DAP), bazılarına alıcı ödemeli veya belirli sepet tutarı üstü ücretsiz sevk edilir", "allow_note": true, "is_other": false },
+        { "value": "her_zaman_firmasi_tarafindan_odenir", "label": "Tüm satışlarımız adrese teslimdir; navlunu her zaman firmamız karşılar ve ürün fiyatına dahildir", "allow_note": false, "is_other": false },
+        { "value": "her_zaman_alici_oder", "label": "Tüm sevkiyatlarda nakliye masrafı müşteriye aittir (Fabrika Teslim / Ex-Works)", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-026",
+      "process": "Navlun ve Lojistik Maliyetleri Yönetimi",
+      "order": 26,
+      "question": "Dış nakliyecilerden ve kargo firmalarından gelen navlun faturaları sevkiyat/sipariş bazında eşleştirilip doğrulanmakta mıdır?",
+      "description": "Nakliye faturası kontrolü (Freight Invoice Verification / 3-Way Match with Transportation Order).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_anlasmali_tarife_ile_otomatik_eslesir", "label": "Evet, nakliyeci faturası sistemdeki sevkiyat kaydı ve sözleşmeli tarife fiyatı ile otomatik karşılaştırılır", "allow_note": true, "is_other": false },
+        { "value": "lojistik_ve_muhasebe_manuel_kontrol_eder", "label": "Lojistik sorumlusu faturadaki sevk listelerini tek tek Excel'den kontrol edip onaylar", "allow_note": true, "is_other": false },
+        { "value": "toplu_kontrolsuz_odeme_yapilir", "label": "Ayrıntılı sevkiyat eşleştirmesi yapılmaz, nakliyecinin kestiği genel cari fatura onaylanıp ödenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-027",
+      "process": "Navlun ve Lojistik Maliyetleri Yönetimi",
+      "order": 27,
+      "question": "Gerçekleşen nakliye ve dağıtım maliyetleri sipariş veya ürün bazında kârlılık analizine (COPA) dağıtılmakta mıdır?",
+      "description": "Müşteri ve sipariş net kârlılığında lojistik maliyet payı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "siparis_ve_musteri_karliligina_tam_dagitilir", "label": "Evet, her teslimatın gerçek navlun payı ilgili satış siparişine maliyet yazılarak net sipariş kârlılığı ölçülür", "allow_note": true, "is_other": false },
+        { "value": "sadece_donemsel_genel_pazarlama_gideri_yazilir", "label": "Sipariş bazında dağıtılmaz, genel muhasebede 760 Pazarlama Satış Dağıtım giderine topluca atılır", "allow_note": false, "is_other": false },
+        { "value": "lojistik_maliyeti_karlilikta_izlenmez", "label": "Nakliye maliyetlerinin ürün/müşteri kârlılığına etkisi analiz edilmemektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-028",
+      "process": "Dış Kaynak Lojistik ve 3PL Yönetimi",
+      "order": 28,
+      "question": "Şirketiniz dış kaynak lojistik hizmet sağlayıcıları (3PL - Üçüncü Parti Lojistik Depo veya Dağıtım) kullanmakta mıdır?",
+      "description": "Harici 3PL depo ve dağıtım merkezi entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_3pl_depo_ve_dagitim_kullaniyoruz", "label": "Evet, belirli bölgelerdeki depolarımız ve dağıtımımız 3PL lojistik firmaları tarafından yürütülmektedir", "allow_note": true, "is_other": false },
+        { "value": "sadece_nakliye_icin_kullaniyoruz_depo_bizim", "label": "Depolama tamamen kendi bünyemizdedir; sadece nakliye/taşıma için lojistik firmaları kullanılır", "allow_note": false, "is_other": false },
+        { "value": "3pl_kullanmiyoruz_tum_operasyon_ic_kaynak", "label": "Hayır, hem depolama hem de sevkiyat tamamen kendi şirket kaynaklarımızla yönetilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-029",
+      "process": "Dış Kaynak Lojistik ve 3PL Yönetimi",
+      "order": 29,
+      "question": "3PL lojistik firması ile stok, sevk emri ve teslimat teyidi veri akışı nasıl sağlanmaktadır?",
+      "description": "EDI / Web Servis / API vs. Manuel Excel e-posta trafiği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_edi_api_arayuzu_ile", "label": "ERP'den sevk emirleri 3PL sistemine otomatik düşer; 3PL'in irsaliye ve teslim teyitleri ERP'ye anlık geri akar", "allow_note": true, "is_other": false },
+        { "value": "gunluk_excel_ve_eposta_ile", "label": "Sevk listeleri her sabah Excel ile e-posta atılır, gün sonunda gerçekleşenler yine Excel ile alınıp sisteme girilir", "allow_note": true, "is_other": false },
+        { "value": "3pl_in_kendi_portalindan_manuel_girilir", "label": "Personelimiz 3PL'in web ekranına girip siparişleri manuel açar", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "LOG-028",
+        "operator": "equals",
+        "value": "evet_3pl_depo_ve_dagitim_kullaniyoruz"
+      }
+    },
+    {
+      "id": "LOG-030",
+      "process": "İhracat Sevkiyatları ve Gümrük Çıkış Süreçleri",
+      "order": 30,
+      "question": "Yurtdışı (İhracat) sevkiyatlarınız var mı ve gümrükleme/konteyner yükleme süreçleri nasıl yürütülüyor?",
+      "description": "Gümrük beyannamesi, intaç tarihi, konteyner mühürleme ve gümrük müşaviri entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_duzenli_ihracat_gumruk_musaviri_ile", "label": "Evet, düzenli ihracatımız var; gümrük müşaviri ve nakliye acentesi ile entegre konteyner/tır sevkiyatları yapılır", "allow_note": true, "is_other": false },
+        { "value": "mikro_ihracat_hizli_kargo_ile", "label": "Sadece ETGB kapsamında mikro ihracat ve kargo gönderileri yapılır", "allow_note": true, "is_other": false },
+        { "value": "nadir_proje_bazli_ihracat", "label": "Yılda birkaç kez proje bazlı yurtdışı sevkiyatı yapılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "ihracatimiz_yok_sadece_yurtici", "label": "Hayır, sadece yurtiçi sevkiyat yapıyoruz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-031",
+      "process": "İhracat Sevkiyatları ve Gümrük Çıkış Süreçleri",
+      "order": 31,
+      "question": "İhracatta fiili çıkış tarihi (İntaç Tarihi / VEDOP kapanma) sisteme işlenerek KDV iadesi ve muhasebe kapatması nasıl yapılır?",
+      "description": "Gümrük çıkış beyannamesi (GBB/VEDOP) kapanış tarihi entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "gumruk_entegrasyonu_veya_musavir_ile_otomatik", "label": "Gümrük müşavirliği yazılımından fiili intaç tarihi ERP'ye otomatik akar ve kur farkı/KDV kaydı kapanır", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_vedoptan_sorgulayip_manuel_isler", "label": "Mali işler GİB VEDOP ekranından intaç tarihini sorgulayıp ERP'deki ihracat faturasına manuel yazar", "allow_note": true, "is_other": false },
+        { "value": "intac_takibi_yapilmaz_fatura_tarihi_esas", "label": "Fiili intaç tarihi sisteme işlenmez, fatura tarihi baz alınır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "LOG-030",
+        "operator": "not_equals",
+        "value": "ihracatimiz_yok_sadece_yurtici"
+      }
+    },
+    {
+      "id": "LOG-032",
+      "process": "Sevkiyat Güvenliği, Kantar ve Mühür Yönetimi",
+      "order": 32,
+      "question": "Sevkiyatta araç kantar tartımı (Dolu Kantar / Boş Kantar) yapılmakta ve tartım fişi sistemle entegre olmakta mıdır?",
+      "description": "Dökme yük veya paletli yüklerde kantar otomasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "kantar_cihazi_erp_ile_tam_entegre", "label": "Evet, araç kantara girdiğinde net ağırlık doğrudan ERP sevk irsaliyesi kalemine aktarılır", "allow_note": true, "is_other": false },
+        { "value": "ayri_kantar_programi_ciktisi_kullanilir", "label": "Kantarın ayrı bir PC yazılımı vardır, tartım fişi basılır ve irsaliyeye zımbalanır", "allow_note": true, "is_other": false },
+        { "value": "kantar_tartimi_yapilmaz", "label": "Ürünlerimiz adet/koli bazlıdır, kantar tartımına ihtiyaç duyulmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-033",
+      "process": "Sevkiyat Güvenliği, Kantar ve Mühür Yönetimi",
+      "order": 33,
+      "question": "Kamyon, tır kasası veya konteyner çıkışlarında güvenlik mühür numarası (Seal No) takibi yapılıyor mu?",
+      "description": "Mühür no'nun irsaliye ve çeki listesinde beyanı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "muhur_no_irsaliye_ve_gumruk_belgesine_yazilir", "label": "Evet, araç mühürlenir ve mühür numarası sisteme girilerek irsaliye/çeki listesine basılır", "allow_note": true, "is_other": false },
+        { "value": "sadece_ihracat_konteynerlerinde", "label": "Sadece yurtdışı deniz ve tır konteyner sevkiyatlarında mühür takılır", "allow_note": false, "is_other": false },
+        { "value": "muhur_takibi_yapilmaz", "label": "Mühür uygulamamız bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-034",
+      "process": "Sevkiyat Performansı, OTIF ve KPI'lar",
+      "order": 34,
+      "question": "Lojistik ve sevkiyat operasyonlarınızda hangi temel performans göstergeleri (KPI) düzenli ölçülmektedir?",
+      "description": "OTIF, gecikme günleri, taşıyıcı başarı oranı vb.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otif_tam_ve_zamaninda_teslimat", "label": "OTIF (On-Time In-Full — Zamanında ve Eksiksiz Teslimat Oranı)", "allow_note": false, "is_other": false },
+        { "value": "sevkiyat_gecikme_suresi", "label": "Ortalama Sevkiyat Gecikme Süresi", "allow_note": false, "is_other": false },
+        { "value": "teslimat_basari_orani", "label": "İlk Seferde Başarılı Teslimat Oranı", "allow_note": false, "is_other": false },
+        { "value": "sevkiyat_ve_koli_basi_maliyet", "label": "Koli / Palet / Sefer Başına Ortalama Nakliye Maliyeti", "allow_note": false, "is_other": false },
+        { "value": "tasiyici_ve_sofor_performansi", "label": "Taşıyıcı / Kargo Firması Performans ve Şikayet Oranı", "allow_note": false, "is_other": false },
+        { "value": "hasarli_ve_hatali_teslimat_orani", "label": "Sevkiyatta Hasar ve Eksik Malzeme Oranı", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-035",
+      "process": "Sevkiyat Performansı, OTIF ve KPI'lar",
+      "order": 35,
+      "question": "Söz verilen teslim tarihi (Commitment Date) ile fiili teslim tarihi arasındaki sapmaların nedenleri sistemde kategorize edilip raporlanıyor mu?",
+      "description": "Gecikme kök neden analizi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "gecikme_neden_kodlari_zorunlu_girilir", "label": "Evet, geciken her sevkiyatta standart bir neden kodu seçilir ve raporlanır", "allow_note": true, "is_other": false },
+        { "value": "manuel_aylik_toplantida_konusulur", "label": "Sistemde neden kodu yoktur, gecikmeler aylık operasyon toplantısında Excel'den konuşulur", "allow_note": false, "is_other": false },
+        { "value": "gecikme_nedenleri_olculmez", "label": "Gecikme nedenleri analiz edilmemektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-036",
+      "process": "Sevkiyat Performansı, OTIF ve KPI'lar",
+      "order": 36,
+      "question": "Müşterilere sevkiyat sonrasında otomatik 'Lojistik ve Teslimat Memnuniyet Anketi' gönderilmekte midir?",
+      "description": "Müşteri teslimat deneyimi ölçümü (CSAT / NPS).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "sistem_otomatik_memnuniyet_anketi_atar", "label": "Evet, teslimat tamamlandığında müşteriye SMS/E-posta ile 1-5 puanlık teslimat değerlendirme linki gider", "allow_note": true, "is_other": false },
+        { "value": "musteri_hizmetleri_orneklem_arama_yapar", "label": "Müşteri temsilcileri belirli müşterileri telefonla arayarak teslimat durumunu sorar", "allow_note": false, "is_other": false },
+        { "value": "teslimat_anketi_uygulanmiyor", "label": "Lojistik memnuniyet anketi yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "LOG-037",
+      "process": "İade Alım ve Müşteriden Toplama Lojistiği",
+      "order": 37,
+      "question": "Müşteriden arızalı, fazla veya iade malzemelerin kendi aracınız veya anlaşmalı nakliyeci ile aldırılması (Toplama / Pickup Emri) nasıl organize edilir?",
+      "description": "Müşteriden mal toplama emri ve taşıyıcı koordinasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemden_tasiyiciya_otomatik_toplama_emri_gider", "label": "Sistemde onaylanan İade Talebinden kargo/nakliyeciye otomatik 'Adresten Alım / Pickup Emri' iletilir", "allow_note": true, "is_other": false },
+        { "value": "sevkiyat_ekibi_donus_aracina_yukletir", "label": "Bölgeye mal götüren kendi aracımızın dönüş yükü olarak müşteriden aldırılır", "allow_note": true, "is_other": false },
+        { "value": "musteri_kendisi_gonderir_biz_karismayiz", "label": "Müşteri kendi ayarladığı kargo veya ambarla gönderir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

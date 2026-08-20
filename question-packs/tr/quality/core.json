@@ -1,0 +1,1555 @@
+{
+  "meta": {
+    "pack_id": "tr.quality.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "QUALITY",
+    "name": "Kalite Kontrol Ön Analizi",
+    "description": "Kalite organizasyonu ve sorumluluk matrisi, ürün ve operasyon bazlı kalite kontrol planları, teknik resim ve revizyon uyumu, giriş kalite kontrol (IQC) ve dinamik muayene seviyeleri (Skip-lot), proses/ara kalite kontrol (IPQC) ve ilk parça onayı (FAI), final ve sevk öncesi kalite kontrol (FQC/OQC), istatistiksel numune alma standartları (AQL / ISO 2859), boyutsal/kimyasal/fiziksel kontrol kriterleri ve tolerans limitleri, sayısal ölçüm verisi kaydı ve tolerans aşım alarmları, kalite kabul/red ve stok serbest bırakma (Release) mekanizması, şartlı kabul (Concession/Deviation) onayları, uygunsuzluk yönetimi ve hata kodları, sistemik NCR (Non-Conformance Report) takibi, karantina alanı ve disposition kararları, yeniden işleme (Rework) ve tamir iş emirleri, hurda (Scrap) ve imha maliyetleri, kök neden analizi metodolojileri (5 Why, Balık Kılçığı, 8D), CAPA (Düzeltici ve Önleyici Faaliyet) yönetimi ve etkinlik doğrulaması, ölçüm cihazları ve kalibrasyon geçerlilik denetimi, kalite sonuçlarının Lot/Seri izlenebilirliği, Analiz Sertifikası (CoA / CoC) üretimi, İlk Seferde Doğru Oranı (FPY), PPM hata oranları, Kötü Kalite Maliyeti (COPQ) ve kalite yönetim kokpiti süreçlerinin AS-IS durumunu ve ERP/QMS gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "QLT-001",
+      "process": "Kalite Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde kalite kontrol ve güvence faaliyetleri (Giriş muayenesi, Proses kontrolleri, Laboratuvar testleri, Final kontrol, Belgelendirme) hangi organizasyonel yapıda ve ekip sorumluluğunda yürütülmektedir?",
+      "description": "Kalite departmanı yapısı, bağımsız denetim gücü ve organizasyonel olgunluk.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "uretimden_bagimsiz_ayri_bir_kalite_kontrol_ve_guvence_departmani_vardir",
+          "label": "Üretimden bağımsız ayrı bir Kalite Departmanı (Giriş, Proses, Final ve QMS uzmanları) tarafından yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_veya_depo_personeli_kendi_yaptigi_isi_kontrol_eder_ayri_ekip_yoktur",
+          "label": "Ayrı bir kalite ekibi yoktur; üretimi yapan operatör veya depocu temel göz kontrolünü kendisi yapar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_laboratuvar_veya_teknik_mudur_ihtiyac_oldukca_numune_bakar",
+          "label": "Rutin kontrol ekibi yoktur; sadece problem çıktığında veya müşteri istediğinde teknik yönetici numune inceler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-002",
+      "process": "Kalite Organizasyonu",
+      "order": 2,
+      "question": "Kalite kontrol personelinin vardiya düzeni, fabrika içi yetki matrisi (Üretimi veya sevkiyatı durdurma yetkisi) ve onay sınırları sistemde tanımlı mıdır?",
+      "description": "Kalite yetki matrisi, hattı durdurma yetkisi (Line Stop Authority) ve vardiya kapsamı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kalite_ekibinin_uretimi_ve_sevkıyatı_resmi_durdurma_yetkisi_ve_vardiya_plani_vardir",
+          "label": "Evet; kalite teknisyeni uygunsuzluk anında hattı durdurma ve sevkiyatı kilitleme tam yetkisine sahiptir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_ekibi_uyari_verir_ancak_durdurma_yetkisi_fabrika_veya_uretim_mudurundedir",
+          "label": "Kalite personeli hata bulsa bile hattı veya sevkiyatı durduramaz; son karar üretim yöneticisindedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yetki_matrisi_veya_resmi_durdurma_kurali_tanimli_degildir",
+          "label": "Resmi bir kalite yetki matrisi veya durdurma kuralı tanımlı değildir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-003",
+      "process": "Kalite Planları ve Kontrol Spesifikasyonları",
+      "order": 3,
+      "question": "Malzemeler, yarı mamuller ve bitmiş ürünler için hangi aşamada hangi kontrollerin yapılacağını belirleyen Kalite Kontrol Planları (Inspection Plans) sistemde tanımlı mıdır?",
+      "description": "Kalite kontrol planı, ürün bazlı kontrol adımları ve test spesifikasyonları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "malzeme_ve_operasyon_bazinda_parametre_ve_tolerans_iceren_kontrol_planlari_tanimlidir",
+          "label": "Evet; ERP/QMS içinde her ürünün giriş, operasyon ve final kontrol kriterleri ve toleransları tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kontrol_planlari_excel_veya_teknik_dokuman_olarak_klasorde_tutulur",
+          "label": "Planlar vardır fakat sistemik değildir; kalite masalarında asılı kağıt formlarda veya Excel'de tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tanimlanmis_resmi_bir_kalite_kontrol_plani_bulunmamaktadir",
+          "label": "Resmi bir kontrol planı yoktur; kontrolü yapan kişinin mesleki tecrübesine ve göz kararına göre bakılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-004",
+      "process": "Kalite Planları ve Kontrol Spesifikasyonları",
+      "order": 4,
+      "question": "Ürün revizyonları, mühendislik değişiklikleri (ECO/ECN) veya teknik resim güncellemeleri kalite kontrol kriterlerine anlık olarak yansıtılmakta mıdır?",
+      "description": "Revizyon uyumu, teknik resim bağlantısı ve mühendislik değişikliği (ECO) entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "revizyon_ve_teknik_resim_degisiklikleri_kalite_kontrol_planina_otomatik_baglidir",
+          "label": "Evet; teknik resim veya BOM revizyonu değiştiğinde kalite kontrol ekranındaki kriterler otomatik güncellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muhendislik_degisiklikleri_kaliteye_eposta_ile_bildirilir_manuel_guncellenir",
+          "label": "Entegrasyon yoktur; AR-GE/Mühendislik ekibi e-posta atar, kalite sorumlusu kontrol formunu elle revize eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "revizyon_veya_teknik_resim_takibi_yapilamamaktadir",
+          "label": "Revizyon takibi yapılamaz; eski teknik resme veya eski toleranslara göre kontrol yapılması riski vardır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-005",
+      "process": "Giriş Kalite Kontrol",
+      "order": 5,
+      "question": "Tedarikçilerden gelen hammadde, yardımcı malzeme ve ticari malların mal kabulü sırasında Giriş Kalite Kontrol (IQC - Incoming Quality Control) süreci işletilmekte midir?",
+      "description": "Giriş kalite kontrol varlığı, kontrol kapsamı ve mal kabul entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_veya_belirlenmis_kritik_hammaddeler_giris_kalite_kontrolunden_gecer",
+          "label": "Evet; satın alma siparişine bağlı gelen malzemeler kontrol edilip onaylanmadan kullanıma açılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_irsaliye_miktar_ve_paket_hasar_kontrolu_yapilir_teknik_muayene_yoktur",
+          "label": "Sadece depocu koli sayısını ve dış hasarı kontrol eder; teknik ölçüm veya laboratuvar testi yapılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "giris_kalite_kontrol_yapilmamaktadir",
+          "label": "Şirketimizde giriş kalite kontrol süreci uygulanmamaktadır; gelen mal doğrudan üretime/stoka alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-006",
+      "process": "Giriş Kalite Kontrol",
+      "order": 6,
+      "question": "Giriş kalite kontrolde tedarikçinin geçmiş performansına ve ürün riskine göre Dinamik Muayene Seviyeleri (Normal, Sıkılaştırılmış, İndirgenmiş / Skip-lot) uygulanmakta mıdır?",
+      "description": "Dinamik kalite seviyesi, tedarikçi güven derecesi ve skip-lot muayene kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "QLT-005",
+        "operator": "not_equals",
+        "value": "giris_kalite_kontrol_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "tedarikci_performansina_gore_sistem_muayene_seviyesini_otomatik_belirler",
+          "label": "Evet; güvenilir tedarikçide Skip-lot (her 5 partide 1 kontrol), sorunlu tedarikçide %100 sıkı kontrol açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_zaman_ayni_sabit_oranda_veya_sabit_numune_sayisiyla_kontrol_edilir",
+          "label": "Tedarikçiye göre değişmez; gelen her partiden standart olarak aynı sayıda numune alınıp bakılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dinamik_muayene_veya_skip_lot_kullanilmamaktadir",
+          "label": "Dinamik muayene veya seviyelendirme uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-007",
+      "process": "Proses / Ara Kontrol",
+      "order": 7,
+      "question": "Üretim ve montaj aşamalarında operasyon bazlı Proses / Ara Kalite Kontrol (IPQC - In-Process Quality Control) ve istasyon kontrolleri yapılmakta mıdır?",
+      "description": "Hat içi ara kontrol, operasyon onayları ve üretim esnası testler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "is_emri_ve_operasyon_bazinda_sistemik_ara_kalite_onaylari_zorunludur",
+          "label": "Evet; belirlenen kritik operasyonlarda kalite onayı verilmeden iş emri bir sonraki istasyona ilerleyemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operatorler_ara_olcumleri_yapar_ancak_sisteme_kaydetmez_kendi_aralarinda_bakar",
+          "label": "Operatörler kumpas/mikrometre ile kontrol eder fakat sistemik onay kısıtı veya kayıt zorunluluğu yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proses_kalite_kontrol_yapilmamaktadir",
+          "label": "Üretim sırasında ara kalite kontrol yapılmaz; yalnızca en son bitmiş ürüne bakılır veya hiç bakılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-008",
+      "process": "Proses / Ara Kontrol",
+      "order": 8,
+      "question": "Yeni bir iş emri veya kalıp/ayar başlangıcında İlk Parça Onayı (First Article Inspection - FAI / Ayar Onayı) süreci işletilmekte midir?",
+      "description": "İlk parça kontrolü (FAI), kalıp/ayar doğrulama ve seri üretime başlama onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "QLT-007",
+        "operator": "not_equals",
+        "value": "proses_kalite_kontrol_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "ilk_parca_kalite_tarafindan_olculup_sistemden_onaylanmadan_seri_uretime_gecilemez",
+          "label": "Evet; makine ayarından sonra üretilen ilk parça onaylanmadan iş emrinin seri üretimine izin verilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ayar_onayi_usta_veya_operator_tarafindan_sozlu_verilir_kayit_tutulmaz",
+          "label": "Usta veya vardiya amiri parçayı kontrol edip 'Tamam çalıştır' der; sistemik FAI kaydı tutulmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ilk_parca_onayi_fai_uygulanmamaktadir",
+          "label": "İlk parça onayı veya ayar kontrol süreci uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-009",
+      "process": "Final Kalite Kontrol",
+      "order": 9,
+      "question": "Üretimi tamamlanan bitmiş mamullerin depoya aktarımı ve müşteriye sevk edilmesinden önce Final Kalite Kontrol (FQC / OQC - Outgoing Quality Control) testi yapılmakta mıdır?",
+      "description": "Son kontrol, sevk öncesi muayene, paketleme/etiketleme kontrolleri ve ürün kabulü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bitmis_tum_mamuller_final_kontrol_ve_fonksiyon_testinden_gecerek_onaylanir",
+          "label": "Evet; üretim bitiminde görsel, boyutsal ve elektriksel/fonksiyonel testler tamamlanıp final onay verilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_ambalaj_etiket_ve_koli_adeti_kontrol_edilir",
+          "label": "Teknik son test yapılmaz; yalnızca doğru etiket ve koli adedi kontrol edilip depoya aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "final_kalite_kontrol_yapilmamaktadir",
+          "label": "Şirketimizde final kalite kontrol süreci uygulanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-010",
+      "process": "Final Kalite Kontrol",
+      "order": 10,
+      "question": "Final kalite kontrol onayı almamış veya test sonucu 'Red' olan ürünlerin müşteriye İrsaliye/Sevkiyat yapılması sistem üzerinden engellenmekte midir?",
+      "description": "Kalite onaysız mamul sevkiyat kilit mekanizması ve blokaj kuralı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "QLT-009",
+        "operator": "not_equals",
+        "value": "final_kalite_kontrol_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "kalite_onaysiz_veya_redli_urunlerin_irsaliyesi_ve_sevkiyati_kesinlikle_engellenir",
+          "label": "Evet; sistem final onay statüsü 'Kabul' olmayan hiçbir palet veya lotun çeki listesine girmesine izin vermez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistem_uyari_verir_ancak_sevkiyatci_uyariyi_gecip_irsaliye_kesebilir",
+          "label": "Sistem uyarı gösterir fakat irsaliye basımını kilitlemez; acil sevkiyat durumunda redli ürün sevk edilebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_onay_durumu_sevkiyatta_denetlenmemektedir",
+          "label": "Sevkiyat sırasında kalite onay durumu kontrol edilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-011",
+      "process": "Numune Alma",
+      "order": 11,
+      "question": "Kalite kontrollerde partiden kaç adet numune alınacağı (Numune Büyüklüğü) hangi yöntemle (AQL / ISO 2859 İstatistiksel Tablo, Yüzde Oranı, Sabit Adet, %100 Muayene) belirlenmektedir?",
+      "description": "Numune alma standardı (Sampling Standard), AQL kurgusu ve parti kabul kriterleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "uluslararasi_aql_iso2859_standartlarina_gore_parti_hacminden_otomatik_hesaplanir",
+          "label": "Evet; parti büyüklüğüne göre ISO 2859 / AQL Seviye II tablosundan numune adedi ve kabul/red sayısı belirlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "parti_miktarinin_sabit_yuzdesi_veya_sabit_adet_numune_alinir",
+          "label": "AQL kullanılmaz; her partiden sabit (Örn. her kutudan 3 adet veya partinin %5'i) numune alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "numune_sayisi_kontrolu_yapan_kisinin_inisiyatifindedir",
+          "label": "Standart kural yoktur; kontrolör o an gözüne çarpan 1-2 parçaya bakar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-012",
+      "process": "Numune Alma",
+      "order": 12,
+      "question": "Üretilen veya satın alınan ürünler arasında numune alma yerine %100 Kontrol (Tüm parçaların tek tek muayenesi / Poka-Yoke / Kamera Kontrolü) gerektiren kritik ürünler var mıdır?",
+      "description": "%100 muayene gereksinimi, güvenlik kritik parçalar ve otomatik optik/kamera kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kritik_ve_guvenlik_parcalarinda_yuzde100_manuel_veya_otomatik_kamera_kontrolu_vardir",
+          "label": "Evet; kritik parçalar %100 boyutsal veya kamera kontrolünden geçer, her parçanın test kaydı oluşur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_urunlerde_sadece_numune_kontrolu_yapilir_yuzde100_kontrol_yoktur",
+          "label": "%100 kontrol yapılmaz; tüm ürün gruplarında yalnızca örnekleme/numune yöntemi kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yuzde100_kontrol_ihtiyaci_veya_kurali_bulunmamaktadir",
+          "label": "%100 kontrol ihtiyacı veya kuralı bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-013",
+      "process": "Ölçüm ve Kontrol Kriterleri",
+      "order": 13,
+      "question": "Kalite kontrol süreçlerinde hangi tip kontrol kriterleri (Boyutsal Ölçümler, Kimyasal/Laboratuvar Analizleri, Görsel/Estetik Kusurlar, Mekanik/Çekme Testleri, Fonksiyonel/Elektriksel Testler) incelenmektedir?",
+      "description": "Kontrol karakteristikleri tipleri (Değişken / Niteliksel - Variable vs Attribute).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hem_sayisal_olcumler_boyut_agirlik_sertlik_hem_niteliksel_gorsel_fonksiyonel_kriterler_birlikte_izlenir",
+          "label": "Evet; boyutsal ölçümler, laboratuvar/kimyasal değerler ve görsel/kusur kriterleri yapısal olarak kontrol edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_gorsel_ve_fiziksel_gozle_muayene_yapilir_sayisal_olcum_azdir",
+          "label": "Laboratuvar veya hassas ölçüm yoktur; yalnızca çizik, renk ve dış görünüş gibi gözle kontroller yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "olcum_kriterleri_standartlastirilmamistir",
+          "label": "Ölçüm kriterleri standartlaştırılmamıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-014",
+      "process": "Ölçüm ve Kontrol Kriterleri",
+      "order": 14,
+      "question": "Ölçüm cihazlarından (Dijital Kumpas, Mikrometre, CMM Koordinat Ölçüm Cihazı, Spektrometre, Terazi) ölçüm verileri sisteme otomatik (RS232/USB/IoT API) aktarılmakta mıdır?",
+      "description": "Cihaz entegrasyonu, otomatik veri toplama ve manuel giriş hatalarının engellenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "olcum_cihazlarindan_veriler_kablo_veya_iot_ile_kalite_ekranina_otomatik_duser",
+          "label": "Evet; dijital kumpas veya CMM cihazındaki butona basıldığında ölçülen değer anında sisteme aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "olcum_cihazindan_okunan_deger_operator_tarafindan_klavyeyle_manuel_girilir",
+          "label": "Cihaz bağlantısı yoktur; operatör ekrandaki veya göstergedeki değeri görüp klavyeyle sisteme yazar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sayisal_olcum_verisi_sisteme_kaydedilmemektedir",
+          "label": "Ölçüm verileri sisteme girilmez; kağıda yazılır veya hiç kaydedilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-015",
+      "process": "Tolerans ve Kabul Limitleri",
+      "order": 15,
+      "question": "Kalite kontrol kriterlerinde Hedef Değer (Nominal), Alt Tolerans (USL) ve Üst Tolerans (LSL) limitleri sistemde tanımlı mıdır ve girilen ölçüm sonucu toleransla otomatik karşılaştırılmakta mıdır?",
+      "description": "Sayısal tolerans limitleri (Nominal, Min, Max), tolerans denetimi ve otomatik uygunluk kararı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "nominal_ve_tolerans_limitleri_tanimlidir_olcum_girildiginde_sistem_uygunlugu_otomatik_hesaplar",
+          "label": "Evet; ölçülen değer girildiği an sistem Min/Max limitlerine bakar ve 'Uygun' veya 'Tolerans Dışı' kararını verir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "toleranslar_teknik_resimde_vardir_ancak_sistemde_yoktur_uygunluk_kararini_kisi_verir",
+          "label": "Sistemde sadece 'Geçti/Kaldı' seçilir; kişi teknik resimdeki toleransa bakıp uygunluğa kendisi karar verir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sayisal_olcum_ve_tolerans_takibi_yapilmamaktadir",
+          "label": "Sayısal ölçüm veya tolerans takibi yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-016",
+      "process": "Tolerans ve Kabul Limitleri",
+      "order": 16,
+      "question": "Tolerans dışı (Out of Specification) bir ölçüm girildiğinde sistem anında sesli/görsel alarm vermekte ve partiyi otomatik 'Şüpheli / Red' durumuna kilitlemekte midir?",
+      "description": "Spesifikasyon dışı durum alarmları, otomatik şartlı kilit ve hatalı partinin ilerlemesinin önlenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "QLT-015",
+        "operator": "not_equals",
+        "value": "sayisal_olcum_ve_tolerans_takibi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "tolerans_asildiginda_ekran_kirmizi_uyari_verir_ve_parti_otomatik_kilitlenir",
+          "label": "Evet; tolerans dışı değer girildiğinde sistem kabul butonunu kilitler ve partiyi otomatik karantinaya çeker",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tolerans_asilsa_bile_kontrolor_isterse_manuel_kabul_verebilir",
+          "label": "Sistem uyarı gösterse de kilit koymaz; kontrolör inisiyatif kullanarak partiyi 'Kabul' seçebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tolerans_asimi_alarmi_bulunmamaktadir",
+          "label": "Tolerans aşımı alarmı veya kilit mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-017",
+      "process": "Kalite Sonucu ve Serbest Bırakma",
+      "order": 17,
+      "question": "Kalite kontrol sonucunda verilen kullanım kararları (Kabul - Unrestricted Use, Red - Blocked, Şartlı Kabul - Concession, Tedarikçiye İade, Hurda) sistemde stok statüsünü doğrudan değiştirmekte midir?",
+      "description": "Kullanım kararı (Usage Decision), stok statüsü değişimi (Kalite Kontrol Stok -> Kullanılabilir Stok).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kullanim_karari_verildigi_an_stok_statu_ve_lokasyonu_sistemde_otomatik_degisir",
+          "label": "Evet; 'Kabul' verilince stok serbest kalır, 'Red' verilince bloke stoğa çekilir ve tüketime kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_karari_sadece_metin_olarak_kalir_stok_transferi_depocu_tarafindan_elle_yapilir",
+          "label": "Sistemik otomatik geçiş yoktur; kalite onay verir, depocu gidip malı manuel olarak kullanılabilir stoka taşır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "stok_kalite_kontrol_statu_ayrimi_yoktur_tum_stok_her_an_kullanilabilir",
+          "label": "Stokta kalite statü ayrımı yoktur; depoya giren her mal kalite kararı beklenmeden tüketilebilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-018",
+      "process": "Kalite Sonucu ve Serbest Bırakma",
+      "order": 18,
+      "question": "Hafif tolerans dışı malzemeler için Şartlı Kabul / Sapma Onayı (Concession / Deviation Permit) verilirken hangi onay mekanizması (Mühendislik, Kalite Müdürü, Üretim Müdürü, Müşteri Onayı) işletilmektedir?",
+      "description": "Şartlı kabul (Concession) onay hiyerarşisi ve sapma izin süreçleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sapma_turu_ve_nedeni_kaydedilerek_kalite_ve_muhendislik_coklu_onayi_ile_verilir",
+          "label": "Evet; sapma gerekçesi girilir, Kalite Müdürü + Üretim/AR-GE ortak onayı ile şartlı kabul verilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_ilgili_kontrolor_veya_usta_kendi_inisiyatifiyle_kabul_eder",
+          "label": "Sistemik iş akışı yoktur; kontrolör veya vardiya ustası 'Bu partiyi kullanırız' diyerek geçirir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sartli_kabul_mekanizmasi_kullanilmamaktadir_ya_tam_kabul_ya_tam_red_yapilir",
+          "label": "Şartlı kabul uygulanmaz; toleransa uymayan malzeme doğrudan reddedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-019",
+      "process": "Uygunsuzluk Yönetimi",
+      "order": 19,
+      "question": "Fabrika içinde (Giriş kontrol, Üretim hatları, Depo, Sevkiyat) tespit edilen kalite uygunsuzlukları ve müşteri iadeleri nasıl kayıt altına alınmakta ve izlenmektedir?",
+      "description": "Uygunsuzluk tespit noktaları, bildirim kanalları ve merkezi uygunsuzluk kütüğü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_uygunsuzluklar_merkezi_erp_qms_sisteminde_tekil_kayit_olarak_acilip_takip_edilir",
+          "label": "Evet; nerede çıkarsa çıksın uygunsuzluk kaynağı, tespit eden, ürün ve miktar detaylarıyla anlık kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uygunsuzluklar_excel_tablosunda_veya_aylik_kalite_formunda_tutulur",
+          "label": "Sistemik kayıt yoktur; kalite birimi aylık Excel tablosuna uygunsuzlukları elle işler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uygunsuzluklar_sozlu_iletilir_resmi_bir_kayit_tutulmaz",
+          "label": "Resmi kayıt tutulmaz; hatta çıkan hatalar anlık olarak ustaya söylenir ve düzeltilmeye çalışılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-020",
+      "process": "Uygunsuzluk Yönetimi",
+      "order": 20,
+      "question": "Müşterilerden gelen kalite şikâyetleri ve iadeler (RMA / Müşteri Uygunsuzluğu) ile fabrika içi kalite ve üretim süreçleri arasında çift yönlü izlenebilirlik bağı kurulabilmekte midir?",
+      "description": "Müşteri şikâyeti - fabrika içi uygunsuzluk köprüsü ve iade analiz entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "musteri_sikayeti_ilgili_lot_is_emri_ve_kalite_raporuyla_sistemde_birebir_eslesir",
+          "label": "Evet; müşteri şikâyet kaydı açıldığında partinin üretim iş emri, operatörü ve test verisi anında çekilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_sikayetleri_crmde_ayri_kalite_analizi_excelde_ayri_tutulur_kopuktur",
+          "label": "İki taraf kopuktur; satış ekibi CRM'de şikâyet açar fakat kalitenin inceleme raporuyla sistemik bağı yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_kalite_sikayetleri_sistemde_izlenmemektedir",
+          "label": "Müşteri kalite şikâyetleri sistemik olarak izlenmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-021",
+      "process": "NCR / Non-Conformance",
+      "order": 21,
+      "question": "Kalite uygunsuzlukları için sistem üzerinden benzersiz numaraya sahip resmi Uygunsuzluk Raporu (NCR - Non-Conformance Report) açılmakta mıdır?",
+      "description": "NCR dokümantasyonu, benzersiz numara üretimi ve uygunsuzluk yaşam döngüsü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemden_otomatik_numarali_ncr_karti_acilir_ve_cozum_sureci_is_akisiyla_yonetilir",
+          "label": "Evet; her uygunsuzluk için sistemden NCR numarası oluşur; sorumlu, miktar ve aksiyon adımları izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_cok_buyuk_hatalarda_veya_musteri_istediginde_word_formatinda_ncr_yazilir",
+          "label": "Sistemik NCR yoktur; yalnızca büyük krizlerde Word/PDF formatında NCR tutanağı tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ncr_kaydi_acilmamaktadir",
+          "label": "Şirketimizde resmi NCR (Uygunsuzluk Raporu) süreci uygulanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-022",
+      "process": "NCR / Non-Conformance",
+      "order": 22,
+      "question": "NCR kayıtlarında standart Hata Kodları (Defect Codes / Kusur Kataloğu — Örn. Çapak, Çatlak, Ölçü Kaçıklığı, Yanlış Etiket) kullanılmakta ve tekrarlayan hatalar raporlanabilmekte midir?",
+      "description": "Standart hata kataloğu (Defect Catalog), kusur ağacı ve tekrarlayan hata analizi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "QLT-021",
+        "operator": "not_equals",
+        "value": "ncr_kaydi_acilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "standart_hata_katalogu_vardir_ve_en_cok_tekrarlayan_hata_turleri_pareto_ile_izlenir",
+          "label": "Evet; hata kodları standarttır; hangi kusur tipinin ne sıklıkla çıktığı Pareto grafikleriyle raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hata_nedeni_serbest_metin_olarak_yazilir_standart_kod_listesi_yoktur",
+          "label": "Standart kodlama yoktur; personelin kendi ifadesiyle serbest metin olarak yazılır, raporlanması zordur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hata_kodu_siniflandirmasi_yapilmamaktadir",
+          "label": "Hata kodu sınıflandırması yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-023",
+      "process": "Karantina ve Disposition",
+      "order": 23,
+      "question": "Uygunsuz bulunan veya şüpheli görülen malzemeler için Karantina Kararı (Disposition: Karantinaya Al, İncele, Tedarikçiye İade, Hurdaya Ayır, Yeniden İşle) nasıl verilmekte ve uygulanmaktadır?",
+      "description": "Karantina disposition süreci, malzeme akıbet kararları ve fiziksel/sistemsel izolasyon.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kalite_kurulu_veya_yetkili_tarafindan_sistemden_disposition_karari_secilir_ve_uygulanir",
+          "label": "Evet; sistem üzerinden karantina kararı verilir, malzeme fiziksel ve sistemsel olarak kullanıma kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "malzemenin_uzerine_kirmizi_etiket_yapistirilir_ancak_sistemde_kilitlenmez",
+          "label": "Fiziksel kırmızı etiket yapıştırılır fakat ERP sisteminde stok serbest görünmeye devam eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "karantina_veya_disposition_sureci_bulunmamaktadir",
+          "label": "Karantina veya resmi disposition süreci bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-024",
+      "process": "Karantina ve Disposition",
+      "order": 24,
+      "question": "Karantinaya alınan malzemelerin fiziki Karantina Depo / Raf Lokasyonuna transferi ve sistemik blokajı eş zamanlı olarak otomatik gerçekleşmekte midir?",
+      "description": "Karantina depo lokasyon entegrasyonu ve stok kilit garantisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "red_karari_verildiginde_stok_otomatik_olarak_karantina_adresine_tasinir_ve_kilitlenir",
+          "label": "Evet; sistem otomatik transfer fişi üretir, mal karantina rafına çekilmeden başka işlem yapılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziki_olarak_ayri_alana_konur_ancak_sistemde_lokasyon_transferi_yapilmaz",
+          "label": "Fiziken köşeye ayrılır fakat sistemde ana ambarda görünmeye devam eder, elle transfer gerekir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "karantina_lokasyon_takibi_yapilamamaktadir",
+          "label": "Karantina lokasyon takibi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-025",
+      "process": "Yeniden İşleme / Rework",
+      "order": 25,
+      "question": "Uygunsuz ürünlerin düzeltilmesi için Yeniden İşleme / Tamir (Rework / Repair) kararı verildiğinde, bu işlem için özel bir Rework İş Emri açılmakta ve ek işçilik/malzeme maliyeti takip edilmekte midir?",
+      "description": "Rework iş emirleri, yeniden işleme operasyonları ve ek maliyetlerin ayrıştırılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ayri_rework_is_emri_acilir_ek_iscilik_ve_malzeme_harcamasi_urunun_maliyetine_yansir",
+          "label": "Evet; sistemde Rework tipi iş emri açılır, düzeltme için harcanan süre ve fireler tam izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ayri_is_emri_acilmaz_ana_is_emri_uzerinde_gayriresmi_olarak_duzeltilir",
+          "label": "Sistemik rework iş emri yoktur; operatör hattan alıp kenarda düzeltir, ek işçilik maliyeti görünmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yeniden_isleme_rework_uygulanmamaktadir_hatali_urun_dogrudan_hurdaya_cikar",
+          "label": "Şirketimizde yeniden işleme uygulanmaz; hatalı ürünler tamir edilmeden doğrudan hurdaya ayrılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-026",
+      "process": "Yeniden İşleme / Rework",
+      "order": 26,
+      "question": "Yeniden işlenen (Rework gören) ürünler tamamlandıktan sonra zorunlu olarak Yeniden Kalite Muayenesine (Re-Inspection) tabi tutulmakta mıdır?",
+      "description": "Rework sonrası yeniden muayene zorunluluğu ve ikinci onay döngüsü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "rework_sonrasi_kalite_onayi_alinmadan_urunun_serbest_stoga_gecisi_engellenir",
+          "label": "Evet; tamir edilen parça tekrar kalite muayenesine girer, onay almadan kullanılabilir stoka geçemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tamiri_yapan_operatorun_onayiyla_dogrudan_ambalaja_veya_sevkiyata_verilir",
+          "label": "Kaliteye tekrar gitmez; tamiri yapan usta 'Oldu' dediğinde doğrudan sevkiyata veya stoka gönderilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yeniden_muayene_sureci_bulunmamaktadir",
+          "label": "Yeniden muayene süreci bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-027",
+      "process": "Hurda ve Şartlı Kabul",
+      "order": 27,
+      "question": "Düzeltilemeyecek durumdaki ürünlerin Hurdaya Ayrılması (Scrap / İmha) kararı nasıl verilmekte, hurda yetki limitleri ve hurda onay iş akışı nasıl işletilmektedir?",
+      "description": "Hurda kararı yetki sınırları, imha tutanağı ve hurda onay hiyerarşisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hurda_tutari_ve_miktarina_gore_sistemden_kalite_ve_fabrika_muduru_onay_is_akisi_vardir",
+          "label": "Evet; hurda nedeni girilir, tutar limitine göre Kalite Müdürü -> Fabrika Müdürü onayıyla hurdaya çıkar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziki_hurda_tutanagi_imzalanir_ay_sonunda_muhasebeye_toplu_iletilir",
+          "label": "Sistemik iş akışı yoktur; kağıt tutanak imzalanır, ay sonunda muhasebe stoktan elle düşer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "resmi_hurda_onay_sureci_yoktur_operator_veya_usta_hurdaya_atar",
+          "label": "Resmi onay süreci yoktur; usta veya operatör parçayı hurda kasasına atar, kaydı tutulmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-028",
+      "process": "Hurda ve Şartlı Kabul",
+      "order": 28,
+      "question": "Hurdaya ayrılan hammadde ve ürünlerin maliyeti (Fire/Hurda Gideri) doğrudan ilgili iş emrine, ürün grubuna veya departman masraf merkezine otomatik muhasebeleşmekte midir?",
+      "description": "Hurda maliyet muhasebesi, fire masraf merkezi ve fiili maliyete yansıma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hurda_maliyeti_ilgili_is_emrine_veya_bolum_gider_hesabina_otomatik_yansir",
+          "label": "Evet; hurda fişi kesildiğinde maliyet otomatik olarak o iş emrinin veya birimin fire giderine yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yil_sonlarinda_sayim_farklarina_genel_gider_olarak_yansitilir",
+          "label": "İş emri bazlı ayrışmaz; yıl sonu sayımında çıkan stok eksiği genel şirket fire giderine atılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hurda_maliyeti_takip_edilememektedir",
+          "label": "Hurda maliyetleri muhasebesel olarak takip edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-029",
+      "process": "Kök Neden Analizi",
+      "order": 29,
+      "question": "Kritik veya tekrarlayan kalite problemlerinde resmi Kök Neden Analizi metodolojileri (5 Why / 5 Neden, Ishikawa / Balık Kılçığı, 8D Metodolojisi, FMEA) uygulanmakta mıdır?",
+      "description": "Kök neden analiz teknikleri (5 Why, Fishbone, 8D, Pareto) ve problem çözme disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistemde_8d_veya_5_why_sablonlari_ile_resmi_kok_neden_analizi_yapilir_ve_kaydedilir",
+          "label": "Evet; kritik hatalarda 8D veya 5-Why formu açılır, kök neden kökünden tespit edilip doğrulanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_sozlu_toplanti_yapilir_neden_oldugu_konusulur_ancak_sablon_kullanilmaz",
+          "label": "Toplantıda 'Neden oldu?' diye konuşulur fakat standart bir kök neden analiz şablonu tutulmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kok_neden_analizi_yapilmamaktadir_sadece_hata_anlik_duzeltilir",
+          "label": "Kök neden analizi yapılmaz; hata o an düzeltilir ve üretime devam edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-030",
+      "process": "Kök Neden Analizi",
+      "order": 30,
+      "question": "Benzer kök nedenlerden kaynaklanan tekrarlayan hatalar (İnsan hatası, Kalıp aşınması, Hammadde değişkenliği, Sıcaklık/Ortam şartları) sistem üzerinden kategorize olarak analiz edilebilmekte midir?",
+      "description": "Tekrarlayan kök neden analizi, hata trendleri ve önleyici aksiyon tetikleyicisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kok_neden_kategorileri_sistemde_siniflandirilir_ve_kronik_problemler_raporlanir",
+          "label": "Evet; hataların kök neden dağılımı (Makine, Metot, Malzeme, İnsan) sistemden grafiklerle analiz edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kronik_problemler_tecrubeyle_bilinir_ancak_sistemik_kategori_analizi_yoktur",
+          "label": "Hangi makinenin veya kalıbın sorunlu olduğu bilinir fakat sistemik kök neden raporu üretilemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kok_neden_kategori_takibi_yapilmamaktadir",
+          "label": "Kök neden kategori takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-031",
+      "process": "CAPA / Düzeltici ve Önleyici Faaliyet",
+      "order": 31,
+      "question": "Kalite uygunsuzlukları, denetim bulguları ve müşteri şikâyetleri sonrasında sistemde Düzeltici ve Önleyici Faaliyet (CAPA - Corrective and Preventive Action) süreci işletilmekte midir?",
+      "description": "CAPA yönetimi, düzeltici/önleyici aksiyon planı, sorumlu atama ve termin takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_uzerinden_sorumlusu_ve_termin_tarihi_olan_capa_is_akisi_yurutulur",
+          "label": "Evet; CAPA açılır, sorumlu kişiye görev ve termin atanır, aksiyon adımları sistem üzerinden takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "capa_takibi_excel_listesinde_veya_kalite_yonetim_temsilcisinin_dosyasinda_tutulur",
+          "label": "Sistemik CAPA yoktur; Kalite Yöneticisi Excel'de aksiyon listesi tutar ve toplantılarda sorar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "capa_sureci_uygulanmamaktadir",
+          "label": "Şirketimizde resmi CAPA (Düzeltici ve Önleyici Faaliyet) süreci uygulanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-032",
+      "process": "CAPA / Düzeltici ve Önleyici Faaliyet",
+      "order": 32,
+      "question": "Açılan CAPA'ların kapanışı öncesinde alınan aksiyonun kalıcı olarak hatayı önlediğini kanıtlayan Etkinlik Doğrulaması (Effectiveness Verification) yapılmakta ve onaylanmakta mıdır?",
+      "description": "CAPA etkinlik doğrulaması, izleme süresi ve resmi kapanış onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "QLT-031",
+        "operator": "not_equals",
+        "value": "capa_sureci_uygulanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "aksiyon_sonrasi_belirli_sure_izleme_yapilir_ve_etkinlik_kanitlanmadan_capa_kapatilamaz",
+          "label": "Evet; 1-3 ay sonra hata tekrarlamadığı doğrulanır, Kalite Müdürü onayıyla CAPA resmi olarak kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aksiyon_yapildigi_an_etkinlik_beklenmeden_capa_hemen_kapatilir",
+          "label": "Etkinlik takibi yapılmaz; ilgili birim 'Aksiyonu tamamladım' dediği an dosya kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "etkinlik_dogrulamasi_yapilmamaktadir",
+          "label": "Etkinlik doğrulaması yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-033",
+      "process": "Ölçüm Cihazı / Kalibrasyon Bağlantısı",
+      "order": 33,
+      "question": "Kalite kontrolde kullanılan ölçüm ve test cihazları (Kumpas, Mikrometre, Mastar, Tork Anahtarı, Terazi, Basınç Sensörü vb.) sistemde kimlik ve kalibrasyon geçerlilik tarihleriyle takip edilmekte midir?",
+      "description": "Ölçüm aletleri envanteri, kalibrasyon periyotları ve geçerlilik durumu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_olcum_cihazlari_seri_no_ve_kalibrasyon_gecerlilik_tarihiyle_sistemde_kayitlidir",
+          "label": "Evet; cihazın kalibrasyon sertifikası, son kalibrasyon tarihi ve gelecek kalibrasyon günü sistemde izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cihazlarin_uzerinde_kalibrasyon_etiketi_vardir_ancak_sistemik_takip_yoktur",
+          "label": "Cihazın üstüne tarihli etiket yapıştırılır fakat ERP sisteminde kayıt ve alarm mekanizması yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "olcum_cihazi_kalibrasyon_takibi_yapilmamaktadir",
+          "label": "Ölçüm cihazlarının kalibrasyon takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-034",
+      "process": "Ölçüm Cihazı / Kalibrasyon Bağlantısı",
+      "order": 34,
+      "question": "Kalibrasyon süresi dolmuş veya arızalı bir ölçüm cihazı ile kalite kontrol ölçümü yapılması sistem tarafından engellenmekte midir ve ölçümü yapan cihaz kayda bağlanmakta mıdır?",
+      "description": "Kalibrasyonsuz cihazla ölçüm engeli ve ölçüm aleti izlenebilirliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "olcum_girilirken_kullanilan_cihaz_secilir_ve_suresi_dolmussa_olcum_kilitlenir",
+          "label": "Evet; kontrolör cihazı barkodla okutur, kalibrasyonu geçmiş cihazla test yapılmasına sistem izin vermez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "olcumde_hangi_cihazin_kullanildigi_kaydedilmez_sistemik_engel_yoktur",
+          "label": "Test sonucuna cihaz bağlanmaz; kalibrasyon sorumluluğu tamamen ölçümü yapan operatördedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalibrasyon_gecerlilik_engeli_bulunmamaktadir",
+          "label": "Kalibrasyon geçerlilik kontrolü veya sistemsel engel bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-035",
+      "process": "Lot / Seri İzlenebilirliği",
+      "order": 35,
+      "question": "Yapılan tüm kalite kontrol test sonuçları, ölçüm değerleri ve onay kayıtları ilgili Hammadde Lotu, Üretim Parti/Seri Numarası veya İş Emri ile birebir eşleştirilmekte midir?",
+      "description": "Kalite sonuçlarının Lot/Seri/İş Emri ile eşleşmesi ve şecere (Genealogy) izlenebilirliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_test_ve_olcum_sonuclari_lot_seri_ve_is_emri_koduyla_birebir_eslesir_ve_saklanir",
+          "label": "Evet; herhangi bir lot veya seri no sorgulandığında o partinin tüm giriş, proses ve final test verisi dökülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_tarih_ve_urun_kodu_yazilir_spesifik_lot_veya_seriyle_baglantisi_kopuktur",
+          "label": "O gün test yapıldığı bilinir fakat hangi specific lot numarasına ait olduğu kayıtlardan net anlaşılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_sonuclari_lot_veya_seri_bazinda_izlenmemektedir",
+          "label": "Kalite sonuçları lot veya seri bazında izlenmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-036",
+      "process": "Lot / Seri İzlenebilirliği",
+      "order": 36,
+      "question": "Piyasadan veya müşteriden gelen bir şikâyet anında, o ürünün geriye dönük hammadde kalite sonuçlarına, üretim ara ölçümlerine ve ölçümü yapan operatöre kadar Denetim İzi (Audit Trail) çıkarılabilmekte midir?",
+      "description": "Geriye dönük kalite denetim izi (Backward Quality Traceability) ve operatör/zaman damgası doğrulaması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "saniyeler_icinde_hammadde_giris_testinden_son_sevkiyata_kadar_tam_kalite_secere_raporu_alinir",
+          "label": "Evet; seri no girildiğinde hangi operatörün ne zaman hangi ölçümü yaptığı ve hammadde onayları tek tıkla dökülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "arsiv_klasorleri_ve_excel_dosyalari_manuel_taranarak_gunler_suren_arastirmayla_bulunur",
+          "label": "Otomatik rapor yoktur; kağıt formlar ve Excel dosyaları geriye dönük taranarak zahmetli bir araştırmayla bulunur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "geriye_donuk_kalite_izlenebilirligi_saglanamamaktadir",
+          "label": "Geriye dönük kalite izlenebilirliği sağlanamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-037",
+      "process": "Kalite Dokümanları ve Sertifikalar",
+      "order": 37,
+      "question": "Müşterilere sevk edilen ürünler için Analiz Sertifikası (CoA - Certificate of Analysis), Uygunluk Belgesi (CoC - Certificate of Conformance) veya Test Raporu düzenlenmekte midir?",
+      "description": "Analiz sertifikası (CoA/CoC), ürün kalite pasaportu ve müşteri sertifika talepleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sevkiyat_onaylanan_test_sonuclari_uzerinden_sistemden_otomatik_coa_coc_belgesi_uretir",
+          "label": "Evet; partinin gerçek ölçüm sonuçları çekilerek sistemden barkodlu ve resmi onaylı CoA/CoC üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "coa_belgesi_word_veya_excel_sablonunda_manuel_doldurulup_imzalanir",
+          "label": "Sistemik üretim yoktur; kaliteci Word şablonuna değerleri elle yazar, imzalar ve müşteriye mail atar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteriye_analiz_veya_uygunluk_sertifikasi_verilmemektedir",
+          "label": "Müşterilere analiz sertifikası veya kalite belgesi verilmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-038",
+      "process": "Kalite Dokümanları ve Sertifikalar",
+      "order": 38,
+      "question": "Tedarikçilerden gelen hammadde Analiz Sertifikaları (Tedarikçi CoA) sisteme dijital olarak yüklenmekte ve standart parametrelerle sistemsel olarak karşılaştırılmakta mıdır?",
+      "description": "Gelen tedarikçi sertifikası (Inbound CoA) doğrulaması ve dijital arşivleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tedarikci_coa_degerleri_sisteme_islenir_ve_spektlere_uygunlugu_otomatik_denetlenir",
+          "label": "Evet; tedarikçinin sertifika değerleri girilir, sistem hammadde spesifikasyonlarına uygunluğu teyit eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_sertifikasi_sadece_pdf_olarak_arsivlenir_deger_kontrolu_manueldir",
+          "label": "PDF olarak taranır veya klasörde tutulur; değerlerin sistemsel bir kontrolü yapılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_analiz_sertifikasi_toplanmamakta_veya_incelenmemektedir",
+          "label": "Tedarikçi analiz sertifikası toplanmamakta veya incelenmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-039",
+      "process": "Kalite Raporlama ve KPI",
+      "order": 39,
+      "question": "Şirketinizde İlk Seferde Doğru Oranı (First Pass Yield - FPY), Kalite Red Oranı (PPM) ve Hurda/Fire Oranları düzenli olarak hesaplanıp takip edilmekte midir?",
+      "description": "Temel kalite üretim metrikleri (FPY, PPM, Scrap Rate, Rework Rate).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "fpy_ppm_ve_hurda_oranlari_hat_ve_urun_bazinda_sistemden_canli_izlenir",
+          "label": "Evet; ilk seferde doğru çıkma oranı (FPY) ve PPM hata oranları üretimden anlık otomatik hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_veya_donemsel_olarak_excel_tablolarinda_manuel_hesaplanir",
+          "label": "Canlı takip yoktur; ay sonlarında hurda ve üretim adetleri Excel'de oranlanarak raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fpy_veya_ppm_oranlari_hesaplanmamaktadir",
+          "label": "FPY veya PPM gibi kalite performans oranları hesaplanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-040",
+      "process": "Kalite Raporlama ve KPI",
+      "order": 40,
+      "question": "Kötü Kalite Maliyeti (Cost of Poor Quality - COPQ — Hurda maliyeti, Rework işçiliği, Müşteri iade zararları, Garanti/Tazminat giderleri) kurumsal olarak ölçülmekte midir?",
+      "description": "Kötü kalite maliyeti (COPQ), iç hata maliyeti, dış hata maliyeti ve önleme maliyetleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ic_hata_hurda_rework_ve_dis_hata_iade_tazminat_maliyetleri_finansal_olarak_olculur",
+          "label": "Evet; kalitesizlikten kaynaklanan hurda, tamir işçiliği ve müşteri ceza maliyetleri TL/Döviz bazında raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_fiziksel_hurda_maliyeti_bilinir_rework_veya_musteri_zararlari_hesaplanmaz",
+          "label": "Yalnızca hurdaya çıkan malzeme tutarı bilinir; rework işçiliği veya müşteri tazminatları hesaplanmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kotu_kalite_maliyeti_copq_olculmemektedir",
+          "label": "Kötü kalite maliyetleri ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-041",
+      "process": "Kalite Raporlama ve KPI",
+      "order": 41,
+      "question": "Açık NCR sayısı, geciken CAPA aksiyonları ve ortalama hata kapatma süresini gösteren Canlı Kalite Yönetim Paneli (Quality Dashboard) kullanılmakta mıdır?",
+      "description": "Kalite kokpiti, açık uygunsuzluklar, CAPA yaşlandırma ve operasyonel KPI paneli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "canli_kalite_kokpiti_uzerinden_acik_ncr_geciken_capa_ve_kpi_durumu_anlik_izlenir",
+          "label": "Evet; yönetim panelinde bekleyen karantinalar, açık NCR'lar ve geciken aksiyonlar canlı takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_kalite_gozden_gecirme_toplantisinda_statik_rapor_olarak_sunulur",
+          "label": "Canlı panel yoktur; ayda bir yapılan kalite toplantısında PowerPoint veya Excel olarak sunulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_performans_paneli_kullanilmamaktadir",
+          "label": "Kalite performans paneli veya düzenli KPI raporlaması bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "QLT-042",
+      "process": "Kalite Raporlama ve KPI",
+      "order": 42,
+      "question": "ERP/QMS dönüşümü sonrasında hedeflenen Kurumsal Kalite Yönetimi vizyonu ve temel önceliği nedir?",
+      "description": "Gelecek vizyonu (TO-BE), kalite güvence dijitalleşmesi ve entegrasyon hedefleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tam_entegre_kontrol_planlari_sayisal_tolerans_denetimi_ve_ucluca_ncr_capa_takibi",
+          "label": "Girişten finale tam entegre kontrol planları, tolerans denetimli stok kilitleme ve uçtan uca NCR/CAPA",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "giris_ve_final_kalite_onaylarinin_sisteme_baglanmasi_ve_kagit_formlarin_kalkmasi",
+          "label": "Giriş ve sevk onaylarının sisteme bağlanması ve sahadaki kağıt kalite formlarının dijitalleşmesi önceliklidir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_maliyetlerinin_ve_hurda_zararlarinin_seffaflasmasi",
+          "label": "Hangi ürün veya operasyonda ne kadar kalitesizlik maliyeti (Hurda/Rework) oluştuğunun şeffaflaşması hedeflenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

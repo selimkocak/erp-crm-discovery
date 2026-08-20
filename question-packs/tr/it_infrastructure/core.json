@@ -1,0 +1,1685 @@
+{
+  "meta": {
+    "pack_id": "tr.it_infrastructure.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "INFORMATION_TECHNOLOGY",
+    "name": "BT Altyapısı ve Bilgi Teknolojileri Ön Analizi",
+    "description": "Türkiye'deki orta ve büyük ölçekli işletmeler için BT Altyapısı ve Bilgi Teknolojileri AS-IS keşif soru paketi. Şirketin mevcut sunucu, istemci ve depolama altyapısını, sanallaştırma kapasitesini, işletim sistemi ve veritabanı tercihlerini, ağ topolojisi ve VLAN segmentasyonunu, internet ve yedek hat mimarisini, şube WAN ve VPN uzak erişim çözümlerini, güvenlik duvarı (Firewall) ve siber güvenlik kontrollerini, kablosuz ağ ve depo el terminali uyumluluğunu, Active Directory / LDAP merkezi kimlik ve yetkilendirme standartlarını, yedekleme ve 3-2-1 immutability seviyesini, felaket kurtarma ve iş sürekliliği hazırlığını, sistem izleme ve log yönetimini, sistem odası iklimlendirme ve UPS durumunu, lisanslama ve üretici SLA anlaşmalarını, ERP/CRM bulut vs on-premise barındırma hazırlığını, dış sistem entegrasyon (API/Webhook/SFTP) ihtiyaçlarını, e-posta/dosya servislerini, yardım masası (Helpdesk) destek süreçlerini, teknik borç seviyesini ve altyapı yatırım yol haritasını keşfetmek amacıyla tasarlanmıştır. Bu paket bir IT operasyon yazılımı değildir; ERP/CRM devreye alımı öncesinde müşterinin teknik kapasitesini ve işletme risklerini ölçer."
+  },
+  "questions": [
+    {
+      "id": "ITI-001",
+      "process": "BT Organizasyonu ve Sorumluluklar",
+      "order": 1,
+      "question": "Şirketinizde bilgi teknolojileri, sistem yönetimi ve teknik altyapı operasyonları hangi organizasyonel modelle yönetilmektedir?",
+      "description": "İç BT personeli, sistem yöneticisi, dış kaynak MSP desteği veya hibrit yönetim modeli.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sirket_ici_tam_zamanli_bt_ekibi_ve_sistem_yoneticisi",
+          "label": "Şirket içi tam zamanlı BT ekibi ve sistem/ağ yöneticisi mevcuttur"
+        },
+        {
+          "value": "dis_kaynak_outsourcing_veya_yonetilen_hizmetler_msp_ile_destek",
+          "label": "Dış kaynak (Outsourcing) / Yönetilen Hizmet Sağlayıcı (MSP) ile anlaşmalıdır"
+        },
+        {
+          "value": "hibrit_model_ic_bt_sorumlusu_ve_dis_danisman_destegi",
+          "label": "Hibrit model: İçeride BT sorumlusu bulunmakta, özel projeler ve altyapı dış danışmanla yürütülmektedir"
+        },
+        {
+          "value": "ayri_bir_bt_ekibi_yoktur_yonetici_veya_muhasebe_ilgilenmektedir",
+          "label": "Ayrı bir BT personeli yoktur; şirket yöneticisi veya ilgili departman personeli ilgilenmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-002",
+      "process": "BT Organizasyonu ve Sorumluluklar",
+      "order": 2,
+      "question": "BT operasyonları, altyapı değişiklikleri ve sistem yatırımları için yıllık bir bütçe ve onay mekanizması işletilmekte midir?",
+      "description": "Yıllık onaylı BT bütçesi, yatırım planı veya durumsal yönetim onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yillik_onayli_bt_butcesi_ve_planli_yatirim_sureci_mevcuttur",
+          "label": "Yıllık onaylı BT bütçesi ve planlı donanım/yazılım yatırım süreci mevcuttur"
+        },
+        {
+          "value": "ihtiyac_dogdukca_yonetim_kurulu_veya_genel_mudur_onayina_sunulur",
+          "label": "İhtiyaç doğdukça yönetim kurulu / genel müdür onayına münferit olarak sunulur"
+        },
+        {
+          "value": "tanimli_bir_bt_butcesi_bulunmamaktadir",
+          "label": "Tanımlı bir BT bütçesi bulunmamaktadır; acil durumlarda harcama yapılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-003",
+      "process": "Kullanıcı ve Cihaz Envanteri",
+      "order": 3,
+      "question": "Şirket genelinde aktif olarak kullanılan kullanıcı, bilgisayar (Masaüstü/Dizüstü), mobil cihaz ve el terminali sayısı hangi aralıktadır?",
+      "description": "Toplam aktif istemci, masaüstü, laptop ve sahadaki mobil cihaz büyüklüğü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "1_25_kullanici_ve_cihaz",
+          "label": "1 - 25 kullanıcı ve cihaz"
+        },
+        {
+          "value": "26_75_kullanici_ve_cihaz",
+          "label": "26 - 75 kullanıcı ve cihaz"
+        },
+        {
+          "value": "76_200_kullanici_ve_cihaz",
+          "label": "76 - 200 kullanıcı ve cihaz"
+        },
+        {
+          "value": "201_500_kullanici_ve_cihaz",
+          "label": "201 - 500 kullanıcı ve cihaz"
+        },
+        {
+          "value": "500_uzeri_kullanici_ve_genis_cihaz_parkuru",
+          "label": "500 üzeri kullanıcı ve geniş cihaz parkuru"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-004",
+      "process": "Kullanıcı ve Cihaz Envanteri",
+      "order": 4,
+      "question": "Kurumsal bilgisayar, mobil cihaz, yazıcı ve ağ ekipmanı envanteri nasıl takip edilip güncellenmektedir?",
+      "description": "Varlık yönetim yazılımı, CMDB, Excel tablosu veya muhasebe demirbaş kaydı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "merkezi_bt_envanter_ve_varlik_yonetim_yazilimi_itil_cmdb_ile",
+          "label": "Merkezi BT envanter ve varlık yönetim yazılımı / CMDB üzerinden otomatik taranarak takip edilir"
+        },
+        {
+          "value": "excel_veya_ofis_tablolari_ile_manuel_olarak_kayit_altindadir",
+          "label": "Excel veya ofis tabloları üzerinden manuel olarak kayıt altında tutulmaktadır"
+        },
+        {
+          "value": "yalnizca_muhasebe_demirbas_kayitlari_mevcuttur_teknik_envanter_yoktur",
+          "label": "Yalnızca muhasebe demirbaş kayıtları mevcuttur; güncel teknik envanter tutulmamaktadır"
+        },
+        {
+          "value": "guncel_bir_envanter_kaydi_bulunmamaktadir",
+          "label": "Güncel bir donanım/yazılım envanter kaydı bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-005",
+      "process": "Sunucu Altyapısı",
+      "order": 5,
+      "question": "Şirketin ana iş uygulamalarını (Mevcut ERP, muhasebe, dosya paylaşımı, veritabanı) barındıran sunucu altyapısı hangi modelde konumlanmıştır?",
+      "description": "On-premise sistem odası, veri merkezi kiralık sunucu, bulut IaaS veya SaaS mimarisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tamamen_onpremise_sirket_ici_sistem_odasi_sunuculari",
+          "label": "Tamamen yerinde (On-Premise) şirket içi sistem odası / kabinet sunucularında"
+        },
+        {
+          "value": "ozel_veri_merkezi_kolokasyon_veya_kiralik_fiziksel_sunucu",
+          "label": "Özel veri merkezinde (Colocation) veya kiralık fiziksel sunucularda"
+        },
+        {
+          "value": "bulut_altyapisi_iaas_azure_aws_gcp_veya_yerel_cloud_saglayici",
+          "label": "Bulut altyapısında (IaaS - Microsoft Azure, AWS, Google Cloud veya yerel bulut sağlayıcı)"
+        },
+        {
+          "value": "hibrit_yapi_hem_yerel_sunucular_hem_bulut_servisleri",
+          "label": "Hibrit yapı: Kritik servisler yerelde, bazı uygulamalar bulut ortamında"
+        },
+        {
+          "value": "kendi_fiziksel_veya_sanal_sunucu_altyapisi_yoktur_tamamen_bulut_saas",
+          "label": "Kendi sunucu altyapımız yoktur; tamamen hazır SaaS/web yazılımları kullanılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-006",
+      "process": "Sunucu Altyapısı",
+      "order": 6,
+      "question": "Mevcut fiziksel veya sanal sunucuların ortalama donanım yaşı, kaynak yeterliliği ve genişleme kapasitesi ne durumdadır?",
+      "description": "Sunucu yaşı, CPU/RAM/Disk darboğazları ve üretici garanti/bakım sözleşmesi durumu.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sunucular_yeni_ve_gunceldir_1_3_yas_ve_kapasite_artirimina_uygundur",
+          "label": "Sunucular yeni ve günceldir (1-3 yaş) ve kapasite artırımına uygundur"
+        },
+        {
+          "value": "sunucular_orta_yastadir_3_5_yas_mevcut_yuk_icin_yeterlidir",
+          "label": "Sunucular orta yaştadır (3-5 yaş); mevcut yükü karşılamaktadır"
+        },
+        {
+          "value": "sunucular_eskidir_5_yil_ve_uzeri_ve_donanim_yenilemesi_gerekmektedir",
+          "label": "Sunucular eskidir (5 yıl ve üzeri); yeni ERP/CRM için yenileme/yükseltme gereklidir"
+        },
+        {
+          "value": "ram_ve_depolama_kaynaklari_sinira_yaklasmistir_darbogaz_vardir",
+          "label": "RAM ve disk depolama kaynakları sınıra yaklaşmıştır; darboğaz yaşanmaktadır"
+        },
+        {
+          "value": "donanim_garanti_ve_vendor_bakim_destegi_devam_etmektedir",
+          "label": "Donanım garanti ve üretici (Vendor) yerinde bakım desteği devam etmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-007",
+      "process": "Sanallaştırma ve Konteyner Kullanımı",
+      "order": 7,
+      "question": "Sunucu ortamında hangi sanallaştırma platformları veya konteyner teknolojileri kullanılmaktadır?",
+      "description": "VMware vSphere, Hyper-V, Proxmox, Nutanix, KVM veya Docker/Kubernetes mimarisi.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "ITI-005",
+        "operator": "not_equals",
+        "value": "kendi_fiziksel_veya_sanal_sunucu_altyapisi_yoktur_tamamen_bulut_saas"
+      },
+      "options": [
+        {
+          "value": "vmware_vsphere_esxi_cluster_mimarisi",
+          "label": "VMware vSphere / ESXi (Cluster ve vCenter mimarisi ile)"
+        },
+        {
+          "value": "microsoft_hyper_v_ve_failover_cluster",
+          "label": "Microsoft Hyper-V (Failover Cluster mimarisi ile)"
+        },
+        {
+          "value": "acik_kaynak_veya_diger_proxmox_kvm_nutanix_ahv_xenserver",
+          "label": "Açık kaynak / Diğer sanallaştırma (Proxmox, KVM, Nutanix AHV, XCP-ng)"
+        },
+        {
+          "value": "docker_veya_kubernetes_konteyner_platformlari",
+          "label": "Docker veya Kubernetes konteyner platformları aktif kullanılmaktadır"
+        },
+        {
+          "value": "sanallastirma_kullanilmamaktadir_yalnizca_tekil_fiziksel_sunucular",
+          "label": "Sanallaştırma kullanılmamaktadır; işletim sistemleri doğrudan fiziksel sunucudadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-008",
+      "process": "Sanallaştırma ve Konteyner Kullanımı",
+      "order": 8,
+      "question": "Yeni kurulacak ERP/CRM uygulama ve veritabanı sunucuları için sanal sunucu kaynağı tahsis edilebilir durumda mıdır?",
+      "description": "CPU çekirdek, RAM ve hızlı depolama (NVMe/SSD) kaynak hazırlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "evet_mevcut_sanallastirma_ve_storage_altyapisinda_yeterli_cpu_ram_ve_nvme_ssd_kaynagi_hazirdir",
+          "label": "Evet, mevcut sanallaştırma/storage üzerinde yeterli CPU, RAM ve hızlı disk (NVMe/SSD) hazırdır"
+        },
+        {
+          "value": "kismen_mevcut_ancak_ek_ram_veya_storage_disk_yatirimi_yapilmasi_gerekir",
+          "label": "Kısmen mevcut; ancak ek RAM veya storage disk alanı yatırımı gerekecektir"
+        },
+        {
+          "value": "hayir_yeni_fiziksel_sunucu_veya_bulut_iaas_aboneligi_acisi_gereklidir",
+          "label": "Hayır, yeni fiziksel sunucu alımı veya bulut IaaS aboneliği gereklidir"
+        },
+        {
+          "value": "proje_dogrudan_bulut_saas_olarak_planlandigi_icin_yerel_sunucu_tahsisi_gerekmemektedir",
+          "label": "Proje doğrudan bulut (SaaS) olarak planlandığı için yerel sunucu tahsisi gerekmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-009",
+      "process": "İşletim Sistemi ve Platformlar",
+      "order": 9,
+      "question": "Sunucu ve altyapı tarafında aktif olarak kullanılan ana işletim sistemi platformları hangileridir?",
+      "description": "Windows Server sürümleri, Red Hat, SUSE, Ubuntu Server, Debian veya diğer Linux dağıtımları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "windows_server_2019_2022_veya_guncel_surumler",
+          "label": "Windows Server (2019, 2022 veya daha güncel sürümler)"
+        },
+        {
+          "value": "windows_server_eski_surumler_2012_2016_veya_destegi_bitmis",
+          "label": "Windows Server eski sürümler (2012, 2016 veya resmi desteği sona ermiş)"
+        },
+        {
+          "value": "kurumsal_linux_redhat_rhel_suse_sles_oracle_linux",
+          "label": "Kurumsal Linux (Red Hat Enterprise Linux, SUSE SLES, Oracle Linux)"
+        },
+        {
+          "value": "acik_kaynak_linux_ubuntu_server_debian_rocky_linux",
+          "label": "Açık kaynak Linux (Ubuntu Server, Debian, Rocky Linux, AlmaLinux)"
+        },
+        {
+          "value": "sunucu_isletim_sistemi_bulunmamaktadir",
+          "label": "Şirket bünyesinde sunucu işletim sistemi barındırılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-010",
+      "process": "İstemci Bilgisayar Altyapısı",
+      "order": 10,
+      "question": "Kullanıcıların kullandığı istemci bilgisayarların (Client PC / Laptop) işletim sistemi ve donanım standartları nasıldır?",
+      "description": "Windows 10/11 Pro, macOS, Linux, donanım yeterliliği (RAM, SSD) ve kurumsal lisanslama.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "windows_11_pro_veya_windows_10_pro_guncel_ve_lisansli",
+          "label": "Windows 11 Pro veya Windows 10 Pro (Güncel ve kurumsal lisanslı)"
+        },
+        {
+          "value": "windows_home_veya_destegi_bitmis_eski_surumler_win7_8",
+          "label": "Windows Home sürümleri veya desteği bitmiş eski Windows sürümleri kullanılmaktadır"
+        },
+        {
+          "value": "macos_apple_ekosistemi_macbook_imac",
+          "label": "macOS / Apple bilgisayarlar yoğun olarak kullanılmaktadır"
+        },
+        {
+          "value": "linux_masaustu_veya_thin_client_terminal",
+          "label": "Linux masaüstü veya Thin Client / Zero Client terminaller kullanılmaktadır"
+        },
+        {
+          "value": "donanim_standardi_en_az_8_16_gb_ram_ve_ssd_disk_ile_yeterlidir",
+          "label": "İstemci donanımları en az 8-16 GB RAM ve SSD disk standardına sahiptir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-011",
+      "process": "Veritabanı Altyapısı",
+      "order": 11,
+      "question": "Şirketinizde mevcut uygulamalar tarafından kullanılan ve BT ekibinin deneyim sahibi olduğu veritabanı yönetim sistemleri (RDBMS) hangileridir?",
+      "description": "MS SQL Server, SAP HANA, Oracle, PostgreSQL, MySQL/MariaDB veya gömülü veritabanları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "microsoft_sql_server_standart_veya_enterprise",
+          "label": "Microsoft SQL Server (Standard veya Enterprise)"
+        },
+        {
+          "value": "sap_hana_in_memory_database",
+          "label": "SAP HANA (In-Memory Database)"
+        },
+        {
+          "value": "oracle_database_veya_oracle_rac",
+          "label": "Oracle Database / Oracle RAC"
+        },
+        {
+          "value": "postgresql_veya_mysql_mariadb_acik_kaynak",
+          "label": "PostgreSQL, MySQL veya MariaDB"
+        },
+        {
+          "value": "sqlite_veya_dosya_tabanli_gomulu_veritabani",
+          "label": "SQLite / MS Access veya dosya tabanlı gömülü veri tabanları"
+        },
+        {
+          "value": "sirketimizde_yonetilen_bir_veritabani_sunucusu_bulunmamaktadir",
+          "label": "Şirketimizde yönetilen bir veritabanı sunucusu bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-012",
+      "process": "Veritabanı Altyapısı",
+      "order": 12,
+      "question": "Kritik veritabanları için lisans durumu, bakım anlaşması ve veritabanı yöneticisi (DBA) yetkinliği ne seviyededir?",
+      "description": "Veritabanı kurumsal lisansı, üretici bakım desteği ve özel DBA personeli varlığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kurumsal_lisanslar_guncel_bakim_anlasmasi_aktif_ve_uzman_dba_mevcuttur",
+          "label": "Kurumsal lisanslar güncel, üretici bakım anlaşması aktif ve özel/yarı zamanlı DBA mevcuttur"
+        },
+        {
+          "value": "lisanslar_mevcut_ancak_ayri_bir_dba_yoktur_sistem_yoneticisi_veya_yazilim_firmasi_bakar",
+          "label": "Lisanslar mevcut ancak ayrı DBA yoktur; sistem yöneticisi veya yazılım sağlayıcı yönetir"
+        },
+        {
+          "value": "ucretsiz_express_community_surumler_kullanilmaktadir_kapasite_sinirlari_vardir",
+          "label": "Ücretsiz / Express / Community sürümler kullanılmaktadır (Boyut/RAM limitleri vardır)"
+        },
+        {
+          "value": "veritabani_lisans_ve_yonetim_durumu_bilinmemektedir",
+          "label": "Veritabanı lisans ve teknik yönetim durumu net bilinmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-013",
+      "process": "Ağ Topolojisi ve Segmentasyon",
+      "order": 13,
+      "question": "Şirket içi yerel alan ağı (LAN) omurgası, anahtar (Switch) yapısı ve ağ segmentasyonu ne durumdadır?",
+      "description": "Yönetilebilir Gigabit/10G switch'ler, VLAN segmentasyonu, yapılandırılmış kablolama ve patch panel.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yonetilebilir_gigabit_10g_anahtarlar_ve_vlan_segmentasyonu_kullanilmaktadir",
+          "label": "Yönetilebilir Gigabit/10G kurumsal anahtarlar (Switch) ve VLAN segmentasyonu mevcuttur"
+        },
+        {
+          "value": "sunucular_kullanicilar_ve_misafirler_ayri_vlan_aglarinda_izole_edilmistir",
+          "label": "Sunucular, kullanıcılar, üretim cihazları ve misafir ağı ayrı VLAN'larda izole edilmiştir"
+        },
+        {
+          "value": "yonetilemeyen_unmanaged_standart_switchler_tek_bir_duz_ag_flat_network_vardir",
+          "label": "Yönetilemeyen standart switch'ler ile tek bir düz ağ (Flat network) üzerinde çalışılmaktadır"
+        },
+        {
+          "value": "yapilandirilmis_kablolama_cat6_cat6a_fiber_ve_etiketlenmis_patch_panel_mevcuttur",
+          "label": "Yapılandırılmış kurumsal kablolama (Cat6/Cat6a/Fiber) ve etiketlenmiş patch panel mevcuttur"
+        },
+        {
+          "value": "kablolama_ve_ag_altyapisinda_fiziksel_duzensizlik_ve_kopma_sorunlari_yasanmaktadir",
+          "label": "Kablolama ve ağ altyapısında fiziksel düzensizlik, hız düşüklüğü ve kopmalar yaşanmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-014",
+      "process": "Ağ Topolojisi ve Segmentasyon",
+      "order": 14,
+      "question": "Yerel ağ üzerinde DHCP ve DNS servisleri hangi platform üzerinden merkezi olarak dağıtılmaktadır?",
+      "description": "Active Directory Domain Controller, kurumsal Firewall/Router veya internet modemi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "active_directory_veya_windows_server_dhcp_dns_servisleri_uzerinden",
+          "label": "Active Directory / Windows Server DHCP ve DNS rolleri üzerinden"
+        },
+        {
+          "value": "kurumsal_firewall_veya_router_cihazi_uzerinden",
+          "label": "Kurumsal Firewall / UTM veya Router cihazı üzerinden"
+        },
+        {
+          "value": "modem_veya_yonetimsiz_ag_cihazi_uzerinden_otomatik_dagitilmaktadir",
+          "label": "İnternet modemi veya basit ağ cihazı üzerinden otomatik dağıtılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-015",
+      "process": "İnternet, WAN ve Şube Bağlantıları",
+      "order": 15,
+      "question": "Şirket merkezinin internet bağlantı tipi, bant genişliği ve yedek hat (Redundancy) durumu nedir?",
+      "description": "Metro ethernet, simetrik fiber, otomatik yedek hat (Failover) ve statik IP varlığı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "simetrik_metro_ethernet_veya_kurumsal_fiber_internet_kullanilmaktadir",
+          "label": "Simetrik Metro Ethernet veya kurumsal fiber internet bağlantısı mevcuttur"
+        },
+        {
+          "value": "farkli_operatorden_aktif_otomatik_yedek_internet_hatti_failover_vardir",
+          "label": "Farklı operatörden otomatik devreye giren yedek internet hattı (Failover/Load Balancing) vardır"
+        },
+        {
+          "value": "asimetrik_vdsl_kablo_veya_standart_fiber_kullanilmaktadir_yedek_hat_yoktur",
+          "label": "Standart VDSL/Fiber bağlantı kullanılmaktadır; yedek internet hattı bulunmamaktadır"
+        },
+        {
+          "value": "statik_sabit_ip_adresi_tanimlidir",
+          "label": "Dış erişim ve servisler için sabit (Statik) IP adresi tanımlıdır"
+        },
+        {
+          "value": "internet_kesintisi_durumunda_operasyon_ve_uretim_tamamen_durmaktadir",
+          "label": "İnternet kesintisi durumunda şirket operasyonu ve sevkiyat/fatura durmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-016",
+      "process": "İnternet, WAN ve Şube Bağlantıları",
+      "order": 16,
+      "question": "Merkez ofis dışında şube, fabrika, depo, mağaza veya bölge müdürlüğü gibi uzak lokasyonlar bulunmakta mıdır?",
+      "description": "Çoklu lokasyon varlığı, fabrika, depo veya mağaza ağlarının mevcudiyeti.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "evet_birden_fazla_sube_fabrika_veya_uzak_depo_magaza_lokasyonumuz_vardir",
+          "label": "Evet, birden fazla şube, fabrika veya uzak depo/mağaza lokasyonumuz vardır"
+        },
+        {
+          "value": "tek_merkez_ofis_harici_sube_fabrika_veya_uzak_lokasyon_yoktur",
+          "label": "Tek merkez ofis/lokasyon mevcuttur; harici şube, fabrika veya uzak lokasyon yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-017",
+      "process": "İnternet, WAN ve Şube Bağlantıları",
+      "order": 17,
+      "question": "Merkez ile uzak lokasyonlar (Şubeler, fabrikalar, depolar) arasındaki geniş alan ağı (WAN) bağlantısı nasıl sağlanmaktadır?",
+      "description": "Site-to-Site IPSec VPN, MPLS, SD-WAN, Metro Ethernet veya doğrudan web erişimi.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ITI-016",
+        "operator": "not_equals",
+        "value": "tek_merkez_ofis_harici_sube_fabrika_veya_uzak_lokasyon_yoktur"
+      },
+      "options": [
+        {
+          "value": "site_to_site_ipsec_vpn_tunelleri_ile_guvenli_baglanti",
+          "label": "Site-to-Site IPSec / SSL VPN tünelleri ile güvenli kurumsal bağlantı"
+        },
+        {
+          "value": "mpls_noktadan_noktaya_metro_veya_sd_wan_altyapisi_ile",
+          "label": "Operatör seviyesinde MPLS, Noktadan Noktaya Metro Ethernet veya SD-WAN altyapısı ile"
+        },
+        {
+          "value": "uzak_lokasyonlar_merkeze_uzak_masaustu_rdp_veya_web_portali_uzerinden_baglanir",
+          "label": "Uzak lokasyonlar doğrudan web portalleri veya Uzak Masaüstü (RDP) ile bağlanmaktadır"
+        },
+        {
+          "value": "lokasyonlar_arasi_ozel_bir_baglanti_yoktur_her_lokasyon_kendi_icinde_bagimsizdir",
+          "label": "Lokasyonlar arası özel ağ bağlantısı yoktur; işlemler bağımsız yürütülmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-018",
+      "process": "VPN ve Uzak Erişim",
+      "order": 18,
+      "question": "Ofis dışındaki çalışanların (Saha satış, evden çalışma, yöneticiler, dış danışmanlar) iç ağa ve sunuculara erişimi nasıl sağlanmaktadır?",
+      "description": "SSL-VPN, 2FA/MFA, doğrudan port yönlendirmeli RDP, AnyDesk/TeamViewer veya kapalı erişim.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "guvenli_kullanici_vpn_ssl_vpn_openvpn_ipsec_istemcisi_ile",
+          "label": "Güvenli kurumsal VPN (SSL-VPN, OpenVPN, FortiClient, AnyConnect vb.) istemcisi ile"
+        },
+        {
+          "value": "vpn_uzerinde_cok_faktorlu_kimlik_dogrulama_2fa_mfa_zorunlulugu_vardir",
+          "label": "Uzak erişimde Çok Faktörlü Kimlik Doğrulama (2FA / MFA) zorunluluğu uygulanmaktadır"
+        },
+        {
+          "value": "disariya_dogrudan_acik_port_yonlendirmeli_uzak_masaustu_rdp_kullanilmaktadir",
+          "label": "Dışarıya doğrudan açılmış port yönlendirmeli Uzak Masaüstü (RDP) veya port açma kullanılmaktadır"
+        },
+        {
+          "value": "uzak_baglanti_yazilimlari_anydesk_teamviewer_rustdesk_ile_erisim_saglanmaktadir",
+          "label": "Üçüncü taraf uzak bağlantı yazılımları (AnyDesk, TeamViewer, RustDesk vb.) ile erişilmektedir"
+        },
+        {
+          "value": "ofis_disindan_ic_sistemlere_uzaktan_erisim_yetkisi_tamamen_kapali_yasaktir",
+          "label": "Ofis dışından iç sistemlere uzaktan erişim tamamen yasaktır / kapalıdır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-019",
+      "process": "Firewall ve Ağ Güvenliği",
+      "order": 19,
+      "question": "İnternet çıkışında ve ağ sınırında hangi güvenlik duvarı (Firewall / UTM) ve güvenlik servisleri aktiftir?",
+      "description": "Kurumsal NGFW (Fortinet, Palo Alto, Sophos), IPS/IDS, web filtreleme ve port denetimi.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yeni_nesil_kurumsal_firewall_ngfw_fortinet_palo_alto_sophos_checkpoint_watchguard",
+          "label": "Yeni nesil kurumsal güvenlik duvarı (NGFW: Fortinet, Palo Alto, Sophos, Check Point, WatchGuard)"
+        },
+        {
+          "value": "acik_kaynak_firewall_pfsense_opnsense",
+          "label": "Açık kaynak güvenlik duvarı (pfSense, OPNsense)"
+        },
+        {
+          "value": "ips_ids_saldiri_tespit_web_filtreleme_ve_antivirus_modulleri_aktif_lisanslidir",
+          "label": "IPS/IDS saldırı tespit, antivirüs taraması ve web filtreleme lisansları aktiftir"
+        },
+        {
+          "value": "yalnizca_internet_servis_saglayici_modemi_uzerindeki_standart_firewall_kullanilmaktadir",
+          "label": "Yalnızca internet servis sağlayıcı modemi üzerindeki standart firewall devrededir"
+        },
+        {
+          "value": "guvenlik_duvari_kural_ve_portlari_periyodik_olarak_denetlenmektedir",
+          "label": "Güvenlik duvarı erişim kuralları ve açık portlar periyodik olarak denetlenmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-020",
+      "process": "Kablosuz Ağ ve Mobil Erişim",
+      "order": 20,
+      "question": "Ofis, depo ve fabrika alanlarındaki kablosuz ağ (Wi-Fi) altyapısı, kapsama alanı ve güvenliği ne durumdadır?",
+      "description": "Merkezi yönetilen kurumsal Access Point ağı, misafir Wi-Fi yalıtımı ve depo kapsama alanı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "merkezi_yonetilen_controller_tabanli_kurumsal_access_pointler_kullanilmaktadir",
+          "label": "Merkezi yönetilen kurumsal Access Point (AP) ağı mevcuttur (UniFi, Aruba, Cisco, Ruckus vb.)"
+        },
+        {
+          "value": "kurumsal_calisan_agi_ile_misafir_wi_fi_agi_birbirinden_tamamen_yalitilmistir",
+          "label": "Kurumsal şirket ağı ile misafir Wi-Fi ağı şifre ve VLAN bazında tamamen yalıtılmıştır"
+        },
+        {
+          "value": "depo_ve_uretim_sahasinda_el_terminalleri_icin_kesintisiz_roaming_kapsama_saglanmistir",
+          "label": "Depo ve üretim sahasında el terminalleri ve barkod okuyucular için kesintisiz roaming/kapsama mevcuttur"
+        },
+        {
+          "value": "ev_tipi_standart_modem_veya_sinyal_genisletici_routerlar_kullanilmaktadir",
+          "label": "Ev tipi standart modem veya sinyal genişletici router'lar kullanılmaktadır"
+        },
+        {
+          "value": "kablosuz_agda_sik_sik_kopma_ve_oluk_bolgeler_dead_zone_bulunmaktadir",
+          "label": "Kablosuz ağda sık sık kopmalar ve kapsama alanı dışı kalan kör noktalar bulunmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-021",
+      "process": "Kablosuz Ağ ve Mobil Erişim",
+      "order": 21,
+      "question": "Depo ve sahada kullanılacak el terminalleri ve endüstriyel mobil cihazların işletim sistemi ve hazırlık seviyesi nedir?",
+      "description": "Android el terminali parkuru, eski Windows CE terminaller veya yeni donanım yatırım ihtiyacı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        {
+          "value": "guncel_kurumsal_android_el_terminalleri_mevcuttur_ve_aktif_kullanilmaktadir",
+          "label": "Güncel kurumsal Android el terminalleri mevcuttur ve aktif kullanılmaktadır"
+        },
+        {
+          "value": "eski_nesil_windows_ce_windows_mobile_el_terminalleri_kullanilmaktadir",
+          "label": "Eski nesil Windows CE / Windows Mobile el terminalleri kullanılmaktadır (Yenileme gerektirir)"
+        },
+        {
+          "value": "mobil_el_terminali_kullanilmamaktadir_yalnizca_masaustu_bilgisayarlar_vardir",
+          "label": "Mobil el terminali kullanılmamaktadır; yalnızca masaüstü bilgisayarlar vardır"
+        },
+        {
+          "value": "yeni_erp_ile_birlikte_el_terminali_ve_barkod_cihazi_yatirimi_yapilacaktir",
+          "label": "Yeni ERP/WMS projesi ile birlikte yeni el terminali ve barkod cihazı yatırımı yapılacaktır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-022",
+      "process": "Kimlik, Kullanıcı ve Yetki Yönetimi",
+      "order": 22,
+      "question": "Kullanıcı hesapları, bilgisayar oturumları ve yetkilendirmeler nasıl yönetilmektedir?",
+      "description": "Rol bazlı yetkilendirme (RBAC), Local Admin kısıtlaması, işten ayrılış süreci ve paylaşımlı hesaplar.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_dizin_uzerinden_rol_bazli_yetkilendirme_rbcc_uygulanmaktadir",
+          "label": "Merkezi dizin üzerinden rol bazlı yetkilendirme (RBAC) ve grup politikaları uygulanmaktadır"
+        },
+        {
+          "value": "kullanicilar_bilgisayarlara_yerel_kullanici_local_admin_olarak_giris_yapmaktadir",
+          "label": "Kullanıcılar bilgisayarlara yerel kullanıcı/Local Admin yetkisi ile giriş yapmaktadır"
+        },
+        {
+          "value": "isten_ayrilan_personelin_tum_sistem_erisimleri_aninda_kapatilmaktadir",
+          "label": "İşten ayrılan personelin tüm sistem, e-posta ve ERP erişimleri İK bildirimiyle anında kapatılmaktadır"
+        },
+        {
+          "value": "sistemler_arasi_ortak_kullanici_veya_paylasimli_sifreler_kullanilabilmektedir",
+          "label": "Bazı departmanlarda ortak kullanıcı hesabı veya paylaşılan şifreler kullanılabilmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-023",
+      "process": "Kimlik, Kullanıcı ve Yetki Yönetimi",
+      "order": 23,
+      "question": "Kurumsal şifre karmaşıklığı, şifre değiştirme periyodu ve kilitlenme politikaları sistem seviyesinde zorunlu tutulmakta mıdır?",
+      "description": "Şifre karmaşıklığı, 90 günlük rotasyon, hatalı deneme kilidi ve kurumsal parola politikası.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "evet_en_az_8_12_karakter_karmasiklik_ve_90_gunluk_degisim_politikasi_otomatik_zorlanir",
+          "label": "Evet, karmaşık şifre ve düzenli değişim politikası sistemler tarafından otomatik zorlanmaktadır"
+        },
+        {
+          "value": "kismen_kullanicilar_uyarilir_ancak_sistem_tarafindan_katica_zorlanmaz",
+          "label": "Kısmen; kullanıcılara tavsiye edilir ancak sistem tarafından katı kural işletilmez"
+        },
+        {
+          "value": "hayir_standart_veya_sabit_basit_sifreler_kullanilabilmektedir",
+          "label": "Hayır; basit veya süresiz sabit şifreler serbestçe kullanılabilmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-024",
+      "process": "Active Directory / LDAP / SSO",
+      "order": 24,
+      "question": "Şirketinizde merkezi bir dizin servisi (Microsoft Active Directory, Azure AD / Entra ID, OpenLDAP) devrede midir?",
+      "description": "On-premise Active Directory, Entra ID / Azure AD bulut dizini veya bağımsız çalışma grubu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "microsoft_active_directory_domain_services_onpremise_kullanilmaktadir",
+          "label": "Microsoft Active Directory Domain Services (On-Premise Domain Controller) devrededir"
+        },
+        {
+          "value": "microsoft_entra_id_azure_ad_bulut_dizin_kullanilmaktadir",
+          "label": "Microsoft Entra ID (Azure AD) bulut kimlik dizini kullanılmaktadır"
+        },
+        {
+          "value": "hibrit_active_directory_onpremise_ad_ve_entra_id_senkronize",
+          "label": "Hibrit Active Directory (Yerel AD ile Entra ID / Azure AD Connect senkronize)"
+        },
+        {
+          "value": "merkezi_dizin_ad_ldap_kullanilmamaktadir_yerel_kullanicilar",
+          "label": "Merkezi bir dizin servisi (AD/LDAP) kullanılmamaktadır; bilgisayarlar bağımsızdır (Workgroup)"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-025",
+      "process": "Active Directory / LDAP / SSO",
+      "order": 25,
+      "question": "Yeni kurulacak ERP ve CRM sisteminin şirket içi Active Directory / Entra ID ile entegre (Single Sign-On / LDAP Auth) çalışması hedeflenmekte midir?",
+      "description": "Tek oturum açma (SSO), LDAP entegrasyonu veya ERP bağımsız şifre yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "evet_tek_oturum_acma_sso_ve_ad_kimlik_dogrulamasi_oncelikli_gereksinimdir",
+          "label": "Evet, tek oturum açma (SSO) ve merkezi kimlik doğrulama öncelikli gereksinimdir"
+        },
+        {
+          "value": "tercih_edilir_ancak_erp_icin_ayri_kullanici_adi_ve_sifre_olmasi_da_kabul_edilebilir",
+          "label": "Tercih edilir; ancak ERP'nin kendi bağımsız kullanıcı veritabanı olması da kabul edilebilir"
+        },
+        {
+          "value": "hayir_erp_ve_crm_kullanici_yonetimi_tamamen_bagimsiz_olmalidir",
+          "label": "Hayır, ERP kullanıcı ve şifre yönetimi tamamen bağımsız olmalıdır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-026",
+      "process": "Active Directory / LDAP / SSO",
+      "order": 26,
+      "question": "Active Directory / Entra ID üzerinde hangi kurumsal güvenlik politikaları ve kimlik denetimleri aktiftir?",
+      "description": "GPO kısıtlamaları, SAML 2.0 / OAuth2 SSO altyapısı ve yetkili hesap (Domain Admin) denetimleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ITI-024",
+        "operator": "not_equals",
+        "value": "merkezi_dizin_ad_ldap_kullanilmamaktadir_yerel_kullanicilar"
+      },
+      "options": [
+        {
+          "value": "group_policy_gpo_ile_bilgisayar_ve_kullanici_kisitlamalari_merkezi_uygulanir",
+          "label": "GPO (Group Policy) ile USB engelleme, ekran kilidi ve işletim sistemi ayarları merkezi uygulanır"
+        },
+        {
+          "value": "kurumsal_sso_ve_saml_oauth2_entegrasyon_altyapisi_hazirdir",
+          "label": "Kurumsal SSO protokolleri (SAML 2.0, OpenID Connect / OAuth2) hazırdır ve kullanılmaktadır"
+        },
+        {
+          "value": "ayricalikli_hesap_yonetimi_ve_domain_admin_sayisi_kisitlidir",
+          "label": "Domain Admin ve ayrıcalıklı yetkili hesap sayısı sıkı kontrol altındadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-027",
+      "process": "Yedekleme Yönetimi",
+      "order": 27,
+      "question": "Kritik sunucuların, veritabanlarının ve şirket dosyalarının yedekleme operasyonu nasıl yürütülmektedir?",
+      "description": "Merkezi yedekleme yazılımı (Veeam vb.), SQL bakım planı, manuel kopyalama veya yedeksizlik durumu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_otomatik_yedekleme_yazilimi_veeam_commvault_acronis_vb_ile_gunluk",
+          "label": "Merkezi kurumsal yedekleme yazılımı ile (Veeam, Commvault vb.) otomatik ve günlük alınmaktadır"
+        },
+        {
+          "value": "veritabani_yerel_script_veya_sql_maintenance_plan_ile_diske_yedeklenmektedir",
+          "label": "Veritabanı kendi içi script veya SQL bakım planı ile yerel diske/NAS'a alınmaktadır"
+        },
+        {
+          "value": "manuel_olarak_harici_hard_diske_veya_flash_bellege_duzensiz_kopyalanmaktadir",
+          "label": "Manuel olarak harici diske veya USB belleğe aralıklarla kopyalanmaktadır"
+        },
+        {
+          "value": "duzenli_otomatik_yedekleme_yapilmamaktadir",
+          "label": "Düzenli ve otomatik bir yedekleme mekanizması işletilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-028",
+      "process": "Yedekleme Yönetimi",
+      "order": 28,
+      "question": "Yedekleme mimarisinde 3-2-1 kuralı (3 kopya, 2 farklı ortam, 1 off-site/uzak kopya) ve değişmezlik (Immutability) durumu nedir?",
+      "description": "Uzak kopya (Off-site), fidye yazılımına karşı silinemez (Immutable) yedek ve şifreleme.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yedekler_farkli_bir_fiziksel_cihaza_nas_ve_buluta_veya_ikincil_lokasyona_aktarilir",
+          "label": "Yedekler şirket dışı bir bulut alanına veya ikincil lokasyona (Off-Site) otomatik aktarılır"
+        },
+        {
+          "value": "fidye_yazilimina_karsi_degismez_immutable_yedek_veya_air_gapped_izole_yedek_vardir",
+          "label": "Fidye yazılımlarına (Ransomware) karşı silinemez/değiştirilemez (Immutable) yedek tutulur"
+        },
+        {
+          "value": "yedekler_yalnizca_ayni_sunucunun_farkli_bir_diskinde_veya_ayni_odadaki_nas_cihazindadir",
+          "label": "Yedekler yalnızca ana sunucu içindeki farklı bir diskte veya aynı odadaki NAS cihazındadır"
+        },
+        {
+          "value": "yedekleme_dosyalari_sifrelenmis_olarak_saklanmaktadir",
+          "label": "Yedekleme arşivleri şifreli (Encrypted) olarak depolanmaktadır"
+        },
+        {
+          "value": "yedeklerin_basarili_b профессиon_raporu_gunluk_e_posta_ile_bt_ekibine_iletilir",
+          "label": "Yedekleme başarı ve hata raporları günlük e-posta ile sorumlu personele iletilmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-029",
+      "process": "Yedekleme Yönetimi",
+      "order": 29,
+      "question": "Alınan yedeklerin sağlamlığı ve çalışabilirliği belirli periyotlarla geri yükleme (Restore Testi) tatbikatı ile doğrulanmakta mıdır?",
+      "description": "Periyodik restore testleri, test sunucusunda veri tabanı açma tatbikatı veya denenmeme durumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ITI-027",
+        "operator": "not_equals",
+        "value": "duzenli_otomatik_yedekleme_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "evet_periyodik_olarak_3_veya_6_ayda_bir_test_sunucusuna_donulerek_test_edilir",
+          "label": "Evet, periyodik olarak (3 veya 6 ayda bir) test sunucusuna geri yükleme testi yapılmaktadır"
+        },
+        {
+          "value": "yalnizca_kriz_veya_acil_durumda_restore_edilir_rutin_tatbikat_yapilmamaktadir",
+          "label": "Yalnızca gerçek bir kriz veya veri kaybı anında denenir; rutin tatbikat yapılmamaktadır"
+        },
+        {
+          "value": "yedeklerin_calisip_calismadigi_hic_test_edilmemistir",
+          "label": "Yedeklerin çalışabilirliği bugüne kadar hiç test edilmemiştir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-030",
+      "process": "Felaket Kurtarma ve İş Sürekliliği",
+      "order": 30,
+      "question": "Ana sistemlerin çökmesi, yangın, sel veya bina erişilemezliği durumunda geçerli yazılı bir Felaket Kurtarma Planı (DRP) ve RTO/RPO hedefleri var mıdır?",
+      "description": "Hedef kurtarma süresi (RTO), maksimum tolere edilebilir veri kaybı (RPO) ve yazılı DRP.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yazili_felaket_kurtarma_plani_mevcuttur_hedef_kurtarma_sureleri_rto_rpo_tanimlidir",
+          "label": "Yazılı Felaket Kurtarma Planı (DRP) mevcuttur; hedef kurtarma süreleri (RTO/RPO) tanımlıdır"
+        },
+        {
+          "value": "teknik_yedekler_vardir_ancak_resmi_ve_yazili_bir_is_surekliligi_plani_yoktur",
+          "label": "Teknik yedekler vardır; ancak yazılı ve test edilmiş kurumsal bir felaket senaryosu yoktur"
+        },
+        {
+          "value": "felaket_kurtarma_plani_ve_fkm_bulunmamaktadir",
+          "label": "Felaket kurtarma planı veya acil durum iş sürekliliği mekanizması bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-031",
+      "process": "Felaket Kurtarma ve İş Sürekliliği",
+      "order": 31,
+      "question": "Felaket kurtarma ve iş sürekliliği mimarisi kapsamında hangi teknik imkanlar devrededir?",
+      "description": "İkincil FKM lokasyonu, bulut DR, sürekli veritabanı replikasyonu ve yıllık tatbikatlar.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ITI-030",
+        "operator": "not_equals",
+        "value": "felaket_kurtarma_plani_ve_fkm_bulunmamaktadir"
+      },
+      "options": [
+        {
+          "value": "cografi_olarak_ayri_ikincil_felaket_kurtarma_merkezi_fkm_veya_cloud_dr_mevcuttur",
+          "label": "Coğrafi olarak ayrı ikincil Felaket Kurtarma Merkezi (FKM) veya Cloud DR mevcuttur"
+        },
+        {
+          "value": "sunucular_ve_veritabanlari_senkron_veya_asenkron_replikasyon_ile_ikincil_ortama_kopyalanir",
+          "label": "Sunucular/veritabanları sürekli replikasyon ile ikincil ortama gerçek zamanlı kopyalanır"
+        },
+        {
+          "value": "yillik_kesinti_ve_fkm_devreye_alma_tatbikati_yapilmaktadir",
+          "label": "Yıllık kesinti ve FKM'ye geçiş tatbikatı başarıyla yapılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-032",
+      "process": "İzleme, Alarm ve Log Yönetimi",
+      "order": 32,
+      "question": "Sunucuların, ağ cihazlarının ve kritik servislerin çalışma durumu (Uptime, CPU, RAM, Disk, Ağ) nasıl izlenmektedir?",
+      "description": "Zabbix, PRTG, Datadog vb. merkezi izleme, anlık SMS/mail alarmları ve 5651 log imzalama.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "merkezi_bt_izleme_yazilimi_zabbix_prtg_nagios_datadog_ile_7_24_otomatik_izlenir",
+          "label": "Merkezi BT izleme yazılımı (Zabbix, PRTG, Nagios, Datadog vb.) ile 7/24 otomatik izlenmektedir"
+        },
+        {
+          "value": "disk_dolulugu_veya_kesintilerde_bt_ekibine_anlik_e_posta_sms_bildirimi_gider",
+          "label": "Disk doluluğu, yüksek CPU veya kesintilerde BT ekibine anlık e-posta/SMS alarmı gitmektedir"
+        },
+        {
+          "value": "otomatik_bir_izleme_yoktur_kullanicilar_sorun_bildirdikce_fark_edilmektedir",
+          "label": "Otomatik bir izleme sistemi yoktur; kullanıcılar yavaşlık veya kesinti bildirince fark edilir"
+        },
+        {
+          "value": "5651_veya_merkezi_log_yonetimi_siem_veya_syslog_sunucusu_kullanilmaktadir",
+          "label": "5651 sayılı kanun uyumlu log imzalama veya merkezi Log/SIEM sunucusu mevcuttur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-033",
+      "process": "Siber Güvenlik ve Zararlı Yazılım Koruması",
+      "order": 33,
+      "question": "Sunucular ve kullanıcı bilgisayarlarında hangi uç nokta güvenliği (Antivirüs / EDR) ve siber güvenlik kontrolleri uygulanmaktadır?",
+      "description": "Kurumsal EDR/XDR, merkezi yama yönetimi, çalışan siber farkındalık eğitimi ve sızma testleri.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_yonetilen_kurumsal_edr_xdr_crowdstrike_sentinelone_kaspersky_sophos_defender",
+          "label": "Merkezi yönetilen kurumsal EDR/XDR veya antivirüs yazılımı tüm cihazlarda yüklüdür"
+        },
+        {
+          "value": "guvenlik_yamalari_ve_isletim_sistemi_guncellemeleri_wsus_veya_otomatik_dagitilmaktadir",
+          "label": "İşletim sistemi güvenlik yamaları ve güncellemeleri merkezi olarak düzenli dağıtılmaktadır"
+        },
+        {
+          "value": "calisanlara_duzenli_siber_guvenlik_farkindalik_ve_oltalama_phishing_egitimi_verilmektedir",
+          "label": "Çalışanlara periyodik siber güvenlik ve oltalama (Phishing) farkındalık eğitimi verilmektedir"
+        },
+        {
+          "value": "ucretsiz_veya_bireysel_antivirus_yazilimlari_kullanilmakta_bazi_cihazlarda_koruma_yoktur",
+          "label": "Bireysel/ücretsiz antivirüs kullanılmakta veya bazı cihazlarda koruma bulunmamaktadır"
+        },
+        {
+          "value": "harici_sizma_testi_penetrasyon_testi_duzenli_olarak_akredite_firmalara_yaptirilmaktadir",
+          "label": "Düzenli olarak sızma testi (Penetrasyon testi) ve zafiyet taraması yaptırılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-034",
+      "process": "Fiziksel Veri Merkezi ve Enerji",
+      "order": 34,
+      "question": "Şirket içi sunucuların ve ağ omurgasının bulunduğu sistem odası/kabinetin fiziksel ve çevresel güvenlik koşulları nasıldır?",
+      "description": "Kartlı/kameralı sistem odası, kesintisiz güç kaynağı (UPS), jeneratör ve hassas klima iklimlendirme.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kilitli_yetkili_kartli_kamera_ile_izlenen_ozel_sistem_odasi_bulunmaktadir",
+          "label": "Yalnızca yetkililerin girebildiği kilitli/kartlı ve kamera ile izlenen özel sistem odası vardır"
+        },
+        {
+          "value": "kesintisiz_guc_kaynagi_ups_ve_otomatik_devreye_giren_jenerator_baglantisi_tamdir",
+          "label": "Yeterli kapasitede Kesintisiz Güç Kaynağı (UPS) ve otomatik jeneratör altyapısı mevcuttur"
+        },
+        {
+          "value": "hassas_klima_iklimlendirme_ve_yangin_algilama_sondurme_fm200_gazli_sistemi_vardir",
+          "label": "Hassas iklimlendirme kliması ve yangın algılama/gazlı söndürme sistemi mevcuttur"
+        },
+        {
+          "value": "sunucular_ofis_icinde_acikta_veya_standart_bir_odada_bulunmaktadir_ozel_iklimlendirme_yoktur",
+          "label": "Sunucular ofis içinde açıkta veya standart bir odada barındırılmaktadır; özel klima/UPS yoktur"
+        },
+        {
+          "value": "tum_altyapi_bulutta_veya_dis_veri_merkezinde_oldugu_icin_fiziksel_sistem_odamiz_yoktur",
+          "label": "Tüm altyapı bulutta/veri merkezinde olduğu için yerel sistem odası ihtiyacı yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-035",
+      "process": "Lisans, Bakım ve Tedarikçi Yönetimi",
+      "order": 35,
+      "question": "Şirkette kullanılan işletim sistemleri, ofis paketleri, sanallaştırma ve veritabanı lisanslarının uyumluluk durumu nedir?",
+      "description": "Kurumsal yazılım lisansları, Microsoft 365 abonelikleri ve üretici SLA/bakım anlaşmaları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_sunucu_istemci_ve_veritabani_lisanslari_orijinal_kurumsal_ve_kayit_altindadir",
+          "label": "Tüm sunucu, istemci, ofis ve veritabanı yazılımları orijinal, kurumsal lisanslı ve faturalıdır"
+        },
+        {
+          "value": "microsoft_365_veya_google_workspace_kurumsal_bulut_aboneligi_kullanilmaktadir",
+          "label": "Microsoft 365 veya Google Workspace kurumsal bulut aboneliği kullanılmaktadır"
+        },
+        {
+          "value": "kritik_yazilimlar_ve_donanimlar_icin_3_parti_bakim_ve_sla_sozlesmeleri_yururluktedir",
+          "label": "Kritik donanım ve yazılımlar için üretici/entegratör SLA ve bakım anlaşmaları yürürlüktedir"
+        },
+        {
+          "value": "bazi_bilgisayarlarda_veya_sunucularda_lisans_acigi_veya_korsan_kullanim_riski_bulunabilir",
+          "label": "Bazı cihazlarda veya sunucularda lisans açığı veya korsan yazılım riski bulunabilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-036",
+      "process": "Lisans, Bakım ve Tedarikçi Yönetimi",
+      "order": 36,
+      "question": "BT tedarikçileri, internet servis sağlayıcıları ve yazılım firmaları ile olan sözleşmelerde Hizmet Seviyesi Taahhüdü (SLA) tanımlı mıdır?",
+      "description": "Arıza müdahale süresi taahhütlü kurumsal SLA sözleşmesi veya çağrı bazlı münferit hizmet.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "evet_tum_kritik_tedarikcilerle_yazili_ve_sure_taahhutlu_sla_sozlesmesi_vardir",
+          "label": "Evet, tüm kritik tedarikçilerle yazılı ve arıza müdahale süresi taahhütlü SLA anlaşması vardır"
+        },
+        {
+          "value": "sozlesmeler_vardir_ancak_katı_bir_sla_veya_ceza_sartlari_uygulanmamaktadir",
+          "label": "Sözleşmeler vardır ancak katı bir müdahale süresi (SLA) takip edilmemektedir"
+        },
+        {
+          "value": "resmi_bir_bakim_sozlesmesi_yoktur_ihtiyac_aninda_cagri_bazli_hizmet_alinir",
+          "label": "Resmi bir bakım sözleşmesi yoktur; sorun çıktığında münferit destek alınmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-037",
+      "process": "ERP/CRM Teknik Ortam Hazırlığı",
+      "order": 37,
+      "question": "Uygulamaya alınacak yeni ERP ve CRM projesinin canlıya geçiş mimarisi için hangi dağıtım (Deployment) modeli hedeflenmektedir?",
+      "description": "Bulut SaaS, On-premise yerel sunucular, Colocation veri merkezi veya hibrit mimari tercihi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bulut_tabanli_saas_veya_yonetilen_bulut_sunucu_cloud_erp",
+          "label": "Tamamen Bulut Tabanlı (SaaS) veya Yönetilen Bulut Sunucu (Cloud ERP/CRM)"
+        },
+        {
+          "value": "sirket_ici_onpremise_kendi_sunucularimiz_ve_yerel_veritabani",
+          "label": "Şirket İçi (On-Premise) - Kendi sunucularımız ve yerel veritabanı altyapımızda"
+        },
+        {
+          "value": "ozel_barindirma_private_cloud_veya_kolokasyon_veri_merkezi",
+          "label": "Özel Barındırma (Private Cloud) veya Colocation Veri Merkezinde Kiralık Sunucu"
+        },
+        {
+          "value": "hibrit_yapi_veritabani_yerelde_mobil_ve_web_arayuzler_bulutta",
+          "label": "Hibrit Yapı - Hassas veritabanı yerelde, mobil ve web arayüzler bulutta"
+        },
+        {
+          "value": "henuz_karar_verilmemistir_analiz_sonucunda_onerilecek_mimari_degerlendirilecektir",
+          "label": "Henüz kesin karar verilmemiştir; teknik analiz raporundaki öneri değerlendirilecektir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-038",
+      "process": "ERP/CRM Teknik Ortam Hazırlığı",
+      "order": 38,
+      "question": "Yeni ERP/CRM projesinde canlı ortamın yanı sıra Test, Geliştirme (Dev) ve Eğitim ortamları için altyapı ayrımı planlanmış mıdır?",
+      "description": "Prod, Test, Dev ve Eğitim ortamları için bağımsız sunucu/veritabanı ayrımı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "evet_canli_test_ve_gelistirme_ortamlari_icin_ayri_sunucu_ve_veritabani_alanlari_planlanmistir",
+          "label": "Evet; Canlı (Prod), Test ve Geliştirme (Dev) için ayrı sunucu/ortamlar planlanmıştır"
+        },
+        {
+          "value": "canli_ortam_haricinde_tek_bir_ortak_test_veritabani_olmasi_yeterli_gorulmektedir",
+          "label": "Canlı ortam haricinde aynı sunucu üzerinde tek bir ortak test veritabanı açılması planlanmaktadır"
+        },
+        {
+          "value": "ayri_bir_test_ortami_icin_sunucu_veya_lisans_kaynagi_ayrilmamistir",
+          "label": "Ayrı bir test/eğitim ortamı için sunucu veya donanım kaynağı ayrılmamıştır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-039",
+      "process": "Entegrasyon ve API Altyapısı",
+      "order": 39,
+      "question": "Kurulacak ERP/CRM sisteminin şirket içi veya dış dünyadaki hangi harici servis ve sistemlerle entegre çalışması gerekmektedir?",
+      "description": "E-Fatura, banka MT940/POS, pazaryerleri, kargo web servisleri veya üretim makine/PLC bağlantıları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "e_fatura_e_irsaliye_e_defter_ozel_entegrator_gib_servisleri",
+          "label": "E-Fatura / E-İrsaliye / E-Defter özel entegratör veya GİB web servisleri"
+        },
+        {
+          "value": "banka_ekstre_ve_sanal_pos_online_tahsilat_entegrasyonlari",
+          "label": "Banka hesap hareketleri (MT940/Online Ekstre) ve Sanal POS/tahsilat servisleri"
+        },
+        {
+          "value": "e_ticaret_pazaryerleri_trendyol_hepsiburada_amazon_shopify_b2b_b2c",
+          "label": "E-Ticaret platformları ve pazaryerleri (Trendyol, Hepsiburada, Amazon, B2B/B2C)"
+        },
+        {
+          "value": "kargo_ve_lojistik_firmalari_barkod_takip_ve_gonderi_entegrasyonu",
+          "label": "Kargo ve lojistik firmaları API servisleri (Barkod, durum takibi, irsaliye)"
+        },
+        {
+          "value": "uretim_makineleri_scada_plc_iot_cihazlari_ve_kantar_entegrasyonu",
+          "label": "Üretim makineleri, SCADA, PLC, IoT sensörleri veya kantar/terazi entegrasyonu"
+        },
+        {
+          "value": "herhangi_bir_dis_sistem_veya_servis_entegrasyonu_bulunmamaktadir",
+          "label": "Herhangi bir dış sistem veya servis entegrasyonu bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-040",
+      "process": "Entegrasyon ve API Altyapısı",
+      "order": 40,
+      "question": "Dış sistem entegrasyonlarında tercih edilen veri aktarım mimarisi, güvenlik protokolleri ve servis standartları nelerdir?",
+      "description": "REST API/JSON, SOAP/XML web servisleri, SFTP dosya transferi veya doğrudan DB bağlantısı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ITI-039",
+        "operator": "not_equals",
+        "value": "herhangi_bir_dis_sistem_veya_servis_entegrasyonu_bulunmamaktadir"
+      },
+      "options": [
+        {
+          "value": "rest_api_veya_webhooks_uzerinden_json_veri_alisverisi",
+          "label": "Modern REST API veya Webhook mimarisi üzerinden gerçek zamanlı JSON haberleşmesi"
+        },
+        {
+          "value": "soap_xml_web_servisleri_uzerinden_entegrasyon",
+          "label": "SOAP / XML tabanlı kurumsal web servisleri üzerinden entegrasyon"
+        },
+        {
+          "value": "dosya_aktarimi_sftp_csv_excel_xml_ile_periyodik_batch_transfer",
+          "label": "Güvenli dosya aktarımı (SFTP / FTP) ile zamanlanmış CSV/Excel/XML aktarımları"
+        },
+        {
+          "value": "dogrudan_veritabani_seviyesinde_view_stored_procedure_veya_dblink_ile_baglanti",
+          "label": "Doğrudan veritabanı seviyesinde tablo/view, Stored Procedure veya DB Link bağlantısı"
+        },
+        {
+          "value": "entegrasyon_ara_yazilimi_middleware_esb_veya_kuyruk_sistemi_rabbitmq_kafka",
+          "label": "Entegrasyon ara yazılımı (Middleware / ESB) veya mesaj kuyruk sistemleri kullanılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-041",
+      "process": "E-posta, Dosya ve Ortak Çalışma Servisleri",
+      "order": 41,
+      "question": "Kurumsal e-posta, dosya depolama ve ofis ortak çalışma platformları hangi altyapı üzerinde çalışmaktadır?",
+      "description": "Microsoft 365, Google Workspace, yerel Exchange/hosting ve şirket içi File Server/NAS yapısı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "microsoft_365_exchange_online_onedrive_teams_sharepoint",
+          "label": "Microsoft 365 (Exchange Online, OneDrive, Teams, SharePoint)"
+        },
+        {
+          "value": "google_workspace_gmail_google_drive_google_meet",
+          "label": "Google Workspace (Gmail, Google Drive, Google Meet)"
+        },
+        {
+          "value": "yerel_mail_sunucusu_exchange_onpremise_zimbra_veya_standart_hosting_pop3_imap",
+          "label": "Yerel e-posta sunucusu (Exchange On-Premise, Zimbra) veya standart hosting (cPanel POP3/IMAP)"
+        },
+        {
+          "value": "sirket_ici_dosya_sunucusu_file_server_veya_nas_cihazi_uzerinde_klasor_paylasimi",
+          "label": "Şirket içi dosya sunucusu (Windows File Server / NAS) üzerinde paylaşılan klasörler"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-042",
+      "process": "BT Destek, Olay ve Değişiklik Yönetimi",
+      "order": 42,
+      "question": "Kullanıcıların yaşadığı teknik sorunlar, yazılım arızaları ve donanım talepleri nasıl toplanıp çözülmektedir?",
+      "description": "Yardım masası (Helpdesk) ticket sistemi, e-posta, telefon veya anlık mesajlaşma desteği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "merkezi_yardim_masasi_helpdesk_ticket_yazilimi_jira_manageengine_freshservice",
+          "label": "Merkezi Yardım Masası (Helpdesk / Ticket) yazılımı üzerinden kayıt ve SLA takibi ile"
+        },
+        {
+          "value": "e_posta_veya_dahili_telefon_ile_bt_ekibine_dogrudan_iletilmektedir",
+          "label": "E-posta veya dahili telefon ile BT personeline doğrudan bildirilmektedir"
+        },
+        {
+          "value": "sozlu_olarak_veya_anlik_mesajlasma_whatsapp_skype_ile_ad_hoc_cozulmektedir",
+          "label": "Sözlü olarak veya anlık mesajlaşma (WhatsApp, Teams vb.) ile plansız ele alınmaktadır"
+        },
+        {
+          "value": "dis_teknik_servis_firmasina_telefon_veya_servis_talebi_acilarak_cozulur",
+          "label": "Dış teknik servis / bilişim firmasına çağrı açılarak destek alınmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-043",
+      "process": "BT Destek, Olay ve Değişiklik Yönetimi",
+      "order": 43,
+      "question": "Canlı sistemlerde yapılacak versiyon güncellemeleri, veritabanı yamaları ve yapılandırma değişiklikleri için bir değişiklik yönetimi süreci var mıdır?",
+      "description": "Onaylı değişiklik formu, geri alma (Rollback) planı, mesai dışı bakım penceresi veya anlık canlı müdahale.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yazili_degisiklik_yonetimi_onay_formu_ve_geri_alma_rollback_plani_ile_mesai_disi_yapilir",
+          "label": "Yazılı değişiklik yönetimi, onay süreci ve geri alma (Rollback) planı ile mesai dışı uygulanır"
+        },
+        {
+          "value": "bt_ekibi_tarafindan_ihtiyac_duyuldukca_mesai_disinda_yapilir_formal_surec_yoktur",
+          "label": "BT personeli tarafından ihtiyaç duyuldukça mesai dışında yapılır; resmi dokümantasyon yoktur"
+        },
+        {
+          "value": "mesai_saatleri_icinde_dogrudan_canli_sistemde_degisiklikler_anlik_uygulanmaktadir",
+          "label": "Mesai saatleri içinde doğrudan canlı sistem üzerinde anlık müdahaleler yapılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-044",
+      "process": "BT Riskleri, Teknik Borç ve Yol Haritası",
+      "order": 44,
+      "question": "Mevcut bilgi teknolojileri altyapınızda ERP/CRM projesinin başarısını veya sürekliliğini tehdit eden en kritik teknik riskler nelerdir?",
+      "description": "Eski donanımlar, internet/ağ kesintileri, yedeksizlik, siber tehditler, personel eksikliği ve teknik borç.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sunucu_ve_storage_donanimlarinin_eskimis_olmasi_ve_performans_yetersizligi",
+          "label": "Sunucu ve depolama donanımlarının eskimiş olması ve performans yetersizliği"
+        },
+        {
+          "value": "ag_ve_internet_altyapisindaki_kopmalar_bant_genisligi_darligi_ve_yedeksizlik",
+          "label": "Ağ ve internet altyapısındaki kopmalar, bant genişliği yetersizliği ve yedeksizlik"
+        },
+        {
+          "value": "yedekleme_ve_felaket_kurtarma_tatbikatlarinin_yetersizligi_veri_kaybi_riski",
+          "label": "Yedekleme ve felaket kurtarma tatbikatlarının yetersizliği; veri kaybı riski"
+        },
+        {
+          "value": "siber_guvenlik_aciklari_fidye_yazilimi_ransomware_ve_yetkisiz_erisim_tehdidi",
+          "label": "Siber güvenlik açıkları, fidye yazılımı (Ransomware) ve yetkisiz erişim tehditleri"
+        },
+        {
+          "value": "nitelikli_bt_personeli_eksikligi_ve_tek_kisiye_bagimlilik_riski",
+          "label": "Şirket içinde nitelikli BT personeli eksikliği ve tek kişiye bağımlılık riski"
+        },
+        {
+          "value": "eski_yazilimlar_ve_destegi_bitmis_isletim_sistemlerinden_kaynaklanan_teknik_borc",
+          "label": "Eski yazılımlar ve desteği bitmiş işletim sistemlerinden kaynaklanan teknik borç"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-045",
+      "process": "BT Riskleri, Teknik Borç ve Yol Haritası",
+      "order": 45,
+      "question": "Yeni ERP/CRM devreye alımı öncesinde planlanan veya bütçelenen BT altyapı yatırım kalemleri hangileridir?",
+      "description": "Sunucu yatırımı, firewall yenileme, metro internet, el terminalleri veya istemci PC yükseltmeleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yeni_fiziksel_sunucu_sanallastirma_veya_bulut_iaas_kapasite_artirimi",
+          "label": "Yeni fiziksel sunucu, sanallaştırma lisansı veya bulut IaaS kapasite yatırımı"
+        },
+        {
+          "value": "kurumsal_firewall_ag_anahtarlari_switch_ve_kablolama_yenilemesi",
+          "label": "Kurumsal güvenlik duvarı (Firewall), yönetilebilir switch'ler ve kablolama yenilemesi"
+        },
+        {
+          "value": "internet_baglantisi_metro_ethernet_ve_otomatik_yedek_hat_aboneligi",
+          "label": "Yüksek hızlı metro internet ve otomatik yedek hat (Failover) aboneliği"
+        },
+        {
+          "value": "depo_ve_saha_icin_yeni_nesil_el_terminalleri_ve_endustriyel_barkod_yazicilar",
+          "label": "Depo ve saha için yeni nesil el terminalleri ve endüstriyel barkod yazıcılar"
+        },
+        {
+          "value": "kullanici_bilgisayarlarinin_ram_ssd_yukseltmesi_ve_kurumsal_isletim_sistemi_lisanslari",
+          "label": "Kullanıcı bilgisayarlarının (PC/Laptop) RAM/SSD yükseltmesi ve lisans güncellemeleri"
+        },
+        {
+          "value": "herhangi_bir_altyapi_yatirimi_planlanmamaktadir_mevcut_altyapi_yeterli_gorulmektedir",
+          "label": "Herhangi bir altyapı yatırımı planlanmamaktadır; mevcut imkanlar yeterli görülmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-046",
+      "process": "BT Organizasyonu ve Sorumluluklar",
+      "order": 46,
+      "question": "ERP ve CRM uygulama projesinde şirket tarafındaki teknik koordinatör / BT proje sorumlusu belirlenmiş midir?",
+      "description": "Şirket içi BT yöneticisi, dış danışman liderliği veya teknik sorumluluk yapısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "evet_sirket_ici_bt_yoneticisi_teknik_proje_lideri_olarak_resmi_atanmistir",
+          "label": "Evet, şirket içi BT yöneticisi teknik proje lideri olarak atanmıştır"
+        },
+        {
+          "value": "kismen_danisman_firma_veya_dis_bt_firmasi_ile_birlikte_teknik_sorumluluk_paylasilacaktir",
+          "label": "Kısmen; dış BT danışmanı ile şirket yöneticisi sorumluluğu birlikte üstlenecektir"
+        },
+        {
+          "value": "hayir_henuz_teknik_bir_sorumlu_atanmamistir_yonetim_tarafindan_karar_verilecektir",
+          "label": "Hayır, henüz teknik bir koordinatör atanmamıştır; süreç içinde belirlenecektir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "ITI-047",
+      "process": "BT Riskleri, Teknik Borç ve Yol Haritası",
+      "order": 47,
+      "question": "Şirket üst yönetiminin ve BT yönetiminin yeni sistemden en temel teknik beklentisi ve önceliği nedir?",
+      "description": "Yüksek performans ve uptime, üst düzey veri güvenliği, kesintisiz entegrasyon veya düşük maliyet.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yuksek_performans_kesintisiz_calisma_uptime_ve_hizli_tepki_suresi",
+          "label": "Yüksek sistem performansı, 7/24 kesintisiz çalışma (%99.9 Uptime) ve hızlı yanıt süreleri"
+        },
+        {
+          "value": "ust_duzey_veri_guvenligi_sifreleme_ve_siber_saldirilara_karsi_tam_koruma",
+          "label": "Üst düzey veri güvenliği, veri izolasyonu ve fidye yazılımlarına karşı tam koruma"
+        },
+        {
+          "value": "farkli_sistemlerle_pazaryeri_banka_makine_sorunsuz_ve_otomatik_entegrasyon",
+          "label": "Farklı platformlar, pazaryerleri, bankalar ve cihazlarla sorunsuz gerçek zamanlı entegrasyon"
+        },
+        {
+          "value": "mobil_ve_webden_her_yerden_kolay_ve_hizli_erisim_esnekligi",
+          "label": "Mobil cihazlardan ve web tarayıcıdan her yerden güvenli ve kolay erişim esnekliği"
+        },
+        {
+          "value": "dusuk_altyapi_ve_bakim_maliyeti_toplam_sahip_olma_maliyetinin_tco_minimize_edilmesi",
+          "label": "Düşük donanım ve bakım maliyeti (Toplam sahip olma maliyetinin minimize edilmesi)"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}

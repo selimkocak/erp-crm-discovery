@@ -1,0 +1,714 @@
+{
+  "meta": {
+    "pack_id": "tr.accounting.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "ACCOUNTING",
+    "name": "Muhasebe (Genel) Ön Analizi",
+    "description": "ERP implementasyonu öncesinde Genel Muhasebe departmanının AS-IS süreçlerini, Tekdüzen Hesap Planı (THP), otomatik yevmiye entegrasyonu, cari muhasebe, masraf merkezleri (7/A), KDV, tevkifat, stopaj, e-Defter, kur farkları, dönemsellik, sürekli envanter, 3-way match, mutabakat, dönem kapanışı, denetim izi (audit trail) ve finansal raporlama operasyonlarını anlamaya yönelik temel discovery soru paketi."
+  },
+  "questions": [
+    {
+      "id": "ACC-001",
+      "process": "Hesap Planı ve Muhasebe Organizasyonu",
+      "order": 1,
+      "question": "Hesap planı yapınız nasıldır ve grup şirketleri / şubeler arasında nasıl yönetilmektedir?",
+      "description": "Tekdüzen Hesap Planı (THP), merkezi tek hesap planı vs. şube/şirket bazında bağımsız hesap planları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_tek_hesap_plani_tum_sirketler", "label": "Tüm grup şirketleri ve şubelerde merkezi tek ve standart Tekdüzen Hesap Planı (THP) kullanılır", "allow_note": false, "is_other": false },
+        { "value": "ortak_ana_hesap_sirket_ozel_alt_hesap", "label": "Ana hesaplar (3 basamak) ortaktır; ancak şirket/şube bazında özel alt hesap kodları açılabilir", "allow_note": true, "is_other": false },
+        { "value": "her_sirket_tamamen_bagimsiz", "label": "Her tüzel kişilik ve şirket tamamen kendine ait bağımsız bir hesap planı kullanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-002",
+      "process": "Hesap Planı ve Muhasebe Organizasyonu",
+      "order": 2,
+      "question": "Yeni muhasebe ana ve alt hesap kodu açma yetkisi ve standart kodlama kuralları nasıl yönetilmektedir?",
+      "description": "Hesap planının kirlenmesini ve mükerrer hesap açılmasını önleyen merkezi kontrol.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "merkezi_yetkili_ekip_onayli_acar", "label": "Merkezi Muhasebe/Finans ekibi açar; hesap kodu açılışında katı kodlama standardı ve onay akışı vardır", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_kullanicilari_ihtiyaca_gore_acar", "label": "Tüm muhasebe personeli ihtiyaç duydukça doğrudan kendi yetkisiyle alt hesap açabilmektedir", "allow_note": false, "is_other": false },
+        { "value": "dis_mali_musavir_acar", "label": "Hesap açılışları şirket içi yapılmaz, anlaşmalı dış mali müşavir veya muhasebe ofisi tarafından yönetilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-003",
+      "process": "Yevmiye ve Muhasebe Fişleri Yönetimi",
+      "order": 3,
+      "question": "Muhasebe kayıtlarının ne kadarı operasyonel belgelerden otomatik üretilmekte, ne kadarı manuel yevmiye fişi olarak girilmektedir?",
+      "description": "Muhasebe otomasyon seviyesi ve operasyonel iş yükü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "cogulukla_otomatik_yuzde_80_uzeri", "label": "Kayıtların %80'inden fazlası fatura, banka, stok vb. kaynak belgelerden sistemsel otomatik oluşur; manuel fiş oranı çok düşüktür", "allow_note": false, "is_other": false },
+        { "value": "yari_otomatik_yari_manuel", "label": "Faturalar otomatik muhasebeleşir; ancak banka, masraf, amortisman ve düzeltmeler manuel girilir (%50-%50)", "allow_note": true, "is_other": false },
+        { "value": "cogulukla_manuel_fis_girisi", "label": "Operasyonel sistemlerden otomatik entegrasyon yoktur; muhasebe ekibi fişleri elle tek tek işler", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-004",
+      "process": "Yevmiye ve Muhasebe Fişleri Yönetimi",
+      "order": 4,
+      "question": "Yevmiye fişi tipleri (Mahsup, Tahsil, Tediye, Açılış, Kapanış, Kur Farkı vb.) ve fiş numaralandırma yapısı nasıl kurgulanmıştır?",
+      "description": "Yasal yevmiye sıra no vs. İç kontrol amaçlı fiş türü ayrımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "standart_tur_ve_aylik_yasal_yevmiye_sirasi", "label": "Fişler türlerine göre (Mahsup, Tahsil, Tediye) ayrılır; yasal defter için müteselsil yevmiye no otomatik verilir", "allow_note": false, "is_other": false },
+        { "value": "tek_tip_mahsup_fisi_kullanilir", "label": "Tüm kayıtlar tek tip mahsup fişi olarak kaydedilir, özel fiş tipi ayrımı yapılmaz", "allow_note": false, "is_other": false },
+        { "value": "modul_bazli_ayri_fis_serileri_var", "label": "Her modül (Fatura, Banka, Üretim vb.) kendi fiş serisinden bağımsız numara alır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-005",
+      "process": "Otomatik Muhasebe Entegrasyonu ve Hesap Tayini",
+      "order": 5,
+      "question": "Operasyonel işlemlerin (satış, satınalma, stok, masraf) muhasebeleşmesinde Hesap Tayini (Account Determination) nasıl belirlenmektedir?",
+      "description": "Malzeme grubu, cari grubu, vergi kodu veya işlem tipine göre otomatik hesap tayin matrisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "parametre_ve_matris_tablolari_ile_otomatik", "label": "Malzeme grubu, cari türü, vergi oranı ve şube parametrelerine göre sistem doğru muhasebe hesabını otomatik bulur", "allow_note": true, "is_other": false },
+        { "value": "kullanici_belge_girerken_manuel_secer", "label": "Kullanıcı her faturada veya işlemde ilgili muhasebe hesap kodunu listeden manuel seçer", "allow_note": true, "is_other": false },
+        { "value": "sabit_tek_hesaba_atar_sonradan_duzeltilir", "label": "Tüm işlemler tek bir havuz hesaba gider, ay sonunda muhasebeci mahsupla doğru hesaplara dağıtır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-006",
+      "process": "Otomatik Muhasebe Entegrasyonu ve Hesap Tayini",
+      "order": 6,
+      "question": "Oluşan bir muhasebe fişinden kaynak ticari belgeye (fatura, irsaliye, banka hareketi vb.) ve tersine doğrudan çift yönlü izlenebilirlik (Drill-Down) sağlanabiliyor mu?",
+      "description": "Yevmiye kaydı ile operasyonel belge arasındaki bağ ve denetim kolaylığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tam_cift_yonlu_canli_baglanti", "label": "Evet, muhasebe fişinden tek tıkla orijinal faturaya/irsaliyeye; faturadan da oluşan muhasebe kaydına anında gidilebilir", "allow_note": false, "is_other": false },
+        { "value": "sadece_fis_aciklamasinda_belge_no_yazar", "label": "Sistemde canlı link yoktur; fiş açıklama satırına fatura no yazılır, arama yapılarak manuel bulunur", "allow_note": true, "is_other": false },
+        { "value": "izlenebilirlik_yoktur_baglanti_kopuk", "label": "Muhasebe fişi bağımsız oluşur, kaynak belge ile hiçbir sistemsel bağlantısı yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-007",
+      "process": "Satıcı ve Müşteri Cari Muhasebesi",
+      "order": 7,
+      "question": "Müşteri ve Tedarikçi cari hesapları ile Defteri Kebir (120 Alıcılar / 320 Satıcılar) hesapları arasındaki bağlantı nasıl kurgulanmıştır?",
+      "description": "Alt hesap bazında tek tek muhasebe hesabı açılması vs. Kontrol hesabı (Reconciliation Account / Yardımcı Defter) mantığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "her_cari_icin_ayri_alt_muhasebe_kodu_acilir", "label": "Her müşteri için 120.XX.XXXX, her tedarikçi için 320.XX.XXXX şeklinde ayrı birer muhasebe alt hesabı açılır", "allow_note": true, "is_other": false },
+        { "value": "kontrol_hesabi_ve_yardimci_defter_kullanilir", "label": "Tüm müşteriler tek/birkaç ana 120 hesabına bağlıdır; detay bakiye yardımcı defterde (Subledger) cari kodla tutulur", "allow_note": true, "is_other": false },
+        { "value": "sadece_bolge_veya_grup_bazinda_muhasebe_hesabi", "label": "Cariler grup veya bölge bazında toplu muhasebe hesaplarına bağlanır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-008",
+      "process": "Satıcı ve Müşteri Cari Muhasebesi",
+      "order": 8,
+      "question": "Cari hesap bakiyeleri (Müşteri/Tedarikçi Modülü) ile Muhasebe Mizan bakiyeleri (120/320 Defteri Kebir) arasında fark/uyumsuzluk oluşmakta mıdır?",
+      "description": "Yardımcı defter ile büyük defter arasındaki tutarsızlık ve mutabakat sorunları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "asla_fark_olusmaz_sistem_tam_entegre", "label": "Hayır, cari hareket ile muhasebe kaydı aynı anda oluşur; mizan ile cari bakiye daima %100 kuruşu kuruşuna eşittir", "allow_note": false, "is_other": false },
+        { "value": "zaman_zaman_manuel_kayitlar_yuzunden_fark_cikar", "label": "Evet, muhasebeye carisiz doğrudan 120/320 fişi atıldığı için ay sonlarında cari-mizan mutabakatı yapmak gerekir", "allow_note": true, "is_other": false },
+        { "value": "surekli_fark_vardir_manuel_duzeltilir", "label": "Cari modül ile muhasebe modülü ayrı çalıştığı için sürekli bakiye farkı çıkar, manuel mahsupla eşitlenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-009",
+      "process": "Masraf ve Gider Muhasebesi",
+      "order": 9,
+      "question": "Gider hesapları yapınızda 7/A seçeneği (Fonksiyonel: 750 Üretim, 760 Pazarlama, 770 Genel Yönetim, 780 Finansman) mi yoksa 7/B seçeneği (Çeşit Esası) mi kullanılmaktadır?",
+      "description": "Türk Tekdüzen Hesap Planı gider muhasebesi standardı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "7a_secenegi_fonksiyonel_giderler", "label": "7/A seçeneği kullanılmaktadır (710/720/730 Üretim, 750 Ar-Ge, 760 Pazarlama, 770 Genel Yönetim, 780 Finansman)", "allow_note": false, "is_other": false },
+        { "value": "7b_secenegi_cesit_esasli_giderler", "label": "7/B seçeneği kullanılmaktadır (790 İlk Madde, 791 İşçi Ücret, 792 Memur Ücret, 793 Dışarıdan Sağlanan Fayda vb.)", "allow_note": false, "is_other": false },
+        { "value": "her_ikisi_birlikte_veya_ozel_kurgu", "label": "Şirket türlerine göre karma yapı veya özel raporlama hesapları kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-010",
+      "process": "Masraf ve Gider Muhasebesi",
+      "order": 10,
+      "question": "Gider fişlerinde Masraf Merkezi (Cost Center), Departman veya Proje kodu seçilmesi zorunlu tutulmakta mıdır?",
+      "description": "Masraf merkezi dağıtımı ve gider bütçesi kontrolü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_7li_hesaplarda_masraf_merkezi_zorunludur", "label": "Evet, 7'li gider hesabı seçildiğinde masraf merkezi / departman seçilmeden fiş kaydedilemez", "allow_note": false, "is_other": false },
+        { "value": "opsiyoneldir_kullanici_isterse_secer", "label": "Masraf merkezi alanı vardır ancak zorunlu değildir, çoğu kayıtta boş bırakılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "masraf_merkezi_kullanilmiyor", "label": "Sistemde masraf merkezi veya departman bazlı gider takibi yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "proje_bazli_takip_zorunludur", "label": "Departman yerine her gider kaydında ilgili Müşteri/İç Proje Kodu seçilmesi zorunludur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-011",
+      "process": "Masraf ve Gider Muhasebesi",
+      "order": 11,
+      "question": "Dönem sonlarında ortak genel giderlerin (kira, elektrik, yemek, yönetim giderleri) üretim ve ürün maliyetlerine dağıtım anahtarları ile dağıtımı yapılıyor mu?",
+      "description": "İkincil maliyet dağıtımı ve yükleme katsayıları (Cost Allocation Cycles).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_tanimli_dagitim_anahtarlari_ile_otomatik", "label": "Evet, m2, personel sayısı, makine saati gibi dağıtım anahtarlarıyla sistem genel giderleri otomatik paylaştırır", "allow_note": true, "is_other": false },
+        { "value": "excelde_hesaplanip_manuel_mahsupla_dagitilir", "label": "Dağıtım Excel'de hesaplanır, ay sonunda muhasebeci manuel mahsup fişiyle giderleri yansıtır", "allow_note": true, "is_other": false },
+        { "value": "gider_dagitimi_yapilmaz_direkt_gider_yazilir", "label": "Ortak giderler ürünlere dağıtılmaz, doğrudan dönem gideri olarak kapatılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-012",
+      "process": "Vergi ve KDV Süreçleri Yönetimi",
+      "order": 12,
+      "question": "KDV oranları (%1, %10, %20 vb.) ve KDV hesapları (191 İndirilecek, 391 Hesaplanan, 360 Ödenecek) sistemde nasıl eşleştirilmektedir?",
+      "description": "Vergi göstergeleri (Tax Codes) ve otomatik vergi matrah/tutar hesaplama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "vergi_kodlari_uzerinden_otomatik_hesaplanir_ve_ayrisir", "label": "Sistemde her KDV oranı için vergi kodu tanımlıdır; fatura girilirken matrah ve KDV tutarı otomatik ayrışıp ilgili alt hesaba işlenir", "allow_note": false, "is_other": false },
+        { "value": "kullanici_kdv_hesabini_ve_tutarini_manuel_yazar", "label": "Kullanıcı faturada veya fişte KDV satırını ve hesap kodunu manuel seçip tutarı elle yazar", "allow_note": true, "is_other": false },
+        { "value": "kdv_oranlarina_gore_ayri_hesap_tutulmaz_tek_hesap", "label": "Tüm KDV'ler tek bir 191 ve tek bir 391 hesabında toplanır, oran kırılımı yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-013",
+      "process": "Vergi ve KDV Süreçleri Yönetimi",
+      "order": 13,
+      "question": "KDV İstisnası, İhraç Kayıtlı Satış (Tecil-Terkin), Dahilde İşleme İzin Belgesi (DİİB) veya İade Hakkı Doğuran İşlemleriniz var mı?",
+      "description": "Özel KDV istisna kodları, 192 Diğer KDV ve 392 Diğer KDV tecil hesapları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_ihrac_kayitli_ve_istisna_kodlu_islemler_var", "label": "Evet, ihraç kayıtlı teslimler (Tecil/Terkin), KDV istisna kodlu satışlar ve KDV iade süreçleri düzenli uygulanır", "allow_note": true, "is_other": false },
+        { "value": "sadece_standart_ihracat_kdv_istisnasi_var", "label": "Sadece 301 İstisna Kodu ile standart yurtdışı mal ihracatı KDV muafiyeti uygulanır", "allow_note": false, "is_other": false },
+        { "value": "istisna_veya_tecil_terkin_islemi_yoktur", "label": "Tüm işlemlerimiz standart oranlı yurtiçi işlemlerdir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-014",
+      "process": "Tevkifat ve Stopaj Süreçleri",
+      "order": 14,
+      "question": "Satış veya satınalma faturalarınızda Kısmi KDV Tevkifatı (2/10, 3/10, 5/10, 7/10, 9/10 vb.) uygulanmakta mıdır?",
+      "description": "Tevkifatlı fatura düzenleme, tevkifatlı satınalma faturası kabulü ve KDV-2 beyannamesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "hem_satista_hem_satinalmada_tevkifat_var", "label": "Evet, hem müşterilere kestiğimiz hem tedarikçilerden gelen faturalarda düzenli tevkifat uygulanır", "allow_note": true, "is_other": false },
+        { "value": "sadece_satinalma_gider_faturalarinda_tevkifat_var", "label": "Biz tevkifatlı fatura kesmeyiz; ancak servis, nakliye, işgücü gibi gider faturalarında tevkifat uygularız", "allow_note": true, "is_other": false },
+        { "value": "sadece_satista_tevkifatli_kesiyoruz", "label": "Belirli kurumsal müşterilerimize kestiğimiz faturalarda tevkifat hesaplanır", "allow_note": true, "is_other": false },
+        { "value": "tevkifatli_islemimiz_bulunmamaktadir", "label": "Hiçbir işlemimizde KDV tevkifatı uygulanmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-015",
+      "process": "Tevkifat ve Stopaj Süreçleri",
+      "order": 15,
+      "question": "Tevkifatlı faturalarda tevkif edilen KDV tutarı ve satıcıya ödenecek net tutar sistemde otomatik muhasebeleşiyor mu?",
+      "description": "360 Ödenecek KDV (KDV-2) ve tevkifat muhasebe satırlarının ayrışması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_tevkifati_otomatik_hesaplar_ve_360a_isler", "label": "Evet, tevkifat kodu seçildiğinde sistem tevkif edilen kısmı 360 Sorumlu Sıfatıyla KDV hesabına, kalanı satıcıya otomatik ayırır", "allow_note": false, "is_other": false },
+        { "value": "muhasebe_kullanicisi_satirlari_manuel_hesaplar", "label": "Fatura genel tutarı girilir, tevkifat ve 360 satırları kullanıcı tarafından elle hesaplanıp fişe yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "ACC-014",
+        "operator": "not_equals",
+        "value": "tevkifatli_islemimiz_bulunmamaktadir"
+      }
+    },
+    {
+      "id": "ACC-016",
+      "process": "Tevkifat ve Stopaj Süreçleri",
+      "order": 16,
+      "question": "Kira ödemeleri, Serbest Meslek Makbuzları (SMM) ve diğer hizmet alımlarında Stopaj (Gelir/Kurumlar Vergisi Kesintisi) nasıl yönetilmektedir?",
+      "description": "Muhtasar prim ve hizmet beyannamesi stopaj kesintileri (021, 022, 041 vb. kodlar).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "smm_ve_kira_modulunden_stopaj_otomatik_muhasebelesir", "label": "Evet, makbuz veya kira kaydı girildiğinde brüt tutar, net tutar ve %20 stopaj otomatik 360 hesabına işlenir", "allow_note": true, "is_other": false },
+        { "value": "manuel_mahsup_fisi_ile_hesaplanir", "label": "Her ay kira ve SMM kayıtları Excel'de brütleştirilip manuel mahsup fişi olarak girilir", "allow_note": true, "is_other": false },
+        { "value": "stopajli_odememiz_bulunmamaktadir", "label": "Stopaj doğuran kira veya serbest meslek ödememiz yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-017",
+      "process": "e-Belge ve e-Defter Muhasebe Süreçleri",
+      "order": 17,
+      "question": "e-Defter (Yevmiye ve Kebir Beratları) oluşturma, berat imzalama ve GİB portalına yükleme süreci nasıl yürütülmektedir?",
+      "description": "e-Defter uyumluluğu, fiş sınır kuralları ve yevmiye kapanış takvimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_icine_gomulu_e_defter_modulu_ile", "label": "ERP içindeki e-Defter modülü yevmiye fişlerini standart XML şemasına göre doğrular, imzalar ve beratları hazırlar", "allow_note": true, "is_other": false },
+        { "value": "harici_ozel_entegrator_veya_yazilim_ile", "label": "ERP'den yevmiye verisi Excel/dosya olarak alınıp harici bir e-Defter yazılımında beratlaştırılır", "allow_note": true, "is_other": false },
+        { "value": "dis_mali_musavir_ofisi_yurutur", "label": "e-Defter berat işlemleri şirket dışında serbest muhasebeci mali müşavir tarafından yürütülür", "allow_note": true, "is_other": false },
+        { "value": "e_defter_mukellefi_degiliz", "label": "e-Defter kullanıcısı değiliz, yasal kâğıt defter tutuyoruz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-018",
+      "process": "e-Belge ve e-Defter Muhasebe Süreçleri",
+      "order": 18,
+      "question": "e-Fatura ve e-Arşiv faturalarında oluşan iptal, red veya iade belgeleri muhasebe sistemine nasıl yansıtılmaktadır?",
+      "description": "İptal edilen e-faturaların yevmiye ters kaydı, iade faturası eşleşmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "entegrator_durumuna_gore_otomatik_ters_kayit", "label": "e-Fatura iptal edildiğinde veya reddedildiğinde sistem ilgili yevmiye fişine otomatik ters kayıt atar veya taslağa çeker", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_iptali_gorup_manuel_ters_fis_yazar", "label": "Entegratörden iptal olduğu görülünce muhasebeci manuel ters mahsup fişi keser", "allow_note": true, "is_other": false },
+        { "value": "fatura_silinir_tekrar_kesilir", "label": "Sistemde fatura kaydı silinir veya düzeltilip tekrar kaydedilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-019",
+      "process": "Dövizli İşlemler ve Kur Farkları Yönetimi",
+      "order": 19,
+      "question": "Dövizli işlemlerinizde (müşteri, tedarikçi, banka hesapları) fatura kesim ve tahsilat/ödeme tarihindeki kur farkları nasıl hesaplanmaktadır?",
+      "description": "Gerçekleşmiş Kur Farkı (Realized FX Gain/Loss) ve otomatik kur farkı faturası/fişi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "odeme_ve_tahsilat_eslesmesinde_sistem_otomatik_hesaplar", "label": "Sistem cari hareketleri eşleştirdiği (kapatma yaptığı) anda kur farkını otomatik hesaplar ve 646/656 hesaplarına işler", "allow_note": true, "is_other": false },
+        { "value": "ay_sonunda_excelde_hesaplanip_manuel_islenir", "label": "Her tahsilatta hesaplanmaz; ay sonlarında cariler tek tek Excel'de hesaplanıp manuel kur farkı fişi girilir", "allow_note": true, "is_other": false },
+        { "value": "kur_farki_faturasi_kesildikce_islenir", "label": "Sadece taraflar birbirine resmi kur farkı faturası kestiğinde muhasebeye işlenir, otomatik hesaplama yoktur", "allow_note": true, "is_other": false },
+        { "value": "dovizli_islemimiz_bulunmamaktadir", "label": "Tüm operasyonlarımız yalnızca Türk Lirası (TL) üzerindendir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-020",
+      "process": "Dövizli İşlemler ve Kur Farkları Yönetimi",
+      "order": 20,
+      "question": "Ay sonlarında ve geçici vergi dönem sonlarında açık dövizli bakiyelerin değerlemesi (Gerçekleşmemiş Kur Farkı) nasıl yapılmaktadır?",
+      "description": "Dönem sonu döviz değerlemesi (Unrealized FX Revaluation / TCMB Döviz Alış Kuru).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_tcmb_kurlariyla_toplu_degerleme_yapar", "label": "Dönem sonunda tek tuşla tüm açık dövizli cari, banka ve kasa hesapları TCMB efektif/alış kurlarıyla değerlenir ve değerleme fişi oluşur", "allow_note": false, "is_other": false },
+        { "value": "muhasebeci_hesap_bazinda_manuel_mahsup_yapar", "label": "Muhasebe personeli mizan döviz bakiyelerini hesaplayıp elle değerleme mahsubu girer", "allow_note": true, "is_other": false },
+        { "value": "donem_sonu_doviz_degerlemesi_yapilmaz", "label": "Sadece yıl sonunda değerleme yapılır veya değerleme kaydı atılmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "ACC-019",
+        "operator": "not_equals",
+        "value": "dovizli_islemimiz_bulunmamaktadir"
+      }
+    },
+    {
+      "id": "ACC-021",
+      "process": "Dönemsellik, Tahakkuk ve Gelecek Aylara Ait Giderler",
+      "order": 21,
+      "question": "Peşin ödenen yıllık giderler (sigorta, kasko, bakım, kira vb.) 180 Gelecek Aylara ve 280 Gelecek Yıllara Ait Giderler hesaplarına aktarılıp aylık itfa ediliyor mu?",
+      "description": "Gider dönemselliği ve aylık otomatik dağıtım takvimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_itfa_takvimi_tanimlanir_aylik_otomatik_dagitilir", "label": "Evet, fatura girilirken dönemi (ör. 12 ay) belirtilir; sistem 180 hesabından ilgili 770 gider hesabına her ay otomatik virman yapar", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_her_ay_manuel_mahsupla_giderlestirir", "label": "Fatura 180'e atılır, muhasebeci her ay Excel tablosuna bakarak manuel mahsup fişi keser", "allow_note": true, "is_other": false },
+        { "value": "pesin_odenen_giderler_dogrudan_tek_seferde_giderlestirilir", "label": "Dönemsellik ayrımı yapılmaz, fatura geldiği ay doğrudan tamamı gider yazılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-022",
+      "process": "Dönemsellik, Tahakkuk ve Gelecek Aylara Ait Giderler",
+      "order": 22,
+      "question": "Dönem sonunda henüz faturası gelmemiş ancak gerçekleşmiş giderler için Gider Tahakkuku (381 Gider Tahakkukları) kaydı yapılıyor mu?",
+      "description": "Elektrik, doğalgaz, nakliye gibi faturası sonraki ay gelen giderlerin tahakkuku.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "duzenli_tahakkuk_fisi_kesilir_ve_sonraki_ay_ters_kayitla_kapatilir", "label": "Evet, tahmini gider fişi kesilir; fatura geldiğinde ters kayıtla fatura eşleştirilir", "allow_note": true, "is_other": false },
+        { "value": "tahakkuk_yapilmaz_fatura_ne_zaman_gelirse_o_aya_islenir", "label": "Tahakkuk kaydı atılmaz, fatura hangi ay gelirse o ayın giderine yazılır", "allow_note": false, "is_other": false },
+        { "value": "sadece_yil_sonlarinda_tahakkuk_yapilir", "label": "Aylık yapılmaz, sadece yıl sonu bilançosu öncesinde kritik giderler için yapılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-023",
+      "process": "Sabit Kıymet ve Amortisman Muhasebesi",
+      "order": 23,
+      "question": "Duran varlık alımları (25'li grup) ve aylık/yıllık Amortisman (257 Birikmiş Amortisman) fişleri muhasebeye nasıl işlenmektedir?",
+      "description": "Sabit kıymet kartından otomatik amortisman fişi üretimi vs. Manuel muhasebe mahsubu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sabit_kiymet_modulunden_otomatik_amortisman_fisi_olusur", "label": "Sabit kıymet modülü faydalı ömre göre aylık amortisman tutarını hesaplar ve yevmiye fişini tek tuşla muhasebeye aktarır", "allow_note": true, "is_other": false },
+        { "value": "excelde_amortisman_tablosu_tutulur_manuel_mahsup_kesilir", "label": "Sabit kıymetler Excel'de izlenir, amortisman tutarları hesaplanıp manuel mahsup fişi olarak girilir", "allow_note": true, "is_other": false },
+        { "value": "dis_mali_musavir_yil_sonunda_topluca_isler", "label": "Amortisman kayıtları yıl sonunda dış mali müşavir tarafından topluca deftere işlenir", "allow_note": true, "is_other": false },
+        { "value": "sabit_kiymetimiz_bulunmamaktadir", "label": "Şirket bünyesinde takip edilen sabit kıymet yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-024",
+      "process": "Sabit Kıymet ve Amortisman Muhasebesi",
+      "order": 24,
+      "question": "Sabit kıymet satışlarında veya hurdaya ayırma işlemlerinde kâr/zarar (679/689) muhasebe kaydı nasıl oluşturulmaktadır?",
+      "description": "Varlık çıkışında maliyet, birikmiş amortisman ve satış faturasının netleştirilmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_sabit_kiymet_cikis_fisinde_net_kar_zarari_otomatik_hesaplar", "label": "Evet, satış faturası sabit kıymet kartıyla eşleştiğinde birikmiş amortismanı kapatır ve kâr/zararı otomatik yazar", "allow_note": false, "is_other": false },
+        { "value": "muhasebe_kullanicisi_manuel_mahsupla_kapatir", "label": "Kullanıcı sabit kıymetin net defter değerini hesaplayıp manuel çıkış fişi düzenler", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "ACC-023",
+        "operator": "not_equals",
+        "value": "sabit_kiymetimiz_bulunmamaktadir"
+      }
+    },
+    {
+      "id": "ACC-025",
+      "process": "Stok Muhasebesi ve Satılan Malın Maliyeti",
+      "order": 25,
+      "question": "Stok hareketleri muhasebeye Sürekli Envanter (Her irsaliye/sevk hareketinde anlık stok-maliyet kaydı) yöntemiyle mi yoksa Dönem Sonu Envanteri ile mi yansıtılmaktadır?",
+      "description": "150/151/152/153 hesaplarının anlık çalışması vs. Dönem sonunda sayımla 620/621 STMM kaydı atılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "surekli_envanter_her_malzeme_hareketinde_otomatik_kayit", "label": "Sürekli Envanter; her mal kabulde 15'li stok hesabına borç, her sevkiyatta anlık STMM (620/621) ve stok çıkış kaydı oluşur", "allow_note": false, "is_other": false },
+        { "value": "donem_sonu_maliyetlendirme_ve_toplu_stmm_kaydi", "label": "Günlük sevk kaydı atılmaz; ay/çeyrek sonunda fiili sayım ve maliyet hesaplamasıyla toplu STMM mahsup fişi kesilir", "allow_note": true, "is_other": false },
+        { "value": "stok_muhasebesi_harici_ofis_tarafindan_yil_sonunda_yapilir", "label": "Stok kayıtları sistemde muhasebeleşmez, yıl sonunda mali müşavir tarafından genel kâr/zarara göre ayarlanır", "allow_note": true, "is_other": false },
+        { "value": "hizmet_sirketiyiz_stok_muhasebemiz_yoktur", "label": "Hizmet firmasıyız, ticari mal veya hammadde stok muhasebemiz yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-026",
+      "process": "Stok Muhasebesi ve Satılan Malın Maliyeti",
+      "order": 26,
+      "question": "Mal kabulü yapılmış ancak faturası henüz gelmemiş satınalmalar (İrsaliyeli Mal Girişi) muhasebede nasıl izlenmektedir?",
+      "description": "GR/IR geçici takas hesapları (ör. 159 veya 381 Verilen Sipariş Avansları / Fatura Bekleyen Mal Girişleri).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "gr_ir_gecici_hesabi_kullanilir_fatura_gelince_kapanir", "label": "Mal kabul anında 150 Borç / 159/381 Fatura Bekleyen Mal Alımları Alacak kaydı atılır; fatura gelince bu geçici hesap 320 Satıcı ile kapanır", "allow_note": true, "is_other": false },
+        { "value": "irsaliye_asamasinda_muhasebe_kaydi_atilmaz", "label": "İrsaliyeye muhasebe kaydı yapılmaz, yalnızca fatura geldiğinde doğrudan 150/320 kaydı işlenir", "allow_note": false, "is_other": false },
+        { "value": "faturasiz_mal_kabul_yapilmaz_fatura_sarttir", "label": "Faturası gelmeyen hiçbir mal depoya kabul edilmez", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "ACC-025",
+        "operator": "not_equals",
+        "value": "hizmet_sirketiyiz_stok_muhasebemiz_yoktur"
+      }
+    },
+    {
+      "id": "ACC-027",
+      "process": "Satın Alma Muhasebesi ve Fatura Eşleştirme",
+      "order": 27,
+      "question": "Satın alma faturalarının muhasebeleşmesinden önce Sipariş - Mal Kabul - Fatura (3-Way Matching) kontrolü yapılıyor mu?",
+      "description": "Miktar ve fiyat farkı denetimi, tolerans limitleri ve onay blokajı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistem_siparis_ve_mal_kabulu_otomatik_karsilastirir_fark_varsa_bloke_eder", "label": "Evet, sistem fatura tutarını ve miktarını onaylı sipariş ve teslimatla karşılaştırır; tolerans üstü fark varsa faturayı bloke eder", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_personeli_kagit_irsaliye_ile_faturayi_manuel_karsilastirir", "label": "Sistemde otomatik eşleşme yoktur, muhasebeci faturanın arkasındaki irsaliye çıktısını kontrol edip kaydeder", "allow_note": true, "is_other": false },
+        { "value": "siparis_veya_irsaliye_kontrolu_yapilmaz_onaylanan_fatura_islenir", "label": "Yönetici faturayı onaylamışsa sipariş/irsaliye kontrolü yapılmadan doğrudan muhasebeye işlenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-028",
+      "process": "Satın Alma Muhasebesi ve Fatura Eşleştirme",
+      "order": 28,
+      "question": "Satın alma faturası ile sipariş fiyatı arasındaki fiyat farkları veya sonradan gelen tedarikçi fiyat farkı faturaları muhasebeye nasıl yansıtılır?",
+      "description": "Stok maliyetine yansıtma vs. 659/679 veya 770 doğrudan gider/gelir yazma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "stok_eldeyse_stok_maliyetine_yoksa_satilan_mal_maliyetine_yansitilir", "label": "Sistem stok miktarını kontrol eder; mal depodaysa 150 stok maliyetine ekler, satılmışsa STMM'ye atar", "allow_note": true, "is_other": false },
+        { "value": "dogrudan_fiyat_farki_gider_hesabina_yazilir", "label": "Stokla ilişkilendirilmez, doğrudan 659 Diğer Olağan Gider veya 770 gider hesabına atılır", "allow_note": false, "is_other": false },
+        { "value": "fiyat_farki_islemi_olmamaktadir", "label": "Sipariş fiyatı dışında fatura kabul edilmez, fiyat farkı faturası alınmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-029",
+      "process": "Satış Muhasebesi ve Gelir Tahakkuku",
+      "order": 29,
+      "question": "Satış faturalarının muhasebe kaydı hangi aşamada ve nasıl oluşturulmaktadır?",
+      "description": "Satış faturasının 600/601 Gelir, 391 KDV ve 120 Müşteri hesaplarına aktarımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "fatura_onaylandigi_anda_sistemde_otomatik_muhasebelesir", "label": "Fatura onaylandığı/kesildiği anda arka planda otomatik yevmiye fişi oluşur", "allow_note": false, "is_other": false },
+        { "value": "gun_sonunda_veya_toplu_entegrasyonla_muhasebelesir", "label": "Faturalar gün boyunca kesilir, akşam veya belirlenen periyotla topluca muhasebeye aktarılır", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_ekibi_faturalari_tek_tek_manuel_isler", "label": "Satış sisteminden muhasebeye otomatik aktarım yoktur, muhasebe personeli elle fiş girer", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-030",
+      "process": "Satış Muhasebesi ve Gelir Tahakkuku",
+      "order": 30,
+      "question": "Satış iskontoları (satır altı iskonto, fatura altı iskonto, ciro primi / yıl sonu iade faturası) muhasebede nasıl ayrıştırılmaktadır?",
+      "description": "Net gelir vs. 610 Satıştan İadeler, 611 Satış İskontoları ve 612 Diğer İndirimler hesap tayini.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "iskonto_tutarlari_otomatik_611_hesabina_borc_yazilir", "label": "Evet, fatura brüt tutarı 600'e, uygulanan indirimler 611 Satış İskontoları hesabına ayrı ayrı işlenir", "allow_note": false, "is_other": false },
+        { "value": "gelir_hesabina_dogrudan_net_tutar_yazilir", "label": "İskonto ayrıştırılmaz, faturadaki net satış tutarı doğrudan 600 hesabına yazılır", "allow_note": false, "is_other": false },
+        { "value": "ciro_ve_donem_sonu_iskontolari_musteri_faturasiyla_islenir", "label": "Dönem içi faturalar net kesilir; yıl sonu ciro primleri müşteriden gelen iskonto faturasıyla 611'e kaydedilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-031",
+      "process": "Banka ve Kasa Muhasebe Entegrasyonu",
+      "order": 31,
+      "question": "Banka hesap hareketleri (Gelen Havale/EFT, Gönderilen EFT, Kredi Kartı POS tahsilatı, Kredi ödemeleri) muhasebeye nasıl işlenmektedir?",
+      "description": "Banka hareketlerinin 102 Bankalar hesabı ve ilgili cari/masraf hesaplarına entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "banka_online_ekstre_mt940_api_ile_otomatik_muhasebelesir", "label": "Banka hareketleri API veya MT940 formatıyla sisteme akar, müşteri cari eşleştirmesi yapılarak otomatik fiş oluşur", "allow_note": true, "is_other": false },
+        { "value": "excel_ekstresi_sisteme_yuklenerek_toplu_muhasebelesir", "label": "Bankadan indirilen Excel ekstresi sisteme yüklenir, kurallara göre toplu mahsup fişleri üretilir", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_ekibi_banka_ekstresine_bakarak_manuel_fis_girer", "label": "Muhasebe personeli internet bankacılığı ekstresini açıp satır satır manuel fiş girer", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-032",
+      "process": "Banka ve Kasa Muhasebe Entegrasyonu",
+      "order": 32,
+      "question": "Nakit Kasa (100 Kasa) hareketleri, avans kapatmaları ve kasa sayım mutabakatları nasıl yürütülmektedir?",
+      "description": "Şube/merkez kasaları, günlük kasa defteri ve kasa limit kontrolleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "kasa_modulunden_tahsil_tediye_makbuzuyla_gunluk_kapatilir", "label": "Her kasa hareketi makbuzla kaydedilir, gün sonunda sistem kasa bakiyesi fiili nakitle eşleştirilip yevmiyeye aktarılır", "allow_note": false, "is_other": false },
+        { "value": "harcamalar_toplu_masraf_fisi_olarak_girilir", "label": "Nakit ödemeler biriktirilir, haftalık/aylık toplu masraf mahsubu kesilir", "allow_note": true, "is_other": false },
+        { "value": "sirketimizde_nakit_kasa_kullanilmamaktadir", "label": "Tüm ödeme ve tahsilatlar banka üzerinden yürütülür, nakit kasa yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-033",
+      "process": "Mutabakat Süreçleri",
+      "order": 33,
+      "question": "Müşteri ve Tedarikçi cari hesap mutabakatları (BA/BS, Bakiye Mutabakatı, e-Mutabakat) nasıl yürütülmektedir?",
+      "description": "Düzenli cari hesap mutabakatı, e-Mutabakat portalları ve uyuşmazlık çözümü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistemden_entegre_e_mutabakat_otomasyonu_ile", "label": "Sistem tek tıkla carilere otomatik e-Mutabakat (BA/BS ve Bakiye) mektubu gönderir, onay/red yanıtları sisteme otomatik yansır", "allow_note": true, "is_other": false },
+        { "value": "excel_ekstresi_e_posta_ile_gonderilerek_manuel_yapilir", "label": "Cari ekstreler Excel/PDF olarak e-posta atılır, telefonla aranarak mutabakat aranır", "allow_note": false, "is_other": false },
+        { "value": "sadece_yil_sonlarinda_resmi_yazi_ile", "label": "Aylık mutabakat yapılmaz, sadece yıl sonu bilançosu için ıslak imzalı mektup gönderilir", "allow_note": false, "is_other": false },
+        { "value": "mutabakat_sureci_yurutulmemektedir", "label": "Carilerle düzenli mutabakat yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-034",
+      "process": "Mutabakat Süreçleri",
+      "order": 34,
+      "question": "Banka hesapları ile muhasebe 102 kayıtları arasında Banka Mutabakatı (Bank Reconciliation) ne sıklıkla ve nasıl yapılır?",
+      "description": "Yoldaki çekler, bekleyen virmanlar ve banka masraflarının mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "gunluk_otomatik_banka_mutabakati", "label": "Sistem banka hareketleri ile muhasebe fişlerini günlük otomatik eşleştirir, açık kalan farkları raporlar", "allow_note": true, "is_other": false },
+        { "value": "ay_sonunda_manuel_ekstre_karsilastirmasi", "label": "Ay sonunda muhasebeci banka ekstresi ile mizan 102 muavinini karşılaştırıp açık kalemleri bulur", "allow_note": true, "is_other": false },
+        { "value": "duzenli_banka_mutabakati_yapilmaz", "label": "Banka mutabakatı yapılmaz, sadece yıl sonunda bakiyeye bakılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-035",
+      "process": "Dönem Sonu ve Mali Kapanış",
+      "order": 35,
+      "question": "Ay sonu ve yıl sonu Mali Kapanış süreci tanımlı bir Kapanış Kontrol Listesi (Closing Checklist) ile mi yürütülmektedir?",
+      "description": "Ön muhasebe, stok maliyeti, amortisman, kur değerleme, yansıtma ve kebir kapanış adımlarının sırası.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "evet_sistemde_tanimli_adim_adim_kapanis_checklisti_var", "label": "Evet, hangi kullanıcının hangi sıra ve tarihe kadar hangi işlemi tamamlayacağı sistemde tanımlıdır ve izlenir", "allow_note": true, "is_other": false },
+        { "value": "kullanicilarin_hafizasinda_ve_excelde_takip_edilir", "label": "Yazılı bir akış vardır ancak Excel tablosunda manuel takip edilir", "allow_note": false, "is_other": false },
+        { "value": "standart_bir_kapanis_listesi_yoktur_isler_geldikce_kapatilir", "label": "Belirli bir kapanış prosedürü yoktur, işlemler tamamlandıkça kapanış yapılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-036",
+      "process": "Dönem Sonu ve Mali Kapanış",
+      "order": 36,
+      "question": "Aylık mali kapanış (tüm alt modüllerin kapatılıp kesin mizan ve gelir tablosunun alınması) ortalama kaç iş günü sürmektedir?",
+      "description": "Finansal kapanış hızı ve operasyonel verimlilik.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "hizli_kapanis_1_3_is_gunu", "label": "Çok hızlı; ay bitiminden itibaren 1-3 iş günü içinde tüm mali tablolar hazırdır", "allow_note": false, "is_other": false },
+        { "value": "standart_kapanis_4_7_is_gunu", "label": "Standart; ay bitiminden itibaren 4-7 iş günü sürer", "allow_note": false, "is_other": false },
+        { "value": "uzun_kapanis_8_15_is_gunu", "label": "Uzun; KDV/Muhtasar beyanname gününe kadar (15-20 gün) kapanış işlemleri devam eder", "allow_note": true, "is_other": false },
+        { "value": "aylik_mali_kapanis_yapilmaz_sadece_gecici_vergi_donemleri", "label": "Aylık kapanış yapılmaz, sadece 3 aylık geçici vergi dönemlerinde kapanış yapılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-037",
+      "process": "Dönem Sonu ve Mali Kapanış",
+      "order": 37,
+      "question": "Kapanmış bir muhasebe dönemine (ay veya yıl) geçmişe dönük kayıt girişi veya değişiklik yapılması sistemde engellenmekte midir?",
+      "description": "Dönem kilitleme (Period Locking / Posting Period Control).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "options": [
+        { "value": "kesin_donem_kilidi_var_yetkisiz_kimse_kayit_atamaz", "label": "Evet, ay kapandığı anda muhasebe dönemi kilitlenir; Finans Direktörü onayı olmadan geçmişe tek bir kayıt dahi atılamaz", "allow_note": false, "is_other": false },
+        { "value": "modul_bazli_kilit_var_muhasebe_acik_kalir", "label": "Ön modüller (fatura, stok) kilitlenir ancak muhasebe ekibi geçmişe fiş girmeye devam edebilir", "allow_note": true, "is_other": false },
+        { "value": "sistemde_donem_kilidi_yoktur_gecmise_serbestce_kayit_girilir", "label": "Sistemde kısıt yoktur, kullanıcılar aylar öncesine dahi serbestçe kayıt atabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-038",
+      "process": "Denetim İzi ve Güvenlik",
+      "order": 38,
+      "question": "Muhasebe fişlerinde ve hesap planında yapılan her türlü değişiklik, silme veya iptal işlemi tarih, saat ve kullanıcı bazında denetim iziyle (Audit Trail) kaydediliyor mu?",
+      "description": "Fiş geçmişi loglama, kim değiştirdi, eski değer/yeni değer izlenebilirliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_denetim_izi_eski_ve_yeni_deger_loglanir", "label": "Evet, fişin ilk oluşturanı, değiştireni, değiştirilen tutar/hesap ve değişiklik tarihi sistemde silinemez log olarak tutulur", "allow_note": false, "is_other": false },
+        { "value": "sadece_son_guncelleyen_kullanici_gorunur", "label": "Detaylı değişiklik geçmişi yoktur, sadece kaydı en son güncelleyen kişi ve tarih görünür", "allow_note": true, "is_other": false },
+        { "value": "kayit_silinebilir_ve_iz_birakmaz", "label": "Fişler sistemden tamamen silinebilir, geçmişe dönük denetim izi tutulmaz", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-039",
+      "process": "Denetim İzi ve Güvenlik",
+      "order": 39,
+      "question": "Kaydedilmiş ve yevmiye numarası almış bir muhasebe fişinin silinmesine izin veriliyor mu, yoksa düzeltme için Ters Kayıt (Storno / Reversal) zorunluluğu var mı?",
+      "description": "Yasal defter bütünlüğü ve fiş silme yasağı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "fis_silinemez_sadece_ters_kayitla_iptal_edilir", "label": "Yevmiyeleşmiş fiş asla silinemez; düzeltme ancak sistemden Ters Kayıt (Storno) oluşturularak yapılabilir", "allow_note": false, "is_other": false },
+        { "value": "yetkili_kullanici_fisi_silebilir", "label": "Yetkili yönetici veya muhasebe müdürü fişi doğrudan sistemden silebilir", "allow_note": true, "is_other": false },
+        { "value": "her_kullanici_kendi_fisini_silebilir", "label": "Fişi giren kullanıcı istediği zaman fişi silebilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-040",
+      "process": "Finansal Raporlama ve Standartlar",
+      "order": 40,
+      "question": "Şirketinizde ERP sisteminden doğrudan (Excel'de ek düzenleme gerektirmeden) hangi finansal raporlar alınabilmektedir?",
+      "description": "Temel mali tabloların sistemden anlık üretilebilirliği.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "critical",
+      "options": [
+        { "value": "aylik_ve_yillik_mizan", "label": "Aylık ve Yıllık Ayrıntılı Mizan (2/3/4/Büyük Defter Kırılımlı)", "allow_note": false, "is_other": false },
+        { "value": "resmi_bilanco", "label": "Resmi Bilanço (VUK Formatında Aktif/Pasif Tablosu)", "allow_note": false, "is_other": false },
+        { "value": "resmi_gelir_tablosu", "label": "Resmi Gelir Tablosu (Dönem Kâr/Zarar Özeti)", "allow_note": false, "is_other": false },
+        { "value": "masraf_merkezi_gider_raporu", "label": "Masraf Merkezi / Departman Bazlı Gider Dağılım Raporu", "allow_note": false, "is_other": false },
+        { "value": "muavin_ve_hesap_ekstresi", "label": "Muavin Defter ve Hesap Ekstreleri", "allow_note": false, "is_other": false },
+        { "value": "nakit_akim_tablosu", "label": "Nakit Akım Tablosu (Cash Flow Statement)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-041",
+      "process": "Finansal Raporlama ve Standartlar",
+      "order": 41,
+      "question": "Yerel Vergi Mevzuatı (VUK) dışında UFRS/TFRS (Uluslararası Finansal Raporlama Standartları) veya Bağımsız Denetim amaçlı İkinci Bir Defter (Çift Defter / Parallel Ledger) tutuluyor mu?",
+      "description": "Çift defter mimarisi (VUK Defteri vs. IFRS / US GAAP Defteri) ve paralel değerleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_sistemde_es_zamanli_cift_defter_ufrs_tutulmaktadir", "label": "Evet, her yevmiye kaydı hem VUK hem IFRS defterine kurallarına göre paralel işlenir", "allow_note": true, "is_other": false },
+        { "value": "vuk_disinda_rapor_icin_excelde_duzeltme_yapilir", "label": "Sistemde tek defter (VUK) tutulur; UFRS raporları yıl sonunda bağımsız denetçiyle Excel'de hazırlanır", "allow_note": true, "is_other": false },
+        { "value": "sadece_vuk_defteri_tutulur_ufrs_ihtiyacimiz_yoktur", "label": "Sadece yasal Türk Vergi Mevzuatı (VUK) defteri tutulur, çift defter ihtiyacı yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "ACC-042",
+      "process": "Finansal Raporlama ve Standartlar",
+      "order": 42,
+      "question": "Mali İşler ekibi tarafından Yönetim Kuruluna sunulan Yönetim Raporları ile Resmi Yasal Muhasebe Verileri arasında tutarsızlık yaşanıyor mu?",
+      "description": "Finansal muhasebe ile yönetim muhasebesi arasındaki tek doğruluk kaynağı (Single Source of Truth).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tek_dogruluk_kaynagi_tamamen_tutarlidir", "label": "Hayır, tüm yönetim raporları doğrudan ERP muhasebe veritabanından çekilir, sıfır tutarsızlık vardır", "allow_note": false, "is_other": false },
+        { "value": "excelde_bircok_duzeltme_yapildigi_icin_zaman_zaman_fark_cikar", "label": "Yönetim raporu Excel'de farklı varsayımlarla derlendiği için yasal bilançoyla sık sık rakamsal uyumsuzluk yaşanır", "allow_note": true, "is_other": false },
+        { "value": "yonetim_raporlamasi_yapilmamaktadir", "label": "Resmi mizan dışında düzenli bir yönetim raporu hazırlanmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1580 @@
+{
+  "meta": {
+    "pack_id": "tr.crm.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "CRM",
+    "name": "Müşteri Yönetimi (CRM) Ön Analizi",
+    "description": "Müşteri ana veri yapısı, potansiyel (lead) ve aday yönetimi, müşteri açılış ve VKN doğrulama süreçleri, kurumsal organizasyon ve hiyerarşi, iletişim kişileri, müşteri sınıflandırma ve segmentasyon, müşteri temsilcisi ataması ve portföy dağıtımı, Müşteri 360 görünümü, etkileşim ve görüşme geçmişi zaman çizelgesi, aktivite ve görev yönetimi, saha müşteri ziyaretleri, müşteri talep takibi, müşteri şikâyet ve geri bildirim yönetimi (SLA), müşteri memnuniyeti (CSAT/NPS), müşteri devir ve temsilci değişikliği, iletişim izinleri ve tercihleri, müşteri veri kalitesi ve denetim izi (Audit Trail), mükerrer kayıt (Duplicate) engelleme ve CRM raporlama/KPI süreçlerinin AS-IS durumunu ve ERP/CRM gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "CRM-001",
+      "process": "Müşteri Ana Veri Yapısı",
+      "order": 1,
+      "question": "Şirketinizde müşteri ana verileri ve cari bilgileri hangi teknolojik ortamda (Merkezi CRM, Entegre ERP Cari Kartı, Bağımsız CRM + ERP Senkronizasyonu, Excel Tabloları) yönetilmektedir?",
+      "description": "Müşteri ana veri ortamı, operasyonel kayıt alanı ve sistem mimarisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_ve_entegre_erp_crm_tek_sistemde_yonetilir",
+          "label": "Tüm müşteri, aday ve cari bilgileri tek bir entegre ERP/CRM platformunda merkezi olarak tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "bagimsiz_crm_yazilimi_ve_ayri_erp_cari_karti_kullanilir",
+          "label": "Müşteri ilişkileri bağımsız bir CRM yazılımında, faturalama ve cari hesaplar ayrı bir ERP'de tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_erp_muhasebe_cari_kartlari_uzerinden_yurutulur",
+          "label": "Ayrı bir CRM yoktur; yalnızca ERP cari kartı ve temel müşteri listeleri üzerinden operasyon yürütülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_ve_kisisel_rehberler_uzerinde_daginik_tutulur",
+          "label": "Müşteri bilgileri satış temsilcilerinin kişisel Excel dosyalarında ve telefon rehberlerinde dağınıktır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-002",
+      "process": "Müşteri Ana Veri Yapısı",
+      "order": 2,
+      "question": "CRM ve ERP sistemleri arasında müşteri ana verisi entegrasyonu ve müşteri numaralandırma otoritesi (Hangi sistem cari kod üretir / iki yönlü senkronizasyon) nasıl kurgulanmıştır?",
+      "description": "Müşteri kodu tekilliği, ana veri otoritesi ve CRM-ERP senkronizasyon disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tek_sistem_veya_otomatik_iki_yonlu_canli_senkronizasyon",
+          "label": "Tek sistemdir veya CRM'de onaylanan müşteri otomatik ERP cari kartı açar ve kodlar çift yönlü senkronize kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "erpde_manuel_kod_acilir_crme_elle_eslestirilir",
+          "label": "ERP'de finans ekibi cari kod açar; satış ekibi bu kodu CRM'deki müşteri kartına manuel yazar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemler_arasi_entegrasyon_yoktur_ayri_kodlar_kullanilir",
+          "label": "Entegrasyon yoktur; aynı müşteri CRM'de ve ERP'de farklı kod ve unvanlarla kayıtlıdır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tek_bir_sistem_vardir_ayri_senkronizasyon_ihtiyaci_yoktur",
+          "label": "Yalnızca tek bir sistem kullanıldığı için sistemler arası senkronizasyon ihtiyacı bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-003",
+      "process": "Potansiyel / Aday Müşteri Yönetimi",
+      "order": 3,
+      "question": "Henüz satış yapılmamış Potansiyel Müşteriler (Lead / Aday / Prospekt) ile ticari cari hesabı açılmış Gerçek Müşteriler sistemde nasıl ayrıştırılmaktadır?",
+      "description": "Aday müşteri havuzu, ERP cari kirliliğinin önlenmesi ve lead ayrımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "adaylar_ayri_lead_havuzunda_tutulur_erpye_cari_acilarak_kirletilmez",
+          "label": "Adaylar CRM'de ayrı bir 'Lead/Aday' statüsünde tutulur; satış kesinleşmeden ERP'ye cari kart açılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_aday_icin_dogrudan_erpde_gecici_veya_normal_cari_acilir",
+          "label": "Adaylar için de doğrudan ERP'de cari hesap açılır; sistemde binlerce hiç alışveriş yapmamış boş cari oluşur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "aday_kayitlari_excelde_tutulur_musteri_olunca_erpye_girilir",
+          "label": "Adaylar satışçıların Excel tablolarında tutulur; ilk sipariş onaylandığında ERP'ye resmi giriş yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aday_ve_gercek_musteri_ayrimi_yapilmamaktadir",
+          "label": "Aday ve gerçek müşteri ayrımı yoktur; tüm kontaklar tek bir listede karışık tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-004",
+      "process": "Potansiyel / Aday Müşteri Yönetimi",
+      "order": 4,
+      "question": "Bir adayın gerçek müşteriye dönüşüm (Lead Conversion) onay kriterleri ve ERP cari kartı oluşturulma tetikleyicisi nasıldır?",
+      "description": "Adayın müşteriye dönüşüm tetikleyicisi, zorunlu alanlar ve onay akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ilk_siparis_veya_sozlesme_onayi_ile_otomatik_donusturulur",
+          "label": "İlk sipariş veya resmi sözleşme onaylandığında zorunlu alanlar kontrol edilerek otomatik müşteriye dönüşür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_temsilcisinin_manuel_butona_basmasiyla_donusturulur",
+          "label": "Satış temsilcisi adayı yeterince olgun gördüğünde tek tuşla dönüştürür; sistemik onay gerekmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_kredi_kontrol_onayi_sonrasi_donusturulur",
+          "label": "Finans/Muhasebe departmanı vergi levhası ve risk limitini onayladıktan sonra dönüşüm gerçekleşir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "resmi_bir_donusum_ve_onay_sureci_bulunmamaktadir",
+          "label": "Resmi bir dönüşüm süreci yoktur; ihtiyaç oldukça manuel olarak cari kart açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-005",
+      "process": "Müşteri Açılış Süreci",
+      "order": 5,
+      "question": "Yeni bir müşteri kaydı açılırken hangi onay ve kontrol hiyerarşisi (Satış Temsilcisi -> Satış Müdürü -> Finans/Kredi Onayı) işletilmektedir?",
+      "description": "Müşteri ana veri açılış iş akışı ve çok kademeli onay disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "satis_yoneticisi_ve_finans_kredi_onayindan_gecer",
+          "label": "Satış temsilcisi talep açar; Satış Müdürü ve Finans/Kredi İstihbarat birimi onayladıktan sonra müşteri aktifleşir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_satis_yoneticisinin_onayi_ile_acilir",
+          "label": "Yalnızca Satış Yöneticisi onaylar; finans birimi açılış sonrasında bilgilendirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_satis_ekibi_onaysiz_serbestce_musteri_acabilir",
+          "label": "Herhangi bir onay süreci yoktur; yetkili tüm satış temsilcileri anında yeni müşteri açabilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_muhasebe_finans_ekibi_musteri_acma_yetkisine_sahiptir",
+          "label": "Satış ekibi açamaz; satıştan gelen evraklara istinaden müşteri kaydını yalnızca Muhasebe/Finans ekibi açar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-006",
+      "process": "Müşteri Açılış Süreci",
+      "order": 6,
+      "question": "Müşteri açılışında resmi ticari unvan, vergi dairesi/numarası (GİB / VKN doğrulaması) ve adres doğrulaması sistemsel olarak nasıl kontrol edilmektedir?",
+      "description": "GİB e-fatura/VKN entegrasyonu, resmi unvan teyidi ve adres standardizasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gib_vkn_sorgusu_ile_otomatik_dogrulanir_ve_e_fatura_mukellefligi_cekilir",
+          "label": "VKN/TCKN girildiğinde sistem GİB'den unvan, vergi dairesi ve e-Fatura/e-İrsaliye posta kutusu adresini otomatik çeker",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "vergi_levhasi_manuel_kontrol_edilir_bilgiler_elle_yazilir",
+          "label": "Otomatik sorgulama yoktur; personeller vergi levhasına bakarak unvan ve vergi dairesini elle yazar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dogrulama_yapilmaz_kullanicinin_yazdigi_bilgi_dogru_kabul_edilir",
+          "label": "Herhangi bir VKN veya e-fatura sorgusu yapılmaz; fatura kesilmeye çalışıldığında hata çıkarsa düzeltilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-007",
+      "process": "Müşteri Organizasyon ve Hiyerarşi Yapısı",
+      "order": 7,
+      "question": "Müşterilerinizin kurumsal hiyerarşi yapısı (Ana Firma, Holding/Grup Şirketleri, Şubeler, Bölge Bayileri, Mağazalar) sistemde nasıl modellenmektedir?",
+      "description": "Müşteri organizasyon ağacı, ana/bağlı ortaklık hiyerarşisi ve şube yapıları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cok_kademeli_holding_ana_firma_ve_sube_agaci_desteklenir",
+          "label": "Evet; Holding -> Grup Şirketi -> Şube/Mağaza şeklinde çok kademeli hiyerarşik ağaç modellenmiştir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_ana_cari_ve_alt_sube_baglantisi_kurulabilir",
+          "label": "Yalnızca basit 2 seviyeli (Ana Firma - Şube) ilişkisi kurulabilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hiyerarsi_yapisi_kullanilmaz_her_cari_bagimsizdir",
+          "label": "Hiyerarşik yapı yoktur; tüm şubeler ve bağlı şirketler birbirinden bağımsız cari kartlar olarak açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-008",
+      "process": "Müşteri Organizasyon ve Hiyerarşi Yapısı",
+      "order": 8,
+      "question": "Çok şubeli veya holding yapısındaki müşterilerde faturalama adresi, sevk adresi, konsolide risk ve sözleşme ilişkileri hiyerarşik olarak nasıl yönetilmektedir?",
+      "description": "Hiyerarşik sözleşme, konsolide ciro/bakiye ve çoklu adres yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "CRM-007",
+        "operator": "not_equals",
+        "value": "hiyerarsi_yapisi_kullanilmaz_her_cari_bagimsizdir"
+      },
+      "options": [
+        {
+          "value": "ana_firmaya_faturalanip_subeye_sevk_ve_konsolide_risk_takibi_mumkundur",
+          "label": "Sözleşme ve fatura ana firmaya kesilirken sevk şubeye yapılabilir; holding risk limiti konsolide izlenebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fatura_ve_sevk_ayrilabilir_ancak_konsolide_risk_izlenemez",
+          "label": "Adresler ayrılabilir ancak holding düzeyinde toplam ciro veya risk konsolidasyonu yapılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "holding_ve_sube_iliskisi_excelde_manuel_hesaplanir",
+          "label": "Sistem hiyerarşik yönetemez; grup şirketlerin toplam bakiyesi Excel'de toplanarak manuel takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-009",
+      "process": "İletişim Kişileri",
+      "order": 9,
+      "question": "Bir müşteri kartı altında birden fazla İletişim Kişisi (Kontak / Yetkili — Satın Alma Müdürü, Muhasebe Sorumlusu, Depo Şefi vb.) unvan, departman ve karar yetkisiyle tutulmakta mıdır?",
+      "description": "Çoklu iletişim kişisi yönetimi, departman, rol ve karar verici işaretlemesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sinirsiz_iletisim_kisis_unvan_departman_ve_karar_rolu_ile_kayitlidir",
+          "label": "Evet; her müşteri altında sınırsız kontak, unvanı, cep telefonu, e-postası ve karar yetkisiyle tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_1_veya_2_temel_yetkili_bilgisi_yazilabilir",
+          "label": "Müşteri kartında yalnızca 1-2 kişinin adı ve sabit telefonu için alan vardır, detaylı liste tutulamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iletisim_kisileri_satiscilarin_kisisel_telefon_rehberinde_tutulur",
+          "label": "Sistemde kontak tutulmaz; yetkili bilgileri satış temsilcilerinin kişisel telefonlarında veya notlarındadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-010",
+      "process": "İletişim Kişileri",
+      "order": 10,
+      "question": "Müşteri bünyesinde işten ayrılan veya pozisyonu değişen iletişim kişilerinin geçmiş ilişki ve görüşme kayıtları tarihsel olarak korunmakta mıdır?",
+      "description": "Kontak geçmişi, pasife alma ve ilişki devamlılığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ayrilan_kisi_pasife_alinir_gecmis_tum_gorusmeleri_korunur",
+          "label": "Evet; ayrılan kontak 'Pasif/Ayrıldı' işaretlenir, geçmiş görüşme kayıtları silinmeden korunur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eski_kisinin_uzerine_yeni_gelen_kisinin_bilgileri_yazilir",
+          "label": "Yeni yetkili geldiğinde eski kişinin ismi silinip üzerine yazılır; geçmişte kiminle ne konuşulduğu kaybolur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kontak_gecmisi_ve_ayrilma_takibi_yapilmamaktadir",
+          "label": "İletişim kişisi geçmişi takip edilmez; sistemdeki kontak listesi güncellenmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-011",
+      "process": "Müşteri Sınıflandırma ve Segmentasyon",
+      "order": 11,
+      "question": "Müşteriler hangi kriterlere göre sınıflandırılmakta ve segmentlere (Stratejik / VIP / A-B-C Grubu, Sektör, Ciro Potansiyeli, Bölge) ayrılmaktadır?",
+      "description": "Müşteri segmentasyon kriterleri, sektör kodları ve ticari değer sınıflandırması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "cok_boyutlu_sektor_abc_grubu_ve_ciro_potansiyeline_gore_siniflandirilir",
+          "label": "Evet; sektör (NACE/özel), müşteri tipi (Bayi, Son Kullanıcı, OEM), A-B-C öncelik grubu ve ciro potansiyeli tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_basit_bir_sektor_veya_bolge_kodu_secilir",
+          "label": "Yalnızca temel bir sektör veya coğrafi bölge seçimi vardır; derin bir segmentasyon modeli yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_siniflandirmasi_ve_segmentasyon_yapilmamaktadir",
+          "label": "Herhangi bir segmentasyon yapılmaz; tüm müşteriler aynı statüde ve aynı önemde listelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-012",
+      "process": "Müşteri Sınıflandırma ve Segmentasyon",
+      "order": 12,
+      "question": "Müşteri segmentleri ve müşteri statüleri (Aktif, Pasif, Potansiyel, Kayıp/Terk Müşteri - Churn) sistemde dinamik olarak güncellenmekte midir?",
+      "description": "Müşteri yaşam döngüsü statüleri ve otomatik/periyodik segment güncellemesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "alisveris_sikligina_gore_sistem_otomatik_aktif_pasif_ve_kayip_statuye_alir",
+          "label": "Evet; son 6/12 aydır sipariş vermeyen müşteri otomatik olarak 'Uykuda/Kayıp Riski' statüsüne geçer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_ekibi_yilda_bir_statu_ve_segmentleri_manuel_gunceller",
+          "label": "Otomasyon yoktur; yılda bir kez satış yönetimi müşterilerin A-B-C sınıflarını manuel revize eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "statu_ve_segmentler_hic_guncellenmez_acildigi_gibi_kalir",
+          "label": "Statüler güncellenmez; 10 yıldır hiç alışveriş yapmamış müşteriler bile sistemde 'Aktif' görünür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-013",
+      "process": "Müşteri Sorumlusu / Temsilci Ataması",
+      "order": 13,
+      "question": "Her müşterinin birincil Satış Temsilcisi (Account Manager / Müşteri Temsilcisi) ve varsa ürün/bölge bazlı ikincil sorumluları sistemde nasıl tanımlanmaktadır?",
+      "description": "Portföy sahipliği, sorumlu satış temsilcisi ve ikincil ürün/hizmet uzmanı atamaları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "her_musterinin_birincil_temsilcisi_ve_ikincil_urun_uzmanlari_net_tanimlidir",
+          "label": "Evet; müşteri kartında sorumlu ana temsilci, müşteri destek sorumlusu ve ilgili bölge yöneticisi kayıtlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_tek_bir_satis_temsilcisi_kodu_secilebilir",
+          "label": "Kart üzerinde yalnızca tek bir satışçı kodu vardır; çoklu temsilci veya ürün uzmanı atanamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "temsilci_atamasi_sistemde_yoktur_kim_ilgilenirse_o_yurutur",
+          "label": "Müşteri kartlarında temsilci bağı yoktur; sahada hangi satışçı boşsa o müşteriye gider",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-014",
+      "process": "Müşteri Sorumlusu / Temsilci Ataması",
+      "order": 14,
+      "question": "Sahipsiz / sorumlusu atanmamış müşteri kayıtlarının takibi ve temsilcilere müşteri havuzundan otomatik veya manuel dağıtım kuralları nasıldır?",
+      "description": "Unassigned müşteri havuzu, lead dağıtım kuralları ve adil portföy yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "ortak_havuzdan_bolge_sektor_veya_round_robin_ile_otomatik_atanir",
+          "label": "Gelen yeni müşteriler/adaylar bölge, sektör veya sırayla (Round-Robin) satış temsilcilerine otomatik atanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_muduru_haftalik_toplantida_sahipsiz_musterileri_manuel_dagitir",
+          "label": "Satış Müdürü sahipsiz havuzu inceler ve temsilcilere manuel olarak paylaştırır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sahipsiz_musteri_takibi_yapilmaz_bircok_musteri_atıl_kalir",
+          "label": "Sahipsiz müşteri havuzu takip edilmez; ilgilenilmeyen yüzlerce müşteri sistemde atıl kalır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-015",
+      "process": "Müşteri 360 Görünümü",
+      "order": 15,
+      "question": "Satış ve müşteri temsilcileri tek bir ekran üzerinden Müşteri 360 Görünümüne (Temel bilgiler, iletişim kişileri, geçmiş görüşmeler, açık talepler, sipariş/bakiye özeti) erişebilmekte midir?",
+      "description": "Customer 360 ekranı, tüm temas noktalarının ve ticari özetin tek pencereden görünürlüğü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_musteri_360_kokpiti_tek_ekrandan_kesintisiz_sunulur",
+          "label": "Evet; temsilci müşteri kartını açtığında görüşmeleri, siparişleri, açık hesap bakiyesini ve şikâyetleri anında görür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "temel_bilgiler_gorunur_fakat_siparis_ve_bakiye_icin_baska_ekrana_bakilir",
+          "label": "CRM'de görüşmeler görünür ancak müşterinin güncel borcu ve sipariş durumu için ERP muhasebe ekranına geçmek gerekir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_360_gorunumu_yoktur_bilgiler_5_farkli_yerden_toplanir",
+          "label": "Müşteri 360 yoktur; bir müşteri hakkında bilgi sahibi olmak için muhasebeye, sevkiyata ve satışçıya ayrı ayrı sorulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-016",
+      "process": "Müşteri 360 Görünümü",
+      "order": 16,
+      "question": "Müşteri kartı üzerinden ilgili müşteriye ait sözleşmeler, kurumsal yazışmalar, teknik şartnameler ve özel anlaşma dokümanları görüntülenebilmekte midir?",
+      "description": "Müşteri ilişkili dijital doküman yönetimi ve kurumsal dosya arşivi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_sozlesme_ve_dokumanlar_musteri_kartina_eklenir_ve_erisim_yetkilidir",
+          "label": "Evet; imzalı sözleşmeler, vergi levhası, imza sirküleri ve teknik protokoller müşteri kartına eklenip görüntülenebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokumanlar_ortak_ag_klasorunde_saklanir_sisteme_bagli_degildir",
+          "label": "Dosyalar ortak sunucu klasöründe saklanır; müşteri kartı üzerinden doğrudan açılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sozlesmeler_fiziksel_arsivde_veya_kisisel_bilgisayarlarda_tutulur",
+          "label": "Dijital doküman bağı yoktur; sözleşmeler fiziksel klasörlerde veya satışçıların kendi bilgisayarlarındadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-017",
+      "process": "İletişim ve Etkileşim Geçmişi",
+      "order": 17,
+      "question": "Müşterilerle yapılan telefon görüşmeleri, e-postalar, toplantı notları ve mesajlaşmalar merkezi sistemde zaman çizelgesi (Timeline) olarak kayıt altına alınmakta mıdır?",
+      "description": "İletişim ve etkileşim geçmişi, kronolojik temas kütüğü ve kurumsal hafıza.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_gorusme_toplanti_ve_notlar_zaman_cizelgesine_duzenli_girilir",
+          "label": "Evet; müşteriyle yapılan her telefon, toplantı ve temas tarihi, konusu ve sonucuyla zaman çizelgesine işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_cok_onemli_kararlar_alindiginda_ozet_not_yazilir",
+          "label": "Rutin görüşmeler girilmez; yalnızca büyük anlaşmazlık veya sözleşme kararlarında kısa bir not yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gorusmeler_whatsapp_ve_kisisel_ajandalarda_kalir_sisteme_girilmez",
+          "label": "Tüm iletişim WhatsApp ve kişisel not defterlerinde kalır; merkezi bir görüşme geçmişi tutulmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-018",
+      "process": "İletişim ve Etkileşim Geçmişi",
+      "order": 18,
+      "question": "E-posta entegrasyonu (Outlook / Gmail / Mail İstemcisi) ve takvim senkronizasyonu ile müşteri yazışmaları otomatik olarak müşteri kartına işlenmekte midir?",
+      "description": "E-posta istemcisi eklentileri (Add-in), gelen/giden mail arşivleme ve takvim senkronu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "outlook_veya_gmail_eklentisi_ile_e_postalar_tek_tikla_musteriye_baglanir",
+          "label": "Evet; e-posta istemcisi eklentisiyle müşteriden gelen ve giden mailler doğrudan müşteri tarihçesine arşivlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onemli_e_postalar_manuel_kopyala_yapistir_ile_not_olarak_girilir",
+          "label": "Otomatik entegrasyon yoktur; kritik e-postalar personeller tarafından kopyalanıp sisteme not olarak yapıştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_posta_entegrasyonu_yoktur_yazismalar_kisisel_posta_kutusunda_kalir",
+          "label": "E-posta entegrasyonu yoktur; kimin müşteriyle ne yazıştığı yalnızca o personelin şahsi posta kutusunda kalır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-019",
+      "process": "Aktivite / Görev / Hatırlatma Yönetimi",
+      "order": 19,
+      "question": "Müşteriyle ilgili yapılacak işler, geri arama görevleri, teklif takip hatırlatmaları ve ekip içi görev atamaları sistem üzerinden nasıl yönetilmektedir?",
+      "description": "Aktivite ve görev takibi, hatırlatma kuralları ve ekip içi iş atama disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gorev_ve_hatirlatmalar_sistemden_atanir_ve_takvimde_izlenir",
+          "label": "Evet; 'Pazartesi ara', 'Numune gönder' gibi görevler bitiş tarihiyle atanır, sistem hatırlatır ve takvimde görünür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "herkes_kendi_outlook_takvimini_veya_kisisel_ajandasini_kullanir",
+          "label": "Merkezi görev yönetimi yoktur; çalışanlar kendi kişisel takvimlerine veya ajandalarına not alır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gorev_ve_hatirlatma_takibi_yapilmaz_bircok_is_unutulur",
+          "label": "Görev sistemi yoktur; müşteriye geri dönüşler ve hatırlatmalar sıklıkla unutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-020",
+      "process": "Aktivite / Görev / Hatırlatma Yönetimi",
+      "order": 20,
+      "question": "Zamanında tamamlanmayan gecikmiş müşteri aktiviteleri ve görevler için yöneticilere ve personele otomatik hatırlatma/eskalasyon bildirimi gitmekte midir?",
+      "description": "Geciken görev eskalasyonu, yönetici bildirimleri ve iş teslim güvencesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "geciken_aktiviteler_icin_otomatik_bildirim_ve_yonetici_uyarisi_vardir",
+          "label": "Evet; süresi geçen görevlerde kullanıcıya bildirim düşer, 48 saat aşılırsa satış müdürüne eskalasyon raporu gider",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_kullanicinin_kendi_ekraninda_kirmizi_uyari_gorunur",
+          "label": "Yalnızca ilgili personelin listesinde görev kırmızıya döner; yöneticiye otomatik bildirim gitmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gecikme_takibi_ve_eskalasyon_mekanizmasi_yoktur",
+          "label": "Gecikme takibi yoktur; açık kalan ve yapılmayan görevler sistemde süresiz bekler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-021",
+      "process": "Müşteri Ziyaretleri",
+      "order": 21,
+      "question": "Saha satış ve müşteri ziyaretleri sistem üzerinden önceden planlanmakta ve ziyaret sonrasında Ziyaret Raporu / Görüşme Notu sisteme girilmekte midir?",
+      "description": "Saha ziyaret planlama, ziyaret frekansı ve ziyaret sonu raporlama disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ziyaretler_onceden_planlanir_ve_ziyaret_raporu_ayni_gun_girilir",
+          "label": "Evet; haftalık ziyaret rotası sistemde planlanır ve ziyaret bitiminde standart form ile rapor girilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ziyaretler_serbest_yapilir_hafta_sonu_toplu_kisa_not_yazilir",
+          "label": "Önceden sisteme plan girilmez; satışçı ziyareti yapar, hafta sonu veya ay sonu topluca kısa not yazar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "saha_ziyaret_plani_ve_raporu_tutulmamaktadir",
+          "label": "Ziyaret planı ve raporu tutulmaz; kimin hangi müşteriye ne zaman gittiği takip edilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-022",
+      "process": "Müşteri Ziyaretleri",
+      "order": 22,
+      "question": "Saha ziyaretlerinde mobil uygulama üzerinden anlık konum/check-in doğrulaması ve ziyaret sonuçlarının ekipçe anlık görünürlüğü sağlanmakta mıdır?",
+      "description": "Mobil CRM, saha GPS/Check-in doğrulaması ve anlık ziyaret notu girişi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "CRM-021",
+        "operator": "not_equals",
+        "value": "saha_ziyaret_plani_ve_raporu_tutulmamaktadir"
+      },
+      "options": [
+        {
+          "value": "mobil_crm_ile_sahada_konum_dogrulamali_anlik_rapor_girisi_yapilir",
+          "label": "Evet; temsilciler mobilden müşteriye check-in yapar, görüşme notunu, fotoğrafları ve talepleri anında girer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mobil_uygulama_vardir_ancak_konum_dogrulamasi_kullanilmaz",
+          "label": "Mobilden not girilebilir ancak GPS check-in veya konum doğrulaması kullanılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mobil_uygulama_yoktur_ziyaret_notlari_ofise_donunce_bilgisayardan_girilir",
+          "label": "Mobil CRM yoktur; saha personeli notlarını kağıda alır, akşam ofise dönünce bilgisayardan sisteme girer",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-023",
+      "process": "Müşteri Talep Yönetimi",
+      "order": 23,
+      "question": "Müşterilerden gelen ticari olmayan bilgi talepleri, teknik destek istekleri, numune talepleri veya özel ricalar merkezi olarak (Talep / Ticket Sistemi) kayıt altına alınmakta mıdır?",
+      "description": "Müşteri destek talepleri, numune/bilgi istekleri ve talep takip mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "merkezi_talep_ticket_sistemi_ile_numaralandirilarak_takip_edilir",
+          "label": "Evet; her müşteri talebi (numune, teknik soru, evrak isteği) bir talep numarasıyla sisteme kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "talepler_e_posta_veya_sozlu_olarak_ilgili_kisiye_iletilir",
+          "label": "Merkezi talep sistemi yoktur; e-posta ile ilgili birime iletilir, takibi e-posta zinciri üzerinden yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_talepleri_kayit_altina_alinmaz_takipsizlik_yasanir",
+          "label": "Talepler kayıt altına alınmaz; satışçıların aklında tuttuğu kadarıyla ilerler, sıkça aksamalar yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-024",
+      "process": "Müşteri Talep Yönetimi",
+      "order": 24,
+      "question": "Müşteri taleplerinin ilgili departmanlara (Teknik Servis, Kalite, Lojistik, Muhasebe) yönlendirilmesi ve talep sonuçlanma süresi (SLA) izlenmekte midir?",
+      "description": "Departmanlar arası talep yönlendirme, SLA takibi ve müşteri bilgilendirmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "departmanlara_otomatik_atanir_ve_sla_sureleri_olculur",
+          "label": "Evet; talep konusuna göre ilgili ekibe atanır, yanıtlama ve çözüm süreleri SLA raporlarıyla izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "manuel_yonlendirilir_ancak_sla_veya_kapanis_suresi_olculmez",
+          "label": "Talep departmana iletilir ancak ne kadar sürede çözüldüğüne dair bir ölçüm veya hedef süre yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "taleplerin_departmanlar_arasi_takibi_yapilamamaktadir",
+          "label": "Talebin hangi departmanda beklediği veya çözülüp çözülmediği takip edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-025",
+      "process": "Şikâyet ve Geri Bildirim Yönetimi",
+      "order": 25,
+      "question": "Müşteri şikâyetleri hangi kanallardan (Çağrı merkezi, web formu, e-posta, satış temsilcisi) toplanmakta ve CRM sistemine nasıl kaydedilmektedir?",
+      "description": "Müşteri şikâyet toplama kanalları, vaka (case) oluşturma ve şikâyet kayıt disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_kanallardan_gelen_sikayetler_merkezi_crm_vaka_havuzuna_kaydedilir",
+          "label": "Evet; web, e-posta, çağrı veya satışçıdan gelen tüm şikâyetler tek bir şikâyet/vaka havuzunda toplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sikayetler_excel_tablosunda_veya_ayri_bir_formda_tutulur",
+          "label": "CRM'e girilmez; müşteri ilişkileri veya kalite birimi şikâyetleri ayrı bir Excel tablosunda listeler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_sikayetleri_sisteme_kaydedilmemektedir",
+          "label": "Şikâyetler kayıt altına alınmaz; müşteri kime ulaştıysa o kişi aralarında sözlü olarak konuyu halleder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-026",
+      "process": "Şikâyet ve Geri Bildirim Yönetimi",
+      "order": 26,
+      "question": "Müşteri şikâyeti kaydedilirken şikâyet konusu (Ürün kalitesi, geciken teslimat, fatura hatası, personel davranışı vb.) sınıflandırılıp ilgili fatura/sipariş/sevkiyat ile ilişkilendirilebilmekte midir?",
+      "description": "Şikâyet kök neden kategorizasyonu ve ticari işlem (fatura/sipariş) bağlantısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "CRM-025",
+        "operator": "not_equals",
+        "value": "musteri_sikayetleri_sisteme_kaydedilmemektedir"
+      },
+      "options": [
+        {
+          "value": "sikayet_konusu_siniflandirilir_ve_ilgili_siparis_faturaya_baglanir",
+          "label": "Evet; kategori seçilir ve şikâyet doğrudan ilgili siparişe, irsaliyeye, faturaya veya malzemeye bağlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sikayet_konusu_secilir_ancak_siparis_veya_faturaya_baglanamaz",
+          "label": "Kategori seçilebilir ancak şikâyetin hangi faturaya veya partiye ait olduğu metin olarak elle yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kategorizasyon_ve_islem_baglantisi_yapilmaz_serbest_metin_yazilir",
+          "label": "Herhangi bir kategori veya işlem bağlantısı yoktur; yalnızca şikâyet açıklaması serbest metin olarak tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-027",
+      "process": "Şikâyet ve Geri Bildirim Yönetimi",
+      "order": 27,
+      "question": "Şikâyetin çözümlenme süreci, müşteriye geri bildirim verilmesi, müşteri onayının alınması ve şikâyet kapatma SLA süreleri nasıl takip edilmektedir?",
+      "description": "Şikâyet çözüm akışı, SLA kapatma süresi, müşteri onay döngüsü ve tekrar eden şikâyet analizi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "CRM-025",
+        "operator": "not_equals",
+        "value": "musteri_sikayetleri_sisteme_kaydedilmemektedir"
+      },
+      "options": [
+        {
+          "value": "sla_sureleri_izlenir_musteri_memnuniyet_teyidi_ile_sikayet_kapatilir",
+          "label": "Evet; çözüm süresi hedefleri (SLA) izlenir, müşteri aranıp çözüldüğü teyit edildikten sonra şikâyet kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sikayet_cozulunce_ic_ekip_tarafindan_kapatilir_musteri_teyidi_alinmaz",
+          "label": "İç ekip işlemi tamamlayınca şikâyeti kapatır; müşteriden tekrar onay veya memnuniyet teyidi alınmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sikayet_kapanis_ve_sure_takibi_yapilmamaktadir",
+          "label": "Şikâyetin ne zaman çözüldüğü veya açık kalıp kalmadığı sistem üzerinden takip edilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-028",
+      "process": "Müşteri Memnuniyeti",
+      "order": 28,
+      "question": "Satış sonrası veya şikâyet/hizmet kapanışı sonrasında Müşteri Memnuniyeti Anketleri (CSAT / NPS / Müşteri Sadakat Ölçümü) düzenli olarak uygulanmakta mıdır?",
+      "description": "Müşteri memnuniyet anketleri, NPS/CSAT metodolojisi ve düzenli anket gönderimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "otomatik_anketler_csat_nps_ile_duzenli_olarak_olculur",
+          "label": "Evet; teslimat veya vaka kapanışı sonrasında otomatik SMS/e-posta anketi gönderilir ve NPS/CSAT ölçülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yilda_bir_kritik_musterilere_manuel_memnuniyet_anketi_yapilir",
+          "label": "Yılda bir kez seçilen ana müşteriler telefonla aranarak veya anket formu gönderilerek manuel ölçüm yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_memnuniyeti_olculmemektedir",
+          "label": "Müşteri memnuniyeti ölçümü veya anket çalışması yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-029",
+      "process": "Müşteri Memnuniyeti",
+      "order": 29,
+      "question": "Memnuniyet anket sonuçları ve NPS skorları doğrudan müşteri 360 kartı üzerinde ve müşteri temsilcisi performansında görüntülenebilmekte midir?",
+      "description": "Anket sonuçlarının müşteri kartına entegrasyonu ve performans göstergesi olarak kullanımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "CRM-028",
+        "operator": "not_equals",
+        "value": "musteri_memnuniyeti_olculmemektedir"
+      },
+      "options": [
+        {
+          "value": "anket_skorlari_musteri_360_kartinda_ve_temsilci_kpisinde_anlik_gorunur",
+          "label": "Evet; anket puanı doğrudan müşteri 360 kartına işlenir ve temsilcinin başarı puanına etki eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "anketler_ayri_bir_anket_aracinda_kalir_musteri_kartina_yansimaz",
+          "label": "Anketler ayrı bir form aracında (Google Forms/SurveyMonkey vb.) kalır; CRM müşteri kartına aktarılmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "anket_sonuclari_raporlanmamakta_ve_kullanilmamaktadir",
+          "label": "Anket sonuçları toplanır ancak analiz edilmez ve müşteri kartıyla ilişkilendirilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-030",
+      "process": "Müşteri Devir / Temsilci Değişikliği",
+      "order": 30,
+      "question": "Bir satış temsilcisi işten ayrıldığında veya bölge/portföy değişikliği olduğunda müşterinin tüm geçmiş görüşme, kontak ve açık işleri yeni temsilciye sistem üzerinden eksiksiz devredilebilmekte midir?",
+      "description": "Portföy devir mekanizması, yetki transferi ve açık işlerin devri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tek_tikla_tum_musteri_portfoyu_ve_gecmis_hafiza_yeni_temsilciye_devredilir",
+          "label": "Evet; sistem üzerinden temsilci değişikliği yapıldığında tüm kontaklar, görüşme geçmişi ve açık işler yeni kişiye geçer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_karti_temsilcisi_degisir_ancak_gecmis_notlar_tam_aktarilamaz",
+          "label": "Müşteri kartındaki isim değiştirilir ancak geçmiş görüşmeler ve görevler eski kullanıcının hesabında asılı kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemik_devir_yoktur_temsilci_ayrilinca_musteri_hafizasi_kaybolur",
+          "label": "Sistemik devir yoktur; temsilci ayrıldığında müşterinin tüm ilişkisi, notları ve kontak bilgileri kaybolur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-031",
+      "process": "Müşteri Devir / Temsilci Değişikliği",
+      "order": 31,
+      "question": "Temsilci ayrıldığında müşteri hafızasının (Kişisel notlar, telefon rehberleri, gizli anlaşmalar) şirkette kalması ve kurumsal hafıza kaybının önlenmesi nasıl sağlanmaktadır?",
+      "description": "Kurumsal hafıza sürekliliği, kişiye bağımlılık riski ve müşteri koruma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_bilgiler_merkezi_crmde_oldugu_icin_kurumsal_hafiza_kaybi_yasanmaz",
+          "label": "Tüm bilgiler merkezi CRM'de zorunlu tutulduğu için temsilci ayrılsa dahi yeni temsilci ilk günden itibaren tüm detayı bilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ayrilan_personelden_sozlu_veya_excel_ile_devir_teslim_raporu_istenir",
+          "label": "Personelden Excel ile müşteri devir listesi istenir ancak bilgilerin çoğu personelin hafızasında kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "temsilci_ayriliklarinda_ciddi_musteri_ve_ciro_kaybi_yasanmaktadir",
+          "label": "Kişiye bağımlılık çok yüksektir; temsilci ayrıldığında müşteriler de temsilciyle birlikte şirketi terk edebilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-032",
+      "process": "İletişim Tercihleri ve İzin Bilgileri",
+      "order": 32,
+      "question": "Müşterilerin ve iletişim kişilerinin ticari elektronik ileti izinleri (E-posta, SMS, Telefon arama onayları) ve izin alma tarih/kanal bilgileri sistemde tutulmakta mıdır?",
+      "description": "Ticari iletişim izinleri (İYS uyumu), izin kaynağı ve tarihsel onay kütüğü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "iletisim_izinleri_kanal_bazinda_eposta_sms_arama_ve_tarihle_kayitlidir",
+          "label": "Evet; E-posta, SMS ve Arama izinleri ayrı ayrı, izin tarihi ve onay metni referansıyla kayıtlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_genel_bir_onay_kutusu_vardir_ayrintili_kanal_tutulmaz",
+          "label": "Kart üzerinde tek bir 'İletişim İzni Var/Yok' seçeneği vardır; izin tarihi ve kanallar ayrıştırılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iletisim_izinleri_sistemde_takip_edilmemektedir",
+          "label": "İletişim izinleri sistemde takip edilmez; tüm iletişim kurumsal güvene dayalı yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-033",
+      "process": "İletişim Tercihleri ve İzin Bilgileri",
+      "order": 33,
+      "question": "Müşteri iletişim tercihleri (Örn. 'Yalnızca e-posta ile ulaşılsın', 'Cuma günleri aranmasın') ve iletişim kısıtlamaları müşteri kartında temsilcilerin görebileceği şekilde işaretlenmekte midir?",
+      "description": "Müşteri özel iletişim tercihleri, zaman kısıtlamaları ve rahatsız etmeme kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tercihler_ve_kisitlamalar_kartta_belirgin_uyari_olarak_gorunur",
+          "label": "Evet; 'Aramayın sadece e-posta', 'Şu saatler arası arayın' gibi tercihler kartta ve aktivite ekranında belirgin görünür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_serbest_not_alanina_yazilirsa_gorunur",
+          "label": "Özel bir tercih alanı yoktur; temsilci unutmayıp genel not kutusuna yazarsa görülebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iletisim_tercihleri_tutulmamaktadir",
+          "label": "İletişim tercihleri tutulmaz; müşteri rahatsız edilse bile bu bilgi diğer temsilcilere yansımaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-034",
+      "process": "Müşteri Veri Kalitesi",
+      "order": 34,
+      "question": "Müşteri veritabanında eksik bilgi (Adres, telefon, e-posta, vergi no, yetkili kişi) oranı ve güncel olmayan atıl/ölü müşteri kayıtlarının tespiti ve temizliği nasıl yapılmaktadır?",
+      "description": "Müşteri veri bütünlüğü, eksik alan kontrolleri ve atıl kart temizleme disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "veri_tamlik_orani_izlenir_ve_eksik_kartlar_duzenli_raporlanip_tamamlanir",
+          "label": "Evet; müşteri kartlarındaki doluluk oranı (%) izlenir, eksik bilgisi olan kartlar satış ekibine tamamlatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hata_veya_ihtiyac_oldukca_manuel_duzeltme_yapilir",
+          "label": "Düzenli bir kontrol yoktur; kargo gitmediğinde veya fatura kesilemediğinde eksik bilgi fark edilip düzeltilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "veritabaninda_ciddi_oranda_eksik_ve_hatali_kayit_birikmistir",
+          "label": "Veri kalitesi çok düşüktür; binlerce kartta telefon, adres veya vergi numarası boştur ya da geçersizdir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-035",
+      "process": "Müşteri Veri Kalitesi",
+      "order": 35,
+      "question": "Müşteri kartındaki temel bilgileri kimlerin değiştirebileceğine dair Değişiklik Yetki Matrisi ve değişiklik tarihçe logları (Audit Trail / Kim, ne zaman, hangi alanı değiştirdi) tutulmakta mıdır?",
+      "description": "Müşteri kartı güncelleme yetki matrisi, alan bazlı kilit ve denetim logları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "alan_bazli_yetkilendirme_ve_tam_degisiklik_tarihcesi_audit_trail_aktif",
+          "label": "Evet; unvan/VKN kilitlidir yalnızca yetkili değiştirir, yapılan her alan değişikliği eski/yeni değeriyle loglanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kart_duzenleme_yetkisi_vardir_ancak_degisiklik_gecmisi_tutulmaz",
+          "label": "Kullanıcılar kartı güncelleyebilir ancak daha önce ne yazdığı veya kimin değiştirdiği geriye dönük izlenemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "herkes_istedigi_alanı_degistirebilir_kontrol_ve_log_yoktur",
+          "label": "Yetki veya loglama yoktur; herhangi bir personel müşteri unvanını veya telefonunu kontrolsüzce değiştirebilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-036",
+      "process": "Mükerrer Kayıt Yönetimi",
+      "order": 36,
+      "question": "Yeni müşteri kaydı açılırken aynı vergi numarası, telefon, unvan veya e-posta ile mükerrer (Duplicate) kayıt oluşmasını engelleyen sistemsel önleyici kontroller var mıdır?",
+      "description": "Mükerrer müşteri önleme kuralları, VKN/TCKN tekilliği ve benzerlik uyarıları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ayni_vkn_telefon_veya_unvanda_sistem_kaydi_engeller_veya_uyarir",
+          "label": "Evet; aynı VKN/TCKN, e-posta veya benzer unvanda sistem mükerrer kaydı anında engeller ve mevcut kartı gösterir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_ayni_vkn_birebir_girilirse_uyarir_unvan_farkliysa_engellemez",
+          "label": "Yalnızca VKN birebir aynıysa uyarır; unvan veya telefon benzerliklerinde mükerrer kayda izin verir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mukerrer_kayit_kontrolu_yoktur_ayni_firma_defalarca_acilabilir",
+          "label": "Mükerrer kontrolü yoktur; aynı firma farklı temsilciler tarafından defalarca mükerrer açılmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-037",
+      "process": "Mükerrer Kayıt Yönetimi",
+      "order": 37,
+      "question": "Geçmişten gelen mükerrer müşteri kayıtlarının tespit edilmesi, birleştirilmesi (Merge) ve geçmiş hareketlerin tek bir ana cariye bağlanması süreci nasıl yürütülmektedir?",
+      "description": "Mükerrer kayıt birleştirme (Customer Merge), hareket aktarımı ve temizlik aracı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "otomatik_birlestirme_merge_araci_ile_tum_gecmis_hareketler_tek_karta_aktarilir",
+          "label": "Evet; mükerrer iki kart seçilerek tek tıkla birleştirilir, tüm geçmiş görüşmeler ve siparişler ana karta taşınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "biri_pasife_alinir_ve_koduna_kullanmayiniz_yazilir",
+          "label": "Birleştirme aracı yoktur; mükerrer kartın unvanına 'KULLANMAYINIZ' yazılıp pasife alınır ancak geçmiş hareketler bölünmüş kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mukerrer_kayit_temizligi_veya_birlestirme_yapilamamaktadir",
+          "label": "Mükerrer kayıtlar birleştirilemez; sistemde aynı müşteriye ait çok sayıda aktif kart yaşamaya devam eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-038",
+      "process": "CRM Raporlama ve KPI",
+      "order": 38,
+      "question": "Müşteri ilişkileri ve CRM performansı için hangi temel göstergeler (Müşteri kazanım oranı, Müşteri kayıp/churn oranı, Ziyaret/görüşme sıklığı, Şikâyet çözüm süresi, NPS) takip edilmektedir?",
+      "description": "Kurumsal CRM performans göstergeleri ve müşteri yönetim metrikleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_crm_kpi_ve_donusum_metrikleri_gosterge_panellerinde_izlenir",
+          "label": "Evet; yeni kazanılan müşteri, churn oranı, temas sıklığı, açık şikâyet sayısı ve NPS puanı kokpitlerde canlı izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_ziyaret_sayisi_veya_yeni_musteri_adedi_takip_edilir",
+          "label": "Yalnızca ayda kaç yeni müşteri açıldığı veya kaç ziyaret yapıldığı takip edilir; derinlemesine CRM KPI'ı yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "crm_ve_musteri_iliskileri_kpi_takibi_yapilmamaktadir",
+          "label": "CRM KPI takibi yapılmamaktadır; müşteri ilişkilerinin performansı ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-039",
+      "process": "CRM Raporlama ve KPI",
+      "order": 39,
+      "question": "Son 3/6/12 aydır hiç iletişim kurulmayan, teklif verilmeyen veya siparişi duran Terk Riski Taşıyan Müşteriler (Dormant / Churn Risk) sistem tarafından otomatik raporlanmakta mıdır?",
+      "description": "Kayıp müşteri (Churn) erken uyarı sinyalleri ve temas edilmeyen müşteri alarmları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "otomatik_churn_alarmi_ve_temassiz_musteri_listesi_temsilciye_sunulur",
+          "label": "Evet; sistem belirli süre temas edilmeyen müşterileri 'Terk Riski' olarak işaretler ve temsilciye geri kazanım görevi açar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_ekibi_excelde_siparis_gecmisini_filtreleyerek_manuel_bulur",
+          "label": "Otomatik alarm yoktur; satış yöneticisi ERP'den sipariş raporu çekip aylardır sipariş vermeyenleri Excel'de tespit eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "terk_riski_veya_hareketsiz_musteri_takibi_yapilmamaktadir",
+          "label": "Hareketsiz müşteri takibi yapılmaz; müşterinin şirketi terk ettiği ancak aylar sonra tesadüfen anlaşılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-040",
+      "process": "CRM Raporlama ve KPI",
+      "order": 40,
+      "question": "Satış temsilcilerinin günlük/haftalık aktivite yoğunluğu (Kaç arama yapıldı, kaç ziyaret tamamlandı, kaç talep kapatıldı) yönetim gösterge panellerinde izlenmekte midir?",
+      "description": "Temsilci efor ve aktivite verimliliği, temas kotaları ve yönetim görünürlüğü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "temsilci_aktivite_ve_performans_karsilastirmasi_canli_izlenir",
+          "label": "Evet; temsilcilerin haftalık ziyaret, görüşme ve görev tamamlama sayıları karşılaştırmalı panellerde izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "haftalik_satis_toplantisinda_sozlu_olarak_raporlanir",
+          "label": "Sistem üzerinden izlenmez; temsilciler haftalık toplantıda kime gittiklerini sözlü olarak anlatır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aktivite_yogunlugu_takip_edilmemektedir",
+          "label": "Aktivite yoğunluğu takip edilmez; yalnızca ay sonunda kesilen faturaya bakılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-041",
+      "process": "CRM Raporlama ve KPI",
+      "order": 41,
+      "question": "Satış ekibinin CRM sistemini düzenli kullanma ve müşteri bilgilerini eksiksiz girme oranı (CRM User Adoption) ve sistem dışı (WhatsApp/Excel) çalışma alışkanlığı ne boyuttadır?",
+      "description": "Kullanıcı benimseme (User Adoption), sistem direnci ve gölge kayıt alışkanlıkları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "cok_yuksek_benimseme_tum_ekip_crmi_ana_calisma_alani_olarak_kullanir",
+          "label": "Çok yüksek; tüm ekip sabah ilk iş CRM'i açar, sisteme girilmeyen görüşme veya bilgi yok sayılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "orta_duzey_bazi_temsilciler_duzenli_girer_bazilari_zorlamayla_yazar",
+          "label": "Orta düzey; genç temsilciler sistemi aktif kullanırken eski çalışanlar Excel ve defter alışkanlığını sürdürmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dusuk_benimseme_sistem_bos_durmaktadir_tum_is_whatsapp_ve_exceldedir",
+          "label": "Düşük; CRM sistemi kurulmuş ancak veri girilmediği için atıl kalmıştır, tüm operasyon WhatsApp ve Excel'dedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "CRM-042",
+      "process": "CRM Raporlama ve KPI",
+      "order": 42,
+      "question": "ERP dönüşümü sonrasında hedeflenen Kurumsal CRM ve Müşteri İlişkileri Yönetimi vizyonu ve temel önceliği nedir?",
+      "description": "Gelecek vizyonu (TO-BE), CRM yatırım hedefleri ve kurumsal öncelikler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "entegre_musteri_360_mobil_saha_ve_kurumsal_hafizanin_tamamen_sistemlesmesi",
+          "label": "ERP ile tam entegre Müşteri 360, mobil saha ziyareti, şikâyet/talep SLA takibi ve kurumsal hafızanın tam sistemleşmesi",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_musteri_kontak_ve_gorusme_notlarinin_duzenli_tutulmasi_yeterlidir",
+          "label": "Müşteri yetkililerinin ve yapılan görüşmelerin düzenli kayıt altına alınması ilk aşamada yeterlidir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mukerrer_kayitlarin_temizlenmesi_ve_vkn_dogrulamasinin_otomasyonu",
+          "label": "Mükerrer müşteri kayıtlarının engellenmesi ve VKN/e-fatura adres doğrulamalarının otomatikleşmesi önceliklidir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1540 @@
+{
+  "meta": {
+    "pack_id": "tr.asset_management.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "ASSET_MANAGEMENT",
+    "name": "Sabit Kıymet ve Varlık Yönetimi Ön Analizi",
+    "description": "Duran varlıkların ve sabit kıymetlerin (makine, hat, bina, araç, IT/elektronik, demirbaş) edinim, aktifleştirme (Capitalization), fiziksel lokasyon hiyerarşisi, personel/departman zimmet takibi, varlık hiyerarşisi (Parent-Child ilişkisi), seri no/barkod/RFID etiketleme, faydalı ömür ve amortisman bağlantısı, garanti ve sigorta poliçesi takibi, varlık transferi, değer artırıcı harcamalar (Modernizasyon/Retrofit), fiziki varlık sayımı ve kayıp/hasar yönetimi, atıl/yedek (Idle) statüsü, hurda/satış/elden çıkarma (Disposal) yaşam döngüsü, bakım yönetimi ekipman entegrasyonu (Asset ↔ Maintenance Equipment mapping), masraf merkezi bağlantısı ve varlık yönetici KPI'larının AS-IS durumunu ve ERP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "AST-001",
+      "process": "Varlık Yönetimi Organizasyonu",
+      "order": 1,
+      "question": "Sabit kıymetlerin ve kurumsal duran varlıkların (fiziksel takip, zimmet, sayım, lokasyon ve transfer) yönetimi şirketinizde hangi departman veya ekip tarafından yürütülmektedir?",
+      "description": "Varlık yönetimi sorumluluk dağılımı, idari işler, muhasebe ve teknik ekiplerin rolü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "idari_isler_ve_muhasebe_ortak_sorumlulugunda_yonetilir",
+          "label": "İdari İşler fiziksel varlık ve zimmeti, Muhasebe ise mali defter ve amortismanı koordine olarak yönetir"
+        },
+        {
+          "value": "ayri_bir_varlik_yonetimi_veya_tesis_yonetimi_departmani_vardir",
+          "label": "Tüm duran varlıkların fiziki ve operasyonel takibi ayrı bir Tesis / Varlık Yönetimi departmanı tarafından yürütülür"
+        },
+        {
+          "value": "her_departman_it_uretim_idari_kendi_varliklarini_bagimsiz_yonetir",
+          "label": "Her birim (IT bilişim ekipmanlarını, Üretim makineleri, İdari İşler mobilya/araçları) bağımsız takip eder"
+        },
+        {
+          "value": "yalnizca_muhasebe_tarafindan_fatura_uzerinden_takip_edilir_saha_takibi_yoktur",
+          "label": "Yalnızca Muhasebe departmanı tarafından yasal defterler üzerinden izlenir; sahada operasyonel varlık takibi yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-002",
+      "process": "Varlık Yönetimi Organizasyonu",
+      "order": 2,
+      "question": "Duran varlıkların ediniminden hurdaya ayrılmasına kadarki fiziksel ve mali süreçleri düzenleyen yazılı bir Sabit Kıymet Prosedürü veya Varlık Yönetim Yönetmeliği bulunmakta mıdır?",
+      "description": "Kurumsal sabit kıymet politikası, aktifleştirme limitleri ve onay kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yazili_prosedur_vardir_ve_tum_tesislerde_eksiksiz_uygulanir",
+          "label": "Evet; aktifleştirme limiti, zimmet, transfer ve hurda kurallarını belirleyen yazılı prosedür mevcuttur ve uygulanır"
+        },
+        {
+          "value": "yazili_dokuman_vardir_ancak_sahada_uygulamada_farkliliklar_yasayabilmektedir",
+          "label": "Yazılı doküman vardır ancak departmanlar arası uygulamada ve onay adımlarında esneklikler yaşanmaktadır"
+        },
+        {
+          "value": "yazili_prosedur_yoktur_yonetim_kararlari_ve_teamullere_gore_yurutulur",
+          "label": "Yazılı bir yönetmelik yoktur; süreçler yöneticilerin tecrübesine ve anlık kararlara göre yürütülür",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-003",
+      "process": "Varlık Ana Veri Yapısı",
+      "order": 3,
+      "question": "Kurumsal Varlık Ana Veri Kartında (Asset Master Data) hangi kimlik, teknik, finansal ve operasyonel bilgiler standart olarak tutulmaktadır?",
+      "description": "Sabit kıymet kartı alan zenginliği, marka/model, seri no, masraf merkezi ve statü.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "varlik_kodu_aciklama_ve_varlik_sinifi",
+          "label": "Varlık Kodu (Asset No), Açıklama ve Ana Varlık Sınıfı"
+        },
+        {
+          "value": "marka_model_seri_numarasi_ve_uretici_bilgisi",
+          "label": "Marka, Model, Üretici Seri Numarası ve İmal Yılı"
+        },
+        {
+          "value": "fiziksel_lokasyon_fabrika_bina_kat_oda_hat",
+          "label": "Ayrıntılı Fiziksel Lokasyon (Fabrika, Bina, Kat, Bölüm/Oda, Hat)"
+        },
+        {
+          "value": "zimmet_sahibi_personel_ve_sorumlu_departman",
+          "label": "Zimmet Sahibi Personel ve Sorumlu Departman / Yönetici"
+        },
+        {
+          "value": "masraf_merkezi_ve_kar_merkezi_baglantisi",
+          "label": "Masraf Merkezi (Cost Center) ve Kâr Merkezi Bağlantısı"
+        },
+        {
+          "value": "edinim_tarihi_aktifiestirme_tarihi_ve_fatura_no",
+          "label": "Edinim Tarihi, Aktifleştirme Tarihi, Fatura No ve Tedarikçi"
+        },
+        {
+          "value": "faydali_omur_amortisman_orani_ve_defter_degeri",
+          "label": "Faydalı Ömür, Amortisman Yöntemi/Oranı ve Net Defter Değeri"
+        },
+        {
+          "value": "garanti_ve_sigorta_police_bilgileri",
+          "label": "Garanti Süresi/Bitiş Tarihi ve Sigorta Poliçe Bilgileri"
+        },
+        {
+          "value": "varlik_operasyonel_statusu_aktif_atil_arizali_hurda",
+          "label": "Varlık Operasyonel Statüsü (Aktif, Atıl, Bakımda, Arızalı, Hurda)"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-004",
+      "process": "Varlık Ana Veri Yapısı",
+      "order": 4,
+      "question": "Büyük üretim tesislerinde veya karmaşık varlıklarda Üst Varlık - Alt Varlık (Parent-Child Asset Hierarchy / Tesis → Hat → Makine → Alt Ünite) hiyerarşik ilişki yapısı kullanılmakta mıdır?",
+      "description": "Kompleks varlık ağacı, ana hat ve alt tezgâh/aparat ilişkisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "cok_seviyeli_parent_child_varlik_hiyerarsisi_kullanilmaktadir",
+          "label": "Evet; üretim hatları ana varlık, bağlı makineler ve kalıplar alt varlık olarak hiyerarşik bağlanır"
+        },
+        {
+          "value": "tek_seviyeli_duz_varlik_listesi_tutulur_hiyerarsi_yoktur",
+          "label": "Hayır; tüm varlıklar aynı hiyerarşi düzeyinde bağımsız tekil kartlar olarak takip edilir"
+        },
+        {
+          "value": "yalnizca_muhasebede_ana_grup_kirilimi_vardir_saha_hiyerarsisi_yoktur",
+          "label": "Yalnızca muhasebe hesap planı düzeyinde kırılım vardır; fiziksel alt-üst varlık bağı kurulmaz"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-005",
+      "process": "Varlık Sınıflandırması",
+      "order": 5,
+      "question": "Duran varlıklar sistemde hangi ana varlık sınıflarına (Asset Class / Demirbaş Kategorisi) göre gruplanmakta ve yönetilmektedir?",
+      "description": "Bina, makine, araç, IT, kalıp, mobilya ve maddi olmayan duran varlık ayrımı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "arazi_arsa_bina_ve_tesis_yapilari",
+          "label": "Arazi, Arsa, Binalar ve Tesis Yapıları"
+        },
+        {
+          "value": "uretim_makineleri_tezgahlar_ve_otomasyon_hatlari",
+          "label": "Üretim Makineleri, Tezgâhlar ve Otomasyon Hatları"
+        },
+        {
+          "value": "ozel_kalip_aparat_fikstur_ve_modeller",
+          "label": "Özel Kalıplar, Aparatlar, Fikstürler ve Modeller"
+        },
+        {
+          "value": "tasitlar_servisler_forklift_ve_istifleme_araclari",
+          "label": "Taşıtlar, Şirket Araçları, Forklift ve İstifleme Ekipmanları"
+        },
+        {
+          "value": "bilgi_teknolojileri_sunucu_bilgisayar_yazici_ve_el_terminalleri",
+          "label": "IT / Bilişim (Sunucular, Bilgisayarlar, Ağ Cihazları, El Terminalleri)"
+        },
+        {
+          "value": "ofis_mobilyalari_ve_idari_demirbaslar",
+          "label": "Ofis Mobilyaları, Mefruşat ve İdari Demirbaşlar"
+        },
+        {
+          "value": "laboratuvar_test_ve_olcum_cihazlari",
+          "label": "Laboratuvar, Test ve Kalibrasyonlu Ölçüm Cihazları"
+        },
+        {
+          "value": "yazilim_lisanslari_patent_ve_maddi_olmayan_duran_varliklar",
+          "label": "Yazılım Lisansları, Patent, Lisans ve Gayrimaddi Haklar"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-006",
+      "process": "Varlık Sınıflandırması",
+      "order": 6,
+      "question": "Şirketin mülkiyetinde olan varlıkların yanı sıra Operasyonel Kiralama (Leasing), Kiralık Araç/Ekipman veya Müşteri/Tedarikçiye ait emanet kalıp ve makineler mülkiyet tipiyle ayrı takip edilmekte midir?",
+      "description": "Leased, rented, customer-owned ve consigned varlık ayrımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "mulkiyet_tipi_oz_varlik_kiralik_leasing_musteri_ayrilir_ve_ayri_izlenir",
+          "label": "Evet; öz varlık, kiralık araç, finansal kiralama ve müşteri kalıpları mülkiyet tipiyle net ayrıştırılır"
+        },
+        {
+          "value": "yalnizca_oz_varliklar_sistemdedir_kiralik_veya_emanet_varliklar_ayri_excelde_tutulur",
+          "label": "Yalnızca öz varlıklar ERP'dedir; kiralık ve müşteri kalıpları harici Excel listelerinde izlenir"
+        },
+        {
+          "value": "kiralik_ve_emanet_varlik_takibi_yapilmamaktadir",
+          "label": "Kiralık veya emanet varlık takibi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-007",
+      "process": "Varlık Kodlama / Numaralandırma",
+      "order": 7,
+      "question": "Sabit kıymetlere verilen Varlık Numarası (Asset Number / Demirbaş Numarası) nasıl üretilmekte ve hangi kodlama yapısını takip etmektedir?",
+      "description": "Otomatik ardışık numara, akıllı kod, sınıf önekli veya harici etiket kodu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_tarafindan_varlik_sinifina_gore_otomatik_ardisik_numara_uretilir",
+          "label": "ERP sistemi tarafından varlık sınıfı önekine göre otomatik ardışık tekil numara üretilir"
+        },
+        {
+          "value": "manuel_olarak_muhasebe_veya_idari_isler_tarafindan_kod_verilir",
+          "label": "Muhasebe veya İdari İşler personeli tarafından manuel kodlama yapılarak girilir"
+        },
+        {
+          "value": "hazir_basilmis_barkod_etiketinin_numarasi_sisteme_asset_no_olarak_tanimlanir",
+          "label": "Önceden basılmış rulo barkod etiketindeki numara okutularak sisteme varlık no olarak kaydedilir"
+        },
+        {
+          "value": "standart_bir_kodlama_yoktur_serbest_metin_veya_fatura_no_kullanilir",
+          "label": "Standart bir kodlama yapısı yoktur; fatura numarası veya serbest açıklamalar kullanılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-008",
+      "process": "Varlık Kodlama / Numaralandırma",
+      "order": 8,
+      "question": "Fiziksel varlıkların üzerine yapıştırılan veya monte edilen etiketlerde hangi tanımlama ve etiketleme teknolojisi kullanılmaktadır?",
+      "description": "Fiziksel etiket tipi, barkod, 2D QR kod, metal plaka, RFID ve zorlu ortam dayanımı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "standart_1d_cizgi_barkodlu_yapiskan_etiketler",
+          "label": "Standart 1D Çizgi Barkodlu Yapışkan Etiketler"
+        },
+        {
+          "value": "2d_karekod_qr_kod_etiketler",
+          "label": "2D Karekod / QR Kod Etiketler (Mobil cihazla okutulabilir)"
+        },
+        {
+          "value": "zorlu_fabrika_ortami_icin_metal_plaka_veya_percinli_etiket",
+          "label": "Zorlu Fabrika/Sıcaklık Ortamına Dayanıklı Metal Plaka veya Perçinli Etiket"
+        },
+        {
+          "value": "rfid_etiketler_veya_akilli_tagler",
+          "label": "RFID Çipli Etiketler veya Akıllı Tag'ler"
+        },
+        {
+          "value": "etiketleme_yapilmamaktadir_fiziksel_etiket_yoktur",
+          "label": "Fiziksel etiketleme yapılmamaktadır; ürünler üzerinde etiket bulunmaz"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-009",
+      "process": "Edinim ve Aktifleştirme",
+      "order": 9,
+      "question": "Yeni bir duran varlık satın alındığında sistemde resmi Varlık Kartı hangi tetikleyici mekanizmayla oluşturulup aktifleştirilmektedir (Capitalization)?",
+      "description": "Satın alma faturası, mal kabul, kurulum tamamlama veya devreye alma onayı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "satinalma_faturasi_ve_mal_kabul_girisi_yapildiginda_otomatik_veya_tek_tikla_olusturulur",
+          "label": "Satın alma faturası veya mal kabul kaydı duran varlık kalemine bağlandığında otomatik/tek tıkla açılır"
+        },
+        {
+          "value": "satin_alindiktan_sonra_kurulum_ve_devreye_alma_tutanagi_onaylaninca_aktifiestirilir",
+          "label": "Fatura girilse de varlık kurulum ve devreye alma tutanağı onaylandığı tarihte aktifleştirilir"
+        },
+        {
+          "value": "muhasebe_tarafindan_ay_sonunda_veya_donem_sonunda_manuel_kart_acilarak_aktife_alinir",
+          "label": "Muhasebe personeli tarafından dönem sonlarında faturalar taranarak manuel kart açılır"
+        },
+        {
+          "value": "standart_bir_aktifiestirme_akisi_yoktur",
+          "label": "Standart bir aktifleştirme akışı yoktur; farklı departmanlar farklı zamanlarda kaydeder"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-010",
+      "process": "Edinim ve Aktifleştirme",
+      "order": 10,
+      "question": "Fabrika inşası, yeni hat kurulumu veya Ar-Ge gibi uzun süren yatırım projelerinde harcamalar Yapılmakta Olan Yatırımlar (CIP / AUC) hesabında toplanıp proje bitiminde nihai sabit kıymetlere dağıtılmakta mıdır?",
+      "description": "Construction in Progress (CIP / AUC), yatırım projeleri ve aktifleştirme transferi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yatirim_projeleri_cip_hesabinda_toplanir_ve_tamamlaninca_varliklara_otomatik_dagitilir",
+          "label": "Evet; proje süresince 258 CIP hesabında toplanır, devreye alınınca ilgili sabit kıymetlere aktarılır"
+        },
+        {
+          "value": "yatirimlar_manuel_olarak_excelde_takip_edilir_bitince_tek_seferde_aktife_alinir",
+          "label": "Yatırım harcamaları Excel'de toplanır, proje tamamlandığında tek seferde muhasebede aktifleştirilir"
+        },
+        {
+          "value": "uzun_sureli_yatirim_projesi_yapilmamaktadir_varliklar_dogrudan_alinir",
+          "label": "Uzun süreli yatırım projesi yürütülmemektedir; tüm varlıklar doğrudan kullanıma hazır satın alınır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-011",
+      "process": "Varlık Maliyet Bileşenleri",
+      "order": 11,
+      "question": "Duran varlığın ilk aktifleştirme (Giriş) maliyetine fatura bedelinin yanı sıra nakliye, gümrük vergisi, sigorta, kurulum, montaj ve mühendislik test giderleri dahil edilmekte midir?",
+      "description": "Varlık edinim maliyeti oluşumu, ek masrafların maliyete kapitalizasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_nakliye_gumruk_montaj_ve_kurulum_giderleri_varlik_aktifiestirme_maliyetine_eklenir",
+          "label": "Evet; varlığı çalışır hale getirmek için yapılan tüm nakliye, gümrük, montaj ve kurulum masrafları eklenir"
+        },
+        {
+          "value": "yalnizca_ana_fatura_bedeli_aktifiestirilir_montaj_ve_nakliye_donemsel_gidere_yazilir",
+          "label": "Yalnızca ana makine faturası aktifleştirilir; nakliye ve montaj faturaları doğrudan dönemsel gidere yazılır"
+        },
+        {
+          "value": "buyuk_tutarlı_makinelerde_eklenir_kucuk_demirbaslarda_yalniz_fatura_tutari_alinir",
+          "label": "Yalnızca büyük tutarlı hat ve makinelerde ek maliyetler kapitalize edilir; diğerlerinde yalnız fatura alınır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-012",
+      "process": "Varlık Maliyet Bileşenleri",
+      "order": 12,
+      "question": "Yurt dışından ithal edilen veya birden fazla faturayla devreye alınan büyük varlıklarda oluşan ek masraflar (Landed Cost / Ek Masraf Dağıtımı) varlık aktifleştirme bedeline nasıl paylaştırılmaktadır?",
+      "description": "İthalat masraf dağıtımı, gümrük/navlun katsayıları ve varlık bedeline yedirme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "ithalat_ve_kurulum_faturalari_sistemde_ilgili_varlik_veya_projeye_baglanarak_otomatik_paylastirilir",
+          "label": "İthalat ve montaj faturaları sistemde ilgili varlık veya yatırım projesine bağlanarak otomatik paylaştırılır"
+        },
+        {
+          "value": "masraf_paylasimi_muhasebe_tarafindan_excelde_hesaplanip_tek_tutar_olarak_varliga_girilir",
+          "label": "Masraf paylaştırması Excel üzerinde hesaplanır ve nihai toplam tutar manuel varlık bedeli olarak girilir"
+        },
+        {
+          "value": "ithal_veya_coklu_faturali_varlik_alimi_yapilmamaktadir",
+          "label": "İthal veya çoklu faturalı karmaşık varlık edinimi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-013",
+      "process": "Fiziksel Lokasyon Yönetimi",
+      "order": 13,
+      "question": "Sabit kıymetlerin bulunduğu fiziksel konumlar sistemde hangi detay seviyesinde tanımlanmakta ve güncellenmektedir?",
+      "description": "Fiziksel lokasyon ağacı, fabrika, bina, kat, oda, hat ve alan seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ayrintili_lokasyon_agaci_fabrika_bina_kat_oda_hat_ile_tam_saha_takibi_yapilir",
+          "label": "Ayrıntılı hiyerarşik lokasyon ağacıyla (Fabrika → Bina → Kat → Bölüm/Oda → Hat) tam takip edilir"
+        },
+        {
+          "value": "yalnizca_tesis_veya_sube_seviyesinde_genel_lokasyon_tutulur",
+          "label": "Yalnızca tesis veya şube seviyesinde genel lokasyon tutulur; bina/oda detayına inilmez"
+        },
+        {
+          "value": "yalnizca_departman_masraf_merkezi_tutulur_fiziksel_lokasyon_alani_yoktur",
+          "label": "Yalnızca zimmetli departman veya masraf merkezi bilinir; fiziki lokasyon bilgisi tutulmaz"
+        },
+        {
+          "value": "duzenli_ve_guvenilir_lokasyon_kaydi_tutulmamaktadir",
+          "label": "Düzenli ve güncel bir lokasyon kaydı tutulmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-014",
+      "process": "Fiziksel Lokasyon Yönetimi",
+      "order": 14,
+      "question": "Fabrika sahasında veya ofisler arasında sürekli hareket eden mobil varlıkların (Forklift, el terminali, ölçüm aleti, laptop, kalıp arabası) lokasyon değişiklikleri nasıl takip edilmektedir?",
+      "description": "Mobil varlık hareketleri, barkod okutma, periyodik denetim ve geçici yer değişimleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "mobil_cihaz_barkod_okutma_veya_transfer_formuyla_anlik_guncellenir",
+          "label": "Mobil terminallerle barkod okutularak veya sistemden transfer formu onaylanarak anlık güncellenir"
+        },
+        {
+          "value": "yalnizca_ana_bagli_oldugu_varsayilan_sabit_lokasyonu_ve_zimmetli_sorumlusu_tutulur",
+          "label": "Hareket anlık izlenmez; yalnızca ana bağlı olduğu varsayılan sabit lokasyon ve sorumlu tutulur"
+        },
+        {
+          "value": "mobil_varliklarin_lokasyon_hareketi_takip_edilmemektedir",
+          "label": "Mobil varlıkların yer değiştirmeleri sistemde takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-015",
+      "process": "Zimmet / Kullanıcı Ataması",
+      "order": 15,
+      "question": "Personele veya belirli bir departmana tahsis edilen kişisel ve ortak varlıkların (Laptop, telefon, araç, el aleti, ölçüm cihazı) zimmet takibi nasıl yürütülmektedir?",
+      "description": "Çalışan zimmeti, departman zimmeti ve zimmet kayıt otoritesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_uzerinden_tc_kimlik_sicil_no_ile_personele_ve_departmana_birebir_zimmet_takibi_yapilir",
+          "label": "ERP sistemi üzerinden personelin sicil numarasına ve departmanına birebir zimmetlenerek tam izlenir"
+        },
+        {
+          "value": "idari_isler_veya_it_tarafindan_harici_excel_ve_kagit_formlarla_zimmet_tutulur",
+          "label": "İdari İşler ve IT tarafından harici Excel tabloları ve basılı kağıt teslim tutanaklarıyla izlenir"
+        },
+        {
+          "value": "yalnizca_arac_ve_laptop_gibi_yuksek_degerli_cihazlar_zimmetlenir_digerleri_izlenmez",
+          "label": "Yalnızca şirket araçları ve bilgisayarlar zimmetlenir; fabrika aletleri ve diğerleri serbest kullanımdadır"
+        },
+        {
+          "value": "zimmet_takibi_yapilmamaktadir",
+          "label": "Zimmet takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-016",
+      "process": "Zimmet / Kullanıcı Ataması",
+      "order": 16,
+      "question": "Zimmet teslim ve iade süreçlerinde sistemden barkodlu Dijital/Basılı Zimmet Teslim Tutanağı üretilmekte ve personel işten ayrılırken zimmet ilişiği kontrol edilmekte midir?",
+      "description": "Zimmet formu, imza onayı, ilişik kesme (Offboarding) ve zimmet geçmişi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "AST-015",
+        "operator": "not_equals",
+        "value": "zimmet_takibi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "sistemden_resmi_zimmet_tutnagi_basilir_ve_ik_cikisinda_ilisik_kesme_otomatik_kontrol_edilir",
+          "label": "Evet; sistemden barkodlu zimmet tutanağı basılır/onaylanır ve İK çıkışında tüm zimmetler kontrol edilir"
+        },
+        {
+          "value": "kagit_tutanak_imzalatilir_ancak_sistemle_ik_cikis_sureci_entegre_degildir",
+          "label": "Kağıt tutanak imzalatılır ancak İK çıkış süreciyle ERP zimmet kaydı otomatik entegre değildir"
+        },
+        {
+          "value": "tutanak_veya_ilisik_kesme_kontrolu_yapilmamaktadir",
+          "label": "Resmi teslim tutanağı düzenlenmemekte veya ayrılışta sistem kontrolü yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-017",
+      "process": "Organizasyon / Şirket / Şube Sahipliği",
+      "order": 17,
+      "question": "Çoklu şirket (Multi-Company) veya çoklu şube yapısında bir varlığın yasal mülkiyet sahibi olan şirket ile fiilen kullandığı şube/masraf merkezi ilişkisi nasıl yönetilmektedir?",
+      "description": "Grup şirketleri arası varlık sahipliği, yasal şirket ve fiili kullanım şubesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yasal_sahip_sirket_ve_fiili_kullanan_sube_ayri_ayri_tanimlanip_sistemde_izlenir",
+          "label": "Varlığın mülkiyet sahibi yasal tüzel kişilik ile fiilen kullandığı fabrika/şube ayrı ayrı izlenir"
+        },
+        {
+          "value": "varlik_yalnizca_kayitli_oldugu_tek_bir_sirket_ve_sube_altinda_izlenebilir",
+          "label": "Varlık yalnızca faturasının kesildiği tek bir şirket ve şube altında izlenebilir; çapraz kullanım tutulmaz"
+        },
+        {
+          "value": "tek_sirketli_ve_tek_lokasyonlu_yapi_vardir_coklu_sirket_ayrimi_gerekmemektedir",
+          "label": "Şirketimiz tek tüzel kişilikli ve tek tesisli yapıdadır; çoklu şirket ayrımı gerekmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-018",
+      "process": "Organizasyon / Şirket / Şube Sahipliği",
+      "order": 18,
+      "question": "Grup şirketleri veya farklı şubeler arasında ortak kullanılan veya geçici tahsis edilen varlıkların şirketler arası masraf yansıtması ve transferi nasıl takip edilmektedir?",
+      "description": "Intercompany varlık transferi, yansıtma faturası ve amortisman dağıtımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sirketler_arasi_transfer_irsaliyesi_ve_fatura_yansitmasi_sistemden_entegre_yurutulur",
+          "label": "Evet; şirketler arası transfer irsaliyesi, yansıtma faturası ve amortisman payı sistemden entegre yürütülür"
+        },
+        {
+          "value": "fiziksel_olarak_diger_sirkette_kullanilsa_da_masraf_ve_amortisman_sahip_sirkette_kalir",
+          "label": "Fiziksel olarak diğer tesiste kullanılsa da yansıtma yapılmaz; tüm amortisman mülkiyet sahibi şirkette kalır"
+        },
+        {
+          "value": "grup_sirketleri_arasi_varlik_paylasimi_veya_transferi_yapilmamaktadir",
+          "label": "Grup şirketleri arası varlık paylaşımı veya transferi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-019",
+      "process": "Seri Numarası ve Teknik Kimlik",
+      "order": 19,
+      "question": "Üretici tarafından verilen orijinal Seri Numarası (Manufacturer Serial Number), Marka, Model, Üretim Yılı ve Teknik Spesifikasyonlar varlık kartında zorunlu tutulmakta mıdır?",
+      "description": "Varlık teknik kimliği, seri no mükerrerlik kontrolü ve orijinal üretici verisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "seri_no_marka_model_ve_teknik_bilgiler_sistemde_zorunlu_ve_tekillik_kontroluyle_tutulur",
+          "label": "Evet; üretici seri numarası, marka ve model zorunlu alandır ve sistemde mükerrerlik kontrolü yapılır"
+        },
+        {
+          "value": "seri_no_ve_marka_bilgisi_opsiyoneldir_bilindikce_serbest_metin_girilir",
+          "label": "Seri no ve marka alanı opsiyoneldir; bilindikçe serbest metin olarak kaydedilir"
+        },
+        {
+          "value": "yalnizca_it_ve_uretim_makinelerinde_seri_no_tutulur_diger_demirbaslarda_tutulmaz",
+          "label": "Yalnızca IT ve ana üretim makinelerinde seri no tutulur; mobilya ve genel demirbaşlarda girilmez"
+        },
+        {
+          "value": "seri_numarasi_takibi_yapilmamaktadir",
+          "label": "Seri numarası takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-020",
+      "process": "Seri Numarası ve Teknik Kimlik",
+      "order": 20,
+      "question": "Ana varlığın üzerinde yer alan önemli bileşenlerin veya motor/şanzıman gibi ünitelerin değişmesi durumunda teknik kimlik revizyon geçmişi varlık kartında izlenebilmekte midir?",
+      "description": "Komponent değişimi, motor/seri no revizyonu ve teknik kimlik tarihçesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "bilesen_veya_motor_degisiminde_yeni_seri_no_ve_degisim_tarihcesi_varlik_kartinda_saklanir",
+          "label": "Evet; ana parçanın motor/ünite seri no değişimi tarihçesiyle birlikte varlık kartında arşivlenir"
+        },
+        {
+          "value": "yalnizca_guncel_seri_numarasi_uzerine_yazilir_eski_numaranin_gecmisi_tutulmaz",
+          "label": "Yalnızca güncel seri numarası alanına yeni değer yazılır; eski parça seri numarasının geçmişi tutulmaz"
+        },
+        {
+          "value": "teknik_bilesen_seri_no_degisimleri_takip_edilmemektedir",
+          "label": "Teknik bileşen seri no değişimleri takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-021",
+      "process": "Faydalı Ömür ve Amortisman Bağlantısı",
+      "order": 21,
+      "question": "Duran varlıkların Faydalı Ömür (Useful Life) süresi, amortisman yöntemi (Normal, Azalan Bakiyeler, Kıst) ve amortisman başlangıç tarihi nerede belirlenip takip edilmektedir?",
+      "description": "Amortisman ana veri parametreleri, VUK amortisman listeleri ve aktifleştirme tarihi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_varlik_kartinda_varlik_sinifina_bagli_olarak_otomatik_atanir_ve_yonetilir",
+          "label": "ERP varlık kartında varlık sınıfına bağlı VUK faydalı ömrü ve amortisman yöntemi otomatik atanır"
+        },
+        {
+          "value": "muhasebe_programinda_veya_harici_amortisman_modulunde_manuel_girilir",
+          "label": "Ayrı muhasebe programında veya harici sabit kıymet yazılımında her varlık için manuel seçilir"
+        },
+        {
+          "value": "excel_amortisman_tablolarinda_takip_edilir_ve_toplu_yevmiye_kaydi_atilir",
+          "label": "Excel tablolarında hesaplanır ve her dönem sonunda muhasebeye toplu yevmiye fişi girilir"
+        },
+        {
+          "value": "amortisman_surecleri_takip_edilmemektedir",
+          "label": "Amortisman süreçleri takip edilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-022",
+      "process": "Faydalı Ömür ve Amortisman Bağlantısı",
+      "order": 22,
+      "question": "Şirketinizde aynı varlık için hem yerel vergi mevzuatı (VUK) hem de uluslararası finansal raporlama (TFRS / IFRS / US GAAP / Management) standartlarına göre farklı amortisman ve değerleme defterleri (Depreciation Areas / Books) tutulmakta mıdır?",
+      "description": "Çoklu amortisman defteri, VUK vs TFRS/IFRS faydalı ömür ve defter değeri ayrımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_amortisman_alani_vuk_ve_tfrs_ifrs_ayri_defter_ve_omurle_es_zamanli_tutulur",
+          "label": "Evet; aynı varlık için hem VUK hem TFRS/IFRS farklı faydalı ömür ve değerlerle paralel hesaplanır"
+        },
+        {
+          "value": "yalnizca_yasal_vuk_amortisman_defteri_tutulur_ikinci_bir_raporlama_defteri_yoktur",
+          "label": "Yalnızca yasal VUK amortisman defteri tutulur; ikinci bir uluslararası değerleme defteri yoktur"
+        },
+        {
+          "value": "tfrs_duzeltmeleri_yil_sonunda_bagimsiz_denetim_icin_excelde_manuel_hesaplanir",
+          "label": "ERP'de tek defter tutulur; TFRS amortisman farkları yıl sonunda denetim için Excel'de hesaplanır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-023",
+      "process": "Garanti Yönetimi",
+      "order": 23,
+      "question": "Satın alınan makine, araç, test cihazı ve bilişim ekipmanlarının Garanti Başlangıç ve Bitiş Tarihleri, garanti kapsamı ve yetkili servis sağlayıcı bilgileri sistemde takip edilmekte midir?",
+      "description": "Garanti süresi takibi, sözleşme şartları ve servis sağlayıcı bilgisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "garanti_tarihleri_kapsami_ve_yetkili_servis_bilgisi_varlik_kartinda_eksiksiz_izlenir",
+          "label": "Evet; garanti başlangıç/bitiş tarihleri, kapsamı ve yetkili servis sözleşmesi varlık kartında kayıtlıdır"
+        },
+        {
+          "value": "yalnizca_fatura_tarihi_bilinir_garanti_sureleri_dosyalanan_evraklardan_manuel_bakilir",
+          "label": "Sistemde yalnız fatura tarihi vardır; garanti süresi gerektiğinde basılı evraklardan incelenir"
+        },
+        {
+          "value": "yalnizca_it_ve_buyuk_makinelerde_takip_edilir_digerlerinde_tutulmaz",
+          "label": "Yalnızca IT sunucu/bilgisayarları ve ana üretim makinelerinde takip edilir; diğerlerinde tutulmaz"
+        },
+        {
+          "value": "garanti_takibi_yapilmamaktadir",
+          "label": "Garanti takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-024",
+      "process": "Garanti Yönetimi",
+      "order": 24,
+      "question": "Garanti süresi dolmak üzere olan varlıklar için ilgili birimlere (Bakım, IT, İdari İşler) otomatik yaklaşma uyarısı (Alarm / Bildirim) gönderilmekte ve garanti kapsamındaki arıza masrafları tedarikçiye rücu edilmekte midir?",
+      "description": "Garanti bitiş uyarıları, garanti içi ücretsiz onarım ve tedarikçi rücu takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "AST-023",
+        "operator": "not_equals",
+        "value": "garanti_takibi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "garanti_bitimine_30_60_gun_kala_otomatik_alarm_uretilir_ve_arizalar_garantiden_takip_edilir",
+          "label": "Evet; garanti bitimine 30/60 gün kala sistem alarm üretir ve arıza durumunda tedarikçi servis kaydı açılır"
+        },
+        {
+          "value": "otomatik_alarm_yoktur_ariza_oldugunda_personel_manuel_kontrol_eder",
+          "label": "Otomatik alarm yoktur; arıza yaşandığında bakım veya IT personeli garanti durumunu manuel sorgular"
+        },
+        {
+          "value": "garanti_alarmi_veya_tedarikci_rucu_sureci_isletilmemektedir",
+          "label": "Garanti yaklaşma alarmı veya rücu takip süreci işletilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-025",
+      "process": "Sigorta Yönetimi",
+      "order": 25,
+      "question": "Tesis, makine, araç ve kritik ekipmanların Sigorta Poliçesi (Poliçe No, Sigorta Şirketi, Teminat Bedeli, Başlangıç ve Bitiş Tarihi) takibi sistemde varlık bazında yapılmakta mıdır?",
+      "description": "Duran varlık sigorta poliçeleri, kasko, yangın, makine kırılması teminatları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "varlik_bazinda_sigorta_policesi_teminat_bedeli_ve_bitis_tarihi_sistemde_tutulur",
+          "label": "Evet; araç, bina ve makinelerin sigorta poliçe no, teminat bedeli ve bitiş tarihi sistemde izlenir"
+        },
+        {
+          "value": "yalnizca_sirket_araclari_icin_kasko_trafik_sigortasi_takip_edilir_makineler_tutulmaz",
+          "label": "Yalnızca şirket araçları için sigorta/kasko takip edilir; üretim makineleri poliçeleri tek tek işlenmez"
+        },
+        {
+          "value": "tum_fabrika_icin_toplu_tek_bir_yangin_makine_policesi_vardir_varlik_bazinda_baglanmaz",
+          "label": "Tüm tesis için toplu genel sigorta poliçesi vardır; münferit varlık kartlarına tek tek bağlanmaz"
+        },
+        {
+          "value": "varlik_bazli_sigorta_takibi_yapilmamaktadir",
+          "label": "Varlık bazlı sigorta takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-026",
+      "process": "Sigorta Yönetimi",
+      "order": 26,
+      "question": "Sigorta poliçesi yenileme tarihleri yaklaştığında sistem alarm vermekte ve hasar/kaza durumlarında sigorta tazminat ve onarım süreçleri varlık kartı üzerinden izlenebilmekte midir?",
+      "description": "Poliçe yenileme hatırlatması, hasar tazminat takibi ve sigorta rücu kayıtları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "AST-025",
+        "operator": "not_equals",
+        "value": "varlik_bazli_sigorta_takibi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "police_yenileme_alarmlari_calisir_ve_hasar_tazminat_dosyalari_varlikla_eslesir",
+          "label": "Evet; poliçe bitimine yakın otomatik bildirim gider ve hasar dosyaları varlık kartına bağlanır"
+        },
+        {
+          "value": "sigorta_sirketi_veya_broker_hatirlatir_sistemden_otomatik_alarm_alinmaz",
+          "label": "Sigorta brokeri veya şirketi manuel hatırlatır; sistemden otomatik alarm üretilmez"
+        },
+        {
+          "value": "police_yenileme_veya_hasar_takip_sureci_sistemde_yoktur",
+          "label": "Poliçe yenileme veya hasar takip süreci sistemde bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-027",
+      "process": "Varlık Transferi",
+      "order": 27,
+      "question": "Varlıkların farklı lokasyonlar, departmanlar, masraf merkezleri veya kullanıcılar arasındaki kurum içi transfer süreci (Asset Transfer) sistemde nasıl onaylanıp yürütülmektedir?",
+      "description": "Kurum içi varlık yer değişimi, masraf merkezi transferi ve onay mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemden_transfer_talebi_acilir_gonderen_ve_alan_yonetici_onayiyla_kayitlar_otomatik_guncellenir",
+          "label": "Sistemden transfer talebi açılır; gönderen ve teslim alan yönetici onayıyla lokasyon ve masraf merkezi değişir"
+        },
+        {
+          "value": "fiziksel_olarak_tasinir_ancak_sistemdeki_masraf_merkezi_ve_lokasyon_manuel_veya_gecikmeli_degisir",
+          "label": "Fiziksel olarak taşınır; sistem kayıtları İdari İşler veya Muhasebe tarafından sonradan manuel güncellenir"
+        },
+        {
+          "value": "lokasyon_ve_kullanici_degisse_de_sabit_kiymet_kartindaki_ilk_masraf_merkezi_degistirilmez",
+          "label": "Varlık yer değiştirse de sistemdeki ilk kayıtlı masraf merkezi değiştirilmez, sabit kalır"
+        },
+        {
+          "value": "varlik_transfer_sureci_takip_edilmemektedir",
+          "label": "Varlık transfer süreci takip edilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-028",
+      "process": "Varlık Transferi",
+      "order": 28,
+      "question": "Fabrikalar veya şehirlerarası tesisler arasındaki varlık transferlerinde nakliye ve sevk irsaliyesi bağlantısı kurularak yoldaki varlık statüsü (In-Transit Asset) takip edilmekte midir?",
+      "description": "Şehirlerarası varlık transferi, yoldaki varlık statüsü ve sevk irsaliyesi entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sevk_irsaliyesi_baglanir_varlik_yolda_statusune_alinir_ve_tesis_mal_kabulunde_tamamlanir",
+          "label": "Evet; dahili sevk irsaliyesi kesilir, varlık yolda statüsüne geçer ve karşı tesis teslim alınca lokasyon güncellenir"
+        },
+        {
+          "value": "kagit_irsaliye_kesilir_ancak_sistemde_yoldaki_varlik_statu_ayrimi_yoktur",
+          "label": "Kağıt irsaliye düzenlenir ancak sistemde yoldaki varlık ayrımı yoktur; doğrudan yeni lokasyona aktarılır"
+        },
+        {
+          "value": "sehirlerarasi_veya_tesisler_arasi_varlik_sevkiyati_yapilmamaktadir",
+          "label": "Tesisler veya şehirlerarası varlık sevkiyatı yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-029",
+      "process": "Değer Artırıcı Harcamalar / Capitalization",
+      "order": 29,
+      "question": "Mevcut bir varlığa sonradan yapılan büyük revizyon, kapasite artırımı, modernizasyon (Retrofit) veya ek aparat harcamaları varlığın defter değerine (Capital Improvement / Ek Maliyet) nasıl eklenmektedir?",
+      "description": "Değer artırıcı harcamaların varlık maliyetine eklenmesi, faydalı ömür revizyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "fatura_mevcut_varlik_kartina_ek_maliyet_olarak_baglanir_ve_faydali_omur_amortisman_yeniden_hesaplanir",
+          "label": "Fatura mevcut varlık kartına ek değer olarak bağlanır; net defter değeri artırılıp amortisman planı revize edilir"
+        },
+        {
+          "value": "ek_harcama_icin_ayri_bir_alt_sabit_kiymet_karti_acilarak_ana_varliga_baglanir",
+          "label": "Ek harcama için bağımsız yeni bir alt sabit kıymet kartı açılır ve ana makineye referans verilir"
+        },
+        {
+          "value": "tum_sonraki_harcamalar_tutarina_bakilmaksizin_donemsel_bakim_onarim_giderine_yazilir",
+          "label": "Modernizasyon yapılsa dahi tüm harcamalar dönemsel 770/730 bakım-onarım giderine yazılır; varlığa eklenmez"
+        },
+        {
+          "value": "deger_artirici_harcama_sureci_takip_edilmemektedir",
+          "label": "Değer artırıcı harcama süreci takip edilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-030",
+      "process": "Değer Artırıcı Harcamalar / Capitalization",
+      "order": 30,
+      "question": "Yapılan teknik bir harcamanın doğrudan dönemsel Bakım-Onarım Gideri mi yoksa Varlık Değerini Artırıcı Yatırım (Capitalization) mı olduğuna karar verme kriteri ve onay akışı nasıl işletilmektedir?",
+      "description": "Bakım gideri vs aktifleştirme sınırı, VUK limitleri ve mühendislik/mali onay mekanizması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "belirlenmis_tutar_limiti_ve_faydali_omur_uzatma_kriterine_gore_muhasebe_ve_teknik_ekip_birlikte_onaylar",
+          "label": "Belirlenmiş tutar eşiği ve kapasite/ömür artırma kriterine göre Teknik Müdür ve Mali İşler ortak kararla onaylar"
+        },
+        {
+          "value": "karar_tamamen_muhasebe_tarafindan_faturadaki_aciklamaya_bakilarak_tek_tarafli_verilir",
+          "label": "Karar tamamen Muhasebe personeli tarafından fatura açıklamasına ve yasal VUK sınırına bakılarak verilir"
+        },
+        {
+          "value": "standart_bir_kriter_veya_ayrim_yoktur_tamamen_donemsel_butce_durumuna_gore_karar_verilir",
+          "label": "Standart bir kriter yoktur; dönemsel kârlılık ve bütçe hedeflerine göre gider veya varlık yazılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-031",
+      "process": "Varlık Bölme / Birleştirme",
+      "order": 31,
+      "question": "Tek bir ana sabit kıymetin birden fazla bağımsız varlığa bölünmesi (Asset Split) veya birden fazla münferit varlığın tek bir varlık/hat altında birleştirilmesi (Asset Merge) ihtiyacı nasıl yönetilmektedir?",
+      "description": "Varlık bölme ve birleştirme, üretim hattı ayrıştırma ve demirbaş parçalama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistemden_varlik_bolme_ve_birlestirme_islemi_maliyet_ve_amortisman_paylastirilarak_yapilabilir",
+          "label": "Evet; sistem üzerinden varlık bölme/birleştirme işlemiyle maliyet ve birikmiş amortisman otomatik paylaştırılır"
+        },
+        {
+          "value": "eski_varliklar_sistemden_cikarilip_yeni_varliklar_manuel_yeni_degerleriyle_bastantan_tanimlanir",
+          "label": "Eski kartlar kayıttan düşülüp yeni varlıklar sıfırdan manuel kart açılarak sisteme girilir"
+        },
+        {
+          "value": "varlik_bolme_veya_birlestirme_ihtiyaci_olmamaktadir",
+          "label": "Şirketimizde varlık bölme veya birleştirme ihtiyacı oluşmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-032",
+      "process": "Varlık Bölme / Birleştirme",
+      "order": 32,
+      "question": "Varlık bölme işleminde orijinal edinim maliyeti, birikmiş amortisman ve net defter değeri yeni parçalara hangi yöntemle (Yüzde Oran, Miktar, Tutar veya Ekspertiz Değeri) dağıtılmaktadır?",
+      "description": "Split maliyet dağıtım yöntemi, oransal veya tutarsal amortisman transferi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yuzdesel_oran_veya_tutar_belirtilerek_orijinal_maliyet_ve_amortisman_oransal_dagitilir",
+          "label": "Yüzdesel oran veya hedef tutar girilerek orijinal maliyet ve birikmiş amortisman matematiksel paylaştırılır"
+        },
+        {
+          "value": "muhasebe_tarafindan_harici_olarak_hesaplanip_manuel_rakamlar_olarak_girilir",
+          "label": "Muhasebe tarafından harici olarak hesaplanır ve yeni kartlara manuel tutarlar yazılır"
+        },
+        {
+          "value": "varlik_bolme_islemi_yapilmamaktadir",
+          "label": "Varlık bölme işlemi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-033",
+      "process": "Fiziksel Sayım",
+      "order": 33,
+      "question": "Şirket genelinde duran varlıkların ve sabit kıymetlerin Fiziksel Sayımı (Physical Asset Count / Audit) hangi periyotlarla ve hangi yöntemle gerçekleştirilmektedir?",
+      "description": "Fiziki sabit kıymet sayımı, yıllık/dönemsel sayım ve sayım ekibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yılda_en_az_bir_kez_tum_tesislerde_planli_fiziksel_sayim_yapilir_ve_kayitlarla_karsilastirilir",
+          "label": "Yılda en az bir kez tüm tesislerde planlı fiziksel sayım yapılır ve ERP kayıtlarıyla mutabakat sağlanır"
+        },
+        {
+          "value": "belirli_araliklarla_yalnizca_it_ve_yuksek_degerli_makineler_sayilir_mobilya_sayilmaz",
+          "label": "Yalnızca IT ve yüksek değerli üretim makineleri periyodik sayılır; ofis demirbaşları sayılmaz"
+        },
+        {
+          "value": "yalnizca_bagimsiz_denetim_veya_sirket_tasinmasi_gibi_ozel_durumlarda_sayim_yapilir",
+          "label": "Yalnızca bağımsız denetim veya taşınma gibi özel durumlarda düzensiz sayım yapılır"
+        },
+        {
+          "value": "fiziksel_varlik_sayimi_yapilmamaktadir",
+          "label": "Fiziksel varlık sayımı yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-034",
+      "process": "Fiziksel Sayım",
+      "order": 34,
+      "question": "Fiziki sayım esnasında mobil el terminalleri / barkod / RFID okuyucular kullanılmakta ve sistemdeki kayıtlar ile sahadaki fiili varlıklar otomatik karşılaştırılarak Sayım Fark Raporu üretilmekte midir?",
+      "description": "Mobil barkodlu sayım, bulunan/bulunamayan/yeri değişen varlık analizi ve sayım mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "AST-033",
+        "operator": "not_equals",
+        "value": "fiziksel_varlik_sayimi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "mobil_terminal_veya_tablet_ile_barkod_okutularak_sayilir_ve_sistem_otomatik_fark_raporu_verir",
+          "label": "Evet; mobil cihazla barkod/QR okutularak sayılır, sistem bulunan/bulunamayan/yeri yanlış listesini anında döker"
+        },
+        {
+          "value": "basili_kagit_veya_excel_listesi_uzerinden_elle_isaretlenerek_sayilir_sonradan_girilir",
+          "label": "Basılı kağıt listeler üzerinden elle işaretlenir, sayım sonrası Excel'e manuel aktarılır"
+        },
+        {
+          "value": "sayim_yapilsa_da_sistemle_karsilastirmali_fark_raporu_cikarilmamaktadir",
+          "label": "Sayım yapılsa da sistemle otomatik karşılaştırmalı fark analizi raporu çıkarılamamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-035",
+      "process": "Kayıp / Çalınma / Hasar",
+      "order": 35,
+      "question": "Fiziki sayımda veya günlük operasyonda bulunamayan, çalınan veya ağır hasar gören varlıklar için Kayıp / Hasar Araştırma ve Tutanak süreci nasıl işletilmektedir?",
+      "description": "Kayıp varlık bildirim akışı, sorumlu kişi araştırması ve hasar tespit tutanağı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemde_varlik_kayip_veya_hasarli_statusune_alinir_arastirma_tutanagi_ve_onay_sureci_baslatilir",
+          "label": "Varlık sistemde 'Kayıp/Araştırmada' statüsüne alınır; komisyon tutanağı ve araştırma süreci işletilir"
+        },
+        {
+          "value": "harici_olarak_idari_isler_tarafindan_kagit_tutanak_tutulur_sistemde_ozel_bir_statu_degisikligi_olmaz",
+          "label": "Harici kağıt tutanak tutulur; sistemde özel bir statü ayrımı yapılmaz, aktif görünmeye devam eder"
+        },
+        {
+          "value": "kayip_veya_hasar_durumlarinda_standart_bir_arastirma_proseduru_yoktur",
+          "label": "Kayıp veya hasar durumlarında standart bir araştırma ve tespit prosedürü işletilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-036",
+      "process": "Kayıp / Çalınma / Hasar",
+      "order": 36,
+      "question": "Araştırma sonucunda bulunamayan veya kullanılamaz hale gelen kayıp varlıkların aktiften çıkarılması (Write-Off / Zarara Mahsup) için yönetim onay mekanizması ve yasal işlem entegrasyonu var mıdır?",
+      "description": "Kayıp varlık aktiften düşme onayı, yasal defterden silinme ve sigorta/tutanak bağlantısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "genel_mudur_cfo_onayli_tutanak_ile_sistemden_write_off_yapilir_ve_zarar_kaydi_otomatik_olusturulur",
+          "label": "Evet; Yönetim onaylı tutanak sisteme eklenerek write-off yapılır ve net defter değeri zarara mahsup edilir"
+        },
+        {
+          "value": "kayip_varliklar_yillarca_sistemde_aktif_kalir_yalnizca_itfa_olunca_toplu_temizlenir",
+          "label": "Kayıp varlıklar aktiften düşülmez; amortismanı sıfırlanana kadar sistemde hayalet varlık olarak kalır"
+        },
+        {
+          "value": "kayip_varlik_aktiften_dusme_veya_write_off_sureci_isletilmemektedir",
+          "label": "Kayıp varlık aktiften düşme veya write-off süreci işletilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-037",
+      "process": "Kullanım Dışı / Idle Asset",
+      "order": 37,
+      "question": "Üretimde veya operasyonda fiilen kullanılmayan, arıza bekleyen, yedek tutulan veya atıl durumdaki varlıklar (Idle / Mothballed / Inactive Assets) sistemde özel bir statüyle ayrıştırılmakta mıdır?",
+      "description": "Atıl varlık ayrımı, yedek makine statüsü, çalışmayan kapasite ve amortisman durdurma/devam kararı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "varlik_statusu_atil_yedek_kullanim_disi_olarak_isaretlenir_ve_ayri_raporlanir",
+          "label": "Evet; çalışmayan varlıklar 'Atıl / Yedek / Kullanım Dışı' statüsüne alınır ve yönetim raporlarında ayrıştırılır"
+        },
+        {
+          "value": "tum_varliklar_calisiyor_gibi_tek_bir_aktif_statusunde_gorunur_ayrim_yapilmaz",
+          "label": "Tüm varlıklar çalışıyor gibi tek bir 'Aktif' statüsündedir; atıl veya yedek makine ayrımı yoktur"
+        },
+        {
+          "value": "yalnizca_fabrika_mudurunun_veya_bakim_ekibinin_kendi_listesinde_bilinir",
+          "label": "Sistemde görünmez; yalnızca fabrika veya bakım şefinin kendi notlarında bilinir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-038",
+      "process": "Kullanım Dışı / Idle Asset",
+      "order": 38,
+      "question": "Atıl veya kullanım dışı durumdaki varlıkların yeniden değerlendirilmesi (Farklı fabrikaya kaydırma, revizyon, satışa çıkarma veya hurdaya ayırma) için periyodik atıl varlık gözden geçirme mekanizması bulunmakta mıdır?",
+      "description": "Atıl varlık değerlendirme komisyonu, satışa çıkarma veya yedek parça olarak değerlendirme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "donemsel_olarak_atil_varlik_raporu_cikarilir_ve_yeniden_degerlendirme_veya_satis_karari_alinir",
+          "label": "Evet; 6 aylık/yıllık periyotlarla atıl varlıklar incelenir; satış, transfer veya revizyon kararı verilir"
+        },
+        {
+          "value": "atil_varliklar_depoda_veya_sahada_bekletilir_duzenli_bir_gozden_gecirme_yapilmaz",
+          "label": "Atıl varlıklar depolarda bekletilir; düzenli bir inceleme ve tasfiye mekanizması işletilmez"
+        },
+        {
+          "value": "atil_varlik_gozden_gecirme_sureci_yoktur",
+          "label": "Atıl varlık gözden geçirme süreci yoktur",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-039",
+      "process": "Hurda / Satış / Elden Çıkarma",
+      "order": 39,
+      "question": "Kullanım ömrünü tamamlayan veya elden çıkarılacak varlıkların (Hurdaya Ayırma, Satış, İtlaf, Bağış) yaşam döngüsü kapanış süreci (Asset Disposal / Retirement) nasıl yürütülmektedir?",
+      "description": "Varlık elden çıkarma yöntemleri, hurda komisyonu, satış onayı ve varlık emekliye ayırma.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemden_hurda_veya_satis_talebi_acilir_komisyon_ve_yonetim_onayiyla_varlik_kapatilir",
+          "label": "Sistemden elden çıkarma talebi açılır; Hurda Komisyonu ve Yönetim onayıyla varlık resmi olarak kapatılır"
+        },
+        {
+          "value": "fiziksel_olarak_satilir_veya_hurdaya_verilir_muhasebe_ay_sonunda_faturadan_kapatir",
+          "label": "Fiziksel olarak elden çıkarılır; Muhasebe satış faturası kesildiğinde kartı sonradan kapatır"
+        },
+        {
+          "value": "hurdaya_ayrılan_varliklar_sistemde_kapatilmaz_pasif_veya_silinmis_olarak_birakilir",
+          "label": "Hurdaya ayrılan varlıklar resmi kapatılmaz; sistemde unutulur veya silinir"
+        },
+        {
+          "value": "standart_bir_elden_cikarma_sureci_yoktur",
+          "label": "Standart bir hurda veya elden çıkarma süreci yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-040",
+      "process": "Hurda / Satış / Elden Çıkarma",
+      "order": 40,
+      "question": "Duran varlık satışında veya hurdaya ayrılmasında satış faturası, hurda tutanağı, amortisman kapatma ve net kâr/zarar oluşumu sistemde tek adımda entegre olarak çözülebilmekte midir?",
+      "description": "Varlık çıkışı muhasebe entegrasyonu, 257 amortisman sıfırlama, satış kâr/zarar hesabı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "satis_faturasi_kesildigi_an_varlik_karti_kapanir_birikmis_amortisman_ve_kar_zarar_otomatik_hesaplanir",
+          "label": "Evet; satış faturası varlığa bağlandığı an varlık kapatılır, birikmiş amortisman ve kâr/zarar otomatik işlenir"
+        },
+        {
+          "value": "fatura_kesilir_ancak_varlik_amortisman_kapatmasi_ve_kar_zarar_yevmiyesi_muhasebede_manuel_yapilir",
+          "label": "Fatura kesilir ancak amortisman kapatma ve kâr/zarar mahsubu muhasebe tarafından manuel fişle çözülür"
+        },
+        {
+          "value": "varlik_cikisi_muhasebe_entegrasyonu_bulunmamaktadir",
+          "label": "Varlık çıkışının muhasebe entegrasyonu bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-041",
+      "process": "Bakım Entegrasyonu",
+      "order": 41,
+      "question": "Üretim ve tesis makinelerinde Varlık Yönetimi kartı (Sabit Kıymet) ile Bakım Yönetimi modülündeki Teknik Ekipman Kartı (Maintenance Equipment) arasında doğrudan bir ilişki ve eşleşme (Asset ↔ Equipment Mapping) bulunmakta mıdır?",
+      "description": "Finansal sabit kıymet ile teknik bakım ekipmanı eşleşmesi, tekil kimlik ve senkronizasyon.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "varlik_karti_ile_teknik_ekipman_karti_birebir_entegredir_ve_ayni_kimlik_uzerinden_senkron_calisir",
+          "label": "Evet; kurumsal sabit kıymet kartı ile bakım ekipmanı kartı birebir eşleştirilmiştir ve senkron çalışır"
+        },
+        {
+          "value": "bakim_ekibi_ayri_bir_yazilimda_ekipman_tutar_sabit_kiymetle_aralarinda_resmi_bir_bag_yoktur",
+          "label": "Bakım ekibi ayrı bir CMMS/Excel listesinde ekipman tutar; muhasebe sabit kıymetiyle aralarında bağ yoktur"
+        },
+        {
+          "value": "yalnizca_ana_tezgahlarda_manuel_eslesme_vardir_diger_ekipmanlarda_bag_kurulmamistir",
+          "label": "Yalnızca ana üretim tezgâhlarında manuel eşleştirme vardır; diğer ekipmanlarda bağlantı kurulmamıştır"
+        },
+        {
+          "value": "bakim_ekipmani_ile_varlik_arasinda_iliski_kurulmamaktadir",
+          "label": "Bakım ekipmanı ile varlık kartı arasında herhangi bir ilişki kurulmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-042",
+      "process": "Bakım Entegrasyonu",
+      "order": 42,
+      "question": "Bakım modülünde açılan iş emirleri, parça değişimleri ve teknisyen harcamalarının toplam kümülatif bakım maliyeti (TCO - Total Cost of Ownership) varlık kartı üzerinde konsolide görülebilmekte midir?",
+      "description": "Toplam sahip olma maliyeti (TCO), kümülatif bakım harcamaları ve varlık amortisman dengesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "AST-041",
+        "operator": "not_equals",
+        "value": "bakim_ekipmani_ile_varlik_arasinda_iliski_kurulmamaktadir"
+      },
+      "options": [
+        {
+          "value": "varlik_kartinda_edinim_maliyeti_birikmis_amortisman_ve_kumulatif_bakim_masrafi_birlikte_gorulur",
+          "label": "Evet; varlık kartında edinim bedeli, birikmiş amortisman ve ömrü boyunca yapılan toplam bakım masrafı tek ekranda izlenir"
+        },
+        {
+          "value": "bakim_masraflari_yalnizca_masraf_merkezi_raporunda_gorulur_varlik_kartina_yansimaz",
+          "label": "Bakım masrafları yalnızca masraf merkezi gider raporunda genel görünür; münferit varlık kartına yansımaz"
+        },
+        {
+          "value": "kumulatif_bakim_veya_tco_maliyeti_takip_edilmemektedir",
+          "label": "Kümülatif bakım veya toplam sahip olma (TCO) maliyeti takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-043",
+      "process": "Belge ve Dokümanlar",
+      "order": 43,
+      "question": "Varlık kartına bağlı olarak fatura, garanti belgesi, araç ruhsatı, sigorta poliçesi, teknik şartname, CE uygunluk belgesi, kullanım kılavuzu, fotoğraf ve teslim tutanağı gibi dijital dokümanlar (Attachments) arşivlenmekte midir?",
+      "description": "Varlık dijital doküman arşivi, ekler ve teknik çizim/sözleşme yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_fatura_ruhsat_garanti_fotograf_ve_kullanim_kilavuzlari_varlik_kartina_dijital_eklenir",
+          "label": "Evet; fatura, ruhsat, garanti, teknik çizim, fotoğraf ve zimmet tutanakları varlık kartında dijital arşivlenir"
+        },
+        {
+          "value": "yalnizca_fiziksel_klasorlerde_arsivlenir_sistemde_dijital_dosya_eklenmez",
+          "label": "Yalnızca muhasebe ve idari işler fiziksel klasörlerinde kağıt saklanır; sisteme dijital ek yapılmaz"
+        },
+        {
+          "value": "yalnizca_arac_ruhsatlari_ve_buyuk_makine_faturalari_eklenir_digerlerinde_tutulmaz",
+          "label": "Yalnızca araç ruhsatları ve ana makine faturaları taranır; genel demirbaşlarda ek dosya tutulmaz"
+        },
+        {
+          "value": "dokuman_arsivleme_yapilmamaktadir",
+          "label": "Dijital veya düzenli doküman arşivleme yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-044",
+      "process": "Varlık Geçmişi / Audit Trail",
+      "order": 44,
+      "question": "Varlığın ediniminden elden çıkarılmasına kadar geçen süreçteki lokasyon, kullanıcı, zimmet, masraf merkezi, operasyonel statü, değer artışı ve transfer değişikliklerinin tarihçesi (Asset Lifecycle Audit Trail) sistemde tutulmakta mıdır?",
+      "description": "Varlık yaşam döngüsü tarihçesi, değişiklik logları, kim-ne zaman-nereye transfer etti kayıtları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_lokasyon_zimmet_masraf_merkezi_ve_statu_degisiklikleri_kullanici_ve_tarih_damgasiyla_saklanir",
+          "label": "Evet; varlığın geçmişteki tüm kullanıcıları, eski lokasyonları, masraf merkezi ve statü hareketleri loglanır"
+        },
+        {
+          "value": "yalnizca_guncel_durum_bilgisi_tutulur_onceki_kullanici_veya_lokasyon_gecmisi_ezilir",
+          "label": "Yalnızca anlık güncel durum tutulur; değişiklik yapıldığında eski kullanıcının veya konumun geçmişi ezilir"
+        },
+        {
+          "value": "tarihce_ve_hareket_gecmisi_takip_edilmemektedir",
+          "label": "Varlık tarihçesi ve denetim izi (audit trail) tutulmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "AST-045",
+      "process": "Varlık Raporlama ve KPI",
+      "order": 45,
+      "question": "Varlık yönetimi kapsamında toplam varlık değeri, sınıf/lokasyon bazlı dağılım, amortisman durumu, varlık yaş analizi, atıl varlık oranı, garanti/sigorta bitiş takvimi ve transfer geçmişi gibi yönetim raporları ve KPI panoları nasıl alınmaktadır?",
+      "description": "Duran varlık KPI göstergeleri, net defter değeri, varlık yaş piramidi ve sigorta/garanti uyarıları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "varlik_sinifi_lokasyon_ve_sirket_bazinda_toplam_ve_net_defter_degeri_raporu",
+          "label": "Varlık Sınıfı, Lokasyon ve Şirket Bazında Toplam Maliyet ve Net Defter Değeri Raporu"
+        },
+        {
+          "value": "tamamen_itfa_olmus_ancak_fiilen_calisan_varliklar_listesi",
+          "label": "Tamamen İtfa Olmuş (Amortismanı Bitmiş) Ancak Sahada Fiilen Çalışan Varlıklar Listesi"
+        },
+        {
+          "value": "atil_yedek_ve_kullanim_disi_varlik_orani_ve_maliyeti",
+          "label": "Atıl, Yedek ve Kullanım Dışı Varlık Oranı ve Maliyet Raporu"
+        },
+        {
+          "value": "yaklasan_garanti_ve_sigorta_police_bitis_takvimi",
+          "label": "Yaklaşan Garanti ve Sigorta Poliçe Bitiş Takvimi / Alarm Raporu"
+        },
+        {
+          "value": "varlik_yas_ve_teknolojik_eskime_analizi",
+          "label": "Varlık Yaş Dağılımı ve Teknolojik Yenileme İhtiyaç Analizi"
+        },
+        {
+          "value": "fiziksel_sayim_sonuclari_ve_kayip_bulunamayan_varlik_raporu",
+          "label": "Fiziksel Sayım Fark Mutabakatı ve Kayıp/Bulunamayan Varlık Raporu"
+        },
+        {
+          "value": "personel_ve_departman_zimmet_dokumu",
+          "label": "Personel ve Departman Bazında Güncel ve Geçmiş Zimmet Dökümü"
+        },
+        {
+          "value": "yonetim_raporlari_ve_kpi_panosu_alinamamaktadir",
+          "label": "Yönetim raporları veya KPI panosu düzenli olarak alınamamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}

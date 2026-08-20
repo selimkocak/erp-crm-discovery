@@ -1,0 +1,1652 @@
+{
+  "meta": {
+    "pack_id": "tr.production_planning.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "PRODUCTION_PLANNING",
+    "name": "Üretim Planlama Ön Analizi",
+    "description": "Üretim organizasyonu, üretim stratejisi (MTS, MTO, ATO, CTO, ETO) ve akış tipleri (Kesikli, Seri, Proses, Proje), mamul/yarı mamul yapısı, tek ve çok seviyeli ürün ağaçları (Multi-Level BOM), alternatif reçeteler ve revizyon geçerlilik tarihleri, üretim rotaları ve operasyon adımları, iş merkezleri (Work Center) ve standart süreler (Setup, Run, Queue, Move, Fason), fabrika takvimi ve vardiya kurgusu, talep kaynakları ve satış siparişinden üretim ihtiyacı dönüşümü, Ana Üretim Çizelgesi (MPS) ve satış tahminleri (Forecast), Malzeme İhtiyaç Planlaması (MRP) ve çok seviyeli patlatma (Multi-Level Explosion), brüt-net ihtiyaç hesabı (Net Requirements), lot büyüklüğü ve parti politikaları (Lot-for-lot, Min/Max, EOQ), teslim süreleri (Lead Times) ve geriye doğru çizelgeleme, kaba ve detaylı kapasite planlama (Finite / Infinite Capacity), darboğaz yönetimi, kalıp/ayar değişim (Setup/Changeover) optimizasyonu, malzeme eksikliği (Shortage) ve hazır bulunurluk kontrolü, planlı üretim emirleri (Planned Orders) ve kesinleştirme (Firming), dinamik yeniden planlama (Replanning), Excel bağımlılığı ve üretim planlama KPI'larının AS-IS durumunu ve ERP/MRP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "PRD-001",
+      "process": "Üretim Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde fabrika üretim planlama, malzeme ihtiyaç hesabı ve çizelgeleme faaliyetleri hangi organizasyonel yapıda ve ekip sorumluluğunda yürütülmektedir?",
+      "description": "Planlama departmanı yapısı, merkezi planlama, fabrika planlama şefliği ve planlamacı rolleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ayri_ve_uzmanlasmis_merkezi_uretim_planlama_departmani_tarafindan_yonetilir",
+          "label": "Üretimden bağımsız ayrı bir Üretim Planlama Departmanı (Tedarik Zinciri veya Fabrika Müdürlüğü altında) tarafından yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_muduru_veya_atolyedeki_ustabasilari_gunluk_olarak_kendileri_planlar",
+          "label": "Ayrı bir planlama ekibi yoktur; fabrika müdürü veya ustabaşılar ne üretileceğine günlük kendileri karar verir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_pazarlama_ekibi_siparis_geldikce_uretime_dogrudan_is_listesi_verir",
+          "label": "Satış ekibi gelen müşteri siparişlerine göre üretim sırasını ve terminleri doğrudan fabrikaya dikte eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-002",
+      "process": "Üretim Organizasyonu",
+      "order": 2,
+      "question": "Üretim planlama ekibi ile Satış, Satın Alma ve Üretim Sahası arasındaki plan koordinasyonu ve bilgi akışı hangi periyotta ve yöntemle yürütülmektedir?",
+      "description": "Planlama koordinasyon rutini, günlük hat başı toplantıları ve S&OP (Satış ve Operasyon Planlama) disiplini.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "haftalik_veya_gunluk_duzenli_planlama_koordinasyon_toplantilari_ve_canli_erp_uzerinden_yurutulur",
+          "label": "Evet; haftalık S&OP toplantıları ve her sabah yapılan günlük saha koordinasyon toplantılarıyla plan canlı ERP üzerinden yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kriz_ve_acil_siparis_oldukca_telefon_eposta_ve_whatsapp_gruplari_uzerinden_konusulur",
+          "label": "Rutin bir toplantı yoktur; acil sipariş veya hammadde gecikmesi çıktıkça WhatsApp ve telefonla anlık çözülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "departmanlar_arasi_plan_koordinasyonu_zayiftir_kopukluklar_yasanir",
+          "label": "Departmanlar arası koordinasyon zayıftır; satışın verdiği terminle fabrikanın ürettiği arasında sıkça kopukluk olur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-003",
+      "process": "Üretim Tipi ve Stratejisi",
+      "order": 3,
+      "question": "Fabrikanızdaki ana üretim stratejisi (Stoka Üretim / MTS, Siparişe Göre Üretim / MTO, Siparişe Göre Montaj / ATO, Siparişe Göre Tasarım / ETO) hangisidir veya hangi kombinasyonda uygulanmaktadır?",
+      "description": "Temel üretim stratejisi, müşteri ayrışma noktası (Decoupling Point) ve stok/sipariş dengesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tamamen_siparise_gore_uretim_make_to_order_mto_calisilir",
+          "label": "Siparişe Göre Üretim (Make-to-Order / MTO) — Müşteri siparişi kesinleşmeden üretime başlanmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "stoka_uretim_make_to_stock_mts_tahmin_ve_hedef_stoklara_gore_uretilir",
+          "label": "Stoka Üretim (Make-to-Stock / MTS) — Satış tahminlerine ve ambar emniyet stoğu hedeflerine göre üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yari_mamuller_stoka_nihai_mamul_siparise_gore_monte_edilir_assemble_to_order_ato",
+          "label": "Siparişe Göre Montaj (Assemble-to-Order / ATO) — Standart yarı mamuller stoka üretilir, nihai montaj siparişle yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "siparise_gore_muhendislik_ve_tasarim_engineer_to_order_eto_her_urun_ozeldir",
+          "label": "Siparişe Göre Tasarım/Mühendislik (Engineer-to-Order / ETO) — Her sipariş için özel tasarım ve yeni ürün ağacı açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "karma_model_bazi_urunler_stoka_ozel_urunler_siparise_gore_uretilir",
+          "label": "Karma Model — Standart hızlı dönen ürünler stoka (MTS), müşteri varyantları siparişe göre (MTO/ATO) üretilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-004",
+      "process": "Üretim Tipi ve Stratejisi",
+      "order": 4,
+      "question": "Üretim tesislerinizdeki fiziksel malzeme ve operasyon akış tipi (Kesikli / Ayrık İmalat, Seri / Hat Tipi, Sürekli / Proses / Kimya, Proje Tipi) nasıl yapılandırılmıştır?",
+      "description": "Fiziksel üretim mimarisi, tezgâh yerleşimi, montaj hatları ve akış karakteristiği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kesikli_ayrik_uretim_discrete_manufacturing_is_merkezleri_arasi_parti_parti_akis",
+          "label": "Kesikli / Ayrık İmalat (Discrete Manufacturing) — Talaşlı imalat, pres, kaynak vb. atölyeler arası parti bazlı akış",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "seri_veya_montaj_hatti_uretimi_line_repetitive_manufacturing_surekli_konveyor_akisi",
+          "label": "Seri / Montaj Hattı (Repetitive / Line Assembly) — Yüksek adetli, hat boyunca akan konveyör tipi montaj",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proses_veya_surekli_uretim_process_manufacturing_reaktor_kazan_kimya_gida",
+          "label": "Proses / Sürekli Üretim (Process Manufacturing) — Reçete/formül bazlı, kazan, tank, kimya, gıda veya döküm akışı",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proje_tipi_uretim_project_manufacturing_buyuk_makine_tesis_insa_tarzi",
+          "label": "Proje Tipi Üretim (Project Manufacturing) — Uzun süren, aşamalı şantiye veya büyük özel makine üretimi",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "karma_akis_hem_kesikli_parca_uretimi_hem_seri_montaj_hatti_vardir",
+          "label": "Karma Akış — Önce kesikli parça üretimi yapılır, ardından seri montaj hattında birleştirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-005",
+      "process": "Mamul / Yarı Mamul Yapısı",
+      "order": 5,
+      "question": "Üretim süreçlerinizde Mamul (Bitmiş Ürün), Yarı Mamul (Montaj Öncesi Parça / Ara Ürün), Satın Alınan Hammadde ve Dışarıdan Alınan Fason Parça ayrımları sistemde net olarak kodlanmış ve stoklanabilir durumda mıdır?",
+      "description": "Malzeme kartı tipleri (Mamul, Yarı Mamul, Hammadde, Yardımcı Malzeme) ve ara stoklama kabiliyeti.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_mamul_yari_mamul_ve_hammaddeler_ayri_kodlarla_ve_kendi_stok_alanlarinda_net_tanimlidir",
+          "label": "Evet; mamul, alt montaj yarı mamulleri ve hammaddeler ayrı malzeme tipleriyle sistemde net izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_nihai_mamul_ve_hammadde_vardir_ara_yari_mamuller_kodlanmaz_hatti_terk_etmez",
+          "label": "Yarı mamul kodu açılmaz; hammadde hatta girer, doğrudan nihai mamul çıkar, ara parçalar stoksuz akar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "bazi_yari_mamuller_kodludur_bazi_ara_parcalar_kodsuz_fiziki_olarak_takip_edilir",
+          "label": "Kısmi tanımlıdır; önemli birkaç yarı mamul sistemdedir fakat birçok ara bileşenin resmi kodu yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-006",
+      "process": "Mamul / Yarı Mamul Yapısı",
+      "order": 6,
+      "question": "Fiziksel olarak ambarda depolanmayan fakat mühendislik veya montaj kolaylığı için ürün ağacında gruplanan Hayali / Sanal Yarı Mamul (Phantom BOM / Blow-Through) yapıları kullanılmakta mıdır?",
+      "description": "Phantom BOM (Hayali montaj grubu), ara stok hareketi yapmadan bileşenleri doğrudan üst iş emrine geçirme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "phantom_bom_yapisi_kullanilir_ara_stok_giris_cikisi_yapilmadan_alt_bilesenler_patlatilir",
+          "label": "Evet; kablo seti veya vida grubu gibi ara montajlar Phantom BOM olarak tanımlanır, iş emrinde doğrudan ana ürüne akar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_gruplar_icin_resmi_yari_mamul_ve_stok_karti_acilir_phantom_kullanilmaz",
+          "label": "Phantom kullanılmaz; her alt grup için ayrı iş emri ve ayrı yarı mamul stok girişi yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "phantom_bom_kavrami_bilinmemekte_veya_kullanilmamaktadir",
+          "label": "Phantom BOM kavramı kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-007",
+      "process": "Ürün Ağacı / BOM",
+      "order": 7,
+      "question": "Üretilen her mamul ve yarı mamul için 1 birim üretimde hangi hammadde ve bileşenden ne miktarda (Birim Sarf Standardı) kullanılacağını gösteren resmi Ürün Ağacı (BOM / Reçete) sistemde mevcut mudur?",
+      "description": "Standart ürün ağacı (Bill of Materials), malzeme sarf normları ve reçete doğruluğu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_mamul_ve_yari_mamullerin_standart_sarf_miktarlari_sistemde_resmi_bom_olarak_kayitlidir",
+          "label": "Evet; her ürünün ERP sisteminde onaylı ürün ağacı tanımlıdır ve planlama bu standart sarflarla çalışır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "urun_agaclari_excel_tablolarinda_veya_arge_klasorlerinde_tutulur_sistemde_yoktur",
+          "label": "Sistemik BOM yoktur; Excel tablolarında veya Ar-Ge teknik çizimlerinde malzeme listesi olarak tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_bir_bom_yoktur_usta_veya_operator_tecrubesine_gore_malzeme_alir",
+          "label": "Resmi bir ürün ağacı yoktur; tecrübeli usta hangi ürüne ne kadar hammadde gideceğini bilerek depodan çeker",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-008",
+      "process": "Ürün Ağacı / BOM",
+      "order": 8,
+      "question": "Ürün ağaçlarında üretim prosesine bağlı Fire Oranları (Scrap Factor — Sabit / Yüzdesel Fire) ve üretimden çıkan Eş Ürün / Yan Ürün / Geri Kazanım (Co-Product / By-Product / Çapak / Hurda) tanımlanabilmekte midir?",
+      "description": "BOM bileşen fire oranları, sabit fire (setup firesi), yüzdesel sarf firesi ve yan ürün modellemesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "bilesen_bazinda_yuzdesel_fire_sabit_fire_ve_varsa_yan_urun_bom_da_tanimlidir",
+          "label": "Evet; saç büküm veya enjeksiyon firesi (%) BOM'da tanımlıdır ve net malzeme ihtiyacına otomatik eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fireler_bom_a_yazilmaz_planlamaci_veya_usta_kafasindan_bir_miktar_fazla_malzeme_ister",
+          "label": "BOM'da fire oranı yoktur; planlamacı sipariş açarken manuel olarak %5-10 fazla hammadde hesaplar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fire_ve_yan_urun_takibi_yapilamamaktadir",
+          "label": "BOM üzerinde fire oranı veya yan ürün tanımlaması yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-009",
+      "process": "Çok Seviyeli BOM",
+      "order": 9,
+      "question": "Fabrikanızdaki ürünlerin ürün ağacı hiyerarşisi kaç seviyelidir (Çok Seviyeli BOM — Nihai Mamul → Üst Yarı Mamul → Alt Yarı Mamul → İşlenmiş Parça → Hammadde) ve sistem bunu özyinelemeli (Recursive / Multi-Level) çözebilmekte midir?",
+      "description": "Multi-level BOM derinliği, ağaç seviyeleri (Level 0, Level 1, Level 2..N) ve kademeli montaj yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cok_seviyeli_bom_kullanilir_3_veya_daha_fazla_derinlikte_yari_mamul_agaci_sistemde_cozulur",
+          "label": "Evet; 3 veya daha fazla seviyeli derin ağaç yapısı vardır; en üst mamulden en alt hammaddeye kadar hiyerarşik çözülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "2_seviyeli_bom_vardir_yalnizca_mamul_ve_bir_kademe_yari_mamul_bulunur",
+          "label": "2 seviyelidir; mamul altında bir grup yarı mamul vardır, onların altında sadece hammaddeler yer alır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_seviyeli_bom_kullanilir_yari_mamul_agaci_yoktur",
+          "label": "Tek seviyelidir (Flat BOM); mamulün altında yarı mamul ayrımı olmadan tüm hammaddeler tek listede durur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-010",
+      "process": "Çok Seviyeli BOM",
+      "order": 10,
+      "question": "Bir nihai mamul için üretim planı veya satış siparişi açıldığında sistem otomatik olarak tüm alt yarı mamullerin ve onların altındaki hammaddelerin ihtiyaçlarını eşzamanlı (Multi-Level Explosion) patlatabilmekte midir?",
+      "description": "Çok seviyeli ihtiyaç patlatması, Low-Level Code mantığı ve alt montaj ihtiyaç senkronizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "PRD-009",
+        "operator": "not_equals",
+        "value": "tek_seviyeli_bom_kullanilir_yari_mamul_agaci_yoktur"
+      },
+      "options": [
+        {
+          "value": "sistem_tek_seferde_tum_seviyeleri_otomatik_patlatir_ve_kademe_kademe_ihtiyac_cikarir",
+          "label": "Evet; nihai ürün ihtiyacı girildiğinde sistem en alt seviyedeki civataya kadar tüm yarı mamul ve hammadde planını üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_seviye_icin_planlamaci_ayri_ayri_manuel_patlatma_veya_is_emri_acar",
+          "label": "Otomatik çok seviyeli patlatma yoktur; planlamacı önce mamulü, sonra tek tek yarı mamulleri manuel hesaplar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cok_seviyeli_ihtiyac_patlatma_yapilamamaktadir",
+          "label": "Çok seviyeli ihtiyaç patlatma yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-011",
+      "process": "Alternatif BOM / Reçete",
+      "order": 11,
+      "question": "Bir ürünün farklı hatlarda üretilmesi, hammadde muadilleri, üretim mevsimi veya müşteri talebine göre Alternatif Ürün Ağaçları (Alternatif BOM / Reçete) ve Revizyon / Geçerlilik Tarihi (Effective Date) takibi yapılmakta mıdır?",
+      "description": "Alternatif reçeteler, BOM versiyonlama, mühendislik değişiklik yönetimi (ECN / ECO) ve geçerlilik tarihleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "bir_urunun_birden_fazla_onayli_alternatif_bom_u_ve_tarih_bazli_revizyon_gecmisi_sistemde_takip_edilir",
+          "label": "Evet; reçete versiyonları (Rev 01, Rev 02), geçerlilik başlangıç/bitiş tarihleri ve alternatif reçeteler sistemde tam yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_urun_icin_sistemde_yalniz_tek_bir_guncel_bom_vardir_eski_revizyon_ezilir",
+          "label": "Tek bir BOM vardır; değişiklik olunca eski reçete güncellenir, geçmiş versiyonların arşivi sistemde tutulamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "alternatif_bom_kullanilmamaktadir_tek_standart_recete_vardir",
+          "label": "Alternatif reçete veya revizyon takibi kullanılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-012",
+      "process": "Alternatif BOM / Reçete",
+      "order": 12,
+      "question": "Üretim miktarına göre (Örn. 100 adet altı farklı reçete / el montajı, 10.000 adet üzeri otomatik hat reçetesi) veya müşteri/proje bazlı dinamik reçete seçimi yapılabilmekte midir?",
+      "description": "Lot büyüklüğü bazlı alternatif reçete seçimi ve müşteri/proje konfigürasyonel reçetesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "PRD-011",
+        "operator": "not_equals",
+        "value": "alternatif_bom_kullanilmamaktadir_tek_standart_recete_vardir"
+      },
+      "options": [
+        {
+          "value": "uretim_miktari_araligina_veya_musteriye_gore_sistem_dogru_alternatif_bom_u_otomatik_secer",
+          "label": "Evet; parti büyüklüğüne veya siparişteki müşteriye göre sistem ilgili reçeteyi otomatik iş emrine bağlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planlamaci_is_emri_acarken_hangi_alternatif_bom_un_kullanilacagini_manuel_secer",
+          "label": "Otomatik kural yoktur; planlamacı iş emrini oluştururken hangi reçeteyi kullanacağını listeden elle seçer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "miktar_bazli_recete_secimi_bulunmamaktadir",
+          "label": "Miktar veya proje bazlı reçete seçimi bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-013",
+      "process": "Rota ve Operasyon Yapısı",
+      "order": 13,
+      "question": "Ürünlerin hangi sırayla, hangi tezgâhlarda ve ne kadar sürede üretileceğini belirleyen standart Üretim Rotaları (Routing — Kesim → Torna → Kaynak → Boya → Montaj → Paketleme) sistemde tanımlı mıdır?",
+      "description": "Üretim rotaları, sıralı operasyon adımları, standart hazırlık (Setup) ve çalışma (Run) süreleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "her_urunun_standart_operasyon_sirasi_hazirlik_ve_birim_islem_sureleri_sistemde_tanimlidir",
+          "label": "Evet; her ürünün rotası, operasyon sırası, setup süresi ve parça başı standart işlem süresi sistemde kayıtlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operasyon_sirasi_teknik_resimlerde_veya_formene_sozlu_olarak_bilinir_sistemde_sure_yoktur",
+          "label": "Sistemde standart rota/süre yoktur; operasyon adımları teknik resimde yazar, ustabaşı sırayla işi yürütür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_rota_veya_operasyon_tanimi_bulunmamaktadir",
+          "label": "Resmi bir rota veya operasyon süre standardı bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-014",
+      "process": "Rota ve Operasyon Yapısı",
+      "order": 14,
+      "question": "Üretim rotasında dışarıya gönderilen Fason Operasyonlar (Dış İşlem / Subcontracting — Örn. Kaplama, Isıl İşlem, Boya vb.) ve operasyonlar arası bekleme/taşıma süreleri (Queue / Move Time) planlamada dikkate alınıyor mu?",
+      "description": "Fason operasyon adımları, dış tedarik teslim süresi ve istasyonlar arası transfer/kuyruk süreleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "fason_operasyon_sureleri_ve_hatlar_arasi_tasima_bekleme_sureleri_rotaya_dahildir",
+          "label": "Evet; ısıl işlem fasoncusuna gidiş-geliş süresi rotada tanımlıdır ve genel üretim teslimat süresine eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fason_islemler_manuel_takip_edilir_sistemik_rotada_sure_ve_termin_baglantisi_yoktur",
+          "label": "Fason vardır fakat rotada standart süresi yoktur; malzeme fasondan gelince bir sonraki operasyona geçilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fason_operasyon_veya_kuyruk_suresi_kullanilmamaktadir",
+          "label": "Fason operasyon veya istasyonlar arası bekleme süresi takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-015",
+      "process": "İş Merkezi / Work Center",
+      "order": 15,
+      "question": "Üretim operasyonlarının yürütüldüğü İş Merkezleri (Work Centers — Makine, Makine Grubu, Montaj Hattı, El İşi İstasyonu) kapasite parametreleriyle birlikte sistemde tanımlı mıdır?",
+      "description": "İş merkezi ana verisi, makine sayısı, verimlilik katsayısı ve iş merkezi hiyerarşisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_makine_ve_istasyonlar_is_merkezi_olarak_kapasite_ve_maliyet_merkezi_baglantisiyla_tanimlidir",
+          "label": "Evet; CNC Grubu, Pres Hattı, Manuel Montaj gibi tüm iş merkezleri makine adetleri ve kapasiteleriyle sistemdedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_merkezleri_sadece_isim_olarak_vardir_kapasite_veya_calisma_saati_kurali_tanimli_degildir",
+          "label": "İş merkezleri sistemde isim olarak vardır fakat kapasite sınırı veya standart çalışma saati tanımlı değildir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "resmi_bir_is_merkezi_tanimi_bulunmamaktadir",
+          "label": "Resmi iş merkezi veya makine grubu tanımlaması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-016",
+      "process": "İş Merkezi / Work Center",
+      "order": 16,
+      "question": "İş merkezlerinin kapasitesi hesaplanırken yalnızca Makine Kapasitesi mi, yoksa İnsan Gücü / Operatör Sayısı (Personel Kapasitesi) kısıtı da eşzamanlı olarak modellenmekte midir?",
+      "description": "Makine kısıtı vs İş gücü kısıtı (Labor vs Machine Constrained Capacity).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hem_makine_hem_operator_kapasitesi_birlikte_modellenir_hangisi_darsa_limit_odur",
+          "label": "Evet; makine olsa bile onu çalıştıracak sertifikalı operatör yoksa kapasite sınırlı kabul edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_makine_saati_baz_alinir_operator_sayisi_sinirsiz_varsayilir",
+          "label": "Sadece makinenin çalışma saati baz alınır; operatör iş gücü kısıtı sistemde ayrı modellenmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_adam_saat_iscilik_kapasitesi_takip_edilir_manuel_agirliklidir",
+          "label": "Makine yoktur veya önemsizdir; tamamen adam-saat işçilik kapasitesine göre planlama yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-017",
+      "process": "Üretim Takvimi ve Vardiya",
+      "order": 17,
+      "question": "Fabrika genelinde ve iş merkezi bazında Çalışma Günleri, Vardiya Saatleri (1, 2 veya 3 Vardiya), Resmi/Dini Tatiller ve Fabrika Yıllık Duruş Günlerini içeren Üretim Takvimi sistemde aktif olarak işletilmekte midir?",
+      "description": "Fabrika fabrika/atölye çalışma takvimleri, vardiya modelleri ve net çalışma saatleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_is_merkezlerinin_vardiya_saatleri_ve_tatil_takvimi_sistemde_tanimlidir_terminler_buna_gore_hesaplanir",
+          "label": "Evet; hangi hattın kaç vardiya çalıştığı ve tatil günleri takvimdedir; sistem pazar gününü otomatik atlayarak termin verir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "takvim_sistemde_vardir_ancak_statiktir_vardiya_degisiklikleri_veya_mesailer_yansitilmaz",
+          "label": "Standart 5 gün takvim vardır fakat cumartesi mesaisi veya 2. vardiyaya geçiş gibi durumlar sisteme işlenmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemik_uretim_takvimi_kullanilmamaktadir",
+          "label": "Sistemik üretim takvimi veya vardiya yönetimi bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-018",
+      "process": "Üretim Takvimi ve Vardiya",
+      "order": 18,
+      "question": "Yoğun dönemlerde açılan Fazla Mesailer, Hafta Sonu Çalışmaları veya Bakım Nedeniyle Planlı Duruşlar üretim takvimine esnek olarak yansıtılarak kapasite anlık artırılıp azaltılabilmekte midir?",
+      "description": "Dinamik takvim yönetimi, fazla mesai kapasite ilavesi ve bakım duruşu kapasite düşümü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "mesai_veya_bakim_durusu_takvime_islenir_ve_o_haftanin_net_kapasitesi_otomatik_guncellenir",
+          "label": "Evet; cumartesi mesaisi girildiğinde hattın kapasitesi artar; planlı bakım girildiğinde o saatler kapasiteden düşer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mesailer_sistem_disinda_tutulur_sistemdeki_kapasite_hep_standart_kalir",
+          "label": "Mesai veya bakım takvime işlenmez; sistem standart 8 saat üzerinden planlamaya devam eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "esnek_kapasite_takvimi_kullanilmamaktadir",
+          "label": "Esnek takvim veya dinamik kapasite uyarlaması kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-019",
+      "process": "Talep Kaynakları",
+      "order": 19,
+      "question": "Fabrikanızda üretim planını ve malzeme ihtiyaçlarını tetikleyen temel Talep Kaynakları (Kesin Satış Siparişleri, Satış Tahminleri / Forecast, Emniyet Stoğu Tamamlama, Proje İş Planı vb.) nelerdir?",
+      "description": "Talep havuzu, bağımsız talep girdileri ve üretim tetikleyicileri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "hem_kesin_satis_siparisleri_hem_de_aylik_forecast_tahminleri_birlikte_talep_kaynagidir",
+          "label": "Kesin Müşteri Siparişleri ve Satış Tahminleri (Forecast) birlikte değerlendirilerek üretim tetiklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_onaylanmis_kesin_musteri_satis_siparisleri_uretimi_tetikler",
+          "label": "Yalnızca onaylı kesin satış siparişleri üretim talebi oluşturur; forecast kullanılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "min_max_stok_ve_emniyet_stogu_seviyelerinin_altina_dusen_urunler_otomatik_uretim_tetikler",
+          "label": "Min/Max stok hedeflerine göre ambar stoğu kritik seviyenin altına indikçe üretim tetiklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_talebi_yonetim_karariyla_manuel_hazirlanan_aylik_is_listeleriyle_baslatilir",
+          "label": "Sistemik talep entegrasyonu yoktur; fabrika yönetimi her ay başında ne üretileceğini manuel liste olarak belirler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-020",
+      "process": "Talep Kaynakları",
+      "order": 20,
+      "question": "Kritik ürünler veya uzun tedarik süreli hammaddeler için Emniyet Stoğu (Safety Stock) ve Stratejik Yarı Mamul Tamponları (Buffer Stock) planlama motoru tarafından otomatik hesaba katılıyor mu?",
+      "description": "Dinamik/statik emniyet stoğu, reorder point ve tampon stok yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "emniyet_stoklari_sistemdedir_stok_bu_seviyenin_altina_indiginde_mrp_otomatik_uretim_satinalma_onerir",
+          "label": "Evet; kritik parçaların emniyet stoğu tanımlıdır ve net ihtiyaç hesabında emniyet stoğunu tamamlayacak miktar eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "emniyet_stoklari_excel_listesinde_tavsiye_olarak_durur_sisteme_bagli_degildir",
+          "label": "Emniyet stoğu Excel'de takip edilir; planlamacı sipariş açarken manuel göz kararı ilave yapar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "emniyet_stogu_politikasi_uygulanmamaktadir",
+          "label": "Resmi bir emniyet stoğu veya tampon stok politikası bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-021",
+      "process": "Satış Siparişinden Üretim İhtiyacı",
+      "order": 21,
+      "question": "Satış departmanı tarafından sisteme girilen bir satış siparişi onaylandığında üretim ihtiyacı (Production Demand / MTO İhtiyacı) otomatik olarak oluşmakta ve siparişe özel izlenebilmekte midir?",
+      "description": "Satış Siparişi - Üretim Planlama entegrasyonu, Make-to-Order sipariş bağlama (Pegging).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "satis_siparisi_onaylaninca_otomatik_uretim_ihtiyaci_olur_ve_siparis_is_emri_baglantisi_korunur",
+          "label": "Evet; satış siparişi onaylandığı an üretim talebine dönüşür, hangi iş emrinin hangi müşteriye ait olduğu uçtan uca izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_ekibi_siparis_formunu_yazdirir_veya_eposta_atar_planlamaci_sisteme_tekrar_elle_girer",
+          "label": "Otomatik akış yoktur; satış ekibi e-posta atar, planlamacı bilgileri kendi planlama sistemine manuel işler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_ve_uretim_sistemleri_tamamen_ayridir_entegrasyon_yoktur",
+          "label": "Satış ve üretim sistemleri ayrıdır; üretim sipariş bazında değil toplu parti olarak planlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-022",
+      "process": "Satış Siparişinden Üretim İhtiyacı",
+      "order": 22,
+      "question": "Satış ekibi yeni bir sipariş alırken veya teklif verirken müşteriye Teslim Tarihi / Termin Sözü (CTP - Capable-to-Promise / ATP - Available-to-Promise) verirken fabrikanın mevcut kapasite ve malzeme durumunu sistemden görebilmekte midir?",
+      "description": "Siparişte termin verme (ATP/CTP kabiliyeti), kapasite ve malzeme doluluğuna göre gerçekçi teslim tarihi hesabı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistem_malzeme_stok_ve_hat_kapasitesini_kontrol_ederek_otomatik_ve_gercekci_termin_tarihi_onerir",
+          "label": "Evet; sistem hattın doluluk takvimine ve malzeme tedarik süresine bakarak teslim tarihini (CTP) otomatik önerir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satis_temsilcisi_planlama_veya_uretim_mudurunu_arayıp_ne_zamana_cikar_diye_sorar",
+          "label": "Sistemik kontrol yoktur; satışçı telefonla planlamacıyı arar, 'Haftaya çıkar mı?' diye sorarak sözlü termin alır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_bir_termin_suresi_soylenir_fabrika_durumu_kontrol_edilmez",
+          "label": "Fabrikaya sorulmadan standart '3 hafta' denir; fabrikada sıkışıklık olunca teslimatlar gecikir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-023",
+      "process": "Forecast ve MPS",
+      "order": 23,
+      "question": "Şirketinizde satış tahminleri ve kesin siparişleri birleştirerek haftalık/aylık bazda Ana Üretim Çizelgesi (MPS - Master Production Schedule) oluşturulmakta mıdır?",
+      "description": "Ana Üretim Çizelgesi (MPS), orta vadeli mamul üretim takvimi ve talep tüketimi (Demand Consumption).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "haftalik_ve_aylik_donemler_icin_onayli_ana_uretim_cizelgesi_mps_sistemde_resmi_calistirilir",
+          "label": "Evet; mamul bazında haftalık/aylık MPS çizelgesi oluşturulur, gelen siparişler forecast tahminlerini tüketerek planlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mps_cizelgesi_excel_tablolarinda_hazirlanir_yonetime_sunulur_fakat_erp_ye_girilmez",
+          "label": "Excel'de haftalık/aylık üretim çizelgesi yapılır fakat ERP içine aktarılmadan manuel takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mps_veya_forecast_kullanilmamaktadir_yalniz_anlik_siparisle_planlanir",
+          "label": "MPS veya forecast kullanılmamaktadır; sadece anlık gelen siparişlere göre günlük/haftalık plan yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-024",
+      "process": "Forecast ve MPS",
+      "order": 24,
+      "question": "MPS çizelgesinde üretime çok yakın günlerde planın bozulmasını engellemek için Dondurulmuş Dönem / Donuk Ufuk (Frozen Horizon / Time Fence) kuralları uygulanmakta mıdır?",
+      "description": "Frozen Horizon, Firm Horizon, Planning Horizon ve son dakika değişiklik kilitleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRD-023",
+        "operator": "not_equals",
+        "value": "mps_veya_forecast_kullanilmamaktadir_yalniz_anlik_siparisle_planlanir"
+      },
+      "options": [
+        {
+          "value": "onumuzdeki_1_2_haftalik_plan_dondurulur_acil_onay_olmadan_kimse_plani_degistiremez",
+          "label": "Evet; önümüzdeki 1-2 haftalık plan dondurulmuştur (Frozen); yeni sipariş gelse bile acil onay olmadan plan bozulamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dondurulmus_donem_kurali_yoktur_yonetici_istedigi_an_mevcut_plani_degistirip_yeni_is_araya_sokar",
+          "label": "Donuk dönem kuralı yoktur; hat çalışırken bile satış veya yönetim araya acil iş sokarak planı değiştirebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dondurulmus_donem_kurali_uygulanmamaktadir",
+          "label": "Dondurulmuş dönem veya time fence kuralları uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-025",
+      "process": "MRP / Malzeme İhtiyaç Planlama",
+      "order": 25,
+      "question": "Fabrikanızda tüm mamul, yarı mamul ve hammadde ihtiyaçlarını stoklar, açık siparişler ve teslim sürelerine göre hesaplayan Malzeme İhtiyaç Planlaması (MRP - Material Requirements Planning) sistemi çalıştırılmakta mıdır?",
+      "description": "MRP motoru, otomatik ihtiyaç hesaplama, satınalma ve üretim siparişi önerisi üretme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_uzerinde_tam_entegre_mrp_motoru_duzenli_calistirilir_satinalma_ve_uretim_onerileri_uretir",
+          "label": "Evet; ERP MRP motoru periyodik çalışır; stokları ve siparişleri tarayarak ne zaman ne üretilmeli ve ne satın alınmalı listesini çıkarır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mrp_benzeri_hesaplamalar_excel_tablolarinda_formul_ve_makrolarla_manuel_yapilir",
+          "label": "Sistemik MRP yoktur; planlama uzmanı Excel tablolarında formüllerle hammadde ihtiyaçlarını kendisi hesaplar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mrp_kullanilmamaktadir_malzeme_ihtiyaclari_manuel_veya_tecrubeyle_cikarilir",
+          "label": "MRP kullanılmamaktadır; malzeme ihtiyaçları sipariş geldikçe veya ambara bakılarak göz kararı çıkarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-026",
+      "process": "MRP / Malzeme İhtiyaç Planlama",
+      "order": 26,
+      "question": "MRP sistemi hangi sıklıkta (Her gece toplu / Regenerative MRP, Gün içinde anlık / Net-Change MRP, Haftalık) çalıştırılmaktadır ve hangi ambar/tesisleri kapsamaktadır?",
+      "description": "MRP çalıştırma frekansı, planlama döngüsü ve çok tesisli/ambarlı planlama kapsamı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRD-025",
+        "operator": "not_equals",
+        "value": "mrp_kullanilmamaktadir_malzeme_ihtiyaclari_manuel_veya_tecrubeyle_cikarilir"
+      },
+      "options": [
+        {
+          "value": "her_gece_otomatik_calisir_tum_fabrika_ve_ambar_stoklarini_kapsar",
+          "label": "Her gece otomatik (Regenerative/Batch) çalışır ve tüm fabrika ambarlarını tarayarak sabah planlama ekranına hazır getirir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "siparis_girdikce_veya_degistikce_anlik_net_change_mrp_calisir",
+          "label": "Anlık (Net-Change) çalışır; sisteme yeni sipariş girildiği an sadece etkilenen parçalar için plan güncellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "haftada_bir_veya_ihtiyac_oldukca_planlamaci_tarafindan_manuel_calistirilir",
+          "label": "Haftada bir gün (Örn. Pazartesi sabahı) planlamacı tarafından manuel tetiklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-027",
+      "process": "Net İhtiyaç Hesabı",
+      "order": 27,
+      "question": "MRP çalışmasında Brüt İhtiyaçtan (Gross Requirement) mevcut stoklar, yoldaki siparişler ve rezerve miktarlar düşülerek Net İhtiyaç (Net Requirement) hesaplama mantığı nasıl işletilmektedir?",
+      "description": "Net ihtiyaç formülü: Brüt İhtiyaç - Mevcut Stok - Açık Satınalma/Üretim Siparişleri + Emniyet Stoğu = Net İhtiyaç.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "brut_ihtiyactan_mevcut_stok_ve_acik_siparisler_dusulup_emniyet_stogu_eklenerek_net_ihtiyac_cikar",
+          "label": "Evet; sistem (Brüt Talep - Eldeki Stok - Açık Satın Alma + Emniyet Stoğu) formülüyle net ihtiyaç ve tedarik tarihi üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eldeki_stok_dusulur_ancak_yoldaki_siparisler_veya_rezervasyonlar_tam_hesaba_katilmaz",
+          "label": "Sadece ambardaki stoğa bakılır; yoldaki satın alma siparişleri veya başka işe rezerve stoklar tam düşülemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "stoklar_ve_acik_siparisler_dusulmez_her_siparis_icin_sifirdan_tum_malzeme_alinir_uretilir",
+          "label": "Netleştirme yapılmaz; ambarda malzeme olsa bile her sipariş için baştan hammadde satın alınır/üretilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-028",
+      "process": "Net İhtiyaç Hesabı",
+      "order": 28,
+      "question": "Açık Satın Alma Siparişleri (PO) ve Yoldaki Malların Tahmini Varış Tarihleri (Scheduled Receipts) net ihtiyaç hesabında hangi güvenilirlikle dikkate alınmaktadır?",
+      "description": "Tedarikçi taahhüt tarihi, yoldaki mal entegrasyonu ve erken/geç tedarik uyarıları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "satinalma_siparislerindeki_onayli_termin_tarihleri_mrp_tarafindan_zaman_ekseninde_dogru_kullanilir",
+          "label": "Evet; satın alma siparişindeki tedarikçi teyit tarihi baz alınır, malın geleceği günden önce o hammaddeye ihtiyaç duyulursa uyarı verir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "siparislerin_tarihleri_guncellenmez_geciken_siparisler_yuzunden_plan_yaniltici_olur",
+          "label": "Tarihler güncellenmez; tedarikçi gecikse bile sistem malı eski tarihte varmış gibi sayar ve hatalı plan üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yoldaki_siparisler_hesaba_katilmamaktadir",
+          "label": "Yoldaki siparişler net ihtiyaç hesabına katılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-029",
+      "process": "Lot Büyüklüğü ve Parti Politikaları",
+      "order": 29,
+      "question": "Üretim ve satın alma ihtiyaçları oluşturulurken Lot Büyüklüğü Politikaları (Birebir İhtiyaç / Lot-for-Lot, Sabit Parti, Minimum Üretim Miktarı, Ekonomik Sipariş Miktarı / EOQ) nasıl belirlenmektedir?",
+      "description": "Lot sizing kuralları (Lot-for-lot, Min/Max lot, Katları / Rounding value, Periyodik lot).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "malzeme_bazinda_lot_politikasi_tanimlidir_orn_min_500_adet_veya_100_un_katlari_seklinde_yuvarlanir",
+          "label": "Evet; her ürün ve hammadde için Min Parti, Katları (Yuvarlama) veya Birebir (L4L) kuralları sistemde tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_urunler_icin_yalnizca_birebir_ihtiyac_kadar_lot_for_lot_emir_acilir",
+          "label": "Yalnızca birebir (Lot-for-Lot) çalışılır; 37 adet lazımsa tam 37 adetlik iş emri veya satın alma açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "parti_buyuklukleri_planlamacinin_tecrubesine_gore_manuel_duzeltilir",
+          "label": "Sistemik parti kuralı yoktur; planlamacı ekrandaki ihtiyacı görüp 'Bunu 1.000 adede tamamlayalım' diye elle düzeltir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-030",
+      "process": "Lot Büyüklüğü ve Parti Politikaları",
+      "order": 30,
+      "question": "Üretim partilerinde ilk ayar firesi (Setup Scrap) veya proses hurda oranları hesaplanarak açılacak iş emri miktarının otomatik olarak artırılması sağlanmakta mıdır?",
+      "description": "Dinamik hurda/fire ilavesi ve net hedeflenen mamul adedi için brüt üretim miktarı hesaplama.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "fire_katsayisi_partiye_otomatik_eklenir_1000_adet_saglam_icin_1050_adetlik_is_emri_acilir",
+          "label": "Evet; 1.000 adet net mamul gerekiyorsa %5 fire katsayısıyla sistem 1.050 adetlik iş emri önerir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tam_miktar_acilir_fire_verilirse_eksik_kalan_icin_sonradan_ek_is_emri_acilir",
+          "label": "Fire önceden eklenmez; tam miktar açılır, üretimde fire çıkıp eksik kalırsa sonradan telafi emri açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "parti_bazli_fire_artirimi_yapilmamaktadir",
+          "label": "Parti bazlı fire artırımı yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-031",
+      "process": "Lead Time ve Termin Hesabı",
+      "order": 31,
+      "question": "Müşterinin istediği teslim tarihinden geriye doğru (Backward Scheduling) giderek her bir yarı mamulün ve hammaddenin üretime/siparişe başlama tarihleri (Lead Time Ofsetleri) sistem tarafından otomatik hesaplanmakta mıdır?",
+      "description": "Geriye doğru çizelgeleme (Backward Scheduling), ileriye doğru çizelgeleme (Forward Scheduling) ve teslim süreleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "teslim_tarihinden_geriye_dogru_tum_operasyon_ve_tedarik_lead_time_lari_hesaplanarak_baslama_tarihi_bulunur",
+          "label": "Evet; geriye doğru çizelgeleme (Backward Scheduling) ile en geç hangi gün hammadde siparişi verileceği ve iş emri başlatılacağı bulunur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ileriye_dogru_cizelgeleme_yapilir_bugun_baslanirsa_ne_zaman_bitecegi_hesaplanir",
+          "label": "İleriye doğru (Forward Scheduling) planlanır; iş bugünden başlatılır, toplam lead time eklenerek bitiş tarihi bulunur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lead_time_hesabi_manuel_veya_tahmini_yapilir_sistemik_cizelgeleme_yoktur",
+          "label": "Sistemik çizelgeleme yoktur; planlamacı kafasından 'Bu iş 10 gün sürer' diyerek başlama tarihi yazar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-032",
+      "process": "Lead Time ve Termin Hesabı",
+      "order": 32,
+      "question": "Hammadde mal kabulünde veya yarı mamul ara aşamalarında yapılan Kalite Kontrol Muayene ve Laboratuvar Bekleme Süreleri (QC Lead Time) planlanan teslimat sürelerine dahil edilmekte midir?",
+      "description": "Kalite kontrol bekleme süresi (Inspection Lead Time) ve karantina süresi entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kalite_onay_ve_laboratuvar_sureleri_malzemenin_lead_time_ina_eklenir_kullanilabilirlik_buna_gore_hesaplanir",
+          "label": "Evet; hammadde gelse bile 2 günlük kalite onay süresi geçmeden o malzemenin üretime hazır olmayacağı planlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_suresi_plana_eklenmez_mal_fabrikaya_girdigi_an_kullanilabilir_sayilir",
+          "label": "Kalite süresi hesaba katılmaz; mal ambara girdiği an üretime verilebilir kabul edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_bekleme_suresi_takip_edilmemektedir",
+          "label": "Kalite kontrol bekleme süresi takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-033",
+      "process": "Kapasite Planlama",
+      "order": 33,
+      "question": "Fabrikanızda makinelerin ve montaj hatlarının kapasite yükleri (Kaba Kapasite / RCCP veya Detaylı Kapasite / CRP) sistemde hesaplanmakta ve aşırı yüklenmeler (Overload) grafiksel olarak izlenmekte midir?",
+      "description": "Kapasite İhtiyaç Planlaması (Rough-Cut Capacity Planning / Capacity Requirements Planning), makine yükleme grafikleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_is_merkezlerinin_kapasite_ve_yuk_oranlari_sistemden_grafiksel_olarak_anlik_izlenir",
+          "label": "Evet; her tezgâhın o haftaki kapasitesi ve üzerine planlanan iş yükü (%) grafiksel olarak izlenir, aşırı yükler kırmızı görünür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "makine_ve_hat_yukleri_excel_tablolarinda_toplam_saat_olarak_takip_edilir",
+          "label": "Sistemik kapasite yükleme yoktur; planlama şefi Excel'de makinelerin toplam saatini formülle takip eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemik_kapasite_planlama_yapilmamaktadir_sonsuz_kapasite_varsayilir",
+          "label": "Kapasite planlama yapılmamaktadır; işler açılır, makineler yetişebildiği kadarını üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-034",
+      "process": "Kapasite Planlama",
+      "order": 34,
+      "question": "Kapasite aşımı durumunda sistem işleri Sonlu Kapasite Çizelgeleme (Finite Scheduling) ile otomatik olarak boş günlere veya alternatif tezgâhlara kaydırmakta mıdır?",
+      "description": "Sonlu (Finite) vs Sonsuz (Infinite) kapasite çizelgeleme, otomatik ileri tarih öteleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRD-033",
+        "operator": "not_equals",
+        "value": "sistemik_kapasite_planlama_yapilmamaktadir_sonsuz_kapasite_varsayilir"
+      },
+      "options": [
+        {
+          "value": "sonlu_kapasite_kullanilir_makine_doldugunda_sistem_isi_otomatik_bir_sonraki_musait_zamana_otar",
+          "label": "Evet; sonlu kapasite (Finite Scheduling) uygulanır; makinenin kapasitesi dolunca sistem işi otomatik erteler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sonsuz_kapasite_planlanir_asiri_yuk_varsa_planlamaci_isleri_manuel_baska_gune_kaydirir",
+          "label": "Sonsuz kapasite (Infinite) planlanır; sistem aynı güne %200 yük bindirebilir, planlamacı çakışmaları elle çözer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sonlu_kapasite_cizelgeleme_kullanilmamaktadir",
+          "label": "Sonlu kapasite çizelgeleme kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-035",
+      "process": "Darboğaz Yönetimi",
+      "order": 35,
+      "question": "Fabrikanızdaki Darboğaz İş Merkezleri (Bottleneck Work Centers — Tüm fabrikanın çıkış hızını belirleyen kısıtlı makineler) belirlenmiş midir ve üretim planı bu darboğazların ritmine göre mi (TOC / Drum-Buffer-Rope) kurulmaktadır?",
+      "description": "Darboğaz yönetimi, Kısıtlar Teorisi (Theory of Constraints) ve darboğaz odaklı çizelgeleme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "darbogaz_is_merkezleri_tanimlidir_tum_fabrika_plani_darbogazin_hizina_ve_onundeki_tampona_gore_yapilir",
+          "label": "Evet; darboğaz tezgâhlar bellidir ve planlama önce darboğazı %100 dolduracak şekilde kurgulanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "darbogaz_makineler_bilinir_ancak_planlama_sisteminde_ozel_bir_oncelik_veya_kural_yoktur",
+          "label": "Darboğazlar tecrübeyle bilinir fakat sistem tüm makineleri eşit ağırlıkta planlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "darbogaz_analizi_yapilmamistir",
+          "label": "Darboğaz analizi veya darboğaz odaklı planlama yapılmamıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-036",
+      "process": "Darboğaz Yönetimi",
+      "order": 36,
+      "question": "Darboğaz iş merkezlerinde yığılma veya arıza olduğunda işlerin onaylı Alternatif İş Merkezlerine (Alternative Work Centers) veya fason tedarikçiye aktarılması sistemde nasıl yönetilmektedir?",
+      "description": "Alternatif iş merkezi rotalama, yük dengeleme ve kapasite baypası.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "rotada_onayli_alternatif_is_merkezleri_tanimlidir_tek_tikla_veya_otomatik_is_aktarilir",
+          "label": "Evet; rotada 1. ve 2. alternatif tezgâhlar tanımlıdır; darboğaz sıkışınca iş emri alternatif kaynağa kolayca atanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "alternatif_makine_atamasi_sistemde_rotayi_ve_sureleri_bastandegistirerek_manuel_yapilir",
+          "label": "Otomatik alternatif yoktur; planlamacı iş emrini silip yeni rotayla baştan açmak zorunda kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "alternatif_is_merkezi_yonetimi_bulunmamaktadir",
+          "label": "Alternatif iş merkezi yönetimi bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-037",
+      "process": "Setup / Changeover Etkisi",
+      "order": 37,
+      "question": "Makinelerdeki Kalıp Değişimi, Renk Değişimi, Ebat Ayarı ve Temizlik (Setup / Changeover) süreleri üretim çizelgelemesinde dikkate alınmakta mıdır?",
+      "description": "Setup süreleri, kalıp değişimi, hat duruş süreleri ve hazırlık maliyeti etkisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "her_is_icin_standart_setup_sureleri_rotada_tanimlidir_ve_hat_kapasitesinden_otomatik_duser",
+          "label": "Evet; kalıp veya ayar değişim süreleri rotada tanımlıdır ve planlanan üretim süresine net olarak eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "setup_sureleri_ayri_tutulmaz_parca_basi_cevrim_suresinin_icine_yedirilir",
+          "label": "Setup ayrı süre olarak tutulmaz; parça başı üretim süresi biraz yüksek tutularak setup içinde eritilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "setup_sureleri_planlamada_dikkate_alinmamaktadir",
+          "label": "Setup ve kalıp değişim süreleri planlamada dikkate alınmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-038",
+      "process": "Setup / Changeover Etkisi",
+      "order": 38,
+      "question": "Setup sürelerini ve firelerini en aza indirmek için benzer ürünlerin ardışık üretilmesini sağlayan Sıralama Optimizasyonu (Sequence-Dependent Setup / Matris Planlama — Örn. Açık renkten koyu renge, inceden kalına, aynı kalıptaki işlerin gruplanması) uygulanmakta mıdır?",
+      "description": "Sıraya bağlı setup matrisleri (Sequence-dependent setup matrix), parti gruplama ve kalıp optimizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "benzer_urunler_kalip_renk_ebat_kriterine_gore_gruplanarak_ardisik_siraya_dizilir_setup_minimize_edilir",
+          "label": "Evet; sistem veya planlamacı aynı kalıbı kullanan işleri bir araya toplayarak gereksiz kalıp sökme-takmayı engeller",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "isler_sadece_musteri_terminine_gore_siralanir_setup_kayiplari_onemsenmez",
+          "label": "Gruplama yapılmaz; sipariş teslim tarihi hangisi önceyse o üretilir, gün içinde defalarca kalıp değiştirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "siralama_optimizasyonu_uygulanmamaktadir",
+          "label": "Sıralama optimizasyonu veya setup matrisi uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-039",
+      "process": "Malzeme Eksikliği Yönetimi",
+      "order": 39,
+      "question": "Bir iş emri üretime verilmeden önce reçetesindeki tüm hammadde ve yarı mamullerin ambarda tam olarak mevcut olup olmadığını gösteren Malzeme Hazır Bulunurluk / Eksik Malzeme Kontrolü (Material Availability Check / Shortage Analysis) yapılmakta mıdır?",
+      "description": "Malzeme eksikliği analizi (Shortage List), kritik parça kontrolü ve eksik malzeme ile üretime başlamanın engellenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_is_emri_oncesinde_eksik_malzeme_kontrolu_yapar_eksik_varsa_uyarir_veya_is_emrini_bloke_eder",
+          "label": "Evet; tüm bileşenler ambarda hazır olmadan iş emrinin sahaya serbest bırakılmasına (Release) izin verilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "malzeme_kontrolu_ambara_sozlu_sorularak_yapilir_eksik_parca_oldugu_cogu_zaman_uretim_ortasinda_anlasilir",
+          "label": "Sistemik kontrol yoktur; iş başlar, montaj sırasında bir civatanın veya parçanın eksik olduğu anlaşılınca hat durur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "malzeme_eksikligi_kontrolu_yapilmamaktadir",
+          "label": "Malzeme hazır bulunurluk kontrolü yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-040",
+      "process": "Malzeme Eksikliği Yönetimi",
+      "order": 40,
+      "question": "Eksik malzemesi olan iş emirlerinin, ilgili satın alma siparişi depoya girdiği an otomatik olarak 'Üretime Hazır' durumuna geçirilmesi ve planlamacıya bildirim verilmesi sağlanmakta mıdır?",
+      "description": "Eksik malzeme tamamlama bildirimi (Shortage Release Trigger) ve beklemedeki iş emirlerinin otomatik uyanması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "eksik_parca_depoya_girdigi_an_bekleyen_is_emirleri_sistemde_otomatik_uretime_hazir_statu_alir",
+          "label": "Evet; mal kabul yapıldığı anda o parçayı bekleyen tüm planlı iş emirleri yeşile döner ve planlamacı uyarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "malzemenin_geldigi_manuel_takip_edilir_depocu_veya_satinalmaci_planlamaciya_sozlu_haber_verir",
+          "label": "Sistemik tetik yoktur; depocu planlamacıya 'Beklediğin hammadde geldi' derse işleme başlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eksik_malzeme_otomatik_bildirimi_bulunmamaktadir",
+          "label": "Eksik malzeme otomatik bildirim mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-041",
+      "process": "Planlı Üretim Emirleri",
+      "order": 41,
+      "question": "MRP sonucunda oluşan Planlı Üretim Emirleri (Planned Orders / Üretim Önerileri) planlamacı tarafından incelenip onaylanarak kesinleşmiş Üretim Emrine (Firm / Released Work Order) nasıl dönüştürülmektedir?",
+      "description": "Planlı emir (Planned Order) yaşam döngüsü, planlama onay kokpiti ve kesinleştirme (Order Firming).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "planlamaci_mrp_ekraninda_planli_emirleri_gorur_toplu_veya_tek_tek_onaylayarak_kesin_is_emrine_donusturur",
+          "label": "Evet; planlama kokpitinde öneriler incelenir, kapasite ve malzeme teyidiyle tek tıkla kesin iş emri yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planli_emir_kavrami_yoktur_mrp_veya_planlamaci_dogrudan_kesin_is_emri_acar",
+          "label": "Planlı emir aşaması yoktur; sisteme girilen her talep doğrudan kesin iş emri olarak oluşur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emirleri_sistem_disinda_excel_veya_kagit_uzerinde_acilir",
+          "label": "Sistemde iş emri açılmaz; matbu kağıt veya Excel iş dağıtım formu doldurularak sahaya verilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-042",
+      "process": "Planlı Üretim Emirleri",
+      "order": 42,
+      "question": "Bir planlı emir kesin iş emrine dönüştürüldüğü anda gereken hammadde ve yarı mamul stokları o iş emri için sistemde rezerve edilip başka işlerin kullanımına kapatılmakta mıdır?",
+      "description": "Sert/Yumuşak Stok Rezervasyonu (Hard / Soft Allocation) ve malzeme çakışmasının engellenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "is_emri_kesinlestigi_an_malzemeler_stokta_rezerve_edilir_baska_is_emri_o_malzemeyi_kullanamaz",
+          "label": "Evet; iş emri açılınca hammadde stoğu o iş emrine rezerve olur (Tahsis), fiili sarf olmasa bile başkası çekemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "rezervasyon_yapilmaz_ambara_ilk_giden_usta_malzemeyi_alir_sonraki_is_emri_malzemesiz_kalir",
+          "label": "Sistemik rezervasyon yoktur; rafta malzeme varsa ilk başlayan iş emri kullanır, diğeri açıkta kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "stok_rezervasyonu_kullanilmamaktadir",
+          "label": "Stok rezervasyon mekanizması kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-043",
+      "process": "Önceliklendirme ve Yeniden Planlama",
+      "order": 43,
+      "question": "Acil bir müşteri siparişi geldiğinde, kritik bir makine arızalandığında veya hammadde geciktiğinde üretim planının Dinamik Olarak Yeniden Çizelgelenmesi (Dynamic Replanning / Rescheduling) nasıl yönetilmektedir?",
+      "description": "Yeniden planlama kuralları, öncelik değiştirme (Priority dispatching), etki analizi ve acil araya iş sokma.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_guncel_ariza_veya_oncelige_gore_etkilenen_tum_isleri_otomatik_yeniden_cizelgeler_ve_uyari_verir",
+          "label": "Evet; makine arızası veya acil sipariş girildiğinde sistem kalan işlerin terminlerini dinamik olarak yeniden hesaplar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planlamaci_excel_uzerinde_tum_cizelgeyi_bastan_manuel_kaydirarak_revize_eder",
+          "label": "Otomatik yeniden planlama yoktur; planlamacı Excel tablosunu açıp saatlerce tüm işleri tek tek elle kaydırır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "plan_revize_edilmez_sahada_ustabasi_kendi_inisiyatifiyle_islerin_sirasini_degistirir",
+          "label": "Plan revize edilmez; atölyede ustabaşı telefonla gelen talimata göre işlerin sırasını sahada anlık değiştirir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "PRD-044",
+      "process": "Üretim Planlama KPI",
+      "order": 44,
+      "question": "Fabrikanızda Üretim Planına Uyum Oranı (Plan Adherence / Schedule Adherence), Kapasite Kullanım Oranı (Capacity Utilization), Malzeme Eksikliği Kaynaklı Duruş Sayısı ve Planlanan vs Gerçekleşen Bitiş Tarihi metrikleri düzenli ölçülmekte midir?",
+      "description": "Planlama performans göstergeleri (Plan Adherence, OEE Kapasite Faktörü, Shortage Sayısı, Backlog).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "plana_uyum_orani_kapasite_kullanimi_ve_gecikme_metrikleri_sistemden_canli_kpi_panosuyla_izlenir",
+          "label": "Evet; planlanan ile gerçekleşen teslim tarihi uyumu (%), hat kapasite doluluğu ve backlog metrikleri sistemden raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_toplantilarda_bazi_kpi_lar_excel_tablolarindan_manuel_derlenerek_sunulur",
+          "label": "Canlı takip yoktur; ay sonlarında planlama sorumlusu Excel verilerini toparlayarak yönetime uyum yüzdesi sunar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_planlama_kpi_lari_olculmemektedir",
+          "label": "Üretim planlama performans göstergeleri veya plana uyum oranı ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1561 @@
+{
+  "meta": {
+    "pack_id": "tr.supplier_management.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "SUPPLIER_MANAGEMENT",
+    "name": "Tedarikçi Yönetimi Ön Analizi",
+    "description": "Tedarikçi ana veri yapısı ve de-duplication, aday tedarikçi yönetimi ve portal ön başvuruları, tedarikçi açılış yetkileri ve zorunlu evrak kontrolleri, departmanlar arası tedarikçi onay iş akışları, onaylı tedarikçi listesi (AVL) ve satın alma kısıtlamaları, tedarikçi sınıflandırması ve kademelendirme (Tier 1/Tier 2), ürün/hizmet kategori yetkinliği ve kapasite takibi, alternatif tedarikçi yönetimi ve çift kaynak politikası (Dual Sourcing), kritik ve stratejik tedarikçi yönetimi (QBR), tek kaynak (Single Source) ve tedarikçi harcama konsantrasyon riskleri, kalite sertifikaları ve belge geçerlilik takibi, tedarikçi kalite performansı ve red oranları (PPM), zamanında ve eksiksiz teslimat performansı (OTD/OTIF), ticari performans ve fiyat istikrarı, tedarikçi değerlendirme karnesi (Scorecard) ve siparişe etkisi, finansal/operasyonel tedarikçi risk analizi, tedarikçi blokajı (Vendor Block) ve kara liste mekanizmaları, tedarikçi geliştirme ve düzeltici faaliyetler (SCAR), tedarikçi KPI kokpiti ve SRM vizyonu süreçlerinin AS-IS durumunu ve ERP/SRM gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "SUP-001",
+      "process": "Tedarikçi Ana Veri Yapısı",
+      "order": 1,
+      "question": "Şirketinizde tedarikçi ana veri kayıtları (Unvan, VKN/TCKN, İletişim Kişileri, Banka IBAN, Adres, Para Birimi) hangi sistemde tutulmakta ve nasıl tekilleştirilmektedir?",
+      "description": "Tedarikçi ana veri yönetim sistemi, merkezi sicil standardı ve tekilleştirme yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_erp_sisteminde_tek_ve_standart_tedarikci_karti_olarak_tutulur",
+          "label": "Tüm tedarikçi verileri merkezi ERP sisteminde tekil kayıt olarak açılır ve standart alanlarla yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muhasebe_programinda_cari_kart_olarak_tutulur_satinalma_ayri_liste_tutar",
+          "label": "Muhasebede cari kart vardır; ancak satın alma ekibi tedarikçi iletişim ve banka bilgilerini ayrı Excel'de tutar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ayni_tedarikci_farkli_sube_veya_kodlarla_mukerrer_acilabilmektedir",
+          "label": "Merkezi kural yoktur; aynı firma farklı departmanlar tarafından mükerrer kodlarla açılabilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-002",
+      "process": "Tedarikçi Ana Veri Yapısı",
+      "order": 2,
+      "question": "Tedarikçi açılışında VKN/Vergi Dairesi doğrulaması, e-Fatura mükellefiyet sorgusu ve mükerrer cari kaydı (Duplicate) engelleme kuralları sistemsel olarak işletilmekte midir?",
+      "description": "VKN kontrolü, GİB e-Fatura entegrasyonu ve otomatik mükerrer kart blokajı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "vkn_ve_efatura_mukellefiyeti_gib_uzerinden_otomatik_dogrulanir_mukerrer_engellenir",
+          "label": "Evet; VKN girildiğinde unvan ve e-Fatura durumu GİB'den anlık çekilir, aynı VKN ile ikinci kart açılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "vkn_alani_vardir_ancak_manuel_girilir_mukerrerlik_kontrolu_yapilmaz",
+          "label": "Sistemde VKN alanı vardır fakat otomatik entegrasyon yoktur; mükerrer girişler sistem tarafından engellenmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "vkn_veya_efatura_kontrolu_yapilmamaktadir",
+          "label": "VKN doğrulaması veya e-Fatura sorgulaması yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-003",
+      "process": "Aday Tedarikçi Yönetimi",
+      "order": 3,
+      "question": "Sisteme henüz onaylanmamış yeni tedarikçi adayları (Aday / Potansiyel Tedarikçi) ile resmi onaylı tedarikçiler arasında statü ayrımı bulunmakta mıdır?",
+      "description": "Aday tedarikçi havuzu, statü yaşam döngüsü (Aday -> Değerlendirmede -> Onaylı -> Pasif).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "aday_tedarikci_statu_ayrimi_vardir_onaylanmadan_aktif_karta_donusmez",
+          "label": "Evet; aday tedarikçiler ayrı statüde tutulur, değerlendirme tamamlanmadan resmi tedarikçi statüsüne geçemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ayri_aday_havuzu_yoktur_tum_firmalar_dogrudan_aktif_tedarikci_acilir",
+          "label": "Aday ayrımı yoktur; teklif alınan her firma doğrudan ana sisteme aktif cari/tedarikçi olarak kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aday_tedarikciler_satinalmacilarin_kisisel_notlarinda_veya_excelde_tutulur",
+          "label": "Sistemik havuz yoktur; aday tedarikçiler satın almacıların e-postalarında veya Excel listelerinde tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-004",
+      "process": "Aday Tedarikçi Yönetimi",
+      "order": 4,
+      "question": "Yeni aday tedarikçilerin kendi kurumsal bilgilerini, sertifikalarını, kataloglarını ve ön tekliflerini sisteme girebildiği bir Tedarikçi Portalı / Ön Başvuru Formu kullanılmakta mıdır?",
+      "description": "Tedarikçi self-servis portalı, online başvuru ve belge yükleme altyapısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "online_tedarikci_portali_uzerinden_self_servis_basvuru_ve_belge_yukleme_aktif",
+          "label": "Evet; tedarikçiler web portalından şirket bilgilerini, sertifikalarını ve banka hesaplarını kendileri yükler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "bilgiler_eposta_ile_alinir_sirket_personeli_tarafindan_sisteme_girilir",
+          "label": "Portal yoktur; tedarikçi evrakları e-posta ile gönderir, satın alma personeli bilgileri elle sisteme kaydeder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_on_basvuru_formu_veya_portali_bulunmamaktadir",
+          "label": "Ön başvuru formu veya tedarikçi portalı bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-005",
+      "process": "Tedarikçi Açılış Süreci",
+      "order": 5,
+      "question": "Şirketinizde yeni bir tedarikçi kartı açma yetkisi hangi departman/role (Satın Alma Uzmanı, Satın Alma Müdürü, Muhasebe/Finans, Kalite Birimi) aittir?",
+      "description": "Tedarikçi kartı açılış yetki matrisi ve rol bazlı güvenlik.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yalnizca_yetkili_merkezi_veri_yoneticisi_veya_finans_tarafindan_acilir",
+          "label": "Yetki sınırlandırılmıştır; yalnızca Satın Alma Müdürü onayı sonrası Muhasebe/Master Data ekibi açabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satinalma_uzmanlari_ihtiyac_duydukca_serbestce_tedarikci_acabilir",
+          "label": "Tüm satın alma uzmanları sisteme serbestçe yeni tedarikçi kartı tanımlayabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "herkes_tedarikci_acabilir_yetki_kisitlamasi_yoktur",
+          "label": "Sistemde kısıtlama yoktur; teklif veya fatura giren herhangi bir kullanıcı tedarikçi açabilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-006",
+      "process": "Tedarikçi Açılış Süreci",
+      "order": 6,
+      "question": "Tedarikçi açılışında zorunlu yasal/ticari evraklar (Vergi Levhası, İmza Sirküleri, Ticaret Sicil Gazetesi, Banka Teyit Yazısı / Kaşeli Hesap Cüzdanı) eksiksiz toplanmadan kart açılışına izin verilmekte midir?",
+      "description": "Zorunlu evrak seti denetimi, yasal uyumluluk ve banka hesap teyidi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "zorunlu_evraklar_sisteme_yuklenmeden_tedarikci_karti_onaylanamaz_ve_kullanilamaz",
+          "label": "Evet; vergi levhası, imza sirküleri ve banka teyit yazısı eklenmeden sistem kartın açılmasına izin vermez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "evraklar_fiziki_dosyada_tutulur_sistemde_zorunlu_evrak_kontrolu_yoktur",
+          "label": "Evraklar klasörde arşivlenir fakat sisteme yükleme zorunluluğu yoktur; evraksız da kart açılabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_acilisi_icin_resmi_evrak_toplanmamaktadir",
+          "label": "Resmi evrak toplanmadan yalnızca unvan ve telefon bilgisiyle tedarikçi açılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-007",
+      "process": "Tedarikçi Onay Süreci",
+      "order": 7,
+      "question": "Yeni bir tedarikçi ile çalışmaya başlamadan önce departmanlar arası (Satın Alma, Kalite Güvence, Finans/Muhasebe, Genel Müdürlük) resmi bir Tedarikçi Onay İş Akışı (Onboarding Approval Workflow) işletilmekte midir?",
+      "description": "Tedarikçi onay iş akışı, çok departmanlı onay zinciri ve denetim izi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_uzerinden_cok_kademeli_satinalma_kalite_ve_finans_onay_is_akisi_vardir",
+          "label": "Evet; Satın Alma -> Kalite Güvence -> Finans Müdürü onayından geçerek onaylı duruma gelir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_satinalma_yoneticisi_sozlu_veya_eposta_ile_onay_verir",
+          "label": "Sistemik onay yoktur; Satın Alma Müdürü sözlü veya e-posta ile 'Çalışalım' derse kart açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onay_sureci_yoktur_tedarikci_hemen_kullanima_acilir",
+          "label": "Herhangi bir onay süreci yoktur; kart açıldığı an herkes tarafından sipariş için kullanılabilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-008",
+      "process": "Tedarikçi Onay Süreci",
+      "order": 8,
+      "question": "Onay süreci tamamlanmamış veya onay bekleyen bir tedarikçiye sistem üzerinden Satın Alma Siparişi (PO) açılması veya avans/ödeme yapılması engellenmekte midir?",
+      "description": "Onaysız tedarikçiye sipariş ve ödeme blokajı, sistemsel yaptırım.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "onaysiz_tedarikciye_siparis_veya_odeme_acilmasi_sistem_tarafindan_kesinlikle_engellenir",
+          "label": "Evet; onay süreci bitmemiş tedarikçi sipariş veya ödeme ekranlarında seçilemez, sistem blokaj koyar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistem_uyari_verir_ancak_kullanici_uyariyi_gecip_siparis_acabilir",
+          "label": "Sistem 'Tedarikçi onaylanmadı' uyarısı gösterir fakat sipariş veya ödeme açılmasını engellemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onay_durumu_kontrol_edilmez_her_tedarikciye_siparis_acilabilir",
+          "label": "Sistemde onay kontrolü yoktur; onay almamış tedarikçilere de doğrudan sipariş ve ödeme çıkılabilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-009",
+      "process": "Onaylı Tedarikçi Listesi",
+      "order": 9,
+      "question": "Şirket genelinde ve malzeme/kategori bazında güncel bir Onaylı Tedarikçi Listesi (Approved Vendor List - AVL) yönetilmekte midir?",
+      "description": "Onaylı tedarikçi listesi (AVL), şirket ve malzeme bazlı tedarikçi uygunluk listesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "malzeme_ve_kategori_bazinda_dinamik_onayli_tedarikci_listesi_yonetilir",
+          "label": "Evet; hangi tedarikçinin hangi malzeme veya hizmet grubu için onaylı olduğu sistemde tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sirket_genelinde_tek_bir_genel_onayli_tedarikci_listesi_vardir",
+          "label": "Kategori/malzeme bazlı ayrım yoktur; şirket genelinde onaylı firmaların yer aldığı tek bir liste vardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "onayli_tedarikci_listesi_kullanilmamaktadir",
+          "label": "Şirketimizde resmi bir Onaylı Tedarikçi Listesi (AVL) uygulaması bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-010",
+      "process": "Onaylı Tedarikçi Listesi",
+      "order": 10,
+      "question": "Satın alma talebi (Requisition) ve sipariş oluşturulurken onaylı listede (AVL) yer almayan tedarikçilerin seçilmesi sistemik olarak kısıtlanmakta mıdır?",
+      "description": "AVL dışı alım kontrolü, liste harici tedarikçi engeli veya özel onay kuralı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "SUP-009",
+        "operator": "not_equals",
+        "value": "onayli_tedarikci_listesi_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "yalnizca_avl_listesindeki_onayli_tedarikciler_secilebilir_digerleri_engellenir",
+          "label": "Evet; malzeme seçildiğinde yalnızca o malzemenin onaylı tedarikçileri gelir, liste dışı alım engellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "avl_disi_tedarikci_icin_ust_yonetim_ozel_onayi_gerekir",
+          "label": "Liste dışı tedarikçi seçilebilir ancak siparişin onaylanması için Satın Alma Direktörü onayı gerekir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemik_kisitlama_yoktur_kullanici_istedigi_tedarikciyi_secebilir",
+          "label": "AVL listesi sadece bilgi amaçlıdır; sipariş oluştururken kullanıcı istediği tedarikçiyi seçebilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-011",
+      "process": "Tedarikçi Sınıflandırması",
+      "order": 11,
+      "question": "Tedarikçiler kurumsal yapılarına (Üretici/Fabrika, Yetkili Distribütör, Toptancı/Bayi, Hizmet/Taşeron Sağlayıcı, İthalatçı) ve lokasyonlarına (Yerli, İthal, Serbest Bölge) göre sınıflandırılmakta mıdır?",
+      "description": "Tedarikçi tipolojisi, kurumsal rolü, yerli/yabancı statüsü ve sınıflandırma yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "uretici_distributor_hizmet_ve_lokasyon_bazinda_detayli_siniflandirilir",
+          "label": "Evet; üretici, ana dağıtıcı, bayi, taşeron ve yerli/ithal kırılımları tedarikçi kartında zorunlu tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_yerli_ve_yabanci_tedarikci_ayrimi_yapilir",
+          "label": "Yalnızca yurt içi ve yurt dışı ayrımı yapılır; üretici veya aracı ayrımı tutulmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_siniflandirmasi_yapilmamaktadir",
+          "label": "Tedarikçiler sınıflandırılmamaktadır; tüm tedarikçiler tek tip firma olarak açılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-012",
+      "process": "Tedarikçi Sınıflandırması",
+      "order": 12,
+      "question": "Tedarikçilerin ticari büyüklük, yıllık satın alma hacmi ve kurumsal risk düzeyine göre kademelendirilmesi (Tier 1 - Ana Tedarikçi, Tier 2 - Alt Tedarikçi) yapılmakta mıdır?",
+      "description": "Tedarikçi kademelendirmesi (Tiering), stratejik önem derecesi ve tedarik zinciri seviyesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tier1_ve_tier2_seviyeleri_ve_stratejik_onem_kademesi_sistemde_tanimlidir",
+          "label": "Evet; Tier 1 (Doğrudan ana girdi sağlayanlar) ve Tier 2 (Alt bileşen tedarikçileri) kademeleri tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_satin_alma_harcama_tutarlarina_gore_abc_analizi_yapilir",
+          "label": "Tiering yapılmaz; yalnızca harcama büyüklüğüne göre A-B-C sınıfı tedarikçi ayrımı yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kademelendirme_veya_tiering_yapilmamaktadir",
+          "label": "Tedarikçi kademelendirmesi veya önem derecelendirmesi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-013",
+      "process": "Ürün / Hizmet / Kategori Yetkinliği",
+      "order": 13,
+      "question": "Tedarikçiler tedarik edebilecekleri malzeme grupları ve hizmet kategorileri (Örn. Mekanik Parçalar, Kimyasal Hammadde, Ambalaj, Nakliye Hizmeti) ile sistemde eşleştirilmekte midir?",
+      "description": "Tedarikçi yetkinlik matrisi, kategori eşleştirmesi ve ürün grubu uzmanlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tedarikciler_yetkin_olduklari_malzeme_ve_hizmet_gruplariyla_birebir_eslesir",
+          "label": "Evet; her tedarikçinin hangi ürün gruplarını sağlayabileceği sistemde tanımlıdır, RFQ buna göre dağıtılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "genel_sektor_tanimi_vardir_ancak_malzeme_kodu_duzeyinde_eslesme_yoktur",
+          "label": "Tedarikçinin genel sektörü bilinir fakat hangi spesifik malzemeleri sağlayabildiği sistemde eşleştirilmemiştir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kategori_veya_urun_yetkinlik_eslestirmesi_yapilmamaktadir",
+          "label": "Tedarikçiler ürün kategorileriyle eşleştirilmez; satın almacılar hafızalarına göre teklif ister",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-014",
+      "process": "Ürün / Hizmet / Kategori Yetkinliği",
+      "order": 14,
+      "question": "Tedarikçilerin belirli ürün veya parça bazında teknik üretim kabiliyeti, makine parkuru, kapasite sınırı ve asgari sipariş miktarı (MOQ) verileri sistemde kayıt altına alınmakta mıdır?",
+      "description": "Tedarikçi teknik kapasitesi, makine parkuru, MOQ ve üretim kısıtları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "teknik_kapasite_makine_parkuru_ve_moq_bilgileri_sistemde_detayli_saklanir",
+          "label": "Evet; tedarikçinin aylık üretim kapasitesi, asgari sipariş miktarı (MOQ) ve tolerans limitleri kayıtlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_sozlesmelerde_veya_teklif_metinlerinde_yazar_sistemik_alan_yoktur",
+          "label": "Teklif dosyalarında veya sözleşmede yazar; ERP üzerinde yapısal kapasite veya MOQ alanı tutulmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_kapasite_ve_moq_verileri_takip_edilmemektedir",
+          "label": "Tedarikçi teknik kapasitesi ve sipariş kısıtları takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-015",
+      "process": "Alternatif Tedarikçi Yönetimi",
+      "order": 15,
+      "question": "Kritik malzeme ve hizmetler için sistemde birincil tedarikçi (Primary Source) yanında tanımlanmış Alternatif Tedarikçiler (Second Source / Yedek Tedarikçi) bulunmakta mıdır?",
+      "description": "Alternatif tedarikçi tanımları, çoklu kaynak yönetimi (Multi-Sourcing) ve tedarik sürekliliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "her_kritik_malzeme_icin_onayli_birincil_ve_ikincil_alternatif_tedarikciler_tanimlidir",
+          "label": "Evet; her kritik malzeme kartında 1. Tercih Edilen (Primary) ve 2. Yedek (Secondary) tedarikçiler tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "alternatif_firmalar_vardir_ancak_sistemde_onceden_tanimlanmaz_kriz_aninda_aranir",
+          "label": "Piyasada alternatifler bilinir fakat sistemde bağlı değildir; ana tedarikçi aksadığında manuel araştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "alternatif_tedarikci_yonetimi_yoktur_tek_kaynakla_calisilir",
+          "label": "Şirketimizde alternatif tedarikçi politikası yoktur; çoğu malzeme için tek tedarikçiyle çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-016",
+      "process": "Alternatif Tedarikçi Yönetimi",
+      "order": 16,
+      "question": "Alternatif tedarikçi dağıtımında çoklu tedarik politikası (Dual Sourcing — Örn. %70 Ana Tedarikçi / %30 Yedek Tedarikçi kota paylaşımı) uygulanmakta mıdır?",
+      "description": "Kota paylaşımı (Split Order / Dual Sourcing), risk dağıtımı ve tedarikçi canlı tutma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "SUP-015",
+        "operator": "not_equals",
+        "value": "alternatif_tedarikci_yonetimi_yoktur_tek_kaynakla_calisilir"
+      },
+      "options": [
+        {
+          "value": "dual_sourcing_kota_oranlarina_gore_siparisler_otomatik_paylastirilir",
+          "label": "Evet; tedarik riskini azaltmak için siparişler %70/%30 veya %80/%20 gibi kotalarla iki tedarikçiye paylaştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiyat_veya_vade_avantajina_gore_manuel_olarak_biri_tercih_edilir",
+          "label": "Kota kuralı yoktur; o anki fiyat, stok durumu veya satın almacının tercihine göre biri seçilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kota_veya_dual_sourcing_kullanilmamaktadir",
+          "label": "Kota paylaşımı veya Dual Sourcing politikası uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-017",
+      "process": "Kritik ve Stratejik Tedarikçiler",
+      "order": 17,
+      "question": "Şirketinizin üretimini, operasyonunu veya nihai ürün kalitesini doğrudan durdurabilecek Kritik ve Stratejik Tedarikçiler (Strategic Suppliers) sistemde ayrı bir statüde izlenmekte midir?",
+      "description": "Stratejik tedarikçi ayrımı, kritiklik matrisi ve özel yönetim statüsü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kritik_ve_stratejik_tedarikciler_sistemde_etiketlenmis_ve_ozel_takip_edilir",
+          "label": "Evet; iş sürekliliği açısından kritik olan firmalar sistemde işaretlidir, özel risk ve performans kurallarına tabidir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yonetim_tarafindan_sozlu_bilinir_ancak_sistemde_ayri_bir_statu_yoktur",
+          "label": "Kimin kritik olduğu tecrübeyle bilinir fakat sistemde standart bir etiket veya filtreleme alanı yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kritik_tedarikci_ayrimi_yapilmamaktadir",
+          "label": "Kritik veya stratejik tedarikçi ayrımı yapılmamaktadır; tüm tedarikçilere aynı kurallar uygulanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-018",
+      "process": "Kritik ve Stratejik Tedarikçiler",
+      "order": 18,
+      "question": "Stratejik tedarikçiler ile dönemsel üst düzey iş ortaklığı toplantıları (QBR - Quarterly Business Review) yapılmakta ve ortak iyileştirme hedefleri belirlenmekte midir?",
+      "description": "Stratejik tedarikçi inceleme toplantıları (QBR), ortak inovasyon ve iş birliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "duzenli_ceyrek_donem_qbr_toplantilari_yapilir_ve_aksiyonlar_takip_edilir",
+          "label": "Evet; stratejik tedarikçilerle çeyreklik değerlendirme yapılır, kapasite ve maliyet hedefleri resmi tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_ciddi_kriz_veya_fiyat_artisi_oldugunda_ust_duzey_gorusulur",
+          "label": "Planlı periyot yoktur; sadece teslimat aksadığında veya büyük fiyat zammı geldiğinde toplantı yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "stratejik_is_ortakligi_toplantilari_yapilmamaktadir",
+          "label": "Stratejik tedarikçi toplantıları veya ortak iş birliği çalışmaları yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-019",
+      "process": "Tek Kaynak / Bağımlılık Riski",
+      "order": 19,
+      "question": "Şirketinizde piyasada alternatifi bulunmayan veya tek bir tedarikçiye bağımlı olunan Tek Kaynaklı (Single Source / Sole Source) malzemeler ve bağımlılık oranları takip edilmekte midir?",
+      "description": "Tek kaynak (Single/Sole Source) malzeme envanteri ve bağımlılık analizi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tek_kaynakli_malzemeler_ve_bagimlilik_oranlari_sistemden_raporlanabilir",
+          "label": "Evet; alternatifsiz tek kaynaklı malzemeler sistemde etiketlidir, tedarik riski düzenli olarak izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_kaynakli_urunler_bilinir_ancak_resmi_bir_risk_takibi_yapilmaz",
+          "label": "Ürünlerin tek kaynaklı olduğu bilinir fakat sistemik raporlanmaz, alternatif geliştirme planı yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_kaynak_bagimlilik_takibi_yapilmamaktadir",
+          "label": "Tek kaynak bağımlılık durumu veya risk analizi takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-020",
+      "process": "Tek Kaynak / Bağımlılık Riski",
+      "order": 20,
+      "question": "Şirketin toplam satın alma bütçesinin belirli bir tedarikçide aşırı yoğunlaşması (Tedarikçi Konsantrasyon Riski — Örn. Yıllık cironun %40'ının tek firmadan alınması) izlenmekte ve raporlanmakta mıdır?",
+      "description": "Harcama yoğunlaşması, tedarikçi ciro payı ve konsantrasyon riski.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "harcama_konsantrasyon_oranlari_ve_tedarikci_finansal_bagimliligi_olculur",
+          "label": "Evet; satın alma hacminin tedarikçilere dağılımı analiz edilir, tek firmada aşırı yoğunlaşma risk sayılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yil_sonlarinda_muhasebe_ekstresinden_manuel_gorulur_risk_olarak_degerlendirilmez",
+          "label": "Yıl sonunda toplam ödemelere bakılır fakat tedarik zinciri riski olarak analiz edilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_konsantrasyon_riski_takip_edilmemektedir",
+          "label": "Tedarikçi konsantrasyon riski takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-021",
+      "process": "Tedarikçi Belge ve Sertifikaları",
+      "order": 21,
+      "question": "Tedarikçilerin kalite sertifikaları (ISO 9001, ISO 14001, IATF 16949, CE, TSE, Helal vb.) ve sektörel yetki belgeleri sistemde geçerlilik tarihleriyle (Expiry Date) saklanmakta mıdır?",
+      "description": "Tedarikçi kalite sertifikaları, yasal yetki belgeleri ve geçerlilik tarihleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_sertifikalar_belge_tipi_ve_gecerlilik_bitis_tarihiyle_sistemde_tutulur",
+          "label": "Evet; sertifika adı, belgelendirme kuruluşu ve geçerlilik bitiş tarihi sistemde dijital dosyasıyla saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "belgeler_klasorde_veya_taranmis_pdf_olarak_tutulur_tarih_takibi_yoktur",
+          "label": "Belge fotokopileri veya PDF'leri arşivdedir fakat sistemde bitiş tarihi ve süre takibi yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sertifika_ve_belgeler_sistemde_takip_edilmemektedir",
+          "label": "Tedarikçi sertifikaları veya belge geçerlilikleri takip edilmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-022",
+      "process": "Tedarikçi Belge ve Sertifikaları",
+      "order": 22,
+      "question": "Belge geçerlilik süresi dolmak üzere olan tedarikçiler için otomatik uyarı üretilmekte ve süresi dolmuş zorunlu sertifikası olan tedarikçiden satın alma bloke edilmekte midir?",
+      "description": "Sertifika bitiş alarmları, otomatik uyarılar ve süresi dolan sertifikada sipariş blokajı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "SUP-021",
+        "operator": "not_equals",
+        "value": "sertifika_ve_belgeler_sistemde_takip_edilmemektedir"
+      },
+      "options": [
+        {
+          "value": "suresi_dolmadan_30_gun_once_uyari_verilir_ve_dolunca_siparis_otomatik_engellenir",
+          "label": "Evet; bitime 30 gün kala bildirim gönderilir, süresi dolan zorunlu belgeli tedarikçiye sipariş açılması kilitlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_eposta_ile_uyari_gider_ancak_satinalma_islemi_engellenmez",
+          "label": "Kaliteye veya satın almacıya e-posta uyarısı gider fakat sistemik satın alma engeli uygulanmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "otomatik_uyari_veya_blokaj_bulunmamaktadir",
+          "label": "Otomatik uyarı veya satın alma blokaj mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-023",
+      "process": "Tedarikçi Kalite Performansı",
+      "order": 23,
+      "question": "Giriş kalite kontrolde veya üretim hattında tespit edilen tedarikçi kaynaklı hatalı/uygunsuz malzemeler (Kalite Red Oranı / PPM / Hurda Oranı) tedarikçi kartıyla eşleştirilerek ölçülmekte midir?",
+      "description": "Tedarikçi kalite performansı, giriş red oranı, üretim içi hata oranı (PPM) ve uygunsuzluklar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kalite_redleri_ve_ppm_oranlari_tedarikci_bazinda_sistemden_otomatik_hesaplanir",
+          "label": "Evet; kalite kontrol redleri ve hat içi uygunsuzluklar tedarikçiyle eşleşir, PPM ve red oranı hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_birimi_aylik_excel_raporu_hazirlar_satinalma_ile_manuel_paylasir",
+          "label": "Sistemde otomatik entegrasyon yoktur; kalite ekibi red kayıtlarını Excel'de tutar ve satın almaya bildirir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_kalite_performansi_sistemik_olculmemektedir",
+          "label": "Tedarikçi kalite performansı veya hata oranları sayısal olarak ölçülmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-024",
+      "process": "Tedarikçi Kalite Performansı",
+      "order": 24,
+      "question": "Tedarikçiye yapılan hatalı malzeme iadeleri (RMA / Tedarikçi İade Faturası) ve oluşan işçilik/hat duruşu zararlarının tedarikçiye rücu edilmesi (Debit Note / Ceza Faturası) sistemde takip edilmekte midir?",
+      "description": "Hatalı malzeme iade süreci, maliyet rücu mekanizması ve tedarikçi ceza yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "iade_ve_zarar_rucu_surecleri_kalite_ve_muhasebe_ile_tam_entegre_yonetilir",
+          "label": "Evet; reddedilen parti iade edilir, oluşan duruş maliyeti tedarikçiye rücu edilerek cari hesabından kesilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_fiziki_malzeme_iadesi_yapilir_ek_maliyetler_rucu_edilmez",
+          "label": "Sadece hatalı parça iade faturası kesilir; hat duruşu veya işçilik kaybı gibi ek zararlar takip edilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iade_veya_maliyet_rucu_takibi_yapilamamaktadir",
+          "label": "İade süreçleri veya maliyet rücu mekanizması takip edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-025",
+      "process": "Teslimat Performansı",
+      "order": 25,
+      "question": "Tedarikçilerin sipariş teyit tarihine göre Zamanında Teslimat Oranı (On-Time Delivery - OTD) ve Eksiksiz Teslimat (OTIF - On-Time In-Full) performansı sistem tarafından otomatik hesaplanmakta mıdır?",
+      "description": "Zamanında teslimat (OTD), eksiksiz teslimat (OTIF) ve tedarik lojistik performansı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "otd_ve_otif_oranlari_siparis_ve_irsaliye_tarihleriyle_sistemden_canli_hesaplanir",
+          "label": "Evet; sipariş onay tarihi ile depo mal kabul tarihi kıyaslanır, OTD ve OTIF oranları otomatik üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satinalma_ekibi_donem_sonlarinda_gecikmeleri_manuel_olarak_raporlar",
+          "label": "Sistemik oran üretilmez; satın almacılar geciken siparişleri Excel'de manuel listeleyerek değerlendirir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "zamaninda_ve_eksiksiz_teslimat_orani_takip_edilmemektedir",
+          "label": "Tedarikçilerin zamanında veya eksiksiz teslimat performansları ölçülmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-026",
+      "process": "Teslimat Performansı",
+      "order": 26,
+      "question": "Tedarikçinin taahhüt ettiği teslim süresi (Lead Time) ile fiili teslimat gerçekleşme süresi arasındaki termin sapmaları sipariş bazında raporlanabilmekte midir?",
+      "description": "Tedarik süresi (Lead Time) doğruluğu, termin sapma analizi ve erken/geç teslimat takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "lead_time_sapmalari_gun_bazinda_her_siparis_ve_tedarikci_icin_raporlanir",
+          "label": "Evet; taahhüt edilen termin ile gerçekleşen mal kabul günü arasındaki sapma (Erken/Geç teslim) raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_cok_buyuk_gecikmelerde_tedarikciye_manuel_hesap_sorulur",
+          "label": "Sistemik sapma analizi yoktur; sadece fabrika duruşuna sebep olan büyük gecikmelerde uyarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "termin_sapmalari_ve_lead_time_takip_edilmemektedir",
+          "label": "Termin sapmaları veya teslim süresi güvenilirliği takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-027",
+      "process": "Ticari Performans",
+      "order": 27,
+      "question": "Tedarikçilerin fiyat istikrarı, teklif verme hızı, sözleşme şartlarına uyumu ve vade/ödeme kolaylıkları ticari performans kriteri olarak değerlendirilmekte midir?",
+      "description": "Ticari güvenilirlik, fiyat tutarlılığı, teklif yanıt süresi ve vade performansı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "fiyat_istikrari_ve_ticari_sartlara_uyum_sistemde_kriter_olarak_puanlanir",
+          "label": "Evet; teklif verilen fiyat ile gerçekleşen fatura fiyatı uyumu, vade şartları ve teklif hızı puanlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satinalma_ekibi_sozlu_veya_kanaat_uzerinden_ticari_degerlendirme_yapar",
+          "label": "Sayısal kriter yoktur; satın alma uzmanının tedarikçiyle olan genel ilişkisi ve izlenimi esas alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ticari_performans_degerlendirmesi_yapilmamaktadir",
+          "label": "Tedarikçilerin ticari performansı veya fiyat güvenilirliği değerlendirilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-028",
+      "process": "Ticari Performans",
+      "order": 28,
+      "question": "Tedarikçiye verilen toplam satın alma hacmi ve geçmiş fatura tutarları tedarikçi bazında konsolide olarak tek ekranda incelenebilmekte midir?",
+      "description": "Tedarikçi harcama görünürlüğü (Supplier Spend 360), geçmiş sipariş ve fatura konsolidasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tedarikci_360_ekraninda_tum_gecmis_siparis_fatura_ve_harcama_hacmi_gorulur",
+          "label": "Evet; tedarikçi kartından geçmiş siparişler, açık PO'lar, fatura toplamları ve ciro payı tek ekranda izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muhasebeden_ayri_ekstre_satinalmadan_ayri_rapor_cekilerek_birlestirilir",
+          "label": "Tek ekran yoktur; satın alma sipariş raporu ve muhasebe cari ekstresi Excel'de birleştirilerek incelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_harcama_ve_siparis_gecmisi_konsolide_gorulememektedir",
+          "label": "Tedarikçi harcama ve sipariş geçmişi konsolide olarak görülememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-029",
+      "process": "Tedarikçi Değerlendirme / Scorecard",
+      "order": 29,
+      "question": "Tedarikçiler belirli dönemlerde (Aylık, Çeyreklik, Yıllık) ağırlıklı kriterlerle (Kalite %40, Teslimat %30, Fiyat %20, Hizmet %10) resmi bir Tedarikçi Değerlendirme Karnesi (Supplier Scorecard / Puanlama) ile derecelendirilmekte midir?",
+      "description": "Tedarikçi değerlendirme karnesi (Scorecard), çok kriterli ağırlıklı puanlama modeli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_uzerinde_kalite_teslimat_fiyat_ve_hizmet_agirlikli_otomatik_scorecard_calisir",
+          "label": "Evet; ERP içinde kalite, teslimat ve fiyat verileri ağırlıklandırılarak otomatik tedarikçi skoru üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_tablolari_uzerinden_periyodik_olarak_manuel_scorecard_hesaplanir",
+          "label": "Sistemik otomatik karne yoktur; kalite ve satın alma verileri çeyreklik dönemlerde Excel'de puanlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_sorun_yasanan_tedarikciler_icin_durumsal_degerlendirme_yapilir",
+          "label": "Rutin karne yoktur; yalnızca ciddi problem çıkaran tedarikçiler masaya yatırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_degerlendirme_karnesi_kullanilmamaktadir",
+          "label": "Şirketimizde resmi bir tedarikçi değerlendirme veya puanlama sistemi bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-030",
+      "process": "Tedarikçi Değerlendirme / Scorecard",
+      "order": 30,
+      "question": "Tedarikçi puanlama sonuçları (A - Mükemmel, B - Onaylı, C - Şartlı/Geliştirilmeli, D - Yetersiz) satın alma teklif/sipariş ekranlarında satın almacıya gösterilmekte ve sipariş dağıtımını etkilemekte midir?",
+      "description": "Scorecard puanının satın alma kararlarına entegrasyonu ve sipariş payı kuralı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "SUP-029",
+        "operator": "not_equals",
+        "value": "tedarikci_degerlendirme_karnesi_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "scorecard_derecesi_siparis_ekraninda_gorunur_ve_dusuk_puanliya_siparis_engellenir",
+          "label": "Evet; tedarikçi derecesi satın alma ekranında anlık görünür, 'D' alan tedarikçiye onay verilmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "derece_yalnizca_yonetim_raporlarinda_kalir_satinalma_ekranina_yansimaz",
+          "label": "Puanlar raporlanır fakat satın almacının ekranında görünmez; sipariş açarken karar satın almacıdadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "puanlama_sonuclari_satinalma_kararlarini_etkilememektedir",
+          "label": "Puanlama sonuçları satın alma kararlarını etkilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-031",
+      "process": "Tedarikçi Risk Yönetimi",
+      "order": 31,
+      "question": "Tedarikçilerin finansal gücü (İflas/Konkordato riski, Kredi skoru), operasyonel kapasitesi ve jeopolitik/lojistik riskleri düzenli olarak analiz edilmekte midir?",
+      "description": "Tedarikçi risk değerlendirmesi, finansal istihbarat ve operasyonel kırılganlık.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "finansal_kredi_istihbarat_ve_jeopolitik_riskler_sistemde_kategorize_takip_edilir",
+          "label": "Evet; kritik tedarikçilerin finansal istihbarat raporları, borçluluk ve ülke riskleri sisteme kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_piyasa_duyumlari_ve_banka_haberleri_ile_manuel_takip_edilir",
+          "label": "Resmi bir risk analizi yoktur; piyasada olumsuz bir haber duyulduğunda önlem alınmaya çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_risk_analizi_yapilmamaktadir",
+          "label": "Tedarikçilerin finansal veya operasyonel riskleri analiz edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-032",
+      "process": "Tedarikçi Risk Yönetimi",
+      "order": 32,
+      "question": "Yüksek riskli olarak işaretlenen tedarikçiler için erken uyarı bildirimleri üretilmekte ve risk azaltma planları (Risk Mitigation / Alternatif Kaynak Bulma) devreye alınmakta mıdır?",
+      "description": "Risk azaltma planları (Risk Mitigation), erken uyarı mekanizması ve acil durum senaryoları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erken_uyari_bildirimleri_ile_risk_azaltma_ve_yedek_stok_plani_otomatik_tetiklenir",
+          "label": "Evet; tedarikçide risk yükseldiğinde satın almaya bildirim düşer ve güvenlik stoğu/yedek kaynak süreci başlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "risk_fark_edilince_yonetimle_manuel_toplanti_yapilir",
+          "label": "Sistemik erken uyarı yoktur; kriz oluştukça yönetim toplantısıyla alternatif aranır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "risk_azaltma_veya_erken_uyari_mekanizmasi_bulunmamaktadir",
+          "label": "Risk azaltma veya erken uyarı mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-033",
+      "process": "Askıya Alma / Blokaj / Kara Liste",
+      "order": 33,
+      "question": "Düşük performanslı, kalite standartlarını karşılamayan veya ticari uyuşmazlık yaşanan tedarikçiler için Sistemik Blokaj / Askıya Alma (Vendor Block) işlemi yapılabilmekte midir?",
+      "description": "Tedarikçi blokajı, askıya alma ve satın alma kısıtlaması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tedarikci_satinalma_veya_odeme_duzeyinde_sistemden_bloke_edilebilir",
+          "label": "Evet; tedarikçi 'Yeni Sipariş Engeli', 'Mal Kabul Engeli' veya 'Ödeme Blokajı' statüsüne alınabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_adi_pasife_alinir_ancak_eski_siparisler_ve_odemeler_otomatik_kilitlenmez",
+          "label": "Kart pasife alınabilir fakat sistemsel kilit yoktur; açık siparişlerin akışı devam eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemik_tedarikci_blokaji_bulunmamaktadir",
+          "label": "Şirketimizde sistemsel tedarikçi blokajı veya askıya alma mekanizması bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-034",
+      "process": "Askıya Alma / Blokaj / Kara Liste",
+      "order": 34,
+      "question": "Bloke edilen veya kara listeye (Blacklist) alınan tedarikçinin blokaj nedeni, blokajı koyan yetkili ve blokajın kaldırılması için gerekli onay süreci sistemde kurala bağlı mıdır?",
+      "description": "Blokaj neden kütüğü, denetim izi, yetki kontrolü ve blokaj kaldırma onay zinciri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "SUP-033",
+        "operator": "not_equals",
+        "value": "sistemik_tedarikci_blokaji_bulunmamaktadir"
+      },
+      "options": [
+        {
+          "value": "blokaj_nedeni_ve_tarihcesi_zorunlu_kaydedilir_kaldirma_icin_yonetim_onayi_gerekir",
+          "label": "Evet; blokaj nedeni (Kalite, Hukuk, Finans) kayıt altına alınır; kaldırmak için Direktör onayı zorunludur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "blokaj_konulabilir_ancak_herhangi_bir_kullanici_blokaji_kolayca_kaldirabilir",
+          "label": "Blokaj konulabilir fakat kaldırma için yetki kısıtı yoktur; satın almacı blokajı kendisi açabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "blokaj_nedeni_veya_onay_kurallari_tutulmamaktadir",
+          "label": "Blokaj nedeni veya blokaj kaldırma onay kuralları tutulmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-035",
+      "process": "Tedarikçi Geliştirme",
+      "order": 35,
+      "question": "Performansı sınırda veya yetersiz çıkan tedarikçiler için Tedarikçi Düzeltici Faaliyet Talebi (SCAR - Supplier Corrective Action Request) ve Geliştirme Planı (Supplier Development) açılmakta mıdır?",
+      "description": "Tedarikçi düzeltici faaliyetleri (SCAR), 8D metodolojisi ve tedarikçi iyileştirme planı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "resmi_scar_ve_gelistirme_aksiyon_plani_sistem_uzerinden_tedarikciye_iletilir_ve_izlenir",
+          "label": "Evet; uygunsuzluk durumunda SCAR formu açılır, tedarikçinin kök neden analizi ve aksiyonu sistemde izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eposta_ile_uyari_yazisi_gonderilir_aksiyon_takibi_manuel_yapilir",
+          "label": "Sistemik SCAR yoktur; tedarikçiye e-posta ile 'Düzeltin' yazılır, takip satın almacının inisiyatifindedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_duzeltici_faaliyet_ve_gelistirme_yapilmaz",
+          "label": "Tedarikçi geliştirme veya resmi düzeltici faaliyet süreci uygulanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-036",
+      "process": "Tedarikçi Geliştirme",
+      "order": 36,
+      "question": "Tedarikçiye atanan düzeltici faaliyet aksiyonları, saha denetim tarihleri (Supplier Audit) ve terminlerin tamamlanma durumu sistem üzerinden takip edilmekte midir?",
+      "description": "Tedarikçi denetimleri (Supplier Audits), aksiyon terminleri ve yeniden değerlendirme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "SUP-035",
+        "operator": "not_equals",
+        "value": "tedarikci_duzeltici_faaliyet_ve_gelistirme_yapilmaz"
+      },
+      "options": [
+        {
+          "value": "tedarikci_saha_denetimleri_ve_aksiyon_terminleri_sistemde_takvime_bagli_izlenir",
+          "label": "Evet; tedarikçi denetim raporları, aksiyon terminleri ve yeniden puanlama takvim üzerinden yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "denetim_yapilir_ancak_raporlar_word_excelde_kalir_sisteme_islenmez",
+          "label": "Tedarikçi ziyaret edilir fakat denetim puanı ve aksiyonlar sistemde değil, Word/Excel raporlarında kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_denetimleri_ve_aksiyon_terminleri_takip_edilmemektedir",
+          "label": "Tedarikçi denetimleri veya aksiyon terminleri takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-037",
+      "process": "Tedarikçi Raporlama ve KPI",
+      "order": 37,
+      "question": "Şirket genelinde Tedarikçi Zamanında Teslimat Oranı (OTD %), Kalite Red Oranı (PPM) ve Genel Tedarikçi Memnuniyet Puanı canlı dashboardlarda izlenmekte midir?",
+      "description": "Tedarikçi performans gösterge paneli (Supplier KPI Dashboard), OTD ve PPM takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "canli_tedarikci_performans_kokpiti_yonetim_tarafindan_anlik_izlenir",
+          "label": "Evet; OTD %, PPM hata oranları ve genel tedarikçi skorları canlı panellerde anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_veya_ceyrek_donemlerde_manuel_excel_raporlari_hazirlanir",
+          "label": "Canlı panel yoktur; ay sonlarında satın alma ve kalite verileri Excel'de birleştirilerek sunulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_performans_dashboardu_kullanilmamaktadir",
+          "label": "Düzenli bir tedarikçi performans paneli veya KPI takibi bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-038",
+      "process": "Tedarikçi Raporlama ve KPI",
+      "order": 38,
+      "question": "Tek kaynaklı (Single Source) malzeme sayısı, kritik tedarikçi bağımlılık oranı ve süresi dolan sertifika sayısı yönetim raporlarında düzenli sunulmakta mıdır?",
+      "description": "Tedarik zinciri risk KPI'ları (Tek kaynak sayısı, sertifika expiry sayısı, kritik bağımlılık).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tedarik_risk_kpilari_tek_kaynak_ve_sertifika_uyarilari_duzenli_raporlanir",
+          "label": "Evet; alternatifsiz parça adedi, yüksek riskli tedarikçiler ve süresi dolacak belgeler yönetim raporundadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "donem_sonlarinda_manuel_olarak_soruldugunda_cikarilir",
+          "label": "Rutin raporlama yoktur; genel müdürlük veya denetim sorduğunda Excel'den manuel çıkartılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarik_risk_kpilari_raporlanmamaktadir",
+          "label": "Tedarik risk KPI'ları veya sertifika geçerlilikleri raporlanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-039",
+      "process": "Tedarikçi Raporlama ve KPI",
+      "order": 39,
+      "question": "Tedarikçi bazında harcama konsantrasyonu (Spend Analysis — En çok harcama yapılan ilk 10/20 tedarikçi ve kategori payları) sistemden analiz edilebilmekte midir?",
+      "description": "Satın alma harcama analitiği (Spend Analysis), tedarikçi ciro dağılımı ve pazar gücü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "harcama_analizi_kategori_malzeme_ve_tedarikci_bazinda_grafiklerle_incelenir",
+          "label": "Evet; harcamanın hangi tedarikçilerde yoğunlaştığı, kategori ve dönem bazında interaktif analiz edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muhasebe_muzanindan_en_cok_odenen_firmalar_manuel_siralanir",
+          "label": "Sistemik analiz yoktur; muhasebe mizanından en büyük cari bakiyeler Excel'e alınıp sıralanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_harcama_analizi_yapilamamaktadir",
+          "label": "Tedarikçi harcama analizi yapılamamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-040",
+      "process": "Tedarikçi Raporlama ve KPI",
+      "order": 40,
+      "question": "Geçmiş dönem tedarikçi değerlendirme karne sonuçları ve puan değişim trendleri (Tedarikçi İyileşme / Kötüleşme Analizi) sistemde arşivlenip karşılaştırılabilmekte midir?",
+      "description": "Tedarikçi karne tarihçesi, performans trend analizi ve geriye dönük karşılaştırma.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gecmis_karne_puanlari_ve_performans_trendleri_sistemde_yillar_itibariyla_saklanir",
+          "label": "Evet; tedarikçinin son 3-5 yıldaki karne puanları saklanır, iyileşme veya gerileme grafiği çıkarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_en_son_yapilan_karne_sonucu_tutulur_gecmis_trend_gorulmez",
+          "label": "Yalnızca en son dönemin puanı bilinir; geçmişe dönük trend ve puan değişimi görülemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "karne_tarihcesi_veya_trend_takibi_yapilmamaktadir",
+          "label": "Karne tarihçesi veya performans trend analizi yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-041",
+      "process": "Tedarikçi Raporlama ve KPI",
+      "order": 41,
+      "question": "Tedarikçi ana verilerinin güncelliği, iletişim kişileri ve banka teyitlerinin doğruluğu periyodik olarak denetlenmekte midir?",
+      "description": "Tedarikçi veri tabanı hijyeni, sahte fatura/banka dolandırıcılığı önleme ve teyit süreci.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tedarikci_ana_verileri_ve_banka_bilgileri_yillik_periyotlarla_teyit_edilir_ve_guncellenir",
+          "label": "Evet; aktif tedarikçilerin iletişim ve banka bilgileri yılda bir teyit edilir, pasifler arşive alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_odeme_hatasi_veya_eposta_ulasmadiginda_manuel_guncellenir",
+          "label": "Planlı denetim yoktur; para yanlış yere gidince veya e-posta dönünce fark edilip düzeltilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_veri_hijyeni_denetimi_yapilmamaktadir",
+          "label": "Tedarikçi veri kalitesi veya hijyeni denetimi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "SUP-042",
+      "process": "Tedarikçi Raporlama ve KPI",
+      "order": 42,
+      "question": "ERP/SRM dönüşümü sonrasında hedeflenen Kurumsal Tedarikçi ve Satıcı İlişkileri Yönetimi (SRM) vizyonu ve temel önceliği nedir?",
+      "description": "Gelecek vizyonu (TO-BE), tedarikçi ilişkileri yönetimi (SRM) ve stratejik satın alma hedefleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "onayli_avl_entegre_otomatik_scorecard_ve_risk_yonetimli_tam_srm_altyapisi",
+          "label": "Onaylı tedarikçi listesi (AVL), otomatik karne puanlaması ve tek kaynak riskini yöneten SRM altyapısı",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_kartlarinin_tekillesmesi_ve_gecerli_belge_takibinin_disipline_edilmesi",
+          "label": "Mükerrer tedarikçi kayıtlarının temizlenmesi ve süresi dolan sertifikaların takibi önceliklidir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_performansinin_satinalma_ve_kalite_tarafindan_ortak_gorulebilmesi",
+          "label": "Satın alma ve kalite ekiplerinin aynı tedarikçi performans verisine şeffaf erişebilmesi hedeflenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

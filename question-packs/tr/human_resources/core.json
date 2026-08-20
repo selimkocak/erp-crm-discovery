@@ -1,0 +1,1547 @@
+{
+  "meta": {
+    "pack_id": "tr.human_resources.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "HUMAN_RESOURCES",
+    "name": "İnsan Kaynakları Yönetimi Ön Analizi",
+    "description": "Türkiye'deki işletmeler için çalışan ana verisi (Employee Master Data), organizasyon şeması, departman/pozisyon/görev/unvan ayrımı, işe giriş (Onboarding), iş sözleşmeleri, personel statüleri (Mavi/Beyaz Yaka, Taşeron), çalışma takvimi, vardiya yönetimi, PDKS ve puantaj veri kaynakları, izin ve devamsızlık yönetimi, fazla mesai onay süreçleri, yetkinlik matrisi (Skill Matrix), zorunlu/İSG eğitimleri ve sertifika geçerlilik süreleri, performans değerlendirme modelleri, terfi ve kariyer hareketleri, ücret ve yan hak master tanımları, SGK iş yeri ve teşvik veri hazırlığı, zimmet özeti, özlük dosyası ve KVKK erişim sınırları, işten çıkış (Offboarding) checklisti ve İK yönetici KPI'larının AS-IS durumunu ve ERP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "HRS-001",
+      "process": "İnsan Kaynakları Organizasyonu",
+      "order": 1,
+      "question": "İnsan Kaynakları ve Özlük İşleri süreçleri (özlük, izin, puantaj, işe alım, eğitim, performans) şirketinizde nasıl bir organizasyon yapısıyla yönetilmektedir?",
+      "description": "İK departman yapısı, özlük ve bordro sorumluluk paylaşımı, tesisler arası yönetim modeli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_ve_uzmanlasmis_ik_direktorlugu_tarafindan_tum_tesisler_yonetilir",
+          "label": "Merkezi İK Direktörlüğü altında İşe Alım, Özlük/Puantaj, Eğitim ve Yetenek Yönetimi ayrı ekiplerle yönetilir"
+        },
+        {
+          "value": "idari_isler_ve_muhasebe_departmani_bunyesinde_ortak_yurutulur",
+          "label": "Ayrı bir İK birimi yoktur; süreçler İdari İşler ve Muhasebe departmanları tarafından ortak yürütülür"
+        },
+        {
+          "value": "her_fabrika_veya_subenin_kendi_lokal_ik_personeli_vardir_merkeze_raporlar",
+          "label": "Her üretim tesisi veya şubenin kendi yerel İK/özlük sorumlusu vardır ve genel merkeze raporlar"
+        },
+        {
+          "value": "ozluk_ve_puantaj_harici_danismanlik_veya_smmm_firmasi_tarafindan_yurutulur",
+          "label": "Özlük ve puantaj takibi harici muhasebe veya danışmanlık firması desteğiyle yürütülür"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-002",
+      "process": "İnsan Kaynakları Organizasyonu",
+      "order": 2,
+      "question": "Şirket genelinde uygulanan İK yönetmelikleri, disiplin kuralları, işe alım standartları ve çalışan el kitabı yazılı olarak tanımlanmış ve güncel midir?",
+      "description": "Kurumsal İK prosedürleri, disiplin yönetmeliği, çalışan el kitabı ve iç yönergeler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tum_ik_prosedurleri_disiplin_yonetmeligi_ve_calisan_el_kitabi_yazilidir_ve_gunceldir",
+          "label": "Evet; tüm İK prosedürleri, disiplin yönetmeliği, onay matrisi ve çalışan el kitabı yazılı ve günceldir"
+        },
+        {
+          "value": "yazili_dokumanlar_vardir_ancak_bazi_bolumleri_eski_veya_revizyona_muhtactir",
+          "label": "Yazılı dokümanlar mevcuttur ancak saha uygulamalarıyla prosedürler arasında güncellik farkları vardır"
+        },
+        {
+          "value": "yazili_yonetmelik_yoktur_teamullere_ve_yonetim_kararlarina_gore_yurutulur",
+          "label": "Yazılı bir yönetmelik yoktur; kararlar genel şirket teamüllerine ve yönetim kararlarına göre verilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-003",
+      "process": "Çalışan Ana Veri Yapısı",
+      "order": 3,
+      "question": "Çalışan Ana Veri Kartında (Employee Master Data) hangi kimlik, iletişim, özlük, organizasyonel ve operasyonel bilgiler standart olarak tutulmaktadır?",
+      "description": "Personel kartı alan kapsamı, kimlik, SGK, unvan, yönetici, masraf merkezi ve iletişim verileri.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "personel_sicil_no_ad_soyad_ve_tckn",
+          "label": "Personel Sicil Numarası, Ad-Soyad ve TCKN / Kimlik Bilgileri"
+        },
+        {
+          "value": "sirket_is_yeri_sube_departman_ve_birim_bilgisi",
+          "label": "Şirket, SGK İş Yeri, Şube, Departman ve Birim Bilgisi"
+        },
+        {
+          "value": "pozisyon_gorev_tanimi_ve_resmi_unvan",
+          "label": "Pozisyon (Kadro), Görev Tanımı ve Resmi Unvan"
+        },
+        {
+          "value": "dogrudan_bagli_oldugu_yonetici_ve_astlari",
+          "label": "Doğrudan Bağlı Olduğu Yönetici (Amir) ve Varsa Astları"
+        },
+        {
+          "value": "masraf_merkezi_cost_center_ve_kar_merkezi",
+          "label": "Masraf Merkezi (Cost Center) ve Kâr Merkezi Bağlantısı"
+        },
+        {
+          "value": "ise_giris_tarihi_kidem_tarihi_ve_sozlesme_turu",
+          "label": "İşe Giriş Tarihi, Kıdem Başlangıç Tarihi ve Sözleşme Türü"
+        },
+        {
+          "value": "calisma_tipi_beyaz_mavi_yaka_tam_kismi_zamanli_ve_statu",
+          "label": "Çalışma Tipi (Beyaz/Mavi Yaka, Tam/Kısmi Süreli, Kadrolu/Taşeron/Stajyer)"
+        },
+        {
+          "value": "ucret_tipi_para_birimi_ve_ucret_kademesi",
+          "label": "Ücret Tipi (Aylık/Saatlik), Para Birimi ve Maaş Kademesi"
+        },
+        {
+          "value": "ogrenim_durumu_mezuniyet_okul_ve_meslek_kodu",
+          "label": "Öğrenim Durumu, Mezun Olunan Okul/Bölüm ve SGK Meslek Kodu"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-004",
+      "process": "Çalışan Ana Veri Yapısı",
+      "order": 4,
+      "question": "Çalışanların acil durum iletişim kişileri, kan grubu, kronik sağlık durumu, engellilik derecesi veya özel sağlık sigortası kapsamı sistemde kayıt altına alınmakta mıdır?",
+      "description": "Özel sağlık, acil durum irtibat, engellilik ve tamamlayıcı sigorta verileri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "acil_durum_iletisim_kan_grubu_ve_saglik_sigortasi_bilgileri_eksiksiz_kaydedilir",
+          "label": "Evet; acil durum kişisi, kan grubu, engellilik ve özel sağlık sigortası bilgileri kartta tutulur"
+        },
+        {
+          "value": "yalnizca_kan_grubu_ve_telefon_bilgisi_tutulur_diger_bilgiler_kagit_ozluk_dosyasindadir",
+          "label": "Yalnızca telefon ve kan grubu tutulur; sağlık ve aile bilgileri basılı özlük dosyasındadır"
+        },
+        {
+          "value": "acil_durum_ve_saglik_bilgileri_sistemde_tutulmamaktadir",
+          "label": "Acil durum ve özel sağlık bilgileri sistemde tutulmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-005",
+      "process": "Organizasyon Şeması",
+      "order": 5,
+      "question": "Şirketin kurumsal hiyerarşik organizasyon şeması (Şirket → Şube/İş Yeri → Departman → Birim → Pozisyon → Yönetici/Ast İlişkisi) sistemde dinamik olarak tanımlı mıdır?",
+      "description": "Hiyerarşik organizasyon ağacı, amir-ast ilişkisi ve onay mekanizması temeli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_hiyerarsik_ve_dinamik_organizasyon_agaci_sistemde_tanimlidir_ve_onay_akislari_buradan_calisir",
+          "label": "Evet; tam hiyerarşik organizasyon ağacı sistemde tanımlıdır ve izin/talep onayları doğrudan bu ağaçtan beslenir"
+        },
+        {
+          "value": "yalnizca_departman_ve_yonetici_adi_secilir_grafik_veya_hiyerarsik_organizasyon_agaci_yoktur",
+          "label": "Yalnızca departman ve bağlı yönetici adı seçilir; hiyerarşik derin ağaç yapısı veya şema yoktur"
+        },
+        {
+          "value": "organizasyon_semasi_harici_visio_powerpoint_veya_excelde_cizilir_sistemde_yoktur",
+          "label": "Organizasyon şeması PowerPoint/Visio üzerinde çizilir; yazılım sisteminde dinamik karşılığı yoktur"
+        },
+        {
+          "value": "resmi_bir_organizasyon_semasi_bulunmamaktadir",
+          "label": "Resmi ve tanımlanmış bir organizasyon şeması bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-006",
+      "process": "Organizasyon Şeması",
+      "order": 6,
+      "question": "Bir yöneticinin izinli, seyahatte veya görevde olmadığı durumlarda onay yetkilerinin (İzin, fazla mesai, satın alma onayı) otomatik olarak bir vekile devredilmesi (Delegasyon / Vekalet Yönetimi) desteklenmekte midir?",
+      "description": "Yetki vekaleti, delegasyon süresi, vekil yönetici onayı ve loglama.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tarih_aralikli_vekalet_atamasi_yapilir_ve_onaylar_otomatik_olarak_vekil_yoneticiye_duser",
+          "label": "Evet; yönetici izinliyken belirli tarih aralığı için vekil atar ve onaylar vekilin ekranına düşer"
+        },
+        {
+          "value": "vekalet_sistemi_yoktur_yonetici_donene_kadar_onaylar_bekletilir_veya_admin_manuel_onaylar",
+          "label": "Vekalet sistemi yoktur; onaylar yönetici dönene kadar bekler veya sistem yöneticisi manuel çözer"
+        },
+        {
+          "value": "onay_surecleri_zaten_sistem_uzerinden_yurutulmemektedir",
+          "label": "Onay süreçleri zaten sistem üzerinden yürütülmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-007",
+      "process": "Departman / Pozisyon / Unvan",
+      "order": 7,
+      "question": "Şirketinizde Departman, Pozisyon (Kadro/Rol), Görev Tanımı ve Resmi Unvan kavramları birbirinden bağımsız ayrı katmanlar olarak mı yönetilmektedir?",
+      "description": "Pozisyon vs unvan vs görev ayrımı, kadro bağımsızlığı ve unvan standardizasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "departman_pozisyon_ve_unvan_ayri_ana_verilerdir_kadro_ve_gorev_net_ayrilir",
+          "label": "Evet; Departman (Örn: Üretim), Pozisyon (Örn: CNC Operatörü Kadrosu) ve Unvan (Örn: Kıdemli Uzman) ayrı yönetilir"
+        },
+        {
+          "value": "unvan_ve_pozisyon_ayni_kabul_edilir_calisan_kartina_tek_bir_metin_olarak_yazilir",
+          "label": "Unvan ve pozisyon aynı kabul edilir; çalışan kartına tek bir serbest metin olarak yazılır"
+        },
+        {
+          "value": "yalnizca_sgk_meslek_kodu_ve_departman_bilgisi_tutulur_unvan_standarti_yoktur",
+          "label": "Yalnızca SGK meslek kodu ve departman tutulur; kurumsal kadro ve unvan standardı yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-008",
+      "process": "Departman / Pozisyon / Unvan",
+      "order": 8,
+      "question": "Şirketinizde onaylanmış Norm Kadro (Headcount Budget / Açık Pozisyon Bütçesi) planlaması yapılmakta ve kadro aşımı sistemde kontrol edilmekte midir?",
+      "description": "Norm kadro sayısı, açık pozisyonlar (Open Headcount) ve kadro dışı istihdam engeli.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "her_departman_ve_pozisyon_icin_norm_kadro_sayisi_tanimlidir_asimlarda_yonetim_onayi_gerekir",
+          "label": "Evet; her departman için onaylı norm kadro sayısı tanımlıdır, kadro aşımında sistem uyarı/onay ister"
+        },
+        {
+          "value": "norm_kadro_yillik_butce_excelinde_tutulur_sistemde_otomatik_kontrolu_yoktur",
+          "label": "Norm kadro bütçe Excel'inde tutulur; ERP sisteminde işe alım sırasında otomatik kadro kontrolü yoktur"
+        },
+        {
+          "value": "norm_kadro_planlamasi_yapilmamaktadir_ihtiyaca_gore_ise_alim_yapilir",
+          "label": "Norm kadro planlaması yapılmamaktadır; anlık taleplere göre işe alım yapılır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-009",
+      "process": "İş Yeri / Şube / Lokasyon",
+      "order": 9,
+      "question": "Çalışanların fiilen görev yaptığı fiziksel çalışma lokasyonları (Merkez Ofis, Fabrika, Şube, Mağaza, Saha, Hibrit/Ev, Müşteri Sahası) sistemde nasıl tanımlanmakta ve takip edilmektedir?",
+      "description": "Çalışma yeri, şube, fabrika, saha ve hibrit lokasyon yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_fiziksel_lokasyonlar_sube_ve_uzaktan_hibrit_durumlari_personel_kartinda_ayrintili_tanimlidir",
+          "label": "Tüm fabrikalar, şubeler, mağazalar ve uzaktan/hibrit çalışma modelleri personel kartında ayrıntılı izlenir"
+        },
+        {
+          "value": "yalnizca_sgk_is_yeri_sicilinin_bagli_oldugu_ana_sirket_adresi_tutulur",
+          "label": "Yalnızca SGK iş yeri sicilinin bağlı olduğu ana adres tutulur; fiili saha veya hibrit ayrımı yapılmaz"
+        },
+        {
+          "value": "lokasyon_bilgisi_serbest_metin_olarak_tutulur",
+          "label": "Lokasyon bilgisi sistemde standart bir kodlama olmadan serbest metin olarak yazılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-010",
+      "process": "İş Yeri / Şube / Lokasyon",
+      "order": 10,
+      "question": "Uzaktan veya hibrit çalışan personelin evden çalışma günleri, saha ziyaretleri veya seyahat görevlendirmeleri sistem üzerinden planlanıp onaylanmakta mıdır?",
+      "description": "Hibrit çalışma planı, seyahat görev formu ve uzaktan gün onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "hibrit_veya_saha_gorevlendirmeleri_sistemden_talep_edilir_ve_yonetici_onayiyla_takvime_islenir",
+          "label": "Evet; uzaktan çalışma ve görevlendirme talepleri sistemden onaylanır ve puantaj takvimine işlenir"
+        },
+        {
+          "value": "hibrit_gunler_departman_ici_sozlu_veya_e_posta_ile_anlasilarak_yurutulur_sisteme_girilmez",
+          "label": "Hibrit günler departman içinde e-posta ile kararlaştırılır; sisteme resmi talep olarak girilmez"
+        },
+        {
+          "value": "uzaktan_veya_hibrit_calisma_uygulanmamaktadir_tum_personel_yerinde_calisir",
+          "label": "Uzaktan veya hibrit çalışma modeli uygulanmamaktadır; tüm personel sahada/ofiste tam zamanlı çalışır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-011",
+      "process": "İşe Alım Sonrası Personel Açılışı",
+      "order": 11,
+      "question": "İşe alım kararı kesinleşen yeni bir çalışanın özlük verileri ve sistem kartı hangi aşamada ve hangi yöntemle açılmaktadır?",
+      "description": "Yeni personel kartı açılışı, işe başlama tarihi, evrak tamamlama ve onay akışı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ise_alim_teklifi_onaylandigi_an_sistemde_aday_kartindan_personel_kartina_otomatik_donusturulur",
+          "label": "Teklif onaylandığı an sistemde aday kartından personel kartına tek tıkla dönüştürülür ve işe giriş başlatılır"
+        },
+        {
+          "value": "personel_ise_basladigi_gun_ik_uzmani_tarafindan_evraklara_bakilarak_manuel_kart_acilir",
+          "label": "Personel ilk gün geldiğinde İK uzmanı tarafından evraklara bakılarak sistemde sıfırdan manuel kart açılır"
+        },
+        {
+          "value": "ay_sonunda_veya_sgk_bildirgesi_verilirken_toplu_olarak_muhasebe_programina_girilir",
+          "label": "Ay sonunda veya SGK bildirimi yapılırken bordro programına muhasebe tarafından toplu girilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-012",
+      "process": "İşe Alım Sonrası Personel Açılışı",
+      "order": 12,
+      "question": "Adayın başvuru ve mülakat sürecindeki özgeçmiş (CV), mülakat değerlendirme notları ve referans kontrol sonuçları çalışan ana veri kartına veya dijital özlük dosyasına otomatik aktarılabilmekte midir?",
+      "description": "Aday takip (ATS) entegrasyonu, mülakat notları ve özgeçmiş aktarımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "mulakat_notlari_cv_ve_referanslar_aday_sisteminden_personel_ozluk_dosyasina_otomatik_aktarilir",
+          "label": "Evet; mülakat puanları, CV ve referans formları otomatik olarak çalışanın dijital özlük kartına eklenir"
+        },
+        {
+          "value": "cv_ve_mulakat_notlari_ayri_bir_klasorde_veya_e_postada_kalir_personel_kartina_aktarilmaz",
+          "label": "CV ve mülakat notları harici klasörde arşivlenir; ERP çalışan kartına aktarılmaz"
+        },
+        {
+          "value": "mulakat_veya_referans_kayitlari_arsivlenmemektedir",
+          "label": "Mülakat ve referans kayıtları sistematik olarak arşivlenmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-013",
+      "process": "İşe Giriş Süreci (Onboarding)",
+      "order": 13,
+      "question": "Yeni personelin işe başlama gününde ve ilk haftasında yürütülen İşe Uyum ve Hazırlık Süreci (Onboarding Checklist — SGK bildirimi, sözleşme, e-posta, ERP hesabı, kart, İSG, zimmet) nasıl yönetilmektedir?",
+      "description": "Onboarding kontrol listesi, departmanlar arası görev dağılımı (İK, IT, İdari, İSG).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_uzerinden_otomatik_onboarding_checklisti_baslatilir_ik_it_idari_gorevleri_adim_adim_tamamlar",
+          "label": "Evet; sistemden otomatik Onboarding iş akışı başlar; İK, IT, İdari İşler ve İSG kendi adımlarını sistemde onaylar"
+        },
+        {
+          "value": "basili_kagit_veya_excel_checklist_uzerinden_manuel_takip_edilir_departmanlara_e_posta_atilir",
+          "label": "Excel veya basılı kağıt kontrol listesiyle manuel izlenir; IT ve İdari İşlere e-posta ile bilgi verilir"
+        },
+        {
+          "value": "standart_bir_onboarding_checklisti_yoktur_her_birim_kendi_ihtiyacina_gore_hareket_eder",
+          "label": "Standart bir oryantasyon ve hazırlık kontrol listesi yoktur; süreçler anlık iletişimle çözülür"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-014",
+      "process": "İşe Giriş Süreci (Onboarding)",
+      "order": 14,
+      "question": "Yeni çalışanın yasal deneme süresi (1-2 ay) takibi ve deneme süresi sonu yönetici değerlendirme anketi sistem üzerinden otomatik işletilmekte midir?",
+      "description": "Deneme süresi bitiş alarmları, yönetici memnuniyet anketi ve kadro kesinleştirme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "deneme_suresi_bitimine_15_gun_kala_sistem_alarm_uretir_ve_yoneticiye_degerlendirme_formu_gonderir",
+          "label": "Evet; deneme süresi bitimine yakın sistem alarm üretir ve yöneticiye onay/değerlendirme formu açar"
+        },
+        {
+          "value": "ik_uzmani_takvimden_manuel_takip_eder_ve_yoneticiyle_sozlu_gorusur",
+          "label": "İK uzmanı takvimden manuel takip eder; yöneticiden sözlü veya e-posta ile geri bildirim alır"
+        },
+        {
+          "value": "deneme_suresi_sonu_resmi_bir_degerlendirme_yapilmamaktadir",
+          "label": "Deneme süresi sonu resmi bir değerlendirme süreci işletilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-015",
+      "process": "İş Sözleşmeleri",
+      "order": 15,
+      "question": "Çalışanlarla imzalanan iş sözleşmeleri hangi tiplerde (Belirsiz Süreli, Belirli Süreli, Kısmi Süreli, Taşeron, Stajyer, Geçici Proje) sınıflandırılmakta ve yönetilmektedir?",
+      "description": "İş sözleşmesi türleri, 4857 sayılı İş Kanunu sözleşme kategorileri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_sozlesme_turleri_belirli_belirsiz_kismi_stajyer_proje_sistemde_kategorize_edilir",
+          "label": "Tüm sözleşme türleri (Belirsiz, Belirli Süreli, Kısmi Süreli, Stajyer, Proje) sistemde ayrı izlenir"
+        },
+        {
+          "value": "tum_personel_tek_tip_standart_belirsiz_sureli_sozlesmeyle_calisir_ayrim_yoktur",
+          "label": "Tüm çalışanlar tek tip standart belirsiz süreli sözleşmededir; sözleşme türü ayrımı yapılmaz"
+        },
+        {
+          "value": "sozlesmeler_yalnizca_kagit_olarak_arsivlenir_sistemde_sozlesme_tipi_secimi_yoktur",
+          "label": "Sözleşmeler yalnızca fiziki klasörde saklanır; yazılımda sözleşme türü alanı tutulmaz"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-016",
+      "process": "İş Sözleşmeleri",
+      "order": 16,
+      "question": "Belirli süreli iş sözleşmelerinin, stajyerlik sürelerinin veya geçici görevlendirmelerin bitiş tarihlerine yaklaşırken İK uzmanına otomatik hatırlatma ve uyarı (Alarm) gönderilmekte midir?",
+      "description": "Sözleşme bitiş alarmları, yenileme veya fesih bildirim süreleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sozlesme_bitimine_30_gun_kala_otomatik_hatirlatma_ve_bildirim_gonderilir",
+          "label": "Evet; sözleşme bitiş tarihine 30 gün kala İK sorumlusuna ve yöneticiye otomatik bildirim gider"
+        },
+        {
+          "value": "ik_personeli_excel_listesinden_veya_ajandadan_manuel_kontrol_eder",
+          "label": "İK uzmanı harici Excel listesinden veya ajandasından manuel kontrol eder"
+        },
+        {
+          "value": "belirli_sureli_sozlesme_takibi_veya_alarm_mekanizmasi_yoktur",
+          "label": "Belirli süreli sözleşme takibi veya alarm mekanizması bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-017",
+      "process": "Personel Statüleri",
+      "order": 17,
+      "question": "Çalışanlar bordrolama, yan haklar ve çalışma koşulları açısından hangi ana personel statülerine (Beyaz Yaka / Aylıklı, Mavi Yaka / Saatlik, Saha Personeli, Taşeron, Stajyer) göre ayrıştırılmaktadır?",
+      "description": "Personel yakalık/statü sınıfları, çalışma rejimi ve bordro parametre ayrımı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "beyaz_yaka_aylik_ucretli_yonetim_ve_ofis_personeli",
+          "label": "Beyaz Yaka (Aylık Sabit Ücretli Yönetim ve Ofis Personeli)"
+        },
+        {
+          "value": "mavi_yaka_saat_veya_gunluk_ucretli_fabrika_ve_saha_personeli",
+          "label": "Mavi Yaka (Saat/Günlük Ücretli Üretim, Depo ve Saha Personeli)"
+        },
+        {
+          "value": "saha_satis_ve_teknik_servis_mobil_ekipleri",
+          "label": "Saha Satış, Servis ve Montaj Mobil Ekipleri"
+        },
+        {
+          "value": "taseron_alt_isveren_dis_kaynak_personeli",
+          "label": "Taşeron / Alt İşveren / Dış Kaynak (Outsource) Personeli"
+        },
+        {
+          "value": "zorunlu_veya_gonullu_stajyerler",
+          "label": "Lise ve Üniversite Stajyerleri (Zorunlu / Gönüllü)"
+        },
+        {
+          "value": "engelli_ve_eski_hukumlu_kontenjan_personeli",
+          "label": "Yasal Kontenjan Kapsamındaki Engelli ve Eski Hükümlü Personel"
+        },
+        {
+          "value": "emekli_calisanlar_sgdp_kapsami",
+          "label": "Sosyal Güvenlik Destek Primi (SGDP) ile Çalışan Emekli Personel"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-018",
+      "process": "Personel Statüleri",
+      "order": 18,
+      "question": "Fabrika sahasında veya şirket tesislerinde görev yapan taşeron (alt işveren) personelinin SGK uygunluğu, İSG belgeleri, tesise giriş kartları ve sözleşme süreleri sistemde takip edilmekte midir?",
+      "description": "Alt işveren (taşeron) denetimi, İSG evrak kontrolü ve tesis giriş yetkilendirmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "taseron_firma_personelinin_sgk_isg_ve_giris_izinleri_sistemde_kisi_bazinda_denetlenir",
+          "label": "Evet; taşeron personelin SGK ve İSG evrakları sisteme yüklenir, uygun olmayanlara tesis giriş izni verilmez"
+        },
+        {
+          "value": "guvenlik_giris_kapisinda_kagit_formlarla_kontrol_edilir_erpde_kayit_tutulmaz",
+          "label": "Güvenlik kapısında kağıt evraklarla kontrol edilir; ERP sisteminde taşeron personel kartı açılmaz"
+        },
+        {
+          "value": "taseron_veya_alt_isveren_personeli_kullanilmamaktadir",
+          "label": "Taşeron veya alt işveren personeli kullanılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-019",
+      "process": "Çalışma Takvimi",
+      "order": 19,
+      "question": "Şirketinizde haftalık çalışma günleri, resmi tatiller, dini bayramlar, arife günleri ve sektörel/bölgesel özel tatilleri içeren Kurumsal Çalışma Takvimi nasıl tanımlanmakta ve yönetilmektedir?",
+      "description": "Çalışma günleri, tatil takvimleri, haftalık 45 saat esası ve puantaj takvimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "resmi_ve_dini_tatiller_haftalik_calisma_gunleriyle_birlikte_sistem_takviminde_tanimlidir",
+          "label": "Tüm resmi ve dini bayramlar, arife günleri ve haftalık tatiller ERP çalışma takviminde merkezi tanımlıdır"
+        },
+        {
+          "value": "tatiller_ve_calisma_gunleri_ay_sonunda_puantaj_exceline_manuel_islenir",
+          "label": "Tatiller sistem takviminde tanımlı değildir; ay sonlarında puantaj Excel'ine manuel işlenir"
+        },
+        {
+          "value": "standart_bir_kurumsal_calisma_takvimi_kullanilmamaktadir",
+          "label": "Standart bir kurumsal çalışma takvimi kullanılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-020",
+      "process": "Çalışma Takvimi",
+      "order": 20,
+      "question": "Farklı şubeler, fabrikalar veya departmanlar için (Örn: Merkez Ofis 5 gün/45 saat, Fabrika 6 gün/45 saat, Sürekli Tesis 7/24) birden fazla bağımsız çalışma takvimi esnek olarak tanımlanabilmekte midir?",
+      "description": "Çoklu çalışma takvimi, departman bazlı çalışma saatleri ve puantaj eşleşmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "her_departman_veya_tesis_icin_ayri_calisma_takvimi_ve_saatleri_esnek_tanimlanabilir",
+          "label": "Evet; merkez, fabrika ve saha ekipleri için bağımsız çalışma takvimleri tanımlanıp personele atanabilir"
+        },
+        {
+          "value": "tum_sirket_icin_tek_bir_genel_calisma_takvimi_vardir_farkliliklar_manuel_duzeltilir",
+          "label": "Tüm şirket için tek bir genel takvim vardır; fabrika ve ofis farkları ay sonu manuel düzeltilir"
+        },
+        {
+          "value": "tek_bir_calisma_modeli_vardir_farkli_takvim_ihtiyaci_yoktur",
+          "label": "Tüm çalışanlarımız aynı mesai düzenindedir; farklı takvim ihtiyacı yoktur",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-021",
+      "process": "Vardiya Yönetimi",
+      "order": 21,
+      "question": "Fabrika, depo veya saha operasyonlarında Vardiyalı Çalışma Sistemi (2 Vardiya, 3 Vardiya, 7/24 Kesintisiz Dönen Vardiya) uygulanmakta mıdır?",
+      "description": "Vardiyalı çalışma varlığı, vardiya saatleri ve rotasyon düzeni.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "evet_2_veya_3_vardiyali_donusumlu_calisma_duzeni_uygulanmaktadir",
+          "label": "Evet; 2 veya 3 vardiyalı dönüşümlü (rotasyonlu) çalışma düzeni uygulanmaktadır"
+        },
+        {
+          "value": "evet_7_24_kesintisiz_4_vardiya_veya_ozel_vardiya_sistemi_vardir",
+          "label": "Evet; 7/24 kesintisiz 4'lü vardiya veya sektöre özel karma vardiya planları uygulanmaktadır"
+        },
+        {
+          "value": "vardiyali_calisma_yapilmamaktadir_tum_sirket_tek_gunduz_mesaisindedir",
+          "label": "Vardiyalı çalışma yapılmamaktadır; tüm şirket tek sabit gündüz mesaisindedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-022",
+      "process": "Vardiya Yönetimi",
+      "order": 22,
+      "question": "Haftalık veya aylık vardiya çizelgeleri (Vardiya Planı) sistemde nasıl oluşturulmakta, vardiya değişimleri ve yönetici onayları nasıl yönetilmektedir?",
+      "description": "Vardiya planlama, personelin vardiyaya atanması ve vardiya takası/onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "HRS-021",
+        "operator": "not_equals",
+        "value": "vardiyali_calisma_yapilmamaktadir_tum_sirket_tek_gunduz_mesaisindedir"
+      },
+      "options": [
+        {
+          "value": "vardiya_planlari_sistemde_onceden_cizilir_degisimler_amir_onayiyla_anlik_guncellenir",
+          "label": "Vardiya planları sistemde çizilir; vardiya takasları ve acil değişimler amir onayıyla anlık işlenir"
+        },
+        {
+          "value": "vardiya_cizelgesi_excelde_tutulur_panolara_asılır_sisteme_yalnizca_ay_sonu_ozet_girilir",
+          "label": "Vardiya çizelgesi Excel'de hazırlanır ve panoya asılır; yazılıma yalnızca ay sonunda fiili durum girilir"
+        },
+        {
+          "value": "planli_vardiya_cizelgesi_yoktur_gunluk_olarak_postabasi_tarafindan_belirlenir",
+          "label": "Önceden hazırlanan sistemik bir vardiya planı yoktur; postabaşı tarafından günlük belirlenir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-023",
+      "process": "Puantaj Veri Kaynakları",
+      "order": 23,
+      "question": "Çalışanların günlük işe geliş-gidiş saatleri ve fiili çalışma süreleri hangi yöntem ve teknolojiyle (PDKS, Kartlı Geçiş, Parmak İzi/Yüz Tanıma, Turnike, Mobil GPS, Excel, Manuel) toplanmaktadır?",
+      "description": "Puantaj toplama teknolojisi, kart okuyucu, biyometrik PDKS ve manuel kayıt.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kartli_turnike_veya_biyometrik_yuz_parmak_izi_pdks_cihazlariyla_elektronik_toplanir",
+          "label": "Kartlı turnike veya biyometrik (yüz tanıma / parmak izi) PDKS cihazlarıyla elektronik toplanır"
+        },
+        {
+          "value": "mobil_uygulama_uzerinden_gps_konumlu_check_in_check_out_ile_toplanir",
+          "label": "Mobil uygulama üzerinden GPS konum doğrulamalı check-in / check-out ile toplanır (Saha/Hibrit)"
+        },
+        {
+          "value": "vardiya_amirleri_tarafindan_gunluk_yoklama_cizelgesi_tutulur_ve_excelde_birlestirilir",
+          "label": "Vardiya amirleri tarafından kağıt yoklama çizelgesi tutulur ve Excel üzerinde puantaj hesaplanır"
+        },
+        {
+          "value": "elektronik_pdks_kullanilmamaktadir_manuel_takip_edilir",
+          "label": "Elektronik PDKS kullanılmamaktadır; personelin tam geldiği varsayılır, yalnız devamsızlıklar yazılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-024",
+      "process": "Puantaj Veri Kaynakları",
+      "order": 24,
+      "question": "Elektronik PDKS cihazlarından gelen ham giriş-çıkış logları sistem tarafından otomatik taranarak geç kalma, erken çıkma, eksik mesai ve fazla mesai olarak puantaj kartına işlenmekte midir?",
+      "description": "PDKS ham veri işleme, tolerans dakikaları, eksik/fazla çalışma hesaplama kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "HRS-023",
+        "operator": "not_equals",
+        "value": "elektronik_pdks_kullanilmamaktadir_manuel_takip_edilir"
+      },
+      "options": [
+        {
+          "value": "ham_pdks_loglari_tolerans_kurallarina_gore_otomatik_puantaja_ve_bordro_girdisine_donusur",
+          "label": "Evet; ham loglar giriş/çıkış toleranslarıyla eşleşir; geç kalma, eksik mesai ve fazla mesai otomatik hesaplanır"
+        },
+        {
+          "value": "pdks_yazilimindan_excel_raporu_alinir_ik_uzmani_manuel_duzelterek_bordroya_aktarir",
+          "label": "PDKS cihazından Excel dökümü alınır; İK personeli hatalı basışları elle düzeltip bordroya aktarır"
+        },
+        {
+          "value": "otomatik_log_isleme_yoktur_yalnizca_guvenlik_amaciyla_gecisler_kaydedilir",
+          "label": "PDKS geçişleri yalnızca güvenlik amacıyla saklanır; puantaj hesabına otomatik aktarılmaz"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-025",
+      "process": "İzin Yönetimi",
+      "order": 25,
+      "question": "Çalışanların yıllık ücretli izin, mazeret izni, hastalık/rapor, ücretsiz izin, evlilik, doğum, babalık ve vefat gibi yasal ve idari İzin Türleri sistemde nasıl talep edilmekte ve onaylanmaktadır?",
+      "description": "İzin talep akışı, mobil/web self-service, yönetici onay adımları ve izin formları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "calisan_sistem_veya_mobil_uygulamadan_izin_talep_eder_hiyerarsik_yonetici_onayiyla_anlik_islenir",
+          "label": "Çalışan sistemden/mobilden izin talep eder; amir ve İK onayından geçerek izin bakiyesinden anında düşer"
+        },
+        {
+          "value": "basili_kagit_izin_formu_doldurulur_imzalatilip_ik_departmanina_teslim_edilir",
+          "label": "Basılı kağıt izin formu imzalatılır; İK uzmanı ay sonu Excel tablosuna veya sisteme manuel işler"
+        },
+        {
+          "value": "sozlu_veya_whatsapp_ile_haber_verilir_ay_sonunda_toplu_mutabakat_yapilir",
+          "label": "Sözlü veya mesajla haber verilir; ay sonunda puantaj yapılırken izinler yaklaşık belirlenir"
+        },
+        {
+          "value": "standart_bir_izin_talep_ve_onay_sureci_yoktur",
+          "label": "Standart bir izin talep ve onay mekanizması işletilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-026",
+      "process": "İzin Yönetimi",
+      "order": 26,
+      "question": "Yasal kıdem yılına göre yıllık ücretli izin hak edişleri (14, 20, 26 gün, 50 yaş üstü 20 gün) sistem tarafından otomatik hesaplanmakta ve kalan izin bakiyesi anlık izlenebilmekte midir?",
+      "description": "İzin hak ediş algoritması, kıdem yılı artışı, devreden izin bakiyesi ve izin defteri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kidem_yili_ve_yas_kriterlerine_gore_izin_hakedisleri_ve_devreden_bakiyeler_otomatik_hesaplanir",
+          "label": "Evet; işe giriş tarihine ve yaşa göre izin günleri sistem tarafından otomatik yüklenir ve devir bakiyesi tutulur"
+        },
+        {
+          "value": "yillik_izin_hak_edisleri_excel_tablolarinda_manuel_takip_edilir",
+          "label": "İzin hak edişleri ve devirler İK departmanı tarafından Excel tablolarında manuel takip edilir"
+        },
+        {
+          "value": "kalan_izin_bakiyesi_takibi_yapilmamaktadir",
+          "label": "Kalan izin bakiyesi ve devreden izin takibi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-027",
+      "process": "Devamsızlık",
+      "order": 27,
+      "question": "Çalışanların habersiz işe gelmeme, geç kalma, erken çıkma veya raporlu Devamsızlık durumları nasıl tespit edilmekte, ihtar/tutanak ve eksik gün süreçleri nasıl işletilmektedir?",
+      "description": "Devamsızlık tespiti, noter ihtarnamesi, savunma talebi, tutanak ve eksik gün bildirimleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "pdks_ve_yoklama_kayitlariyla_aninda_tespit_edilir_otomatik_savunma_tutanak_sureci_baslatilir",
+          "label": "Giriş yapmayan personel anında tespit edilir; amir bilgilendirilir ve resmi tutanak/savunma süreci başlar"
+        },
+        {
+          "value": "amirler_haber_verir_idari_isler_tarafindan_kagit_tutanak_tutulur",
+          "label": "Vardiya amiri veya yönetici İK'ya haber verir; basılı kağıt tutanak düzenlenip özlük dosyasına konur"
+        },
+        {
+          "value": "yalnizca_ay_sonunda_puantaj_kapatilirken_eksik_gun_olarak_kesilir_tutanak_tutulmaz",
+          "label": "Günlük takip yapılmaz; ay sonunda puantajda eksik gün olarak maaştan kesilir, tutanak tutulmaz"
+        },
+        {
+          "value": "devamsizlik_takip_sureci_yoktur",
+          "label": "Sistematik bir devamsızlık takip ve ihtar süreci yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-028",
+      "process": "Devamsızlık",
+      "order": 28,
+      "question": "SGK vizite sistemiyle entegre olarak çalışanların istirahat raporları (E-Rapor / İş Göremezlik Raporu) sistemden sorgulanabilmekte ve otomatik olarak hastalık iznine dönüştürülmekte midir?",
+      "description": "SGK E-Vizite web servis entegrasyonu, iş göremezlik ödeneği ve rapor onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sgk_e_vizite_entegrasyonu_vardir_raporlar_otomatik_cekilir_ve_puantaja_hastalik_izni_islenir",
+          "label": "Evet; SGK e-raporları sistem tarafından otomatik çekilir, onaylanır ve puantaja raporlu olarak işlenir"
+        },
+        {
+          "value": "ik_uzmani_sgk_vizite_sitesine_manuel_girer_raporlari_indirip_puantaja_elle_yazar",
+          "label": "İK uzmanı SGK portalına manuel giriş yapar; raporları kontrol edip puantaja elle işler"
+        },
+        {
+          "value": "calisanin_hastaneden_getirdigi_kagit_rapor_uzerinden_manuel_islem_yapilir",
+          "label": "Çalışan kağıt raporu getirdiğinde işlem yapılır; SGK portalından otomatik sorgulama yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-029",
+      "process": "Fazla Mesai",
+      "order": 29,
+      "question": "Şirketinizde haftalık yasal çalışma süresini aşan çalışmalar için Fazla Mesai (Overtime) uygulaması ve onay akışı nasıl yürütülmektedir?",
+      "description": "Fazla mesai yönetimi, ön onay, fiili mesai hesaplama ve puantaj eşleşmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "onceden_sistemden_mesai_talebi_acilir_amir_onaylar_ve_pdks_fiili_saatiyle_eslesir",
+          "label": "Önceden sistemden fazla mesai talebi açılır; amir onaylar ve PDKS fiili çıkış saatiyle doğrulanır"
+        },
+        {
+          "value": "pdksdeki_fazla_calisma_sureleri_ay_sonunda_amir_tarafindan_toplu_onaylanarak_bordroya_aktarilir",
+          "label": "Ön talep yoktur; PDKS'de oluşan fazla saatler ay sonunda amir tarafından onaylanarak bordroya aktarılır"
+        },
+        {
+          "value": "mesai_saatleri_excel_cizelgesine_manuel_yazilir_ve_imzalatilarak_muhasebeye_verilir",
+          "label": "Mesai saatleri Excel formlarına manuel yazılır; amir imzasıyla ay sonu bordroya gönderilir"
+        },
+        {
+          "value": "fazla_mesai_uygulanmamaktadir",
+          "label": "Şirketimizde fazla mesai uygulaması veya mesai ücreti ödemesi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-030",
+      "process": "Fazla Mesai",
+      "order": 30,
+      "question": "Fazla mesaiye kalacak personel için önceden Fazla Mesai Talep ve Yönetici Onay Formu işletilmekte ve yasal yıllık 270 saat limiti sistem tarafından denetlenmekte midir?",
+      "description": "Yıllık 270 saat yasal fazla mesai tavanı, fazla mesai onay limitleri ve uyarılar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "HRS-029",
+        "operator": "not_equals",
+        "value": "fazla_mesai_uygulanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "yasal_270_saat_limiti_ve_gunluk_maksimum_calisma_sureleri_sistem_tarafindan_otomatik_denetlenir",
+          "label": "Evet; sistem çalışan bazında kümülatif mesaiyi takip eder ve yıllık 270 saat yaklaşınca uyarı verir"
+        },
+        {
+          "value": "yillik_limit_kontrolu_manuel_olarak_ik_uzmani_tarafindan_excelde_incelenir",
+          "label": "Limit kontrolü İK uzmanı tarafından Excel dökümlerinden manuel incelenir; sistemik kilit yoktur"
+        },
+        {
+          "value": "fazla_mesai_saat_limiti_veya_yillik_sinir_takibi_yapilmamaktadir",
+          "label": "Fazla mesai saat limiti veya yıllık sınır takibi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-031",
+      "process": "Yetkinlik Yönetimi",
+      "order": 31,
+      "question": "Çalışanların mesleki yetkinlikleri, teknik becerileri, kullandıkları makineler, yabancı dil ve yönetim yetkinlikleri bir Yetkinlik Matrisi (Skill Matrix) üzerinde takip edilmekte midir?",
+      "description": "Yetkinlik kütüphanesi, seviyelendirme (1-5 puan), teknik ve davranışsal yetkinlikler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemde_kapsamli_yetkinlik_matrisi_skill_matrix_tanimlidir_ve_periyodik_seviyeler_guncellenir",
+          "label": "Evet; tüm pozisyon ve çalışanlar için yetkinlik matrisi (1-5 seviye) sistemde tanımlıdır ve izlenir"
+        },
+        {
+          "value": "yalnizca_uretim_ve_bakim_ekipleri_icin_excelde_coklu_beceri_matrisi_tutulur",
+          "label": "Yalnızca üretim ve bakım personeli için Excel üzerinde çoklu beceri matrisi (polyvalence) tutulur"
+        },
+        {
+          "value": "calisanlarin_ozgecmisindeki_bilgilerle_yetinilir_resmi_bir_yetkinlik_matrisi_yoktur",
+          "label": "Çalışanların işe giriş CV'sindeki bilgilerle yetinilir; periyodik bir yetkinlik matrisi işletilmez"
+        },
+        {
+          "value": "yetkinlik_takibi_yapilmamaktadir",
+          "label": "Yetkinlik takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-032",
+      "process": "Yetkinlik Yönetimi",
+      "order": 32,
+      "question": "Üretim hattında veya kritik tezgâhlarda çalışanların Çoklu Beceriklilik (Polyvalence) seviyeleri ve makine yetkilendirmeleri vardiya planlaması ve iş emri atamalarında dikkate alınmakta mıdır?",
+      "description": "Operatör makine yetkinliği, iş emri atama kısıtları ve çoklu beceri puanı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "HRS-031",
+        "operator": "not_equals",
+        "value": "yetkinlik_takibi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "vardiya_ve_is_emri_atamalarinda_operatorun_ilgili_tezgah_icin_onayli_yetkinlik_seviyesi_zorunludur",
+          "label": "Evet; yetkinliği onaylanmamış operatörün ilgili makineye veya kritik operasyona atanması engellenir"
+        },
+        {
+          "value": "vardiya_amiri_personeli_tecrubesine_gore_sozlu_yonlendirir_sistemde_kilit_yoktur",
+          "label": "Vardiya amiri personeli kendi tecrübesine göre yönlendirir; yazılımda makine bazlı atama kilidi yoktur"
+        },
+        {
+          "value": "makine_bazli_yetkinlik_kiti_veya_eslesme_kullanilmamaktadir",
+          "label": "Makine bazlı yetkinlik kilidi veya eşleşme kullanılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-033",
+      "process": "Eğitim ve Sertifika",
+      "order": 33,
+      "question": "Çalışanların katıldığı zorunlu İSG eğitimleri, mesleki yeterlilik belgeleri, teknik eğitimler ve ehliyet/sertifikaların (Forklift, Kaynakçı, İlk Yardım, Yangın, Hijyen) geçerlilik süreleri sistemde takip edilmekte midir?",
+      "description": "Zorunlu ve yasal eğitimler, sertifika takibi, mesleki yeterlilik ve İSG eğitim kayıtları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_isg_ve_teknik_egitimler_sertifika_belgeleri_ve_gecerlilik_tarihleriyle_sistemde_tutulur",
+          "label": "Evet; tüm İSG, mesleki yeterlilik ve teknik sertifikalar bitiş tarihleriyle sistemde kayıtlıdır"
+        },
+        {
+          "value": "isg_uzmani_veya_egitim_sorumlusu_harici_excel_listelerinde_ve_kagit_dosyalarda_tutar",
+          "label": "İSG uzmanı ve eğitim sorumlusu harici Excel listelerinde ve basılı dosyalarda takip eder"
+        },
+        {
+          "value": "yalnizca_yasal_isg_egitim_tutanaklari_arsivlenir_sertifika_gecerlilik_takibi_yapilmaz",
+          "label": "Yalnızca yasal İSG eğitim katılım formları taranır; sertifika geçerlilik süreleri izlenmez"
+        },
+        {
+          "value": "egitim_ve_sertifika_takibi_yapilmamaktadir",
+          "label": "Eğitim ve sertifika takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-034",
+      "process": "Eğitim ve Sertifika",
+      "order": 34,
+      "question": "Sertifika veya periyodik muayene geçerlilik süresi dolmak üzere olan çalışanlar için ilgili yöneticilere ve İK uzmanına otomatik yaklaşma alarmı (30-60 gün önceden uyarı) üretilmekte midir?",
+      "description": "Sertifika bitiş uyarıları, yenileme eğitim planlaması ve yetki askıya alma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sertifika_veya_muayene_bitimine_30_60_gun_kala_otomatik_yenileme_uyarisi_gonderilir",
+          "label": "Evet; süre dolmadan önce İK ve İSG birimlerine otomatik bildirim gider, yenileme eğitimi planlanır"
+        },
+        {
+          "value": "isg_uzmani_manuel_tarih_kontrolu_yapar_ve_denetim_oncesi_toplu_egitim_acar",
+          "label": "İSG uzmanı manuel tarih kontrolü yapar; denetimler öncesinde toplu yenileme eğitimleri düzenlenir"
+        },
+        {
+          "value": "sertifika_gecerlilik_uyari_mekanizmasi_bulunmamaktadir",
+          "label": "Sertifika geçerlilik uyarı mekanizması bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-035",
+      "process": "Performans Değerlendirme",
+      "order": 35,
+      "question": "Şirketinizde çalışanların iş performansını, hedeflerini ve yetkinliklerini ölçen Sistematik Performans Değerlendirme süreci uygulanmakta mıdır?",
+      "description": "Performans değerlendirme varlığı, kurumsal hedef yayılımı ve değerlendirme periyotları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "evet_tum_personel_veya_beyaz_yaka_icin_yillik_donemsel_resmi_performans_degerlendirmesi_yapilir",
+          "label": "Evet; tüm çalışanlar veya beyaz yaka için yıllık/dönemsel resmi performans değerlendirme süreci vardır"
+        },
+        {
+          "value": "yalnizca_satis_veya_yonetici_kadrolari_icin_prim_hedef_performansi_izlenir",
+          "label": "Yalnızca satış ve üst yönetim kadroları için prim ve hedef gerçekleşme performansı izlenir"
+        },
+        {
+          "value": "sistematik_performans_degerlendirme_yapilmamaktadir",
+          "label": "Sistematik bir performans değerlendirme süreci uygulanmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-036",
+      "process": "Performans Değerlendirme",
+      "order": 36,
+      "question": "Performans değerlendirme süreci hangi modelle (Hedef/KPI bazlı, Yetkinlik bazlı, 360 Derece, OKR, Yönetici Değerlendirmesi) ve hangi onay akışıyla işletilmektedir?",
+      "description": "Performans değerlendirme yöntemi, KPI hedef ağırlıkları, 360 derece geri bildirim ve prim bağlantısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "HRS-035",
+        "operator": "not_equals",
+        "value": "sistematik_performans_degerlendirme_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "hedef_kpi_ve_yetkinlik_puanlari_sistem_uzerinden_oz_degerlendirme_ve_yonetici_onayiyla_tamamlanir",
+          "label": "Hedef/KPI ve yetkinlikler sistemden belirlenir; öz değerlendirme, 1. ve 2. yönetici onayıyla puanlanır"
+        },
+        {
+          "value": "performans_formlari_excel_veya_word_uzerinde_doldurulur_ik_tarafindan_toplanip_konsolide_edilir",
+          "label": "Değerlendirme formları Word/Excel üzerinde doldurulur; İK tarafından toplanarak puanlar hesaplanır"
+        },
+        {
+          "value": "yalnizca_yoneticinin_sozlu_kanaati_esas_alinir_ayrintili_kriter_puani_verilmez",
+          "label": "Yalnızca yöneticinin genel sözlü kanaati esas alınır; ayrıntılı KPI puanlama formu işletilmez"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-037",
+      "process": "Kariyer / Terfi / Görev Değişikliği",
+      "order": 37,
+      "question": "Çalışanın kurum içerisindeki terfi, unvan değişikliği, departman transferi, şube nakli ve yönetici değişikliklerinin tarihçesi (Career Movement History) sistemde nasıl izlenmektedir?",
+      "description": "Kariyer hareketleri, pozisyon değişim tarihçesi, eski-yeni unvan ve yönetici logları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_terfi_nakil_ve_unvan_degisiklikleri_yururluk_tarihiyle_sistemde_tarihce_olarak_saklanir",
+          "label": "Evet; tüm terfi, unvan, departman ve yönetici değişiklikleri yürürlük tarihiyle tarihçe olarak saklanır"
+        },
+        {
+          "value": "yalnizca_guncel_pozisyon_ve_unvan_tutulur_eski_gorev_ve_unvan_gecmisi_ezilir",
+          "label": "Yalnızca güncel pozisyon tutulur; değişiklik yapıldığında eski görev ve unvan geçmişi ezilir"
+        },
+        {
+          "value": "terfi_ve_gorev_degisiklikleri_yalnizca_kagit_ozluk_dosyasindaki_yazismalarda_saklanir",
+          "label": "Kariyer hareketleri yalnızca basılı özlük dosyasındaki atama yazılarında saklanır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-038",
+      "process": "Kariyer / Terfi / Görev Değişikliği",
+      "order": 38,
+      "question": "Görev veya departman değişikliği onaylandığında çalışanın ERP/CRM sistem yetkileri, onay limitleri, masraf merkezi ve zimmetli ekipmanları yeni pozisyonuna göre otomatik revize edilmekte midir?",
+      "description": "Pozisyon değişikliği sonrası yetki, onay limiti ve masraf merkezi senkronizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "pozisyon_degisimiyle_birlikte_onay_yetkileri_masraf_merkezi_ve_rol_atamalari_otomatik_guncellenir",
+          "label": "Evet; pozisyon bazlı yetki modeli sayesinde çalışanın onay limitleri ve rolleri yeni pozisyonuna geçer"
+        },
+        {
+          "value": "it_ve_muhasebeye_ayri_ayri_e_posta_atilarak_yetki_ve_masraf_merkezi_manuel_degistirilir",
+          "label": "IT ve Muhasebeye e-posta atılarak ERP yetkileri ve masraf merkezi elle değiştirilir"
+        },
+        {
+          "value": "gorev_degisse_de_eski_yetkiler_ve_masraf_merkezleri_uzun_sure_degistirilmeden_kalabilmektedir",
+          "label": "Görev değişse de eski sistem yetkileri unutulabilmekte veya gecikmeli güncellenmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-039",
+      "process": "Ücret ve Yan Hak Master Bilgileri",
+      "order": 39,
+      "question": "Çalışanların ücret tipi (Aylık Net, Aylık Brüt, Saatlik Ücret), maaş kademesi, para birimi ve masraf merkezi bağlantısı İK ana veri kartında nasıl tanımlanmaktadır?",
+      "description": "Ücret master verisi, brüt/net sözleşme tipi, dövizli maaş ve masraf merkezi entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ucret_tipi_net_brut_para_birimi_maas_grubu_ve_masraf_merkezi_kartta_eksiksiz_tanimlidir",
+          "label": "Ücret tipi (Net/Brüt), para birimi, maaş kademesi ve masraf merkezi kartta tam ve şifreli tanımlıdır"
+        },
+        {
+          "value": "ucret_bilgisi_ik_sisteminde_tutulmaz_yalnizca_harici_bordro_yaziliminda_veya_bankada_bilinir",
+          "label": "Ücret bilgisi ERP'de tutulmaz; gizlilik gerekçesiyle yalnız harici bordro programında tutulur"
+        },
+        {
+          "value": "yalnizca_aylik_tek_bir_brut_rakam_olarak_tutulur_ek_ucret_parametreleri_yoktur",
+          "label": "Yalnızca aylık tek bir brüt tutar olarak tutulur; saatlik veya kademe ayrımı yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-040",
+      "process": "Ücret ve Yan Hak Master Bilgileri",
+      "order": 40,
+      "question": "Çalışanlara sağlanan yan hak paketleri (Yemek kartı, yol ücreti/servis güzergahı, şirket aracı, yakıt kartı, özel sağlık sigortası, prim/ikramiye şablonu) personel kartında izlenmekte midir?",
+      "description": "Yan haklar (Benefits), yemek, servis/yol, özel sağlık, hayat sigortası ve şirket aracı hakları.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yemek_karti_veya_yemekhane_kullanim_hakki",
+          "label": "Yemek Kartı (Sodexo/Multinet vb.) veya Tesis Yemekhane Hakkı"
+        },
+        {
+          "value": "personel_servis_guzergahi_veya_nakit_yol_ucreti",
+          "label": "Personel Servis Güzergâhı Ataması veya Nakit Yol Yardımı"
+        },
+        {
+          "value": "ozel_saglik_veya_tamamlayici_saglik_sigortasi_paketi",
+          "label": "Özel Sağlık veya Tamamlayıcı Sağlık Sigortası (TSS) Kapsamı"
+        },
+        {
+          "value": "sirket_araci_tahsisi_ve_yakit_limiti",
+          "label": "Şirket Aracı Tahsisi, Plaka ve Aylık Yakıt Kartı Limiti"
+        },
+        {
+          "value": "kurumsal_cep_telefonu_ve_gsm_hatti",
+          "label": "Kurumsal Akıllı Telefon ve Şirket GSM Hattı Paketi"
+        },
+        {
+          "value": "donemsel_performans_primi_veya_satis_komisyon_sablonu",
+          "label": "Dönemsel Performans Primi veya Satış Prim/Komisyon Şablonu"
+        },
+        {
+          "value": "yan_haklar_sistemde_takip_edilmemektedir",
+          "label": "Yan haklar sistemde takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-041",
+      "process": "SGK / Teşvik Veri Hazırlığı",
+      "order": 41,
+      "question": "Çalışanların SGK iş yeri sicil numarası, meslek kodu, kanun teşvik kapsamı (5510, 6111, 7103 vb.), engelli/emekli/eski hükümlü statüleri ve teşvik başlangıç/bitiş tarihleri nerede tutulup hazırlanmaktadır?",
+      "description": "SGK iş yeri sicili, meslek kodları, istihdam teşvik kodları ve teşvik uygunluk verileri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sgk_is_yeri_meslek_kodu_ve_tesvik_kanun_maddeleri_personel_kartinda_eksiksiz_tanimlidir",
+          "label": "SGK iş yeri, meslek kodu ve yararlanılan teşvik kanun maddesi çalışan kartında tam tanımlıdır"
+        },
+        {
+          "value": "tesvik_ve_sgk_kodlari_yalnizca_harici_bordro_yaziliminda_veya_smmm_tarafindan_tutulur",
+          "label": "Teşvik ve SGK kodları ERP'de yoktur; harici bordro yazılımında veya mali müşavir tarafından yönetilir"
+        },
+        {
+          "value": "yalnizca_genel_5510_indirimi_uygulanir_ozel_istihdam_tesviki_takip_edilmez",
+          "label": "Yalnızca standart 5510 sayılı %5 indirimi uygulanır; özel teşvik kodları takip edilmez"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-042",
+      "process": "SGK / Teşvik Veri Hazırlığı",
+      "order": 42,
+      "question": "Şirketinizde personel istihdam teşviklerinin tespiti ve takibi harici bir teşvik danışmanlık yazılımı veya profesyonel uzmanlık hizmeti ile entegre olarak mı yürütülmektedir?",
+      "description": "SGK teşvik yazılımları, teşvik optimizasyonu ve İK verisi aktarımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "harici_tesvik_yazilimi_veya_danismanlik_firmasiyla_entegre_olarak_en_uygun_tesvik_belirlenir",
+          "label": "Evet; harici teşvik optimizasyon yazılımı veya danışmanlık firmasıyla her ay en avantajlı teşvik seçilir"
+        },
+        {
+          "value": "ik_veya_muhasebe_ekibi_mevzuati_takip_ederek_tesvik_secimini_manuel_yapar",
+          "label": "İK veya Muhasebe ekibi mevzuatı takip ederek teşvik seçimini şirket içinde manuel yapar"
+        },
+        {
+          "value": "ozel_istihdam_tesvikleri_takip_edilmemektedir",
+          "label": "Özel istihdam teşvikleri takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-043",
+      "process": "Zimmet Entegrasyonu",
+      "order": 43,
+      "question": "Çalışana teslim edilen şirket varlıklarının (Laptop, telefon, hat, araç, anahtar, el terminali, iş kıyafeti) özet listesi İK personel kartı üzerinden görüntülenebilmekte ve zimmet tutanağı ilişkilendirilebilmekte midir?",
+      "description": "Personel kartı üzerinden zimmetli varlık görünürlüğü, teslim tutanağı ve varlık yönetimi bağı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "personel_kartinda_tum_zimmetli_cihazlar_ve_teslim_tutanaklari_tek_ekranda_canli_gorulur",
+          "label": "Evet; personel kartında tüm zimmetli laptop, telefon, araç ve anahtarlar teslim tutanaklarıyla canlı izlenir"
+        },
+        {
+          "value": "zimmetler_it_ve_idari_islerin_ayri_excel_listelerinde_tutulur_ik_kartinda_gorulmez",
+          "label": "Zimmetler IT ve İdari İşlerin ayrı Excel listelerindedir; İK çalışan kartında görünmez"
+        },
+        {
+          "value": "yalnizca_kagit_teslim_tutanagi_imzalatilip_ozluk_dosyasina_konur_sistemde_takip_yoktur",
+          "label": "Yalnızca basılı teslim tutanağı imzalatılıp özlük klasörüne konur; sistemde dijital takip yoktur"
+        },
+        {
+          "value": "zimmet_takibi_yapilmamaktadir",
+          "label": "Zimmet takibi yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-044",
+      "process": "Personel Belgeleri ve KVKK",
+      "order": 44,
+      "question": "Çalışanların dijital özlük dosyasında (İş sözleşmesi, diploma, kimlik, adli sicil, sağlık raporu, İSG formu, ehliyet) belgeler taranıp saklanmakta ve KVKK kapsamında yetkilendirilmiş kişilerce mi erişilmektedir?",
+      "description": "Dijital özlük arşivi, KVKK veri gizliliği, hassas sağlık/adli sicil verilerine rol bazlı erişim.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_ozluk_evraklari_dijital_arsivlenir_ve_kvkk_kapsaminda_yalnizca_yetkili_roller_erisebilir",
+          "label": "Evet; tüm özlük belgeleri taranıp şifrelenir ve KVKK kurallarına göre yalnızca yetkili İK uzmanları erişir"
+        },
+        {
+          "value": "belgeler_yalnizca_kilitli_fiziki_dolaplarda_saklanir_sistemde_dijital_arsiv_yoktur",
+          "label": "Belgeler yalnızca kilitli fiziki arşiv dolaplarında saklanır; sistemde dijital belge arşivi yoktur"
+        },
+        {
+          "value": "ortak_sunucuda_dosya_klasorlerinde_saklanir_ozel_bir_rol_bazli_erisim_kisiti_yoktur",
+          "label": "Ortak ağ klasöründe taranmış PDF olarak tutulur; rol bazlı gelişmiş erişim kısıtlaması yoktur"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-045",
+      "process": "İşten Çıkış Süreci (Offboarding)",
+      "order": 45,
+      "question": "İşten ayrılan bir personelin çıkış onayı, istifa/fesih gerekçesi, SGK çıkış kodu hazırlığı, zimmet iade teslimi ve sistem erişimlerinin kapatılmasını içeren İşten Çıkış Kontrol Listesi (Offboarding Checklist) nasıl işletilmektedir?",
+      "description": "Offboarding kontrol listesi, SGK çıkış kodu, ilişik kesme formu, zimmet iadesi ve IT erişim iptali.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemden_resmi_offboarding_sureci_baslatilir_zimmet_iadesi_it_kapatma_ve_ilisik_kesme_adim_adim_onaylanir",
+          "label": "Evet; sistemden offboarding başlatılır; zimmet iadesi, IT hesap iptali ve İK onayları adım adım tamamlanır"
+        },
+        {
+          "value": "basili_ilisik_kesme_formu_departman_departman_eldest_dolastirilarak_imzalattirilir",
+          "label": "Kağıt ilişik kesme formu departmanlar arasında elden dolaştırılarak imzalatılır ve İK'ya verilir"
+        },
+        {
+          "value": "standart_bir_ilisik_kesme_sureci_yoktur_ayrildiktan_sonra_sgk_cikisi_yapilir_ve_hesaplar_kapatilir",
+          "label": "Standart bir kontrol listesi yoktur; personel ayrılınca SGK çıkışı verilir ve hesaplar sonradan kapatılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "HRS-046",
+      "process": "HR Raporlama ve KPI",
+      "order": 46,
+      "question": "İnsan Kaynakları yönetimi kapsamında Toplam Çalışan Sayısı (Headcount), Personel Devir Oranı (Turnover), Devamsızlık Oranı, Fazla Mesai Saati, İzin Kullanım Bakiyesi, Yaş ve Kıdem Piramidi ve Açık Pozisyon Raporları nasıl alınmaktadır?",
+      "description": "İK yönetici gösterge paneli (KPI Dashboard), turnover, headcount, izin/mesai ve demografi analizleri.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "toplam_calisan_sayisi_headcount_ve_departman_sube_dagilimi",
+          "label": "Toplam Çalışan Sayısı (Headcount), Departman, Şube ve Statü Dağılım Raporu"
+        },
+        {
+          "value": "personel_devir_orani_turnover_rate_ve_ise_giris_cikis_analizi",
+          "label": "Personel Devir Oranı (Turnover Rate) ve İşe Giriş / Çıkış Trend Analizi"
+        },
+        {
+          "value": "departman_ve_kisi_bazinda_aylik_fazla_mesai_ve_devamsizlik_raporu",
+          "label": "Departman ve Kişi Bazında Aylık Fazla Mesai Saatleri ve Devamsızlık Raporu"
+        },
+        {
+          "value": "kullanilmayan_yillik_izin_bakiyeleri_ve_izin_maliyeti_karsiligi_raporu",
+          "label": "Kullanılmayan Yıllık İzin Gün Bakiyeleri ve İzin Maliyet Karşılığı Raporu"
+        },
+        {
+          "value": "calisan_yas_kidem_ve_cinsiyet_demografi_piramidi",
+          "label": "Çalışan Yaş Piramidi, Kıdem Yılı Dağılımı ve Cinsiyet Demografi Analizi"
+        },
+        {
+          "value": "yaklasan_isg_ve_mesleki_sertifika_yenileme_takvimi",
+          "label": "Yaklaşan İSG ve Mesleki Sertifika Yenileme / Geçerlilik Takvimi"
+        },
+        {
+          "value": "norm_kadro_doluluk_ve_acik_pozisyon_open_headcount_raporu",
+          "label": "Norm Kadro Doluluk Oranı ve Açık Pozisyon (Open Headcount) Raporu"
+        },
+        {
+          "value": "ik_yonetim_raporlari_ve_kpi_panosu_duzenli_alinamamaktadir",
+          "label": "İK yönetim raporları ve KPI panoları düzenli olarak alınamamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}

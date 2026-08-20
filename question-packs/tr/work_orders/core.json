@@ -1,0 +1,1670 @@
+{
+  "meta": {
+    "pack_id": "tr.work_orders.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "WORK_ORDERS",
+    "name": "İş Emirleri ve Üretim İcrası Ön Analizi",
+    "description": "Üretim iş emri oluşturma (Manuel, Planlı emirden dönüşüm, Satış siparişinden), onay ve sahaya serbest bırakma (Release), iş emri yaşam döngüsü statüleri, mamul ve yarı mamul iş emirleri hiyerarşisi (Parent-Child), reçete dondurma (BOM Snapshot) ve revizyon kilitleme, rota kopyası (Routing Snapshot) ve alternatif operasyonlar, iş merkezi ve operatör/ekip ataması, sahada barkod/kiosk/terminal ile operasyon başlatma/durdurma, operasyon bazlı gerçekleşen üretim teyidi (Confirmation) ve kısmi bildirimler (Partial Confirmation), gerçekleşen üretim miktarları (Sağlam, Fire, Hurda, Rework), fiili hammadde ve malzeme sarfı (Material Issue), üretim bildirimiyle otomatik tüketim (Backflush) ve düzeltmeler, ek sarf ve ikame malzeme yönetimi, girdi-çıktı lot/seri izlenebilirliği (Genealogy), fiili işçilik adam-saat ve makine çalışma süreleri, duruş/bekleme süreleri ve duruş neden kodları (Downtime Reasons), rework/yeniden işleme rotaları ve iş emirleri, operasyonlar arası kalite beklemesi/blokajı, mamul ve yarı mamullerin ambara stok girişi (Goods Receipt), iş emri teknik/mali kapanış kuralları, planlanan vs gerçekleşen (Plan vs Actual) sapma analizleri ve üretim icra KPI'larının AS-IS durumunu ve ERP/MES gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "WOR-001",
+      "process": "Üretim İş Emri Oluşturma",
+      "order": 1,
+      "question": "Fabrikanızda üretim faaliyetlerini başlatan resmi Üretim İş Emirleri (Production Work Order / İmalat Emri) hangi tetikleyici mekanizmayla (Satış Siparişinden, MRP Planlı Emrinden, Projeden, Manuel) açılmaktadır?",
+      "description": "İş emri açılış yöntemi, numaralandırma ve üretim tetikleyici kaynakları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "mrp_veya_satis_siparisi_onaylandiginda_sistemden_resmi_is_emri_olarak_otomatik_veya_tek_tikla_acilir",
+          "label": "Evet; MRP önerisi veya kesin satış siparişi onaylandığında sistemde numaralı resmi iş emri olarak açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planlamaci_veya_ustabasi_sisteme_girip_her_is_icin_tek_tek_manuel_is_emri_olusturur",
+          "label": "Otomatik açılış yoktur; planlamacı veya ustabaşı ekrandan her iş için manuel iş emri oluşturur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemik_is_emri_yoktur_kagit_form_veya_excel_is_dagitim_listesiyle_uretime_baslanir",
+          "label": "Sistemde iş emri açılmaz; matbu kağıt veya Excel iş listesi yazdırılarak sahaya verilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-002",
+      "process": "Üretim İş Emri Oluşturma",
+      "order": 2,
+      "question": "Sık tekrarlanan seri üretimler veya özel müşteri projeleri için standart şablonlardan türetilen Şablon İş Emirleri (Template Work Orders) kullanılmakta mıdır?",
+      "description": "Şablon iş emirleri, tekrarlı üretim modelleri ve hızlı iş emri oluşturma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sablon_is_emirleri_tanimlidir_tekrar_eden_islerde_saniyeler_icinde_is_emri_turetir",
+          "label": "Evet; standart ürünler için şablonlar hazırdır; miktar ve termin girilerek hızla iş emri açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_seferinde_urun_ve_recete_bastan_secilerek_standart_is_emri_acilir",
+          "label": "Şablon yoktur; her defasında mamul kodu, reçete ve rota baştan seçilerek açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sablon_is_emri_kullanilmamaktadir",
+          "label": "Şablon iş emri kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-003",
+      "process": "Planlı Emirden Dönüşüm",
+      "order": 3,
+      "question": "Üretim planlama (MRP/MPS) tarafından üretilen Planlı Emirlerin (Planned Orders) sahadaki fiili Üretim İş Emrine dönüştürülmesi ve kesinleştirilmesi (Firming) süreci sistemde nasıl işletilmektedir?",
+      "description": "Planlı emirden fiili iş emrine dönüşüm, toplu kesinleştirme ve planlama-üretim devri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "planlama_kokpitinde_planli_emirler_secilip_tek_tikla_veya_toplu_olarak_kesin_is_emrine_donusturulur",
+          "label": "Evet; planlamacı onayladığı planlı emirleri tek tıkla kesinleştirir; sistem reçeteyi ve rotayı bağlayarak iş emrini üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planli_emir_kavrami_yoktur_talep_dogrudan_fiili_is_emri_olarak_acilir",
+          "label": "Planlı emir aşaması yoktur; sisteme girilen her üretim talebi doğrudan fiili iş emri olarak oluşur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planli_emirden_donusum_manuel_veri_girisiyle_yapilir",
+          "label": "Otomatik dönüşüm yoktur; planlamacı plandaki miktara bakarak üretim ekranına baştan manuel iş emri girer",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-004",
+      "process": "Planlı Emirden Dönüşüm",
+      "order": 4,
+      "question": "Müşteri satış siparişi veya haftalık üretim programı kapsamında birden fazla mamul ve yarı mamul için Toplu İş Emri Oluşturma (Mass Work Order Creation) kabiliyeti kullanılmakta mıdır?",
+      "description": "Toplu iş emri üretimi, sipariş grubu bazında iş emri açılışı ve hat yükleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "haftalik_veya_siparis_bazinda_onlarca_is_emri_tek_seferde_toplu_olarak_olusturulabilir",
+          "label": "Evet; haftalık programdaki tüm kalemler veya çok satırlı bir satış siparişi tek seferde toplu iş emrine çevrilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emirleri_yalnizca_tek_tek_acilir_toplu_islem_yapilamaz",
+          "label": "Toplu açılış yoktur; planlamacı her ürün ve yarı mamul için tek tek iş emri açmak zorundadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "toplu_is_emri_olusturma_kullanilmamaktadir",
+          "label": "Toplu iş emri oluşturma kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-005",
+      "process": "İş Emri Onay / Serbest Bırakma",
+      "order": 5,
+      "question": "Açılan bir iş emrinin sahaya verilip üretime başlanabilmesi için resmi bir Serbest Bırakma / Onaylama (Release / Sahaya Verme) aşaması var mıdır?",
+      "description": "İş emri onay mekanizması, taslaktan serbest bırakma (Release) durumuna geçiş ve yetkilendirme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "is_emri_once_taslak_acilir_yetkili_serbest_birakmadan_release_sahada_islem_yapilamaz",
+          "label": "Evet; iş emri serbest bırakılmadan (Release) sahada barkod okutulamaz, malzeme çekilemez veya operasyon başlatılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emri_acildigi_an_otomatik_serbesttir_ayri_bir_onay_adimi_yoktur",
+          "label": "Ayrı bir release adımı yoktur; iş emri oluşturulduğu anda sahada işlem yapılabilir durumdadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "serbest_birakma_kagit_formun_imzalanmasiyla_fiziki_yurutulur",
+          "label": "Sistemik kilit yoktur; üretim müdürü kağıt formu imzalayıp ustabaşına teslim edince iş serbest sayılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-006",
+      "process": "İş Emri Onay / Serbest Bırakma",
+      "order": 6,
+      "question": "İş emri serbest bırakılırken reçetedeki hammadde ve yarı mamullerin ambarda eksik olması durumunda sistemin iş emrini serbest bırakmayı engellemesi veya uyarı vermesi sağlanmakta mıdır?",
+      "description": "Release aşamasında otomatik malzeme mevcudiyet kontrolü (Material Availability on Release).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "malzeme_eksikse_sistem_is_emrini_serbest_birakmaz_veya_onay_icin_yonetici_sifresi_ister",
+          "label": "Evet; ambarda hammadde hazır değilse iş emri serbest bırakılamaz; hat başında malzeme beklemesi engellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "malzeme_eksik_olsa_da_is_emri_serbest_birakilabilir_yalnizca_uyari_gorunur",
+          "label": "Sert kilit yoktur; sistem sarı uyarı verir fakat planlamacı isterse iş emrini yine de sahaya verebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "serbest_birakmada_malzeme_kontrolu_yapilmamaktadir",
+          "label": "Serbest bırakma esnasında malzeme mevcudiyet kontrolü yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-007",
+      "process": "İş Emri Statüleri",
+      "order": 7,
+      "question": "İş emirlerinin sahadaki anlık durumları sistemde standart statülerle (Taslak, Serbest Bırakıldı, Üretimde / Başladı, Duraklatıldı / Beklemede, Tamamlandı, Kapatıldı, İptal) takip edilmekte midir?",
+      "description": "İş emri statü yaşam döngüsü (Status Lifecycle) ve anlık takip.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_is_emirleri_sistemde_resmi_statuler_taslak_serbest_uretimde_tamamlandi_kapandi_ile_anlik_izlenir",
+          "label": "Evet; bir iş emrinin sahada hangi aşamada olduğu statüsünden (Taslak -> Serbest -> Üretimde -> Tamamlandı -> Kapandı) canlı izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_acik_ve_kapali_seklinde_2_statu_vardir_ara_durumlar_gorulemez",
+          "label": "Statü yapısı sığdır; iş emri ya 'Açık' ya 'Kapalı' görünür, sahada başlayıp başlamadığı anlaşılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emri_statuleri_sistemde_takip_edilmemektedir",
+          "label": "İş emri statüleri sistemde takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-008",
+      "process": "İş Emri Statüleri",
+      "order": 8,
+      "question": "İş emirlerine aciliyet ve müşteri önemine göre Öncelik Seviyesi (Acil / Yüksek / Standart / Düşük) atanabilmekte ve saha ekranlarında işler bu önceliğe göre sıralanmakta mıdır?",
+      "description": "İş emri önceliklendirme (Priority dispatching) ve hat başı öncelik listesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "oncelik_seviyesi_atanir_ve_operator_ekraninda_acil_isler_otomatik_olarak_en_uste_dizilir",
+          "label": "Evet; iş emrine acil kodu verildiğinde operatörün kiosk/terminal ekranında en üstte kırmızı olarak öne çıkar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "oncelik_kodu_vardir_ancak_siralamayi_otomatik_etkilemez_ustabasi_sozlu_yonlendirir",
+          "label": "Öncelik seçilir fakat ekran sırasını değiştirmez; ustabaşı personele 'Önce şu işi yap' diye sözlü söyler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emri_oncelik_takibi_yapilmamaktadir",
+          "label": "İş emri öncelik takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-009",
+      "process": "Mamul / Yarı Mamul İş Emirleri",
+      "order": 9,
+      "question": "Çok seviyeli ürünlerde nihai mamul iş emri ile alt yarı mamul iş emirleri arasında Hiyerarşik Bağ (Parent-Child / Üst İş Emri - Alt İş Emri İlişkisi) kurulmakta mıdır?",
+      "description": "Çok seviyeli iş emri yapısı (Multi-level work orders), hiyerarşik bağ ve alt montaj tamamlama takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ust_ve_alt_is_emirleri_parent_child_hiyerarsisiyle_birbirine_baglidir_tum_zincir_tek_ekranda_gorulur",
+          "label": "Evet; ana mamul iş emri açıldığında altındaki tüm yarı mamul iş emirleri hiyerarşik olarak açılır ve birbirine bağlı izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_yari_mamul_icin_bagimsiz_ayri_bir_is_emri_acilir_aralarinda_sistemik_bag_yoktur",
+          "label": "Yarı mamuller için ayrı iş emri açılır fakat bunlar birbirinden bağımsızdır; hangi yarı mamulün hangi mamule gittiği sistemde görünmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_seviyeli_is_emri_kullanilir_yari_mamuller_ayri_is_emri_olmaz",
+          "label": "Tek seviyeli iş emri kullanılır; yarı mamuller için ayrı iş emri açılmaz, tüm işlemler tek emirde toplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-010",
+      "process": "Mamul / Yarı Mamul İş Emirleri",
+      "order": 10,
+      "question": "Alt yarı mamul iş emri üretilip tamamlanmadan, onu girdi olarak kullanan üst montaj iş emrinin başlatılması sistem tarafından engellenmekte midir?",
+      "description": "Hiyerarşik iş emirleri bağımlılık kısıtı ve öncül/ardıl iş emri tamamlama kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "WOR-009",
+        "operator": "not_equals",
+        "value": "tek_seviyeli_is_emri_kullanilir_yari_mamuller_ayri_is_emri_olmaz"
+      },
+      "options": [
+        {
+          "value": "alt_yari_mamul_stoga_girmeden_ust_montaj_is_emrinin_baslatilmasina_sistem_izin_vermez",
+          "label": "Evet; alt yarı mamul tamamlanıp ambara/hatta teslim edilmeden üst montaj iş emri başlatılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistem_uyari_verir_ancak_fiziki_olarak_parca_hazirsa_operator_ust_isi_baslatabilir",
+          "label": "Sert kilit yoktur; sistem uyarı verir fakat fiili montaj başlamışsa üst iş emri kaydı başlatılabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emirleri_arasi_bagimlilik_kiliti_bulunmamaktadir",
+          "label": "İş emirleri arasında tamamlama bağımlılık kilidi bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-011",
+      "process": "BOM / Reçete Snapshot",
+      "order": 11,
+      "question": "Bir iş emri açıldığında ürün ağacının (BOM) o anki güncel kopyası İş Emri Reçetesi (BOM Snapshot) olarak dondurulmakta mıdır; sonradan ana BOM revize edilse bile açık iş emri kendi açılış reçetesini korur mu?",
+      "description": "BOM Snapshot mimarisi, açık iş emrinde reçete dondurma ve geriye dönük izlenebilirlik.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "is_emri_acildiginda_bom_kopyasi_dondurulur_ana_bom_degisse_de_is_emri_kendi_recetesini_korur",
+          "label": "Evet; iş emri açıldığı andaki reçete kopyalanır (BOM Snapshot); ana reçetede yapılan revizyon açık iş emrini bozmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emri_canli_bom_a_baglidir_ana_recete_degisirse_acik_is_emrinin_malzemeleri_de_otomatik_degisir",
+          "label": "Snapshot yoktur; iş emri canlı ana BOM'a bağlıdır, ana reçete değişirse açık iş emrinin ihtiyaçları da anında değişir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "bom_snapshot_kavrami_bilinmemekte_veya_kullanilmamaktadir",
+          "label": "BOM snapshot kavramı kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-012",
+      "process": "BOM / Reçete Snapshot",
+      "order": 12,
+      "question": "Özel bir sipariş veya üretim zorunluluğu nedeniyle yetkili mühendis/planlamacı tarafından ana ürün ağacını bozmadan yalnızca o İş Emrine Özel Bileşen veya Sarf Miktarı Değişikliği (Order-Specific BOM Change) yapılabilmekte midir?",
+      "description": "İş emrine özel münferit reçete değişikliği ve yetki onayı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yetkili_kullanici_ana_bom_u_bozmadan_yalnizca_ilgili_is_emrinde_malzeme_ekleyip_miktar_degistirebilir",
+          "label": "Evet; yalnızca o iş emrine mahsus olmak üzere ek hammadde eklenebilir veya sarf miktarı yetkiyle revize edilebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emrindeki_malzemeler_kilitlidir_degisiklik_icin_ana_bom_degistirilip_is_emri_bastan_acilir",
+          "label": "İş emri üzerinde değişiklik yapılamaz; değişiklik gerekiyorsa ana reçete değiştirilip yeni iş emri açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emrine_ozel_recete_degisikligi_yapilamamaktadir",
+          "label": "İş emrine özel reçete değişikliği yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-013",
+      "process": "Rota / Operasyon Snapshot",
+      "order": 13,
+      "question": "İş emri oluşturulduğunda standart üretim rotası İş Emri Rotası (Routing Snapshot) olarak kopyalanmakta mıdır ve gerektiğinde sahada operasyon ekleme/silme (Örn. Ekstra zımpara veya ara kontrol operasyonu) yapılabilmekte midir?",
+      "description": "Routing Snapshot, iş emrinde münferit operasyon adımı ekleme/çıkarma ve sıra değiştirme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "rota_is_emrine_kopyalanir_ve_yetkiyle_o_is_emrine_ozel_ekstra_operasyon_eklenebilir_silinebilir",
+          "label": "Evet; iş emri rotası bağımsız kopyadır; gerekirse sadece o iş için 'Ekstra Temizlik' veya 'Fason Taşlama' operasyonu eklenebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "rota_kilitlidir_standart_operasyonlar_disinda_is_emrinde_hicbir_adim_degistirilemez",
+          "label": "Rota kilitlidir; ana rotada ne varsa iş emri o sırayı takip etmek zorundadır, münferit operasyon eklenemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistemde_operasyon_adimlari_takip_edilmemektedir",
+          "label": "Sistem üzerinde operasyon adımları takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-014",
+      "process": "Rota / Operasyon Snapshot",
+      "order": 14,
+      "question": "İş emrindeki bir operasyon için tezgâh arızası veya yoğunluk nedeniyle standart iş merkezi yerine Onaylı Alternatif İş Merkezi seçilerek operasyon o tezgâha aktarılabilmekte midir?",
+      "description": "İş emrinde alternatif iş merkezi yönlendirme ve süre uyarlaması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "operasyon_esnasinda_alternatif_tezgah_secilebilir_ve_islem_o_tezgahin_maliyetiyle_kaydolur",
+          "label": "Evet; operatör veya ustabaşı iş emrindeki tezgâhı listeden alternatif bir makineye kolayca yönlendirebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "baska_tezgahta_islenir_ancak_sistemde_standart_tezgah_uzerinde_tamamlanmis_gosterilir",
+          "label": "Fiziken başka makinede işlenir fakat sistemde orijinal planlanan makinede yapılmış gibi onaylanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "alternatif_is_merkezi_secimi_yapilamamaktadir",
+          "label": "Alternatif iş merkezi seçimi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-015",
+      "process": "İş Merkezi Ataması",
+      "order": 15,
+      "question": "İş emirlerindeki her bir operasyon adımı sahada belirli bir İş Merkezine (Work Center / Tezgâh / İstasyon / Hat) atanmakta ve operatörler yalnızca kendi iş merkezine atanan işleri mi görmektedir?",
+      "description": "İş merkezi iş kuyruğu (Work Center Dispatch List) ve istasyon bazlı iş listesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "her_operasyon_ilgili_is_merkezine_atanir_ve_istasyon_terminalinde_sadece_o_makinenin_is_kuyrugu_gorulur",
+          "label": "Evet; her operasyon ilgili makineye atanır; tezgâh başındaki ekranda sadece o tezgâhın sıradaki işleri listelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_fabrikanin_is_emirleri_tek_bir_genel_havuzda_gorulur_tezgah_filtresi_yoktur",
+          "label": "İstasyon bazlı kuyruk yoktur; tüm açık iş emirleri tek bir ortak listede durur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_merkezi_atamasi_sistemde_yapilmamaktadir",
+          "label": "İş merkezi ataması veya dijital iş kuyruğu bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-016",
+      "process": "İş Merkezi Ataması",
+      "order": 16,
+      "question": "Birden fazla makinenin veya hattın paralel çalıştığı durumlarda (Örn. 5 adet CNC Torna veya 3 Montaj Masası) tek bir iş emrinin parçaları farklı makineler arasında bölünerek (Split Work Order) eşzamanlı işletilebilmekte midir?",
+      "description": "İş emri bölme (Work Order Splitting / Parallel Execution) ve çoklu makinede ortak üretim.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "is_emri_partilere_bolunerek_farkli_makinelerde_es_zamanli_uretilebilir_ve_takip_edilir",
+          "label": "Evet; 10.000 adetlik iş emri sistemde 2 ayrı tezgâha (5.000 + 5.000) bölünerek paralel yürütülebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emri_bolunemez_tek_makinede_bastansona_kadar_tamamlanmak_zorundadir",
+          "label": "İş emri bölünemez; tek bir tezgâhta başlar ve orada biter; bölünmesi için ayrı iş emri açmak gerekir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emri_bolme_sureci_kullanilmamaktadir",
+          "label": "İş emri bölme süreci kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-017",
+      "process": "Operatör / Ekip Ataması",
+      "order": 17,
+      "question": "Üretim iş emri veya operasyonuna müdahaleyi yapan Operatör veya Üretim Ekibi (Vardiya / İstasyon Takımı) sistemde kaydedilmekte ve yetkinlik kontrolü yapılmakta mıdır?",
+      "description": "Operatör sicil kaydı, ekip ataması, yetkili operatör kontrolü ve iş gücü izlenebilirliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "operatör_kendi_kullanici_veya_barkoduyla_ise_giris_yapar_hangi_parcayi_kimin_urettigi_tam_kaydolur",
+          "label": "Evet; operatör işe başlarken kendi kimliğini/barkodunu okutur; üretilen her parçanın hangi operatörden çıktığı bilinir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "isler_kisiye_degil_vardiyaya_veya_atolyeye_yazilir_tekil_operator_kaydi_tutulmaz",
+          "label": "Kişi bazında tutulmaz; '1. Vardiya Pres Ekibi' gibi toplu ekip olarak kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operator_kaydi_tutulmamaktadir",
+          "label": "Operatör veya çalışan kişi kaydı sisteme işlenmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-018",
+      "process": "Operatör / Ekip Ataması",
+      "order": 18,
+      "question": "Saha terminallerinde operatörlerin giriş yapması (Login / Personel Tanıma) hangi donanım ve yöntemle (Barkod / Karekod Okutma, RFID / Personel Kartı, Parmak İzi, Kullanıcı Adı/Şifre, Ortak Terminal) sağlanmaktadır?",
+      "description": "Saha operatör kimlik doğrulama yöntemi ve shop-floor terminal erişim altyapısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "rfid_personel_karti_veya_yaka_karti_barkodunun_okutulmasiyla_hizlica_giris_yapilir",
+          "label": "RFID personel kartı veya yaka kartındaki barkodun terminale okutulmasıyla saniyeler içinde giriş yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokunmatik_ekrandan_kullanici_adi_ve_sifre_veya_pin_kodu_girilerek_giris_yapilir",
+          "label": "Kiosk/tablet dokunmatik ekranından kullanıcı adı ve PIN/şifre girilerek açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ortak_genel_bir_hesap_surekli_aciktir_kimse_bireysel_giris_yapmaz",
+          "label": "Terminalde ortak genel bir kullanıcı sürekli açıktır; operatörler şahsi giriş yapmadan işlem yapar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-019",
+      "process": "Operasyon Başlatma",
+      "order": 19,
+      "question": "Üretim sahasında bir operasyon fiilen başladığında ve durduğunda Zaman Kaydı (Başlangıç ve Bitiş Saati) hangi ortam ve araçla (Hat Başı Dokunmatik Kiosk, El Terminali / Tablet, Barkod Okutma, Kağıt Form, MES / PLC) yapılmaktadır?",
+      "description": "Operasyon başlatma/durdurma yöntemi, gerçek zamanlı zaman takibi ve saha veri toplama ortamı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "operator_hat_basindaki_terminal_tablet_veya_barkod_okuyucuyla_isi_aninda_baslatir_ve_durdurur",
+          "label": "Evet; operatör iş emri refakat kartındaki barkodu okutarak işi başlatır ve bitirir; başlama/bitiş anlık kaydolur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "plc_veya_makine_otomasyonu_ise_baslama_ve_bitisi_otomatik_olarak_sisteme_gonderir_mes",
+          "label": "Makine/PLC entegrasyonu vardır; tezgâh çalışmaya başladığı an sistemik zaman kaydı otomatik başlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "vardiya_veya_gun_bitiminde_kagit_forma_yazilan_saatler_toplu_olarak_bilgisayara_girilir",
+          "label": "Anlık zaman kaydı yoktur; vardiya sonunda operatörün kağıda yazdığı başlama/bitiş saatleri sisteme sonradan girilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operasyon_baslangic_ve_bitis_saatleri_kaydedilmemektedir",
+          "label": "Operasyon başlama ve bitiş saati takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-020",
+      "process": "Operasyon Başlatma",
+      "order": 20,
+      "question": "Üretim partisine eşlik eden ve üzerinde iş emri barkodu, rota adımları ve teknik çizim referansı bulunan İş Emri Refakat Kartı (Job Traveler / Rota Kartı / İmalat Fişi) basılıp sahada dolaştırılmakta mıdır?",
+      "description": "Refakat kartı (Traveler / Route Sheet), fiziki parti takibi ve barkodlu operasyon formu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "barkodlu_refakat_karti_yazdirilir_ve_kasa_palet_uzerinde_tum_operasyonlar_boyunca_parcaya_eslik_eder",
+          "label": "Evet; iş emri açıldığında barkodlu refakat kartı basılır; kasa/palet üzerinde tüm istasyonları gezer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tamamen_dijital_ve_kagitsiz_calisilir_operator_isleri_ekrandan_gorur_kagit_basilmaz",
+          "label": "Kâğıtsız fabrika (Paperless) çalışılır; kasalarda dijital barkod/RFID etiket vardır, basılı form kullanılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_bir_refakat_karti_kullanilmamaktadir",
+          "label": "Standart bir iş emri refakat kartı kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-021",
+      "process": "Operasyon Bildirimi",
+      "order": 21,
+      "question": "Üretim onayları Operasyon Bazında Tek Tek (Her operasyon bittiğinde o operasyonun sağlam ve fire miktarı onaylanarak) mi, yoksa yalnızca En Son Mamul Çıkışında Toplu olarak mı sisteme bildirilmektedir?",
+      "description": "Operasyon onayları (Operation Confirmation) vs Nihai toplu bildirim (Milestone / Final Confirmation).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "her_operasyon_ayri_ayri_onaylanir_kesim_torna_kaynak_montaj_adimlari_sistemde_tek_tek_tamamlanir",
+          "label": "Evet; her operasyon adımında teyit (Confirmation) verilir; parça hangi istasyonda bekliyor anlık görülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_kritik_bir_iki_ana_asamada_milestone_bildirim_yapilir_diger_ara_adımlar_otomatik_kapanir",
+          "label": "Milestone operasyon onayı uygulanır; sadece 1-2 ana istasyonda onay verilir, aradaki adımlar otomatik tamamlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operasyon_bazli_bildirim_yapilmaz_yalniz_mamul_cikinca_toplu_kapatilir",
+          "label": "Operasyon bazlı onay yoktur; ürün tüm aşamalardan geçip bitmiş mamul olunca tek seferde toplu bildirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-022",
+      "process": "Operasyon Bildirimi",
+      "order": 22,
+      "question": "Bir iş emri günlerce sürdüğünde veya birden fazla vardiyaya yayıldığında Kısmi Üretim Bildirimleri (Partial Confirmation — Örn. 1.000 adetten ilk vardiyada üretilen 350 adedin girilmesi) yapılabilmekte midir?",
+      "description": "Kısmi üretim teyidi (Partial Confirmation), vardiya devirleri ve kümülatif miktar takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "WOR-021",
+        "operator": "not_equals",
+        "value": "operasyon_bazli_bildirim_yapilmaz_yalniz_mamul_cikinca_toplu_kapatilir"
+      },
+      "options": [
+        {
+          "value": "kismi_bildirimler_yapilabilir_her_vardiya_urettigi_kadarini_onaylar_kalan_miktar_acik_kalir",
+          "label": "Evet; vardiya bittiğinde üretilen 350 adet onaylanır, kalan 650 adet bir sonraki vardiyaya açık olarak devreder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kismi_bildirim_yapilamaz_is_emrinin_tamami_bitmeden_sisteme_miktar_girilemez",
+          "label": "Kısmi onay yoktur; 1.000 adedin tamamı bitene kadar iş emri sistemde açık bekler, tek seferde kapatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kismi_uretim_bildirimi_kullanilmamaktadir",
+          "label": "Kısmi üretim bildirimi kullanılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-023",
+      "process": "Üretim Miktarı Bildirimi",
+      "order": 23,
+      "question": "Üretim bildirimi yapılırken üretilen miktarlar Sağlam Ürün (Good Yield), Hurda / Fire Miktarı (Scrap) ve Yeniden İşlenecek Miktar (Rework) olarak net biçimde ayrıştırılarak mı sisteme girilmektedir?",
+      "description": "Gerçekleşen miktarların sınıflandırılması (Sağlam, Hurda, Rework) ve üretim verimliliği (Yield) hesabı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "saglam_fire_ve_rework_miktarlari_bildirim_ekraninda_ayri_ayri_zorunlu_olarak_girilir",
+          "label": "Evet; ekranda 950 adet sağlam, 30 adet fire, 20 adet rework ayrı alanlara girilir ve net üretim verimi hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_saglam_cikan_miktar_girilir_fire_veya_hurdalar_sisteme_islenmez",
+          "label": "Sadece sağlam adet girilir; hurda veya fire olan parçalar kayda geçirilmez, ambardan kayıp olarak kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "toplam_uretilen_miktar_tahmini_yazilir_ayrim_yapilmaz",
+          "label": "Toplam miktar tahmini yazılır; sağlam/fire ayrımı yapılmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-024",
+      "process": "Üretim Miktarı Bildirimi",
+      "order": 24,
+      "question": "Planlanan miktarın üzerinde Fazla Üretim Bildirimi (Over-Delivery / Over-Production) yapılmasını engelleyen veya yönetici onayına bağlayan bir Tolerans Kontrol Mekanizması var mıdır?",
+      "description": "Fazla üretim kontrolü, yüzde tolerans kuralı ve plansız stok şişmesinin engellenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tolerans_limiti_vardir_orn_yuzde_5_fazla_uretime_izin_verilir_uzeri_icin_onay_gerekir",
+          "label": "Evet; iş emri miktarının en fazla %5-10 fazlası bildirilebilir; toleransı aşan fazla üretim sistem tarafından engellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hicbir_limit_yoktur_operator_istedigi_kadar_yuksek_miktar_bildirebilir",
+          "label": "Limit yoktur; 100 adetlik iş emrine operatör 500 adet de bildirse sistem kabul eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fazla_uretim_tolerans_kontrolu_bulunmamaktadir",
+          "label": "Fazla üretim tolerans kontrolü bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-025",
+      "process": "Fire / Hatalı Ürün",
+      "order": 25,
+      "question": "Üretim sırasında oluşan fire ve hurdalar için standart Fire Neden Kodları (Hammadde Hatası, Tezgâh/Kalıp Ayarı, Operatör Hatası, Elektrik Kesintisi, Ölçü Kaçıklığı, Çatlak/Yırtılma vb.) seçilmekte midir?",
+      "description": "Fire neden kodları (Scrap Reason Codes), hurda analizleri ve kayıp kök nedenleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "standart_fire_neden_katalogu_vardir_hurda_girilirken_neden_kodu_secilmesi_zorunludur",
+          "label": "Evet; standart fire kodları tanımlıdır; operatör hurda miktarını yazarken nedenini (Hammadde, Ayar, Çapak vb.) seçmek zorundadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fire_nedeni_serbest_metin_olarak_aciklamaya_yazilir_standart_kod_yoktur",
+          "label": "Standart kod yoktur; forma veya sisteme 'Kalıp sıkıştı' gibi serbest not düşülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fire_neden_kaydi_tutulmamaktadir",
+          "label": "Fire neden kaydı tutulmamaktadır; yalnızca hurda ayrılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-026",
+      "process": "Fire / Hatalı Ürün",
+      "order": 26,
+      "question": "İşin başındaki kalıp ayarı ve tezgâh ısınmasında verilen Ayar / Başlangıç Firesi (Setup Scrap) ile proses sırasında oluşan İşleme Firesi (Process Scrap) sistemde ayrı ayrı raporlanabilmekte midir?",
+      "description": "Ayar firesi vs Proses firesi ayrımı ve parti büyüklüğü optimizasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "ayar_firesi_ve_proses_firesi_ayri_kodlarla_ve_ayri_asamlarda_kaydedilir",
+          "label": "Evet; ilk kalıp bağlama deneme parçaları 'Ayar Firesi' olarak, çalışma esnasındaki hurdalar 'Proses Firesi' olarak ayrılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_fireler_tek_bir_toplam_hurda_olarak_kaydedilir_ayrim_yapilmaz",
+          "label": "Ayrım yapılmaz; iş boyunca çıkan tüm hurda parçalar tek kalemde toplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ayar_ve_proses_firesi_ayrimi_yapilmamaktadir",
+          "label": "Ayar ve proses firesi ayrımı yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-027",
+      "process": "Malzeme Sarfı",
+      "order": 27,
+      "question": "İş emrinde kullanılan hammadde, yardımcı malzeme ve yarı mamullerin stoktan düşümü (Fiili Malzeme Sarfı / Goods Issue to Work Order) hangi yöntemle yürütülmektedir?",
+      "description": "Malzeme sarf yöntemi, manuel sarf fişi kesme, barkod okutarak hat başı sarfı ve iş emrine maliyetleme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "barkod_okutularak_veya_is_emri_ekranindan_kullanilan_fiili_miktar_secilerek_anlik_sarf_edilir",
+          "label": "Evet; sahada hammadde barkodu okutularak veya sarf ekranından fiili miktar onaylanarak iş emrine anında sarf edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_onayi_verildiginde_recetedeki_standart_miktara_gore_otomatik_sarf_edilir_backflush",
+          "label": "Otomatik sarf (Backflush) kullanılır; üretilen mamul adedi girilince sistem reçetedeki oranda hammaddeyi stoktan düşer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ay_sonunda_veya_hafta_sonunda_depocu_kalan_miktara_bakarak_toplu_sarf_fisi_keser",
+          "label": "Anlık sarf yoktur; ay sonlarında ambardaki sayım farkına göre toplu genel sarf fişi kesilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "malzeme_sarflari_sistemde_takip_edilmemektedir",
+          "label": "İş emri bazında malzeme sarf takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-028",
+      "process": "Malzeme Sarfı",
+      "order": 28,
+      "question": "Depodan iş emrine hammadde çekilirken yanlış malzeme kullanımını engellemek için Barkod / Karekod Doğrulama (Poka-Yoke / Hata Önleme) kontrolü yapılmakta mıdır?",
+      "description": "Hat başı malzeme doğrulama, reçete kontrolü ve yanlış hammadde engelleme (Poka-Yoke).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hammadde_barkodu_okutuldugunda_receteyle_eslesmezse_sistem_sesli_ve_gorsel_kirmizi_uyari_verir",
+          "label": "Evet; operatör yanlış bir hammadde veya boya barkodu okutursa sistem 'Reçetede Bu Malzeme Yok' uyarısıyla engeller",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "barkod_okutulmaz_operatör_ambardan_gelen_etikete_gozle_bakarak_malzemeyi_alır",
+          "label": "Barkod doğrulaması yoktur; operatör çuval veya palet üzerindeki etikete gözle bakıp tezgâha döker",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "poka_yoke_veya_barkodlu_dogrulama_bulunmamaktadir",
+          "label": "Barkodlu malzeme doğrulama sistemi bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-029",
+      "process": "Backflush ve Otomatik Sarf",
+      "order": 29,
+      "question": "Üretim gerçekleşme onayı girildiğinde ürün ağacındaki standart miktarlara göre hammaddelerin stoktan otomatik düşülmesi (Backflush / Ters Yıkama Tüketimi) yöntemi uygulanmakta mıdır?",
+      "description": "Backflush sarf mekanizması, otomatik stok tüketimi ve standart sarf normları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "backflush_kullanilir_mamul_veya_operasyon_onaylandigi_an_bilesenler_otomatik_sarf_olur",
+          "label": "Evet; parça başı standart sarf miktarları tanımlıdır; 100 adet montaj onayı verildiğinde 100x reçete otomatik stoktan düşer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_civata_somun_gibi_onemsiz_c_grubu_parcalarda_backflush_ana_parcalarda_manuel_sarf_yapilir",
+          "label": "Hibrit model; küçük bağlantı elemanları otomatik backflush ile, pahalı ana gövde ve motorlar barkodla manuel sarf edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "backflush_kullanilmaz_tum_malzemeler_manuel_sarf_edilir",
+          "label": "Backflush kullanılmaz; tüm hammaddeler tartılarak veya sayılarak manuel sarf fişiyle düşülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-030",
+      "process": "Backflush ve Otomatik Sarf",
+      "order": 30,
+      "question": "Backflush sarfı sonrasında fiili tüketim ile standart sarf arasında fark oluştuğunda (Örn. Standart 100 kg ama fiilen 108 kg kullanıldı) bu farkın iş emri üzerinde kolayca düzeltilmesi sağlanabilmekte midir?",
+      "description": "Backflush sapma düzeltmesi ve fiili sarf mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "WOR-029",
+        "operator": "not_equals",
+        "value": "backflush_kullanilmaz_tum_malzemeler_manuel_sarf_edilir"
+      },
+      "options": [
+        {
+          "value": "otomatik_sarftan_sonra_ekstra_kullanilan_miktar_fark_sarfi_olarak_is_emrine_islenir",
+          "label": "Evet; otomatik düşülen miktar üzerine eklenen veya iade edilen miktar iş emrinde kolayca revize edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "backflush_miktari_degistirilemez_farklar_ay_sonu_sayim_acigi_olarak_muhasebeye_kalir",
+          "label": "İş emrinde düzeltme yapılamaz; standart neyse o düşer, aradaki 8 kg fark ay sonunda genel fire yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "backflush_fark_duzeltmesi_yapilamamaktadir",
+          "label": "Backflush sapma düzeltmesi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-031",
+      "process": "Ek Sarf / İkame Malzeme",
+      "order": 31,
+      "question": "Üretim esnasında reçetede olmayan bir malzemenin kullanılması (Ek Sarf / Extra Issue) veya hammadde bittiğinde onaylı alternatif/muadil malzemenin iş emrine ikame edilmesi (Substitute Material) sistemi nasıl yönetilmektedir?",
+      "description": "İş emrinde ek malzeme sarfı, ikame malzeme kullanımı, onay hiyerarşisi ve maliyet kaydı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yetkili_onayi_ile_is_emrine_ek_malzeme_veya_ikame_muadil_hammadde_secilerek_sarf_edilebilir",
+          "label": "Evet; reçete dışı ek malzeme veya muadil hammadde yetkili onayıyla iş emrine eklenir ve nedeni kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muadil_malzeme_fiziken_kullanilir_ancak_sistemde_orijinal_malzeme_sarf_edilmis_gibi_gosterilir",
+          "label": "Sistemik ikame yoktur; sahada başka hammadde kullanılır fakat sisteme orijinal reçetedeki parça yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "recete_disi_ek_sarf_veya_ikame_malzeme_kullanimi_yapilamamaktadir",
+          "label": "Ek malzeme sarfı veya ikame malzeme yönetimi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-032",
+      "process": "Ek Sarf / İkame Malzeme",
+      "order": 32,
+      "question": "Kullanılan ikame malzemelerin maliyet farkları ve ürün kalitesine etkisi sonradan Denetim İzi (Audit Trail) ve sapma raporu olarak incelenebilmekte midir?",
+      "description": "İkame malzeme denetim izi, malzeme fiyat farkı ve kalite etkisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "hangi_is_emrinde_hangi_muadil_parcanin_kullanildigi_ve_maliyet_farki_raporlanir",
+          "label": "Evet; muadil parça kullanımı sonucu oluşan hammadde maliyet farkı ve kalite onayı sistemde raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ikame_kullanimi_sonradan_ayristirilamaz_genel_maliyet_icinde_kaybolur",
+          "label": "Ayrıştırılamaz; hangi partide muadil kullanıldığı sonradan raporlarda görülemez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ikame_denetim_izi_tutulmamaktadir",
+          "label": "İkame malzeme denetim izi veya sapma takibi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-033",
+      "process": "Lot / Seri İzlenebilirliği",
+      "order": 33,
+      "question": "Üretim iş emrinde tüketilen Hammadde ve Yarı Mamul Lot / Seri Numaraları ile üretilen Nihai Mamul Lot / Seri Numarası arasında Girdi-Çıktı Şeceresi (Genealogy / Traceability — İleri ve Geri İzlenebilirlik) kurulabilmekte midir?",
+      "description": "Üretim şeceresi (Genealogy), as-built yapısı, tüketilen parça lotlarının üretilen mamulle birebir eşleşmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_secereli_izlenebilirlik_vardir_mamul_seri_no_sundan_hangi_hammadde_lotu_kullanildigi_aninda_dokulur",
+          "label": "Evet; mamulün lot/seri numarası girildiğinde içinde kullanılan tüm hammadde lotları, tezgâh ve operatör şeceresi tek tıkla dökülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_mamule_yeni_lot_numarasi_verilir_icine_giren_hammadde_lotlari_eslestirilemez",
+          "label": "Tek taraflıdır; üretilen mamule parti no verilir fakat o partide hangi hammadde lotunun kullanıldığı sistemde eşleşmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lot_veya_seri_izlenebilirligi_tutulmamaktadir",
+          "label": "Üretimde lot veya seri bazında izlenebilirlik tutulmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-034",
+      "process": "Lot / Seri İzlenebilirliği",
+      "order": 34,
+      "question": "Kritik bileşenler içeren montajlarda (Örn. Motor Seri No, Elektronik Kart Seri No, Akü Barkodu) her bir seri numaralı parça mamulün kendi seri numarasına birebir (1-to-1 Serial Mapping) olarak mı işlenmektedir?",
+      "description": "Seri-Seri montaj eşleştirme (Component Serial Number Capture) ve dijital ürün pasaportu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "WOR-033",
+        "operator": "not_equals",
+        "value": "lot_veya_seri_izlenebilirligi_tutulmamaktadir"
+      },
+      "options": [
+        {
+          "value": "montaj_esnasinda_motor_ve_kart_seri_numaralari_okutularak_mamul_seri_kartina_birebir_kaydolur",
+          "label": "Evet; montaj sırasında bileşen seri numarası barkodla okutulur ve mamulün kimlik kartına kalıcı olarak işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "seri_numaralari_kağıt_montaj_formuna_elle_yazilir_sistemde_seri_eslesmesi_yoktur",
+          "label": "Sistemde tutulmaz; teknisyen motor seri numarasını kağıt forma elle yazar, klasörde saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "birebir_seri_seri_eslestirmesi_yapilamamaktadir",
+          "label": "Birebir seri-seri eşleştirmesi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-035",
+      "process": "İşçilik ve Makine Süresi",
+      "order": 35,
+      "question": "İş emrinde harcanan Fiili İşçilik Süresi (Adam-Saat / Labor Time) ve Tezgâh Çalışma Süresi (Makine Saati / Machine Run Time) operatör bazında kaydedilmekte midir?",
+      "description": "Fiili süre takibi, işçilik puantajı, makine saati kaydı ve standart vs fiili süre karşılaştırması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "baslama_bitis_aninda_otomatik_hesaplanir_hem_fiili_iscilik_hem_fiili_makine_suresi_kaydolur",
+          "label": "Evet; operatör işe girip çıktığında fiili adam-saat ve tezgâhın net çalışma dakikası sisteme otomatik kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_standart_sureler_baz_alinir_fiili_sure_tutulmaz_100_adet_icin_standart_ne_ise_o_yazilir",
+          "label": "Fiili süre tutulmaz; iş bittiğinde standart süre ne ise o kadar işçilik harcanmış kabul edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iscilik_ve_makine_sureleri_kaydedilmemektedir",
+          "label": "İşçilik veya makine çalışma süresi kaydı tutulmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-036",
+      "process": "İşçilik ve Makine Süresi",
+      "order": 36,
+      "question": "Bir operatörün aynı anda birden fazla tezgâhı çalıştırması (Çoklu Tezgâh Kullanımı / Multi-Machine Handling) durumunda işçilik adam-saat maliyetinin iş emirlerine paylaştırılması nasıl yönetilmektedir?",
+      "description": "Çoklu tezgâh işçilik paylaştırma katsayısı ve eşzamanlı çalışma süreleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "operator_ayni_anda_3_tezgaha_giris_yapabilir_sistem_iscilik_suresini_3_is_emrine_otomatik_boler",
+          "label": "Evet; operatör 3 makineye aynı anda oturum açabilir; sistem 1 saatlik işçiliği 3 iş emrine 20'şer dakika olarak dağıtır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operator_tek_bir_is_emrine_giris_yapar_diger_tezgahlardaki_isler_isciliksiz_kalir",
+          "label": "Çoklu dağıtım yoktur; operatör sadece tek bir makineye giriş yapabilir, diğer makinelerdeki süreler karışır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "coklu_tezgah_iscilik_dagitimi_bulunmamaktadir",
+          "label": "Çoklu tezgâh işçilik paylaştırma mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-037",
+      "process": "Duruş / Bekleme Nedenleri",
+      "order": 37,
+      "question": "Üretim esnasında meydana gelen plansız duruşlar (Makine Arızası, Malzeme Bekleme, Kalıp/Ayar Değişimi, Kalite Onay Bekleme, Elektrik Kesintisi, Personel Molası vb.) sahadan Duruş Neden Kodlarıyla (Downtime Reasons) kaydedilmekte midir?",
+      "description": "Saha duruş neden kodları, bekleme süreleri, duruş sınıflandırması ve OEE kullanılabilirlik kaybı analizi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tezgah_durdugunda_operator_terminalden_durus_nedenini_zorunlu_secer_durus_suresi_anlik_sayar",
+          "label": "Evet; makine durduğunda operatör ekrandan 'Malzeme Bekliyor', 'Arıza' veya 'Kalıp Ayarı' kodunu seçer ve duruş süresi kaydolur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "duruslar_vardiya_raporuna_elle_dakika_olarak_yazilir_sistemik_durus_kodu_secilmez",
+          "label": "Sistemik duruş kaydı yoktur; operatör kağıt forma '1 saat arıza oldu' diye yazar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "durus_ve_bekleme_sureleri_kaydedilmemektedir",
+          "label": "Duruş süreleri veya neden kodları kaydedilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-038",
+      "process": "Duruş / Bekleme Nedenleri",
+      "order": 38,
+      "question": "Operatörün kaydetmediği kısa süreli duruşlar (Micro-Stops — Örn. 1-2 dakikalık parça takılmaları) ve hat hızı düşüşleri sistem tarafından otomatik tespit edilebilmekte midir?",
+      "description": "Mikro duruşlar, hat hızı kayıpları ve otomasyon sinyalleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "plc_otomasyonundan_kisa_duruslar_ve_hiz_kayiplari_otomatik_yakalanir_ve_raporlanir",
+          "label": "Evet; makine PLC'sinden gelen sinyallerle 2 dakikalık duruşlar dahi otomatik loglanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_uzun_duruslar_orn_15_dakika_uzeri_operator_tarafindan_manuel_girilir",
+          "label": "Sadece 15 dakikadan uzun büyük duruşlar manuel kaydedilir; kısa duruşlar ölçülmez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kisa_durus_takibi_yapilamamaktadir",
+          "label": "Kısa duruş veya hız kaybı takibi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-039",
+      "process": "Rework / Yeniden İşleme",
+      "order": 39,
+      "question": "Hatalı çıkan ancak hurdaya atılmayıp tamir edilebilecek parçalar için Rework / Yeniden İşleme süreci (Ayrı Rework İş Emri açılması veya Mevcut İş Emrine Rework Operasyonu eklenmesi) sistemde nasıl yürütülmektedir?",
+      "description": "Rework iş akışı, yeniden işleme iş emirleri, rework rotası ve ekstra maliyet izleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hatali_parcalar_icin_sistemden_ayri_bir_rework_is_emri_acilir_veya_is_emrinde_rework_operasyonu_isletilir",
+          "label": "Evet; tamir edilecek parçalar için resmi Rework İş Emri açılır; harcanan ek süre ve malzeme ana işten ayrı izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "rework_gayriresmi_yapilir_operator_ayni_makinede_parcayi_duzeltir_ekstra_kayit_tutulmaz",
+          "label": "Sistemik kayıt yoktur; operatör hatalı parçayı tezgâhta tekrar işleyip düzeltir, ek işçilik normal süreye karışır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "rework_sureci_yoktur_hatali_parca_tamamen_hurdaya_ayrilir",
+          "label": "Rework yapılmaz; hatalı çıkan tüm parçalar doğrudan hurdaya ayrılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-040",
+      "process": "Rework / Yeniden İşleme",
+      "order": 40,
+      "question": "Rework işlemi sırasında harcanan ilave işçilik süresi ve tüketilen ek malzemeler orijinal iş emrinin maliyetine mi, yoksa ayrı bir Kalite/Rework Masraf Merkezine mi yüklenmektedir?",
+      "description": "Rework maliyet muhasebesi, yeniden işleme işçiliği ve ek malzeme sarfı muhasebeleştirmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "WOR-039",
+        "operator": "not_equals",
+        "value": "rework_sureci_yoktur_hatali_parca_tamamen_hurdaya_ayrilir"
+      },
+      "options": [
+        {
+          "value": "rework_iscilik_ve_malzemesi_ayri_maliyetlendirilir_orijinal_urun_maliyeti_yapay_olarak_sismez",
+          "label": "Evet; rework maliyeti ayrı bir masraf kaleminde izlenir; ürünün standart maliyetiyle rework kaynaklı kayıp ayrıştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ana_is_emrine_eklenir_ve_o_partinin_birim_maliyetini_artirir",
+          "label": "Ayrı tutulmaz; ek işçilik ve sarf ana iş emrine yüklenir ve o partinin toplam maliyetini yükseltir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "rework_maliyeti_ayrilamamaktadir",
+          "label": "Rework maliyeti ayrıştırılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-041",
+      "process": "Kalite Bekleme / Blokaj",
+      "order": 41,
+      "question": "İş emrinde ara operasyonlarda (Örn. Isıl işlem sonrası sertlik testi) veya son operasyonda Kalite Kontrol Onayı verilmeden iş emrinin bir sonraki adıma geçmesi veya mamul ambarına aktarılması sistem tarafından engellenmekte midir?",
+      "description": "Süreç içi kalite kontrol blokajı (In-Process Quality Gate) ve kalite serbest bırakma (Quality Release) kuralı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kalite_onay_vermeden_is_emri_blokedir_bir_sonraki_operasyon_baslatilamaz_ve_stoga_giremez",
+          "label": "Evet; kalite kontrol personeli sistemden 'Kabul' onayı vermeden sonraki operasyona geçilemez ve mamul stoğuna alınamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kaliteci_fiziki_olarak_etiket_yapistirir_ancak_sistemde_operasyon_engeli_yoktur",
+          "label": "Fiziki kontrol yapılır fakat ERP'de kilit yoktur; operatör kalite onayını beklemeden işi sonraki tezgâha geçirebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_esnasinda_kalite_blokaj_mekanizmasi_bulunmamaktadir",
+          "label": "Üretim esnasında sistemik kalite blokaj mekanizması bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-042",
+      "process": "Mamul / Yarı Mamul Girişi",
+      "order": 42,
+      "question": "Üretimi tamamlanan mamul ve yarı mamullerin ambara stok giriş bildirimi (Goods Receipt from Production / Mamul Ambar Girişi) nasıl gerçekleşmekte ve barkodlu etiket ne zaman basılmaktadır?",
+      "description": "Üretimden mamul girişi (Goods Receipt), otomatik ambar stoklama ve palet/koli etiketleme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "son_operasyon_onaylandigi_an_mamul_otomatik_stoga_girer_ve_palet_etiketi_yazicidan_cikar",
+          "label": "Evet; son operasyon onayıyla birlikte mamul ambar stoğuna otomatik girer, lotlu palet barkodu yazıcıdan basılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mamul_ambara_tasinir_depocu_fiziki_sayip_sisteme_manuel_stok_giris_fisi_keser",
+          "label": "Otomatik giriş yoktur; ürün ambara taşınır, depocu sayarak sisteme manuel üretimden giriş fişi keser",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mamul_stok_giris_bildirimi_sistemde_takip_edilmemektedir",
+          "label": "Mamul stok giriş bildirimi sistemde anlık takip edilmemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-043",
+      "process": "İş Emri Kapanışı",
+      "order": 43,
+      "question": "Bir iş emrinin Kapatılması (Technical Completion / Final Close) sırasında açık kalan miktar, eksik malzeme sarfı veya tamamlanmamış operasyon kontrolleri sistem tarafından denetlenmekte midir ve kapatma yetkisi kimdedir?",
+      "description": "Teknik ve mali iş emri kapanışı (TECO / Close), açık sarf kontrolleri ve kapanış onay yetkisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_eksik_sarf_ve_acik_operasyonlari_kontrol_eder_yetkili_onayi_olmadan_is_emri_kapatilamaz",
+          "label": "Evet; sistem tüm malzeme sarfları ve operasyon bildirimleri tamamlanmadan iş emrinin kapanmasına izin vermez",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "operator_veya_ustabasi_eksik_varsa_bile_tek_tikla_is_emrini_kapatildi_statu_yapabilir",
+          "label": "Sistemik denetim yoktur; kullanıcı eksik bildirim olsa bile iş emrini kapatabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "is_emirleri_resmi_olarak_kapatilmaz_sistemde_surekli_acik_kalir",
+          "label": "İş emirleri kapatılmaz; sistemde açık olarak kalır, eski işler temizlenmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-044",
+      "process": "Planlanan / Gerçekleşen Karşılaştırması",
+      "order": 44,
+      "question": "İş emri kapandığında Planlanan ile Gerçekleşen Değerler (Miktar, Hammadde Sarfı, Hurda Oranı, İşçilik Süresi, Makine Süresi ve Üretim Maliyeti) sapma analizleriyle (Variance Analysis) raporlanabilmekte midir?",
+      "description": "Planlanan vs Gerçekleşen sapma analizleri (Plan vs Actual Variance), maliyet farkları ve verimlilik raporları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "planlanan_ile_gerceklesen_miktar_sarf_sure_ve_maliyet_sapmalari_is_emri_bazinda_tek_ekranda_raporlanir",
+          "label": "Evet; iş emri karnesinde 'Planlanan 100 kg sarf / Fiili 106 kg sarf' veya 'Planlanan 4 saat / Fiili 5.5 saat' sapmaları net dökülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sapmalar_yalnizca_ay_sonu_maliyet_muhasebesi_calismasinda_toplu_olarak_ortaya_cikar",
+          "label": "İş emri bazında anlık sapma analizi yoktur; ay sonlarında genel fabrika maliyet farkı olarak görülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "planlanan_vs_gerceklesen_karsilastirmasi_yapilamamaktadir",
+          "label": "Planlanan ile gerçekleşen karşılaştırması veya sapma analizi yapılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "WOR-045",
+      "process": "Üretim İş Emri KPI",
+      "order": 45,
+      "question": "Fabrikanızda İş Emri Tamamlama Oranı (Work Order Completion Rate), Hurda/Fire Oranı, Fiili Çevrim Süresi (Cycle Time), Hat Verimliliği ve OEE Saha Verileri düzenli olarak izlenmekte midir?",
+      "description": "Üretim icra performans göstergeleri (OEE, Yield, Scrap Rate, Cycle Time, First Pass Yield).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "is_emri_tamamlama_orani_hurda_yuzdesi_ve_fiili_cevrim_sureleri_canli_kpi_panolarinda_izlenir",
+          "label": "Evet; iş emri performans göstergeleri ve hat bazlı ilk seferde doğru üretme (First Pass Yield) canlı panolardan takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_toplantilarda_bazi_uretim_rakamlari_excel_tablolarindan_manuel_derlenerek_sunulur",
+          "label": "Canlı pano yoktur; ay sonu toplantılarında üretim şefi Excel'den derlediği hurda ve üretim adetlerini sunar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uretim_icra_kpi_lari_olculmemektedir",
+          "label": "Üretim icra KPI'ları veya iş emri verimlilik göstergeleri ölçülmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

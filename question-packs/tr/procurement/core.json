@@ -1,0 +1,738 @@
+{
+  "meta": {
+    "pack_id": "tr.procurement.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "PROCUREMENT",
+    "name": "Satın Alma Ön Analizi",
+    "description": "ERP implementasyonu öncesinde Satın Alma departmanının AS-IS süreçlerini, onay mekanizmalarını, tedarikçi ilişkilerini ve entegrasyon noktalarını anlamaya yönelik temel discovery soru paketi."
+  },
+  "questions": [
+    {
+      "id": "PROC-001",
+      "process": "Satın Alma Talebi",
+      "order": 1,
+      "question": "Satın alma talepleri departmanlar tarafından sisteme nasıl iletiliyor?",
+      "description": "Şirket içi mal ve hizmet ihtiyacının satın alma birimine hangi yöntemle bildirildiğini ve kayıt altına alındığını anlamak için.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_talep", "label": "ERP / Kurumsal yazılım içindeki satın alma talep modülü üzerinden", "allow_note": true, "is_other": false },
+        { "value": "ayri_yazilim", "label": "Ayrı bir talep/bilet (helpdesk, intranet vb.) uygulaması üzerinden", "allow_note": true, "is_other": false },
+        { "value": "excel_ortak", "label": "Excel / Ortak ağ dosyası üzerinden", "allow_note": true, "is_other": false },
+        { "value": "eposta", "label": "E-posta ile", "allow_note": false, "is_other": false },
+        { "value": "sozlu_telefon", "label": "Sözlü bildirim / Telefon / Anlık mesajlaşma ile", "allow_note": false, "is_other": false },
+        { "value": "coklu_yontem", "label": "Departmana veya malzeme türüne göre farklı yöntemler kullanılıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-002",
+      "process": "Satın Alma Talebi",
+      "order": 2,
+      "question": "Satın alma talebi oluşturulurken stok kontrolü yapılıyor mu?",
+      "description": "Talep edilen malzemenin depoda mevcut olup olmadığının talep anında tespit edilip edilmediği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_sistem", "label": "Evet, sistem talep anında mevcut stoku ve rezerve miktarları otomatik gösteriyor", "allow_note": false, "is_other": false },
+        { "value": "manuel_kontrol", "label": "Evet, talep eden veya satın alma personeli depoyu manuel kontrol ediyor", "allow_note": true, "is_other": false },
+        { "value": "depo_sorulur", "label": "Depo sorumlusuna telefon veya e-posta ile soruluyor", "allow_note": false, "is_other": false },
+        { "value": "kontrol_edilmez", "label": "Stok kontrolü yapılmadan doğrudan satın alma sürecine geçiliyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-003",
+      "process": "Satın Alma Talebi",
+      "order": 3,
+      "question": "Satın alma talepleri bütçe veya masraf merkezi ile ilişkilendiriliyor mu?",
+      "description": "Taleplerin departman bütçesi, masraf merkezi veya proje kodu bazında açılıp açılmadığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "masraf_ve_butce", "label": "Evet, hem masraf merkezi/proje hem de tanımlı departman bütçesi kontrol ediliyor", "allow_note": true, "is_other": false },
+        { "value": "sadece_masraf_merkezi", "label": "Evet, masraf merkezi / departman kodu seçiliyor ancak bütçe kontrolü yok", "allow_note": false, "is_other": false },
+        { "value": "sadece_proje", "label": "Sadece proje bazlı işlerde proje kodu ile ilişkilendiriliyor", "allow_note": true, "is_other": false },
+        { "value": "iliskilendirilmiyor", "label": "Hayır, talep aşamasında bütçe veya masraf merkezi seçilmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-004",
+      "process": "Satın Alma Talebi",
+      "order": 4,
+      "question": "Hangi tür ihtiyaçlar için satın alma talebi açılıyor?",
+      "description": "Sisteme girecek satın alma tiplerinin kapsamını belirlemek için.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "hammadde_ticari", "label": "Hammadde ve ticari mallar (üretim/satış amaçlı)", "allow_note": false, "is_other": false },
+        { "value": "isletme_sarf", "label": "İşletme malzemesi ve sarf malzemeleri", "allow_note": false, "is_other": false },
+        { "value": "hizmet_alim", "label": "Hizmet alımları (danışmanlık, bakım, nakliye vb.)", "allow_note": true, "is_other": false },
+        { "value": "demirbas_yatirim", "label": "Demirbaş ve yatırım alımları (CapEx)", "allow_note": true, "is_other": false },
+        { "value": "proje_ozel", "label": "Müşteri projesine özel malzeme ve ekipmanlar", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-005",
+      "process": "Talep Onayı",
+      "order": 5,
+      "question": "Satın alma talepleri satın alma departmanına iletilmeden önce bir onay sürecinden geçiyor mu?",
+      "description": "Talep onay mekanizmasının varlığı ve kurumsallık seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistem_onay_var", "label": "Evet, sistem üzerinde tanımlı bir onay akışı var", "allow_note": true, "is_other": false },
+        { "value": "eposta_yonetici", "label": "Evet, e-posta veya yazılı imza ile yönetici onayı alınıyor", "allow_note": true, "is_other": false },
+        { "value": "sozlu_onay", "label": "Evet, sözlü veya duruma göre onay alınıyor", "allow_note": false, "is_other": false },
+        { "value": "onaysiz_dogrudan", "label": "Hayır, talep açan herkes doğrudan satın almaya iletebiliyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-006",
+      "process": "Talep Onayı",
+      "order": 6,
+      "question": "Talep onay akışında hangi kriterlere göre onay kademeleri değişiyor?",
+      "description": "Onay matrisinin yapısını ve karmaşıklığını anlamak için.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tutar_limiti", "label": "Talep tutarı limitlerine göre (kademeli yetki matrisi)", "allow_note": true, "is_other": false },
+        { "value": "departman_hiyerarsi", "label": "Talep eden kişinin departman ve organizasyon hiyerarşisine göre", "allow_note": false, "is_other": false },
+        { "value": "masraf_malzeme_tipi", "label": "Malzeme/hizmet kategorisine veya masraf tipine göre (örn. Demirbaş vs Sarf)", "allow_note": true, "is_other": false },
+        { "value": "butce_asimi", "label": "Bütçe aşımı durumuna göre ek onay", "allow_note": true, "is_other": false },
+        { "value": "proje_yoneticisi", "label": "Proje bazlı işlerde proje yöneticisi onayı", "allow_note": false, "is_other": false },
+        { "value": "tek_yonetici", "label": "Kriter olmaksızın sadece ilk amir onayı yeterli", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-005",
+        "operator": "not_equals",
+        "value": "onaysiz_dogrudan"
+      }
+    },
+    {
+      "id": "PROC-007",
+      "process": "Tedarikçi Seçimi",
+      "order": 7,
+      "question": "Satın alma işlemlerinde onaylı tedarikçi listesi (Approved Vendor List) kullanılıyor mu?",
+      "description": "Tedarikçi seçiminde kurumsal onay kısıtı olup olmadığını belirlemek için.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "zorunlu_onayli", "label": "Evet, sistemde sadece onaylı tedarikçilerden satın alma yapılmasına izin veriliyor", "allow_note": true, "is_other": false },
+        { "value": "liste_var_esnek", "label": "Onaylı liste var ancak zorunlu değil, serbestçe yeni tedarikçi seçilebiliyor", "allow_note": true, "is_other": false },
+        { "value": "resmi_liste_yok", "label": "Resmi bir liste yok, satın alma sorumlusu piyasa tecrübesine göre seçiyor", "allow_note": false, "is_other": false },
+        { "value": "tek_kaynak_tedarikci", "label": "Çoğu malzeme için tek yetkili/sözleşmeli tedarikçiyle çalışılıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-008",
+      "process": "Tedarikçi Seçimi",
+      "order": 8,
+      "question": "Aynı malzeme veya hizmet için alternatif tedarikçiler sistemde kayıtlı mı?",
+      "description": "Tedarik sürekliliği ve alternatif kaynak yönetiminin durumunu belirlemek için.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistemde_tanimli", "label": "Evet, her malzeme kartına bağlı alternatif tedarikçiler ve kodları tanımlı", "allow_note": false, "is_other": false },
+        { "value": "satinalma_hafizasi", "label": "Satın alma personelinin bilgi ve geçmişinde var ama sistemde kayıtlı değil", "allow_note": true, "is_other": false },
+        { "value": "excel_listesi", "label": "Ayrı bir Excel veya dokümanda alternatif listesi tutuluyor", "allow_note": true, "is_other": false },
+        { "value": "alternatif_tutulmuyor", "label": "Hayır, alternatif tedarikçi kaydı tutulmuyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-009",
+      "process": "Teklif Toplama ve Karşılaştırma",
+      "order": 9,
+      "question": "Satın alma siparişi öncesinde tedarikçilerden teklif toplama süreci nasıl yürütülüyor?",
+      "description": "RFQ (Teklif Talebi) toplama ve sisteme işleme olgunluk seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_rfq_sistemi", "label": "ERP / Satın alma portalı üzerinden teklif talebi açılıp karşılaştırma yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "eposta_excel", "label": "E-posta ile teklif toplanıp Excel tablosunda karşılaştırılıyor", "allow_note": true, "is_other": false },
+        { "value": "eposta_manuel", "label": "E-posta / Telefon ile toplanıyor, resmi karşılaştırma tablosu yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "teklif_alinmiyor", "label": "Sözleşmeli/sabit fiyatlı çalışıldığı için teklif toplanmıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-010",
+      "process": "Teklif Toplama ve Karşılaştırma",
+      "order": 10,
+      "question": "Bir alım için kural olarak en az kaç farklı tedarikçiden teklif alınması gerekiyor?",
+      "description": "Teklif toplama politikasının kurallılığını anlamak için.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "en_az_3", "label": "Kural olarak en az 3 teklif zorunlu", "allow_note": true, "is_other": false },
+        { "value": "en_az_2", "label": "En az 2 teklif yeterli", "allow_note": false, "is_other": false },
+        { "value": "tutara_gore_degisir", "label": "Alım tutarına göre gereken teklif sayısı değişiyor (örn. belirli tutar üzeri 3 teklif)", "allow_note": true, "is_other": false },
+        { "value": "kural_yok", "label": "Belirlenmiş asgari bir teklif sayısı kuralı yok", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-009",
+        "operator": "not_equals",
+        "value": "teklif_alinmiyor"
+      }
+    },
+    {
+      "id": "PROC-011",
+      "process": "Teklif Toplama ve Karşılaştırma",
+      "order": 11,
+      "question": "Tedarikçi teklifleri değerlendirilirken hangi kriterler karşılaştırılıyor?",
+      "description": "Satın alma kararının sadece birim fiyata mı yoksa çok kriterli analize mi dayandığı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "birim_fiyat", "label": "Birim fiyat ve toplam maliyet", "allow_note": false, "is_other": false },
+        { "value": "odeme_vadesi", "label": "Ödeme vadesi ve ödeme koşulları", "allow_note": true, "is_other": false },
+        { "value": "teslimat_termini", "label": "Teslimat süresi / Termin tarihi", "allow_note": false, "is_other": false },
+        { "value": "teslim_sekli_incoterms", "label": "Teslim şekli ve nakliye/sigorta masrafları (Incoterms)", "allow_note": true, "is_other": false },
+        { "value": "kalite_marka", "label": "Teknik şartnameye uygunluk, marka ve kalite referansı", "allow_note": false, "is_other": false },
+        { "value": "gecmis_performans", "label": "Tedarikçinin geçmiş teslimat ve kalite performansı", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-009",
+        "operator": "not_equals",
+        "value": "teklif_alinmiyor"
+      }
+    },
+    {
+      "id": "PROC-012",
+      "process": "Fiyat ve Ticari Koşullar",
+      "order": 12,
+      "question": "Satın alma personeli sipariş veya teklif anında malzemenin son alış fiyatını ve fiyat geçmişini görebiliyor mu?",
+      "description": "Geçmiş fiyat şeffaflığı ve fiyat doğrulama kabiliyeti.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_anlik", "label": "Evet, sistem son alış fiyatını, tedarikçisini ve tarihini otomatik gösteriyor", "allow_note": false, "is_other": false },
+        { "value": "fatura_rapor_arama", "label": "Evet, ancak eski faturaları veya raporları manuel aratarak bakabiliyor", "allow_note": true, "is_other": false },
+        { "value": "excelde_takip", "label": "Ayrı bir Excel fiyat takip dosyasından kontrol ediliyor", "allow_note": true, "is_other": false },
+        { "value": "gorunmuyor", "label": "Hayır, son alış fiyatı ve geçmişi anlık olarak görülemiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-013",
+      "process": "Fiyat ve Ticari Koşullar",
+      "order": 13,
+      "question": "Tedarikçilerle yapılan çerçeve anlaşmalar veya dönemsel sözleşmeli fiyat listeleri kullanılıyor mu?",
+      "description": "Kontratlı satın alma ve sabit fiyatlı anlaşmaların varlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_kontrat_var", "label": "Evet, sistemde sözleşme ve geçerlilik tarihli fiyat listeleri tanımlı ve otomatik uygulanıyor", "allow_note": true, "is_other": false },
+        { "value": "sozlesme_var_manuel", "label": "Sözleşmeler var ancak siparişe fiyatlar manuel giriliyor", "allow_note": true, "is_other": false },
+        { "value": "nadiren_sozlesme", "label": "Sadece birkaç kritik stratejik malzeme için sözleşme yapılıyor", "allow_note": false, "is_other": false },
+        { "value": "sozlesme_kullanilmiyor", "label": "Hayır, her alım spot piyasadan / anlık teklifle yapılıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-014",
+      "process": "Fiyat ve Ticari Koşullar",
+      "order": 14,
+      "question": "Sözleşmeli alımlarda taahhüt edilen miktar ve bakiye takibi yapılıyor mu?",
+      "description": "Çerçeve sözleşmelerde kalan miktar/tutar takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_otomatik_bakiye", "label": "Evet, sistem sözleşmeden çekilen miktarı ve kalan bakiyeyi otomatik düşüyor", "allow_note": false, "is_other": false },
+        { "value": "excel_manuel_bakiye", "label": "Evet, Excel üzerinden manuel bakiye takibi yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "takip_yapilmiyor", "label": "Hayır, taahhüt miktarı/bakiye takibi yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-013",
+        "operator": "not_equals",
+        "value": "sozlesme_kullanilmiyor"
+      }
+    },
+    {
+      "id": "PROC-015",
+      "process": "Fiyat ve Ticari Koşullar",
+      "order": 15,
+      "question": "Tedarikçilerin belirlediği Minimum Sipariş Miktarı (MOQ) veya ambalaj katları nasıl yönetiliyor?",
+      "description": "Sipariş miktarı kısıtlarının sistemde yönetilme durumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_kural_var", "label": "Sistemde malzeme/tedarikçi bazında MOQ ve koli katları tanımlı, siparişte uyarı veriyor/tamamlıyor", "allow_note": false, "is_other": false },
+        { "value": "satinalma_manuel_duzeltir", "label": "Satın alma personeli bildiği için sipariş miktarını manuel yuvarlıyor", "allow_note": true, "is_other": false },
+        { "value": "moq_takip_yok", "label": "Minimum sipariş miktarı kuralı uygulanmıyor / takip edilmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-016",
+      "process": "Satın Alma Siparişi",
+      "order": 16,
+      "question": "Satın alma siparişi (PO) resmi olarak hangi ortamda oluşturuluyor?",
+      "description": "Satın alma siparişinin kurumsal kayıt ve üretim kaynağı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_sisteminde", "label": "ERP sistemi üzerinden oluşturuluyor ve onaylanıyor", "allow_note": true, "is_other": false },
+        { "value": "excel_word", "label": "Excel veya Word şablonu ile hazırlanıp PDF yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_programi", "label": "Doğrudan muhasebe / ticari yazılımdan açılıyor", "allow_note": true, "is_other": false },
+        { "value": "eposta_metni", "label": "Özel bir sipariş formu olmadan doğrudan e-posta metni ile iletiliyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-017",
+      "process": "Satın Alma Siparişi",
+      "order": 17,
+      "question": "Satın alma siparişleri onaylı bir talep veya tekliften otomatik dönüştürülebiliyor mu?",
+      "description": "Belge izlenebilirliği ve veri tekrarının önlenmesi durumu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tam_entegre_donusum", "label": "Evet, onaylanan talep veya tekliften tek tıkla siparişe dönüştürülüyor", "allow_note": false, "is_other": false },
+        { "value": "kismi_manuel_aktarim", "label": "Kısmen, bazı bilgiler kopyalanıyor ama sipariş elle tekrar oluşturuluyor", "allow_note": true, "is_other": false },
+        { "value": "bastan_manuel_giris", "label": "Hayır, tüm sipariş satırları sıfırdan manuel giriliyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-018",
+      "process": "Satın Alma Siparişi",
+      "order": 18,
+      "question": "Siparişte yapılan değişiklikler ve revizyonlar (fiyat, miktar, termin) nasıl izleniyor?",
+      "description": "Sipariş revizyon kontrolü ve değişiklik tarihçesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_versiyon_tarihcesi", "label": "Sistem her değişikliği versiyonlayarak (Rev 1, Rev 2) ve loglayarak saklıyor", "allow_note": false, "is_other": false },
+        { "value": "mevcut_satir_uzerine_yazma", "label": "Mevcut sipariş üzerinde değişiklik yapılıyor, eski hali eziliyor", "allow_note": true, "is_other": false },
+        { "value": "yeni_siparis_acma", "label": "Eski sipariş iptal edilip yeni sipariş açılıyor", "allow_note": false, "is_other": false },
+        { "value": "izleme_yapilmiyor", "label": "Değişiklikler sistematik olarak izlenmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-019",
+      "process": "Satın Alma Siparişi",
+      "order": 19,
+      "question": "Sipariş iptali veya satır kapatma süreci nasıl işletiliyor?",
+      "description": "Kısmi kapanışlar, bakiye iptalleri ve açık sipariş temizliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "neden_kodu_ve_onay", "label": "İptal nedeni seçilerek ve yetkili onayıyla satır/sipariş kapatılıyor", "allow_note": true, "is_other": false },
+        { "value": "serbest_silme_kapatma", "label": "Satın alma personeli serbestçe siparişi silebiliyor veya kapatabiliyor", "allow_note": false, "is_other": false },
+        { "value": "acik_birakiliyor", "label": "Kullanılmayan siparişler sistemde açık kalıyor, periyodik temizlik yok", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-020",
+      "process": "Sipariş Onay Süreci",
+      "order": 20,
+      "question": "Satın alma siparişleri tedarikçiye gönderilmeden önce bir onay sürecinden geçiyor mu?",
+      "description": "Siparişin resmi olarak geçerlilik kazanması için kurumsal onay akışı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistem_onay_akisi", "label": "Evet, sistem üzerinde tutar ve yetki matrisine bağlı onay akışı var", "allow_note": true, "is_other": false },
+        { "value": "islak_imza_form", "label": "Evet, sipariş çıktısı alınıp yöneticilere ıslak imza imzalatılıyor", "allow_note": true, "is_other": false },
+        { "value": "eposta_onayi", "label": "Evet, e-posta ile yönetici onayı alındıktan sonra gönderiliyor", "allow_note": false, "is_other": false },
+        { "value": "onay_yok_serbest", "label": "Hayır, satın alma personeli oluşturduğu siparişi doğrudan tedarikçiye gönderebiliyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-021",
+      "process": "Sipariş Onay Süreci",
+      "order": 21,
+      "question": "Sipariş onay akışında hangi yetkilendirme ve kontrol kriterleri uygulanıyor?",
+      "description": "Sipariş onay matrisinin karmaşıklık parametreleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tutar_baremleri", "label": "Tutar baremlerine göre kademeli onay (örn. Müdür → Direktör → Genel Müdür)", "allow_note": true, "is_other": false },
+        { "value": "butce_kontrolu", "label": "Departman bütçesi kontrolü ve bütçe aşımında ek onay", "allow_note": true, "is_other": false },
+        { "value": "avans_odeme_sarti", "label": "Peşin / Avans ödemeli siparişlerde finans onayı", "allow_note": true, "is_other": false },
+        { "value": "sozlesme_disi_alim", "label": "Sözleşmesiz veya onaylı liste dışı tedarikçi alımlarında özel onay", "allow_note": false, "is_other": false },
+        { "value": "dovizli_siparis", "label": "Dövizli veya yüksek tutarlı alımlarda yönetim kurulu onayı", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-020",
+        "operator": "not_equals",
+        "value": "onay_yok_serbest"
+      }
+    },
+    {
+      "id": "PROC-022",
+      "process": "Termin ve Teslimat Takibi",
+      "order": 22,
+      "question": "Sipariş satırlarında vaat edilen teslim tarihi (termin) nasıl takip ediliyor?",
+      "description": "Tedarikçi termin tarihinin kayıt altına alınması ve revizyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "satir_bazli_sistem", "label": "Sistemde her sipariş satırı için ayrı termin tarihi giriliyor ve izleniyor", "allow_note": false, "is_other": false },
+        { "value": "genel_siparis_tarihi", "label": "Tüm sipariş için tek bir teslimat tarihi giriliyor", "allow_note": false, "is_other": false },
+        { "value": "excel_ayri_takip", "label": "Sistemde girilmiyor, ayrı bir Excel teslimat takip tablosunda izleniyor", "allow_note": true, "is_other": false },
+        { "value": "termin_takip_edilmiyor", "label": "Termin tarihi sistematik olarak takip edilmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-023",
+      "process": "Termin ve Teslimat Takibi",
+      "order": 23,
+      "question": "Geciken veya teslim tarihi yaklaşan siparişler nasıl tespit ediliyor?",
+      "description": "Erken uyarı ve gecikme takibi mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_rapor_uyari", "label": "Sistem geciken siparişleri otomatik raporluyor veya uyarı/bildirim gönderiyor", "allow_note": false, "is_other": false },
+        { "value": "manuel_liste_tarama", "label": "Satın alma personeli açık sipariş listesini periyodik manuel tarıyor", "allow_note": true, "is_other": false },
+        { "value": "uretim_sikayet_edince", "label": "Üretim veya ilgili departman malzeme gelmedi diye arayınca fark ediliyor", "allow_note": true, "is_other": false },
+        { "value": "tespit_mekanizmasi_yok", "label": "Gecikmeler için sistematik bir kontrol yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-024",
+      "process": "Kısmi Teslimat / Eksik Teslimat",
+      "order": 24,
+      "question": "Tedarikçiden gelen kısmi teslimatlar (parçalı sevkıyatlar) sistemde nasıl yönetiliyor?",
+      "description": "Bir siparişin birden fazla irsaliye ile parça parça gelmesi durumunun yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_kalan_bakiye_izler", "label": "Sistem her irsaliyeyi siparişle eşleştirir, teslim alınan ve kalan bakiyeyi otomatik izler", "allow_note": false, "is_other": false },
+        { "value": "manuel_hesaplama", "label": "Kalan miktar manuel notlarla veya Excel'de hesaplanıyor", "allow_note": true, "is_other": false },
+        { "value": "siparis_tek_seferde_kapatilir", "label": "Kısmi teslimat gelse de sipariş tek seferde kapatılıyor / sorun yaşanıyor", "allow_note": true, "is_other": false },
+        { "value": "kismi_teslimat_kabul_edilmez", "label": "Tedarikçiden kesinlikle kısmi teslimat kabul edilmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-025",
+      "process": "Kısmi Teslimat / Eksik Teslimat",
+      "order": 25,
+      "question": "Sipariş miktarından fazla veya eksik teslimatlarda tolerans uygulanıyor mu?",
+      "description": "Dökme, tartımlı veya toleranslı malzemelerde fazla/eksik sevkıyat kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_yuzde_tolerans", "label": "Evet, sistemde tanımlı % tolerans sınırı içinde fazla/eksik mal kabulüne izin veriliyor", "allow_note": true, "is_other": false },
+        { "value": "fazla_kesin_red", "label": "Fazla mal kabul edilmez, eksik teslimatta kalan bakiye açık bırakılır", "allow_note": false, "is_other": false },
+        { "value": "depocu_insiyatifi", "label": "Tolerans kuralı tanımlı değil, depo sorumlusunun onayına göre alınıyor", "allow_note": true, "is_other": false },
+        { "value": "tolerans_ihtiyaci_yok", "label": "Tam adetli çalışıldığı için tolerans ihtiyacı yok", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-026",
+      "process": "Depo Mal Kabul Entegrasyonu",
+      "order": 26,
+      "question": "Depoda mal kabul (irsaliye girişi) işlemi doğrudan satın alma siparişine bağlanarak mı yapılıyor?",
+      "description": "Satın alma ve depo mal kabul entegrasyonunun sıkılığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "zorunlu_siparis_bagli", "label": "Evet, siparişi olmayan hiçbir malzeme depoya kabul edilemez, sistem siparişi zorunlu tutar", "allow_note": false, "is_other": false },
+        { "value": "siparis_secilir_serbestlik_var", "label": "Sipariş seçilerek kabul yapılır ancak siparişsiz giriş yapılmasına da sistem izin verir", "allow_note": true, "is_other": false },
+        { "value": "bagimsiz_irsaliye_girisi", "label": "Depo irsaliyeyi siparişten bağımsız stok girişi olarak işler, sonradan eşleştirilir", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_kabul_sonra_sistem", "label": "Fiziksel kabul yapılıp irsaliye faturayla birlikte muhasebeye gider, depoda sistem kaydı açılmaz", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-027",
+      "process": "Depo Mal Kabul Entegrasyonu",
+      "order": 27,
+      "question": "Mal kabul sırasında irsaliye ile sipariş arasında fiyat veya ürün kodu kontrolü depoda yapılabiliyor mu?",
+      "description": "Deponun sipariş detaylarına (miktar, teknik özellik) erişim seviyesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "miktar_ve_kod_gorunur", "label": "Depo sadece ürün kodunu ve beklenen miktarı görür, fiyat gizlidir", "allow_note": false, "is_other": false },
+        { "value": "tum_detay_gorunur", "label": "Depo siparişteki fiyat dahil tüm detayları görür", "allow_note": false, "is_other": false },
+        { "value": "sadece_fiziksel_irsaliye", "label": "Deponun sistemde siparişi görme yetkisi yoktur, sadece gelen kâğıt irsaliyeyi kontrol eder", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-028",
+      "process": "Kalite Kontrol Entegrasyonu",
+      "order": 28,
+      "question": "Depoya gelen satın alma malzemeleri için mal kabulde Kalite Kontrol (girdi kalite) süreci uygulanıyor mu?",
+      "description": "Girdi kalite kontrol ayrımı ve stok blokajı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_kalite_blokaj", "label": "Evet, kaliteye tabi ürünler doğrudan kullanılabilir stoka girmez, Kalite Kontrol (bloke) stokta bekler", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_kontrol_sistem_sonra", "label": "Evet, fiziksel olarak kalite onayı verildikten sonra irsaliye sisteme girilir", "allow_note": true, "is_other": false },
+        { "value": "numune_bazi_urunler", "label": "Sadece belirli kritik hammadde/ürünler için kalite kontrol yapılır", "allow_note": true, "is_other": false },
+        { "value": "kalite_kontrol_yok", "label": "Hayır, gelen tüm mallar doğrudan kullanılabilir stoka kabul edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-029",
+      "process": "Kalite Kontrol Entegrasyonu",
+      "order": 29,
+      "question": "Kalite kontrol tarafından reddedilen (uygunsuz) malzemelerin tedarikçiye iade veya şartlı kabul süreci nasıl işliyor?",
+      "description": "Uygunsuzluk yönetimi ve tedarikçi iade akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_uygunsuzluk_ve_iade", "label": "Sistemde uygunsuzluk raporu (NCR) açılır, onaylı iade irsaliyesi ile tedarikçiye sevk edilir", "allow_note": true, "is_other": false },
+        { "value": "sartli_kabul_veya_iade", "label": "Duruma göre şartlı kabul (fiyat indirimi/ayıklama) veya manuel iade faturası kesilir", "allow_note": true, "is_other": false },
+        { "value": "manuel_tutanak_ve_iade", "label": "Fiziksel tutanak tutulup malzeme hemen geri gönderilir, sistemde kayıt açılmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-028",
+        "operator": "not_equals",
+        "value": "kalite_kontrol_yok"
+      }
+    },
+    {
+      "id": "PROC-030",
+      "process": "Satın Alma Faturası / Sipariş Eşleştirmesi",
+      "order": 30,
+      "question": "Satın alma faturası işlenirken Sipariş — Mal Kabul (İrsaliye) — Fatura 3'lü eşleştirmesi (3-Way Match) yapılıyor mu?",
+      "description": "Fatura girişinde miktar ve fiyat doğrulamasının sistem entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "otomatik_3lu_eslestirme", "label": "Evet, sistem fatura tutarını ve miktarını irsaliye ve siparişle otomatik karşılaştırır, fark varsa uyarı verir/bloke eder", "allow_note": true, "is_other": false },
+        { "value": "irsaliyeden_fatura_aktarim", "label": "Fatura doğrudan irsaliyeden aktarılır ancak birim fiyat farkları manuel kontrol edilir", "allow_note": true, "is_other": false },
+        { "value": "manuel_karsilastirma", "label": "Muhasebe gelen faturayı kâğıt sipariş/irsaliye ile manuel karşılaştırıp sisteme sıfırdan girer", "allow_note": true, "is_other": false },
+        { "value": "eslestirme_yapilmaz", "label": "Eşleştirme yapılmadan fatura doğrudan gider/stok hesabı seçilerek kaydedilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-031",
+      "process": "Satın Alma Faturası / Sipariş Eşleştirmesi",
+      "order": 31,
+      "question": "Faturada siparişten farklı bir fiyat veya ek masraf (navlun, sigorta, vade farkı) geldiğinde nasıl yönetiliyor?",
+      "description": "Fiyat farkı ve masraf dağıtımı süreçleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "fark_faturasi_veya_onay", "label": "Belirli limit üzerindeki fiyat farkları için satın alma onayına düşer veya fark faturası talep edilir", "allow_note": true, "is_other": false },
+        { "value": "malzeme_maliyetine_dagitilir", "label": "Ek masraflar (navlun vb.) mal kabul faturasına veya malzeme maliyetine dağıtılır", "allow_note": true, "is_other": false },
+        { "value": "dogrudan_gidere_yazilir", "label": "Fiyat farkı veya ek masraf sorgulanmadan doğrudan finansman/gider hesabına atılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-032",
+      "process": "Satın Alma Faturası / Sipariş Eşleştirmesi",
+      "order": 32,
+      "question": "Satın alma faturası onaylanmadan önce tedarikçi cari hesap bakiyesi ve mutabakat durumu kontrol ediliyor mu?",
+      "description": "Finans-satın alma cari şeffaflığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "cari_bakiye_ve_vade_gorunur", "label": "Evet, satın alma personeli ve muhasebe cari karttaki açık hesap bakiyesini ve vadesini anlık görür", "allow_note": false, "is_other": false },
+        { "value": "sadece_muhasebe_gorur", "label": "Cari durumu sadece muhasebe görür, satın almanın erişimi yoktur", "allow_note": false, "is_other": false },
+        { "value": "periyodik_mutabakat_yapilir", "label": "Sadece ay sonlarında BA/BS ve cari mutabakatı ile kontrol edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-033",
+      "process": "Tedarikçi Performansı",
+      "order": 33,
+      "question": "Tedarikçilerin performansı (termin uyumu, kalite, fiyat istikrarı) sistematik olarak ölçülüyor mu?",
+      "description": "Tedarikçi değerlendirme sistematiğinin varlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_skorlar", "label": "Evet, sistem teslimat gecikmesi ve kalite ret oranlarına göre otomatik tedarikçi skoru üretir", "allow_note": true, "is_other": false },
+        { "value": "periyodik_anket_form", "label": "Evet, dönemsel olarak anket ve değerlendirme formları ile manuel puanlama yapılır", "allow_note": true, "is_other": false },
+        { "value": "gayri_resmi_hafiza", "label": "Yazılı bir sistem yok, satın alma yöneticisinin kişisel tecrübe ve kanaatine dayanır", "allow_note": false, "is_other": false },
+        { "value": "performans_olculmuyor", "label": "Hayır, tedarikçi performansı ölçülmüyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-034",
+      "process": "Tedarikçi Performansı",
+      "order": 34,
+      "question": "Tedarikçi değerlendirmesinde hangi performans kriterleri kullanılıyor veya hedefleniyor?",
+      "description": "Tedarikçi KPI ağırlıklandırma parametreleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "termin_uyumu", "label": "Zamanında teslimat oranı (OTIF - On-Time In-Full)", "allow_note": false, "is_other": false },
+        { "value": "kalite_hata_orani", "label": "Kalite kabul/ret ve PPM (milyonda hata) oranı", "allow_note": false, "is_other": false },
+        { "value": "fiyat_rekabetciligi", "label": "Fiyat rekabetçiliği ve indirim esnekliği", "allow_note": false, "is_other": false },
+        { "value": "iletisim_ve_destek", "label": "İletişim hızı, teknik destek ve problem çözme kabiliyeti", "allow_note": false, "is_other": false },
+        { "value": "finansal_esneklik", "label": "Ödeme vadesi ve finansal esneklik", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-033",
+        "operator": "not_equals",
+        "value": "performans_olculmuyor"
+      }
+    },
+    {
+      "id": "PROC-035",
+      "process": "İthal Satın Alma / Döviz İhtiyaçları",
+      "order": 35,
+      "question": "Şirketinizde yurt dışından ithal satın alma veya dövizli alım yapılıyor mu?",
+      "description": "İthalat ve çoklu para birimi süreçlerinin varlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "duzenli_ithalat_ve_doviz", "label": "Evet, düzenli olarak ithalat operasyonu ve dövizli alımlar yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "sadece_dovizli_ic_piyasa", "label": "İthalatı kendimiz yapmıyoruz ancak iç piyasadan dövize endeksli alımlar yapıyoruz", "allow_note": true, "is_other": false },
+        { "value": "nadiren_ithalat", "label": "Yılda birkaç kez münferit ithalat yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "hayir_sadece_tl", "label": "Hayır, tüm satın almalarımız yurt içinden ve Türk Lirası iledir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-036",
+      "process": "İthal Satın Alma / Döviz İhtiyaçları",
+      "order": 36,
+      "question": "Dövizli sipariş ve faturalarda kur türü (TCMB Alış, Satış, Efektif vb.) nasıl belirleniyor?",
+      "description": "Döviz kuru tipi ve kur değerleme kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_tcmb_kuru", "label": "Sistem TCMB kurlarını günlük otomatik çeker ve belirlenen kur tipini uygular", "allow_note": true, "is_other": false },
+        { "value": "fatura_tarihi_manuel_kur", "label": "Fatura tarihindeki kur manuel olarak girilir veya faturadaki kur esas alınır", "allow_note": true, "is_other": false },
+        { "value": "sozlesme_sabit_kur", "label": "Sözleşmede önceden sabitlenmiş kur kullanılır", "allow_note": true, "is_other": false },
+        { "value": "odeme_tarihi_kuru", "label": "Ödeme günündeki kur ile kur farkı faturası kesilerek kapatılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-035",
+        "operator": "not_equals",
+        "value": "hayir_sadece_tl"
+      }
+    },
+    {
+      "id": "PROC-037",
+      "process": "İthal Satın Alma / Döviz İhtiyaçları",
+      "order": 37,
+      "question": "İthalat dosyası masrafları (gümrük, navlun, ordino, KKDF, sigorta vb.) ürün maliyetine nasıl dağıtılıyor?",
+      "description": "İthalat maliyet yükleme ve fiili maliyet hesaplama olgunluğu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "ithalat_modulu_maliyet_dagitimi", "label": "Sistemdeki ithalat modülü ile tüm masraflar ithalat dosyasına girilip malzeme maliyetine otomatik dağıtılır", "allow_note": true, "is_other": false },
+        { "value": "excelde_maliyet_hesabi", "label": "Excel'de ithalat maliyeti hesaplanıp depoya maliyetli birim fiyat manuel girilir", "allow_note": true, "is_other": false },
+        { "value": "masraflar_gidere_yazilir", "label": "İthalat masrafları malzeme maliyetine eklenmez, doğrudan dönem gideri yazılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "PROC-035",
+        "operator": "not_equals",
+        "value": "hayir_sadece_tl"
+      }
+    },
+    {
+      "id": "PROC-038",
+      "process": "Satın Alma Raporlama ve KPI",
+      "order": 38,
+      "question": "Satın alma departmanının yönetim için düzenli olarak ürettiği veya ihtiyaç duyduğu temel raporlar nelerdir?",
+      "description": "Yönetim raporlama ihtiyaçlarını belirlemek için.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "acik_siparis_raporu", "label": "Açık ve geciken satın alma siparişleri raporu", "allow_note": false, "is_other": false },
+        { "value": "tedarikci_harcama_analizi", "label": "Tedarikçi ve malzeme grubu bazında toplam harcama analizi", "allow_note": false, "is_other": false },
+        { "value": "fiyat_degisim_trend", "label": "Malzeme bazında fiyat değişim ve enflasyon trend analizi", "allow_note": false, "is_other": false },
+        { "value": "butce_gerceklesen", "label": "Departman/Kategori bazlı satın alma bütçe-gerçekleşen raporu", "allow_note": true, "is_other": false },
+        { "value": "tedarikci_termin_performans", "label": "Tedarikçi teslimat performansı ve kalite ret raporu", "allow_note": false, "is_other": false },
+        { "value": "stok_tedarik_dongu_suresi", "label": "Satın alma talep-sipariş-teslimat döngü süreleri (Lead Time)", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-039",
+      "process": "Satın Alma Raporlama ve KPI",
+      "order": 39,
+      "question": "Tedarikçi yoğunlaşma riski (belirli tedarikçilere aşırı bağımlılık) takip ediliyor mu?",
+      "description": "Tedarik zinciri risk analizi ve harcama konsantrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "duzenli_raporlanir", "label": "Evet, harcamaların tedarikçilere dağılımı (Pareto / ABC analizi) düzenli raporlanır", "allow_note": true, "is_other": false },
+        { "value": "hissiyatla_bilinir", "label": "Resmi raporlama yok ancak kritik tedarikçiler biliniyor", "allow_note": false, "is_other": false },
+        { "value": "takip_edilmiyor", "label": "Hayır, tedarikçi yoğunlaşma riski takip edilmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PROC-040",
+      "process": "Satın Alma Raporlama ve KPI",
+      "order": 40,
+      "question": "Satın alma süreçlerinde dijital onay ve mobil kullanım ihtiyacı var mı?",
+      "description": "Yöneticilerin talep ve siparişleri mobil cihaz veya e-posta üzerinden onaylama beklentisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "mobil_ve_web_onay_sart", "label": "Evet, yöneticilerin ofis dışından mobil cihaz veya e-posta ile onay verebilmesi kritik bir ihtiyaç", "allow_note": true, "is_other": false },
+        { "value": "sadece_ofis_masaustu_yeterli", "label": "Hayır, onay verenlerin ERP masaüstü ekranını kullanması yeterli", "allow_note": false, "is_other": false },
+        { "value": "eposta_bildirimi_yeterli", "label": "Mobil onay gerekmez, e-posta ile uyarı gelmesi yeterli", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

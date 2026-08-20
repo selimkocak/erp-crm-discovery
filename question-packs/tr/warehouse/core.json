@@ -1,0 +1,681 @@
+{
+  "meta": {
+    "pack_id": "tr.warehouse.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "WAREHOUSE",
+    "name": "Depo Yönetimi Ön Analizi",
+    "description": "ERP implementasyonu öncesinde Depo Yönetimi departmanının AS-IS süreçlerini, mal kabul, lokasyon adresleme, rezervasyon, toplama, sayım ve izlenebilirlik operasyonlarını anlamaya yönelik temel discovery soru paketi."
+  },
+  "questions": [
+    {
+      "id": "WH-001",
+      "process": "Depo Yapısı ve Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde kaç adet fiziksel depo bulunmaktadır ve bu depolar nasıl sınıflandırılmaktadır?",
+      "description": "Fiziksel depo sayısı, lokasyonları ve depo tiplerinin (Hammadde, Yarı Mamul, Mamul, Yedek Parça vb.) haritasını çıkarmak için.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tek_merkez_cok_bolum", "label": "Tek bir ana yerleşkede farklı amaçlı depo alanları (Hammadde, Mamul, Sarf vb.) var", "allow_note": true, "is_other": false },
+        { "value": "coklu_lokasyon_fabrika", "label": "Farklı fabrika, şube veya şehirlerde birden fazla bağımsız depo var", "allow_note": true, "is_other": false },
+        { "value": "harici_antrepo_3pl", "label": "Kendi depolarımıza ek olarak harici antrepo / 3PL lojistik depoları kullanılıyor", "allow_note": true, "is_other": false },
+        { "value": "tek_depo_ayrimsiz", "label": "Tüm malzemelerin tutulduğu tek bir depo alanı var, alan ayrımı yok", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-002",
+      "process": "Depo Yapısı ve Organizasyonu",
+      "order": 2,
+      "question": "Fiziksel depolardaki alanlar ile mevcut sistemdeki depo tanımları birbiriyle tam örtüşüyor mu?",
+      "description": "Sistemdeki depo kodlarının sahadaki fiziksel gerçekliği ne kadar yansıttığını anlamak için.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tam_ortusuyor", "label": "Evet, sistemdeki her depo kodu fiziksel olarak ayrılmış gerçek bir depoya karşılık geliyor", "allow_note": false, "is_other": false },
+        { "value": "kismi_sanal_depo", "label": "Kısmen, bazı depolar fiziksel değil muhasebesel/sanal amaçlarla açılmış", "allow_note": true, "is_other": false },
+        { "value": "sistem_fiziksel_kopuk", "label": "Hayır, sistemdeki depo yapısı fiziksel yerleşimden çok farklı, karmaşa yaşanıyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-003",
+      "process": "Mal Kabul ve Giriş Kontrolü",
+      "order": 3,
+      "question": "Tedarikçiden gelen malzemelerin mal kabulü sahada hangi belgeye ve sisteme dayanılarak yapılıyor?",
+      "description": "Mal kabul kayıt yöntemi ve belge dayanağı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_siparis_karsilama", "label": "ERP sistemi üzerinden ilgili Satın Alma Siparişi çağrılarak doğrudan mal kabul yapılır", "allow_note": false, "is_other": false },
+        { "value": "kagit_irsaliye_sonra_sistem", "label": "Fiziksel kâğıt irsaliye kontrol edilip kaşelenir, sisteme sonradan topluca işlenir", "allow_note": true, "is_other": false },
+        { "value": "el_terminali_barkod", "label": "El terminali ile gelen irsaliye/barkod okutularak anlık mal kabul yapılır", "allow_note": true, "is_other": false },
+        { "value": "kendi_kabul_fisi_excel", "label": "Depo kendi kâğıt teslim tesellüm fişini veya Excel listesini doldurur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-004",
+      "process": "Mal Kabul ve Giriş Kontrolü",
+      "order": 4,
+      "question": "Mal kabul sırasında sahada hangi fiziksel kontroller yapılıyor?",
+      "description": "Mal kabul esnasında yürütülen kontrol adımları.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "koli_paket_sayim", "label": "Koli/Paket/Palet adedi ve fiziksel ambalaj bütünlüğü kontrolü", "allow_note": false, "is_other": false },
+        { "value": "teknik_etiket_kod", "label": "Ürün etiketi, katalog kodu ve teknik tanım doğrulaması", "allow_note": false, "is_other": false },
+        { "value": "lot_seri_kontrol", "label": "Tedarikçi lot/parti veya seri numarası kontrolü", "allow_note": true, "is_other": false },
+        { "value": "skt_raf_omru", "label": "Son kullanma tarihi ve kalan raf ömrü kontrolü", "allow_note": true, "is_other": false },
+        { "value": "kantar_tartim", "label": "Kantar / Hassas tartım ile brüt/net ağırlık kontrolü", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-005",
+      "process": "Siparişsiz ve Beklenmeyen Mal Kabul",
+      "order": 5,
+      "question": "Sistemde açık bir satın alma siparişi olmayan veya sipariş miktarı aşılmış malzemeler depoya geldiğinde nasıl yönetiliyor?",
+      "description": "Siparişsiz mal kabul politikası ve yetki esnekliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kesin_kabul_edilmez", "label": "Siparişi olmayan hiçbir mal depoya fiziksel olarak alınmaz, kapıdan geri çevrilir", "allow_note": false, "is_other": false },
+        { "value": "gecici_alana_onay_bekler", "label": "Fiziksel olarak geçici bekleme alanına alınır, satın alma sipariş açınca sisteme girilir", "allow_note": true, "is_other": false },
+        { "value": "siparis_bagimsiz_stok_girisi", "label": "Sistemde siparişsiz serbest stok girişi yapılarak depoya alınır", "allow_note": true, "is_other": false },
+        { "value": "depocu_insiyatifi", "label": "Depo sorumlusu satın almayı telefonla arayıp sözlü teyitle depoya alır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-006",
+      "process": "Kalite Kontrol ve Karantina Alanı",
+      "order": 6,
+      "question": "Kalite kontrole tabi malzemeler mal kabul anında depoda nasıl ayrıştırılıyor?",
+      "description": "Girdi kalite kontrol bekleyen stokların kullanılabilir stokla karışmasının önlenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistem_karantina_deposu", "label": "Sistemde otomatik olarak 'Kalite Karantina / Bloke Deposu'na girer, kalite onayı vermeden üretime/satışa açılamaz", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_ayri_alan", "label": "Fiziksel olarak karantina alanına çekilir ve sarı/kırmızı etiket yapıştırılır ancak sistemde tek depodadır", "allow_note": true, "is_other": false },
+        { "value": "numune_alindiktan_sonra_serbest", "label": "Numune alınıp doğrudan ana raflara konulur, ret çıkarsa geri toplanır", "allow_note": true, "is_other": false },
+        { "value": "kalite_kontrol_uygulanmiyor", "label": "Gelen malzemelere girdi kalite kontrol uygulanmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-007",
+      "process": "Kalite Kontrol ve Karantina Alanı",
+      "order": 7,
+      "question": "Kalite kontrol tarafından onaylanan veya reddedilen malzemenin depo hareketi nasıl işliyor?",
+      "description": "Kalite kararından sonra stok transferi ve ret alanı yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_transfer", "label": "Kalite onayı verilince sistem otomatik olarak karantinadan kullanılabilir depoya/lokasyona aktarır", "allow_note": false, "is_other": false },
+        { "value": "depo_onay_gorup_tasir", "label": "Kalite onayı sistemde görülünce depo personeli manuel transfer belgesi ile taşır", "allow_note": true, "is_other": false },
+        { "value": "ret_iade_deposu", "label": "Reddedilen malzeme derhal 'İade / Hurda Deposu'na taşınır ve tedarikçiye sevk irsaliyesi beklenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-006",
+        "operator": "not_equals",
+        "value": "kalite_kontrol_uygulanmiyor"
+      }
+    },
+    {
+      "id": "WH-008",
+      "process": "Raf / Göz / Lokasyon Yönetimi",
+      "order": 8,
+      "question": "Depo içinde raf, koridor, kat ve göz bazında adresli lokasyon (Bin Location) takibi yapılıyor mu?",
+      "description": "Depo içi hücresel adresleme sisteminin varlığı ve olgunluğu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistemde_raf_goz_tam_tanimli", "label": "Evet, her malzemenin hangi koridor, raf, kat ve gözde olduğu sistemde anlık takip ediliyor", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_adres_var_sistemde_yok", "label": "Depoda rafların üzerinde adres etiketleri var ancak ERP/sistemde sadece depo bazında tutuluyor", "allow_note": true, "is_other": false },
+        { "value": "sadece_kritik_alanlarda", "label": "Sadece belirli kritik veya küçük malzemeler için raf/göz takibi yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "adresleme_yok_hafizaya_bagli", "label": "Hayır, tanımlı raf/göz adresi yok; malzemelerin yeri personelin hafızasına ve tecrübesine bağlı", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-009",
+      "process": "Raf / Göz / Lokasyon Yönetimi",
+      "order": 9,
+      "question": "Depo lokasyon yapısı nasıl kurgulanmıştır (sabit lokasyon mu, dinamik/kaotik depolama mı)?",
+      "description": "Malzemenin sabit bir adresinin mi olduğu yoksa boş olan herhangi bir göze mi konulduğu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sabit_urun_lokasyonu", "label": "Her ürünün tanımlı sabit bir rafı/gözü vardır, her zaman aynı yere konur", "allow_note": false, "is_other": false },
+        { "value": "dinamik_bos_goz", "label": "Dinamik depolama; ürün o an boş olan en uygun rafa/göze konur ve sistemde güncellenir", "allow_note": true, "is_other": false },
+        { "value": "karma_model", "label": "Hızlı dönen ürünler için sabit alan, diğer ürünler için dinamik alanlar kullanılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-008",
+        "operator": "not_equals",
+        "value": "adresleme_yok_hafizaya_bagli"
+      }
+    },
+    {
+      "id": "WH-010",
+      "process": "Raf / Göz / Lokasyon Yönetimi",
+      "order": 10,
+      "question": "Sistemde lokasyonların anlık doluluk ve boşluk durumu görülebiliyor mu?",
+      "description": "Depo hacim ve kapasite doluluk izleme durumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "anlik_hacim_doluluk", "label": "Evet, her raf ve gözün doluluk oranı ve kalan kapasitesi sistemde anlık izlenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_stok_miktari", "label": "Lokasyonda hangi malzemeden kaç adet olduğu görünür ancak hacimsel doluluk hesaplanmaz", "allow_note": false, "is_other": false },
+        { "value": "gosterge_yok", "label": "Hayır, boş/dolu lokasyon durumu sistemde görünmez, fiziksel gözle kontrol edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-008",
+        "operator": "not_equals",
+        "value": "adresleme_yok_hafizaya_bagli"
+      }
+    },
+    {
+      "id": "WH-011",
+      "process": "Stok Yerleştirme (Putaway)",
+      "order": 11,
+      "question": "Mal kabulü tamamlanan ürünlerin depodaki hangi rafa/lokasyona konulacağına nasıl karar veriliyor?",
+      "description": "Mal yerleştirme kararının sistem önerisiyle mi yoksa personelin inisiyatifiyle mi verildiği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_oneri", "label": "Sistem ürün tipi, boyut, ABC analizi ve doluluğa göre hedef rafı otomatik önerir", "allow_note": true, "is_other": false },
+        { "value": "personel_bos_yere_koyup_okutur", "label": "Personel uygun gördüğü boş yere koyar ve el terminaliyle raf barkodunu okutarak sisteme kaydeder", "allow_note": true, "is_other": false },
+        { "value": "tanimli_sabit_alana_tasinir", "label": "Her ürünün alanı belli olduğu için doğrudan o alana taşınır, sisteme ekstra adres girilmez", "allow_note": false, "is_other": false },
+        { "value": "serbest_yerlestirme", "label": "Personel bulduğu boş yere koyar, lokasyon kaydı tutulmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-012",
+      "process": "Depolar Arası Transfer ve Yoldaki Stok",
+      "order": 12,
+      "question": "Farklı depolar veya şubeler arasında malzeme transferleri nasıl yürütülüyor?",
+      "description": "Depolar arası transfer emirleri, sevk irsaliyeleri ve çift taraflı onay döngüsü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "cift_tarafli_transfer_emri", "label": "Sistemde transfer talebi/emri açılır, çıkış deposu sevk eder, varış deposu onaylayıp kabul eder (2 Adımlı)", "allow_note": true, "is_other": false },
+        { "value": "tek_adimli_anlik_aktarim", "label": "Çıkış deposu doğrudan transfer fişi keser ve stok anında karşı depoya geçer (1 Adımlı)", "allow_note": false, "is_other": false },
+        { "value": "irsaliye_ile_manuel_aktarim", "label": "Depolar arası kâğıt sevk irsaliyesi ile taşınır, muhasebe sonradan sistemde aktarır", "allow_note": true, "is_other": false },
+        { "value": "sozlu_veya_excel", "label": "Transferler telefon/Excel ile bildirilir, sistem kaydı düzenli tutulmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-013",
+      "process": "Depolar Arası Transfer ve Yoldaki Stok",
+      "order": 13,
+      "question": "Fiziksel olarak sevk edilmiş ancak henüz varış deposuna ulaşmamış 'Yoldaki Stok' (In-Transit) sistemde izleniyor mu?",
+      "description": "Transfer süresince stok mülkiyetinin ve miktarının havada kalmasının önlenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "yoldaki_depo_izlenir", "label": "Evet, sistemde 'Yoldaki Depo / Sevk Deposu' tanımlıdır ve sevk anında stoğu buraya alır", "allow_note": false, "is_other": false },
+        { "value": "cikis_yapildigi_anda_karsida", "label": "Hayır, çıkış yapıldığı anda doğrudan varış deposunun stoğunda görünür", "allow_note": true, "is_other": false },
+        { "value": "varis_onaylayana_kadar_cikista", "label": "Varış deposu onaylayana kadar çıkış yapan deponun stoğunda görünür", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-014",
+      "process": "Stok Rezervasyonu ve Tahsis",
+      "order": 14,
+      "question": "Satış siparişleri veya üretim iş emirleri için depodaki stok rezerve ediliyor (bağlanıyor) mu?",
+      "description": "Sipariş veya iş emri girildiğinde mevcut stoktan düşülmeden rezerve edilip mükerrer kullanımın önlenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_sert_rezervasyon", "label": "Evet, sipariş/iş emri onaylandığında sistem stoku otomatik rezerve eder, başkası kullanamaz (Hard Allocation)", "allow_note": true, "is_other": false },
+        { "value": "sistem_yumusak_rezervasyon", "label": "Evet, rezerve miktar görünür ancak depodan fiziksel çıkışta kısıtlama yapmaz (Soft Allocation)", "allow_note": false, "is_other": false },
+        { "value": "fiziksel_ayirma_etiket", "label": "Sistemde rezervasyon yok, depocu gidip ürünün üzerine müşteri adı yazıp ayırır", "allow_note": true, "is_other": false },
+        { "value": "rezervasyon_yapilmiyor", "label": "Hayır, rezervasyon yapılmaz; ilk gelen / ilk faturası kesilen ürünü alır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-015",
+      "process": "Stok Rezervasyonu ve Tahsis",
+      "order": 15,
+      "question": "Üretime malzeme çıkışları (besleme) rezervasyona göre mi yoksa serbest taleple mi yapılıyor?",
+      "description": "Üretim malzeme besleme yönteminin depo entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "is_emri_recete_rezervasyonu", "label": "İş emri ürün ağacındaki (BOM) planlı malzeme rezervasyonuna göre depodan çekilir", "allow_note": false, "is_other": false },
+        { "value": "uretimden_manuel_talep_fisi", "label": "Üretim ustası kâğıt talep fişi yazar, depo bu fişe göre malzeme çıkarır", "allow_note": true, "is_other": false },
+        { "value": "kanban_veya_serbest_kullanim", "label": "Hammadde üretim hattına topluca dökülür, üretim bittikçe ters kayıt (Backflush) ile düşülür", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-016",
+      "process": "Sipariş Toplama (Picking)",
+      "order": 16,
+      "question": "Depodan sipariş toplama (picking) işlemi hangi yöntemle gerçekleştiriliyor?",
+      "description": "Sipariş toplama emirlerinin personele iletilmesi ve sahada uygulanması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "el_terminali_yonlendirmeli", "label": "El terminali personeli en uygun rota ve lokasyona yönlendirir, barkod okutarak toplar", "allow_note": true, "is_other": false },
+        { "value": "yazili_toplama_listesi", "label": "Sistemden kâğıt Toplama Listesi (Picking List) yazdırılır, depocu listeden toplayıp işaretler", "allow_note": true, "is_other": false },
+        { "value": "dogrudan_fatura_irsaliye", "label": "Doğrudan basılmış irsaliye/faturaya bakılarak depodan ürün toplanır", "allow_note": false, "is_other": false },
+        { "value": "hafiza_ve_sozlu", "label": "Yazılı liste olmadan, sözlü veya WhatsApp mesajıyla ürün toplanır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-017",
+      "process": "Sipariş Toplama (Picking)",
+      "order": 17,
+      "question": "Toplama sırasında siparişler tek tek mi yoksa birden fazla sipariş birleştirilerek (dalga/toplu toplama) mi toplanıyor?",
+      "description": "Sipariş toplama stratejisi (Single Order vs. Batch/Wave Picking).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tekil_siparis_toplama", "label": "Her sipariş tek tek bağımsız olarak toplanır", "allow_note": false, "is_other": false },
+        { "value": "toplu_dalga_toplama", "label": "Aynı lokasyondaki birden fazla sipariş birleştirilip topluca toplanır (Wave/Batch Picking)", "allow_note": true, "is_other": false },
+        { "value": "bolge_bazli_toplama", "label": "Depo bölgelere ayrılmıştır, her bölge kendi payını toplayıp konsolidasyon alanında birleştirir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-018",
+      "process": "Sipariş Toplama (Picking)",
+      "order": 18,
+      "question": "Toplama esnasında yanlış ürün veya yanlış miktar alınması sistem tarafından nasıl engelleniyor?",
+      "description": "Toplama doğrulama ve hata önleme mekanizmaları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "zorunlu_barkod_esleme", "label": "El terminalinde ürün ve lokasyon barkodu eşleşmeden sistem sonraki kaleme geçit vermez", "allow_note": false, "is_other": false },
+        { "value": "cikis_kontrol_masasi", "label": "Toplanan ürünler sevkiyat öncesi kontrol masasında ikinci bir kişi tarafından tek tek taranır", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_goz_kontrolu", "label": "Sistemsel doğrulama yoktur, toplayan personelin göz kontrolüne dayanır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-019",
+      "process": "Paketleme ve Sevkiyata Hazırlık",
+      "order": 19,
+      "question": "Toplanan ürünlerin koli/palet bazında paketlenmesi ve sevkiyat koli etiketlemesi nasıl yapılıyor?",
+      "description": "Paketleme masası, koli barkodu ve çeki listesi (Packing List) üretimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_koli_palet_etiketi", "label": "Sistemde paketleme yapılarak her koli/palete içeriğini gösteren standart SSCC / koli barkodu basılır", "allow_note": true, "is_other": false },
+        { "value": "manuel_etiketleme", "label": "Koli üzerine kargo etiketi veya el yazısıyla müşteri/ürün bilgisi yazılır", "allow_note": false, "is_other": false },
+        { "value": "ambalajsiz_dogrudan_sevk", "label": "Paketleme gerekmez, ürünler doğrudan araca yüklenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-020",
+      "process": "Paketleme ve Sevkiyata Hazırlık",
+      "order": 20,
+      "question": "Depoda sevkiyat için ayrılmış özel bir Sevkiyat Bekleme / Yükleme Alanı (Staging Area / Rampa) bulunuyor mu?",
+      "description": "Toplanan malların araç yüklenene kadar ana stoktan ayrılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tanimli_sevk_peronu", "label": "Evet, her müşteri/araç için sistemde tanımlı rampa ve sevk bekleme peronları var", "allow_note": true, "is_other": false },
+        { "value": "genel_sevk_alani", "label": "Fiziksel olarak depo çıkışında genel bir alan var ancak sistemde lokasyon olarak tanımlı değil", "allow_note": false, "is_other": false },
+        { "value": "ayri_alan_yok", "label": "Hayır, toplanan ürünler rafların önünde veya koridorda bekletilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-021",
+      "process": "Sayım ve Envanter Kontrolü",
+      "order": 21,
+      "question": "Fiziksel stok sayımları hangi periyotta ve hangi yöntemle gerçekleştiriliyor?",
+      "description": "Yıllık genel sayım vs. periyodik dinamik sayım (Cycle Counting) olgunluğu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "surekli_cycle_count", "label": "Yıl boyunca lokasyon veya ABC kategorisi bazında planlı sürekli sayım (Cycle Counting) yapılır", "allow_note": true, "is_other": false },
+        { "value": "yillik_genel_sayim", "label": "Yılda bir veya iki kez depo tamamen durdurularak genel sayım yapılır", "allow_note": false, "is_other": false },
+        { "value": "aylik_manuel_kontrol", "label": "Her ay sonu kritik malzemeler kâğıt listelerle sayılır", "allow_note": true, "is_other": false },
+        { "value": "ihtiyac_duyuldukca", "label": "Sadece stokta açık çıkınca veya şüphe duyuldukça münferit sayım yapılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-022",
+      "process": "Sayım ve Envanter Kontrolü",
+      "order": 22,
+      "question": "Sayım esnasında ve sonrasında sayım farkları (fazla/eksik) sisteme nasıl işleniyor?",
+      "description": "Sayım farklarının onay matrisi ve otomatik mutabakat kuralları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "onay_matrisli_fark_fisi", "label": "Sistem sayım fark raporu üretir; yetkili yöneticiler onaylayınca otomatik sayım fark fişi kesilir", "allow_note": true, "is_other": false },
+        { "value": "depocu_stogu_direkt_esitler", "label": "Depo sorumlusu serbestçe stok düzeltme fişi kesip stoku eşitler", "allow_note": false, "is_other": false },
+        { "value": "farklar_ayri_tutulur", "label": "Farklar sistemde hemen düzeltilmez, uzun süre araştırılıp muhasebe kararıyla kapatılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-023",
+      "process": "Sayım ve Envanter Kontrolü",
+      "order": 23,
+      "question": "Mevcut sisteminizde fiziksel stok ile sistem stoğu arasında ne sıklıkla uyumsuzluk yaşanıyor?",
+      "description": "Stok doğruluk oranı ve envanter güvenilirliği seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "cok_nadir_yuzde_98_ustu", "label": "Çok nadir, stok doğruluğumuz %98'in üzerindedir", "allow_note": false, "is_other": false },
+        { "value": "bazi_gruplarda_sik", "label": "Genel olarak iyi ancak sarf veya dökme malzemelerde sık fark çıkıyor", "allow_note": true, "is_other": false },
+        { "value": "sik_sik_uyusmazlik", "label": "Sık sık uyuşmazlık çıkıyor; sistemde var görünen mal rafta bulunamıyor veya tersi", "allow_note": true, "is_other": false },
+        { "value": "stok_dogrulugu_bilinmiyor", "label": "Düzenli ölçülmediği için doğruluk oranı bilinmiyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-024",
+      "process": "Sayım ve Envanter Kontrolü",
+      "order": 24,
+      "question": "Sistemde stok miktarlarının eksiye (negatif stoka) düşmesine izin veriliyor mu?",
+      "description": "Negatif stok kilidi ve operasyonel disiplin.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "kesinlikle_yasak", "label": "Hayır, sistemde negatif stok kesinlikle engellenmiştir, stok yoksa çıkış yapılamaz", "allow_note": false, "is_other": false },
+        { "value": "izin_veriliyor_sonradan_duzeltilir", "label": "Evet, iş aksamasın diye eksiye düşmeye izin veriliyor, irsaliye girilince kapanıyor", "allow_note": true, "is_other": false },
+        { "value": "sadece_belirli_depolarda", "label": "Sadece üretim besleme veya sarf depolarında izin veriliyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-025",
+      "process": "Lot / Seri Numarası Takibi",
+      "order": 25,
+      "question": "Depoda malzemeler için Lot (Parti) veya Seri Numarası takibi yapılıyor mu?",
+      "description": "İleri ve geri izlenebilirlik (Traceability) omurgası.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "hem_lot_hem_seri", "label": "Evet, bazı ürünlerde Lot (parti), bazı ürünlerde benzersiz Seri Numarası takip ediliyor", "allow_note": true, "is_other": false },
+        { "value": "sadece_lot_takibi", "label": "Sadece hammadde ve ürünlerde Lot/Parti takibi yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "sadece_seri_no", "label": "Sadece cihaz/ekipman bazında tekil Seri Numarası takip ediliyor", "allow_note": true, "is_other": false },
+        { "value": "lot_veya_seri_yok", "label": "Hayır, lot veya seri numarası takibi yapılmıyor, sadece miktar bazlı tutuluyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-026",
+      "process": "Lot / Seri Numarası Takibi",
+      "order": 26,
+      "question": "Lot veya seri numaraları sisteme nasıl kazandırılıyor?",
+      "description": "Tedarikçi lotu mu yoksa iç üretim lotu mu kullanıldığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tedarikci_ve_dahili_otomatik", "label": "Tedarikçinin lotu kaydedilir veya sistem giriş anında otomatik benzersiz dahili lot no üretir", "allow_note": true, "is_other": false },
+        { "value": "tedarikci_lotu_manuel_yazilir", "label": "Tedarikçi irsaliyesindeki lot kâğıda veya sisteme manuel yazılır", "allow_note": false, "is_other": false },
+        { "value": "sadece_uretimde_lot_uretilir", "label": "Satın almada tutulmaz, sadece kendi üretimimizde lot açılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-025",
+        "operator": "not_equals",
+        "value": "lot_veya_seri_yok"
+      }
+    },
+    {
+      "id": "WH-027",
+      "process": "Lot / Seri Numarası Takibi",
+      "order": 27,
+      "question": "Depodan çıkış yaparken belirli bir lot/seri numarasının seçilmesi zorunlu tutuluyor mu?",
+      "description": "Çıkış anında tam izlenebilirlik kısıtı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "cikis_aninda_zorunlu_okutma", "label": "Evet, el terminali ile ilgili lot/seri barkodu okutulmadan sistem çıkışa izin vermez", "allow_note": false, "is_other": false },
+        { "value": "sistem_onerdigi_lot_secilir", "label": "Sistem FIFO/FEFO kuralına göre lotu seçer, personel onaylar", "allow_note": false, "is_other": false },
+        { "value": "lot_secimi_serbest", "label": "Personel sistemden herhangi bir lotu seçer, fiziksel çıkanla sistemdeki her zaman tutmayabilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-025",
+        "operator": "not_equals",
+        "value": "lot_veya_seri_yok"
+      }
+    },
+    {
+      "id": "WH-028",
+      "process": "Raf Ömrü, SKT, FIFO ve FEFO",
+      "order": 28,
+      "question": "Depodaki malzemeler için Son Kullanma Tarihi (SKT) veya Raf Ömrü takibi gerekiyor mu?",
+      "description": "Kimyasal, gıda, ilaç, kauçuk, boya vb. malzemelerde raf ömrü yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "zorunlu_skt_fefo", "label": "Evet, raf ömrü olan ürünlerimiz var; Son Kullanma Tarihi İlk Dolan İlk Çıkar (FEFO) zorunludur", "allow_note": true, "is_other": false },
+        { "value": "sadece_giris_tarihli_fifo", "label": "SKT yok ancak Giriş Tarihi İlk Olan İlk Çıkar (FIFO) kuralı uygulanmalıdır", "allow_note": false, "is_other": false },
+        { "value": "raf_omru_kisiti_yok", "label": "Hayır, ürünlerimizin bozulma veya raf ömrü riski yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-029",
+      "process": "Raf Ömrü, SKT, FIFO ve FEFO",
+      "order": 29,
+      "question": "Raf ömrü yaklaşan veya dolan ürünler için sistemde otomatik blokaj veya uyarı var mı?",
+      "description": "Miadı dolan ürünün müşteriye veya üretime sevk edilmesinin engellenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_sistem_blokaji", "label": "Evet, sistem süresi dolan veya kalan raf ömrü kritik eşiğin altına inen ürünü otomatik bloke eder", "allow_note": true, "is_other": false },
+        { "value": "manuel_raporla_tarama", "label": "Personel periyodik rapor çekerek süresi yaklaşanları manuel kontrol eder", "allow_note": true, "is_other": false },
+        { "value": "otomatik_uyari_yok", "label": "Sistemde uyarı yoktur, fiziksel kontrolle fark edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-028",
+        "operator": "equals",
+        "value": "zorunlu_skt_fefo"
+      }
+    },
+    {
+      "id": "WH-030",
+      "process": "Hasarlı, İade ve Hurda Stok",
+      "order": 30,
+      "question": "Depoda tespit edilen hasarlı, kusurlu veya hurda malzemeler nasıl yönetiliyor?",
+      "description": "Uygunsuz ürünlerin sağlam ürünlerden tecrit edilmesi ve fire kayıtları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "hurda_ve_fire_deposu", "label": "Sistemde 'Hurda / Fire Deposu' tanımlıdır; hasarlı ürünler onaylı fire fişiyle buraya taşınır", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_ayri_sistemde_aynis", "label": "Fiziksel olarak bir köşeye ayrılır ancak sistemde sağlam stokla aynı depoda görünür", "allow_note": true, "is_other": false },
+        { "value": "dogrudan_stoktan_dusulur", "label": "Fark edildiği anda doğrudan stoktan silinir / gider yazılır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-031",
+      "process": "Hasarlı, İade ve Hurda Stok",
+      "order": 31,
+      "question": "Müşteriden geri gelen iade ürünlerin depoya kabulü nasıl yapılıyor?",
+      "description": "Satış iadesi mal kabulü ve yeniden satışa uygunluk kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "iade_kabul_ve_ekspertiz", "label": "Önce 'Müşteri İade Deposu'na alınır, kalite/teknik inceleme sonrası sağlam veya hurdaya aktarılır", "allow_note": true, "is_other": false },
+        { "value": "dogrudan_saglam_stoka", "label": "İade geldiği gibi doğrudan sağlam ürün deposuna geri alınır", "allow_note": false, "is_other": false },
+        { "value": "muhasebe_faturasi_sonra_fiziksel", "label": "Muhasebe iade faturasını işleyinceye kadar depoda bekletilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-032",
+      "process": "Barkod, QR ve El Terminali",
+      "order": 32,
+      "question": "Depo operasyonlarında Barkod / QR Kod ve El Terminali (Mobil Cihaz) kullanılıyor mu?",
+      "description": "Deponun dijitalleşme ve donanım altyapısı seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "aktif_el_terminali_barkod", "label": "Evet, depoda tüm giriş, transfer, sayım ve çıkışlar el terminali ve barkod ile yapılır", "allow_note": true, "is_other": false },
+        { "value": "kismi_barkod_kullanimi", "label": "Barkod etiketleri var ancak el terminali sadece sayımda veya belirli alanlarda kullanılıyor", "allow_note": true, "is_other": false },
+        { "value": "barkod_var_terminal_yok", "label": "Ürünlerde barkod var ancak el terminali yok, işlemler masaüstü bilgisayardan yapılıyor", "allow_note": true, "is_other": false },
+        { "value": "barkod_ve_terminal_yok", "label": "Hayır, ne barkod ne de el terminali kullanılmıyor; tüm süreçler kâğıt ve masaüstü ERP ile yürüyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-033",
+      "process": "Barkod, QR ve El Terminali",
+      "order": 33,
+      "question": "Depoda hangi unsurlar için barkod / QR etiket basılıyor ve kullanılıyor?",
+      "description": "Barkodlama derinliği ve etiket şablonları.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "urun_malzeme_etiketi", "label": "Ürün / Malzeme birim ambalaj barkodu", "allow_note": false, "is_other": false },
+        { "value": "raf_lokasyon_etiketi", "label": "Raf / Göz / Lokasyon barkodu", "allow_note": false, "is_other": false },
+        { "value": "koli_palet_etiketi", "label": "Koli / Palet / Koli içi taşıma birimi (SSCC) etiketi", "allow_note": true, "is_other": false },
+        { "value": "lot_seri_etiketi", "label": "Lot / Seri numarası ve Son Kullanma Tarihi barkodu", "allow_note": false, "is_other": false },
+        { "value": "tedarikci_barkodu_direkt", "label": "Kendi etiketimiz yerine tedarikçinin üzerindeki orijinal barkod doğrudan okutuluyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-032",
+        "operator": "not_equals",
+        "value": "barkod_ve_terminal_yok"
+      }
+    },
+    {
+      "id": "WH-034",
+      "process": "Barkod, QR ve El Terminali",
+      "order": 34,
+      "question": "Depo alanında kesintisiz kablosuz ağ (Wi-Fi) ve endüstriyel donanım altyapısı mevcut mu?",
+      "description": "Depo saha bağlantısı ve offline çalışma riski.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tum_depo_kesintisiz_wifi", "label": "Evet, deponun tamamında endüstriyel access point'lerle kesintisiz Wi-Fi çekimi var", "allow_note": false, "is_other": false },
+        { "value": "bazi_koridorlarda_kopma", "label": "Kısmen, bazı metal rafların arkasında veya açık alanda Wi-Fi çekim sorunları yaşanıyor", "allow_note": true, "is_other": false },
+        { "value": "wifi_yok_gsm_veya_kablolu", "label": "Depoda Wi-Fi yok, mobil hat (GSM) veya sadece masaüstü kablolu ağ var", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "WH-032",
+        "operator": "not_equals",
+        "value": "barkod_ve_terminal_yok"
+      }
+    },
+    {
+      "id": "WH-035",
+      "process": "Depo Performansı ve Özel Koşullar",
+      "order": 35,
+      "question": "Depo yönetimi için düzenli olarak takip edilen veya raporlanmak istenen temel performans göstergeleri (KPI) nelerdir?",
+      "description": "Depo verimlilik ve operasyon KPI ihtiyaçları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "stok_dogruluk_orani", "label": "Stok doğruluk oranı (Inventory Record Accuracy - IRA)", "allow_note": false, "is_other": false },
+        { "value": "siparis_hazirlama_hizi", "label": "Sipariş hazırlama ve toplama çevrim süresi (Order Lead Time)", "allow_note": false, "is_other": false },
+        { "value": "toplama_hatasizlik_orani", "label": "Toplama doğruluk ve hatasızlık oranı (Picking Accuracy)", "allow_note": false, "is_other": false },
+        { "value": "depo_kapasite_kullanim", "label": "Depo hacim ve metrekare kapasite kullanım oranı", "allow_note": false, "is_other": false },
+        { "value": "mal_kabul_raf_alma_suresi", "label": "Mal kabulden rafa yerleştirmeye kadar geçen süre (Dock-to-Stock Time)", "allow_note": false, "is_other": false },
+        { "value": "atil_yavas_donen_stok", "label": "Yavaş dönen ve atıl/ölü stok raporu (Slow-moving / Dead Stock)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-036",
+      "process": "Depo Performansı ve Özel Koşullar",
+      "order": 36,
+      "question": "Depo personelinin bireysel veya vardiya bazlı toplama/yerleştirme performans takibi yapılıyor mu?",
+      "description": "Personel iş yükü ve verimlilik ölçümü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_kisi_bazli_olcer", "label": "Evet, sistem her personelin saatte kaç satır/koli topladığını veya yerleştirdiğini loglar", "allow_note": true, "is_other": false },
+        { "value": "vardiya_veya_takim_bazli", "label": "Kişi bazlı değil, vardiya bazında toplam sevk edilen miktar takip edilir", "allow_note": false, "is_other": false },
+        { "value": "performans_olculmuyor", "label": "Hayır, personel bazlı hız ve verimlilik takibi yapılmıyor", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-037",
+      "process": "Depo Performansı ve Özel Koşullar",
+      "order": 37,
+      "question": "Depoda özel saklama koşulu (soğuk hava, nem kontrollü, yanıcı/parlayıcı kimyasal vb.) gerektiren alanlar var mı?",
+      "description": "Özel ortam ve güvenlik koşullarına tabi malzeme depolama gereksinimleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "soguk_hava_ve_iklimlendirme", "label": "Evet, soğuk hava deposu veya sıcaklık/nem takipli özel alanlarımız var", "allow_note": true, "is_other": false },
+        { "value": "yanici_tehlikeli_madde", "label": "Evet, ADR / Yangın güvenlikli tehlikeli madde (HazMat) depolama alanı var", "allow_note": true, "is_other": false },
+        { "value": "standart_kuru_depo", "label": "Hayır, tüm malzemelerimiz standart kuru depo ortamında saklanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "WH-038",
+      "process": "Depo Performansı ve Özel Koşullar",
+      "order": 38,
+      "question": "Depoda otomasyonlu depolama sistemleri (ASRS, Dikey Karusel, Konveyör, AGV vb.) bulunuyor veya planlanıyor mu?",
+      "description": "Otomatik depolama ve malzeme taşıma sistemleri entegrasyonu (WCS/PLC).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "mevcut_otomasyon_entegre", "label": "Evet, mevcut ASRS / Dikey Karusel / Konveyör sistemimiz var ve ERP ile entegre olmalı", "allow_note": true, "is_other": false },
+        { "value": "yakin_gelecekte_planlaniyor", "label": "Şu an yok ancak yeni depo yatırımında otomasyon planlanıyor", "allow_note": true, "is_other": false },
+        { "value": "tamamen_manuel_forklift", "label": "Hayır, tamamen standart raflar, forklift ve transpalet ile manuel çalışıyoruz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

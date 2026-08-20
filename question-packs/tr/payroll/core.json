@@ -1,0 +1,1555 @@
+{
+  "meta": {
+    "pack_id": "tr.payroll.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "PAYROLL",
+    "name": "Bordro ve Ücret Yönetimi Ön Analizi",
+    "description": "Türkiye'deki işletmeler için bordro dönemi, ücret yapısı (Sabit, Saatlik, Parça Başı), brüt ücret bileşenleri, sabit/değişken kazançlar, prim ve bonus modelleri, fazla mesai ücretlendirmesi, izin/devamsızlık kesintileri, puantajın bordroya aktarımı, SGK prime esas kazanç (PEK) parametreleri, SGK teşviklerinin uygulanması ve seçimi, kümülatif gelir vergisi matrahı ve dilimleri, damga vergisi, yasal istisnalar (Asgari ücret istisnası, yemek/yol muafiyetleri), yan haklar, yasal ve özel kesintiler (BES, Sendika, Özel Sigorta), icra/nafaka sırası ve avans mahsubu, tam işveren maliyeti, bordro kapatma kontrolleri, onay mekanizmaları, dönem kilidi, ek bordro/fark hesaplama (Retro/Off-cycle), banka maaş ödeme dosyaları (Excel/TXT), e-bordro dağıtımı, MUHSGK ve SGK bildirgeleri ile bordro KPI'larının AS-IS durumunu ve ERP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "PAY-001",
+      "process": "Bordro Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde bordro hesaplama, tahakkuk ve yasal bildirim süreçleri hangi birim veya model tarafından yürütülmektedir?",
+      "description": "Bordro operasyon modeli, şirket içi bordro uzmanlığı, muhasebe veya harici bordro hizmeti (BPO).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sirket_bunyesindeki_uzmanlasmis_bordro_ve_ozluk_isleri_ekibi_tarafindan_yurutulur",
+          "label": "Şirket bünyesindeki uzmanlaşmış Bordro ve Özlük İşleri ekibi tarafından doğrudan yürütülür"
+        },
+        {
+          "value": "genel_muhasebe_ve_mali_isler_departmani_tarafindan_yurutulur",
+          "label": "Genel Muhasebe ve Mali İşler departmanı tarafından diğer muhasebe işlemleriyle birlikte yürütülür"
+        },
+        {
+          "value": "harici_bordro_hizmet_firmasi_veya_smmm_tarafindan_outsourcing_olarak_yurutulur",
+          "label": "Harici bordro danışmanlık firması (Outsource / BPO) veya mali müşavir tarafından yürütülür"
+        },
+        {
+          "value": "her_grup_sirketi_veya_fabrika_kendi_bordrosunu_yerel_olarak_hesaplar",
+          "label": "Her fabrika veya grup şirketi kendi yerel personeliyle bağımsız bordro hesaplar"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-002",
+      "process": "Bordro Organizasyonu",
+      "order": 2,
+      "question": "Bordro süreçlerinde kullanılan mevcut bordro yazılımı veya bordro veri tabanı ile ERP/Muhasebe sistemi arasında entegrasyon bulunmakta mıdır?",
+      "description": "Bordro yazılım altyapısı, tek veritabanı, harici bordro programı veya Excel tabanlı hesaplama.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "bordro_modulu_erp_sistemiyle_ayni_veritabaninda_tam_entegre_ve_canli_calisir",
+          "label": "Evet; bordro modülü ERP sistemiyle aynı veritabanında çalışır, muhasebe ve İK verisiyle tam entegredir"
+        },
+        {
+          "value": "ayri_bir_bordro_yazilimi_kullanilir_ay_sonu_muhasebeye_excel_veya_xml_ile_aktarilir",
+          "label": "Ayrı bir bağımsız bordro yazılımı kullanılır; ay sonunda tahakkuk fişleri Excel/XML ile ERP'ye aktarılır"
+        },
+        {
+          "value": "bordro_hesaplamalari_excel_tablolarinda_manuel_yapilip_muhasebeye_mahsup_kesilir",
+          "label": "Bordro hesaplamaları Excel tablolarında formüllerle yapılır; muhasebeye manuel mahsup fişi kesilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-003",
+      "process": "Bordro Dönemi",
+      "order": 3,
+      "question": "Şirketinizde bordro hesaplama dönemi (Aylık Takvim Ayı, Ayın 15'i - 14'ü, 14 Günlük, Haftalık, Farklı Personel Grupları İçin Farklı Dönem) nasıl işletilmektedir?",
+      "description": "Bordro kesim dönemi, takvim ayı (1-30), özel kesim periyotları ve ödeme günü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_personel_icin_standart_aylik_takvim_ayi_1_ve_son_gun_arasi_esas_alinir",
+          "label": "Tüm çalışanlar için standart aylık takvim ayı (Ayın 1'i ile son günü arası) esas alınır"
+        },
+        {
+          "value": "ozel_donem_uygulanir_orn_ayin_15i_ile_takip_eden_ayin_14u_arasi",
+          "label": "Özel dönem uygulanır (Örn: Ayın 15'i ile takip eden ayın 14'ü arası veya 20'si - 19'u arası)"
+        },
+        {
+          "value": "beyaz_yaka_icin_aylik_mavi_yaka_veya_saha_icin_14_gunluk_haftalik_donem_vardir",
+          "label": "Beyaz yaka için aylık takvim ayı, mavi yaka veya saha ekipleri için 14 günlük/haftalık dönem uygulanır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-004",
+      "process": "Bordro Dönemi",
+      "order": 4,
+      "question": "Ay içerisinde işe giren veya işten ayrılan personelin ilk/son maaş kıst hesaplaması (Gün hesabı, 30 gün esası veya takvim günü) nasıl yapılmaktadır?",
+      "description": "Kıst maaş hesabı, 30 gün kuralı, fiili çalışılan takvim günü ve saatlik bölünme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "ise_giris_ve_cikis_aylarinda_fiili_takvim_gunu_uzerinden_oransal_kist_hesaplama_yapilir",
+          "label": "Evet; işe giriş ve çıkış aylarında fiili çalışılan takvim günü üzerinden oransal kıst maaş hesaplanır"
+        },
+        {
+          "value": "her_ay_sabit_30_gun_kabul_edilerek_calisilan_gun_30_formuluyle_hesaplanir",
+          "label": "Ay kaç gün çekerse çeksin sabit 30 gün kabul edilir; (Maaş / 30) * Çalışılan Gün uygulanır"
+        },
+        {
+          "value": "kist_maas_tutarlari_bordro_uzmani_tarafindan_manuel_hesaplanip_girilir",
+          "label": "Kıst maaş tutarları bordro uzmanı tarafından Excel'de manuel hesaplanıp sisteme girilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-005",
+      "process": "Ücret Yapısı",
+      "order": 5,
+      "question": "Çalışanların sözleşme bazlı ücret yapısı hangi ana modellerde (Aylık Sabit Brüt, Aylık Sabit Net, Saatlik Ücret, Günlük Ücret, Parça Başı/Tonaj Bazlı, Prim Ağırlıklı) tanımlanmaktadır?",
+      "description": "Ücret rejimleri, netten brüte hesaplama, saatlik puantaj ve tonaj/parça başı akort sistemleri.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "aylik_sabit_brut_ucret_sozlesmesi",
+          "label": "Aylık Sabit Brüt Ücret Sözleşmesi (Vergi dilimine göre net maaş değişir)"
+        },
+        {
+          "value": "aylik_sabit_net_ucret_sozlesmesi_netten_brute",
+          "label": "Aylık Sabit Net Ücret Sözleşmesi (Vergi dilimi farkını şirket karşılar / Netten Brüte)"
+        },
+        {
+          "value": "saatlik_ucret_uzerinden_calisma",
+          "label": "Saatlik Ücret Üzerinden Çalışma (Fiili çalışma saati * Saat ücreti)"
+        },
+        {
+          "value": "gunluk_yevmiye_ucret_modeli",
+          "label": "Günlük Yevmiye Ücret Modeli"
+        },
+        {
+          "value": "parca_basi_akort_veya_tonaj_uretim_bazli_ucret",
+          "label": "Parça Başı (Akort) veya Tonaj / Üretim Miktarına Dayalı Ücret"
+        },
+        {
+          "value": "asgari_ucret_arti_satis_komisyonu_prim_agirlikli",
+          "label": "Taban Asgari Ücret + Satış Komisyonu / Prim Ağırlıklı Ücret"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-006",
+      "process": "Ücret Yapısı",
+      "order": 6,
+      "question": "Döviz cinsinden (USD, EUR vb.) ücretle çalışan personel bulunmakta mıdır ve döviz kuru değerlemesi hangi kur tipiyle (TCMB Döviz Alış/Satış, Fatura Kuru) bordroya yansıtılmaktadır?",
+      "description": "Dövizli bordro, kur değerleme tipi, TCMB kur entegrasyonu ve kur farkı vergisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "dovizli_ucretler_tcmb_bordro_gunu_veya_ay_basi_alis_kuruyla_otomatik_tl_brute_cevrilir",
+          "label": "Evet; dövizli maaşlar TCMB resmi kuruyla sistem tarafından otomatik TL brüt ücrete çevrilerek hesaplanır"
+        },
+        {
+          "value": "dovizli_ucret_manuel_belirlenen_sabit_bir_kur_uzerinden_tl_olarak_girilir",
+          "label": "Dövizli ücret yönetimce belirlenen sabit kurla manuel çarpılıp TL olarak sisteme girilir"
+        },
+        {
+          "value": "doviz_cinsinden_ucret_uygulamasi_yoktur_tum_ucretler_tl_olarak_belirlenir",
+          "label": "Döviz cinsinden ücret uygulaması yoktur; tüm çalışanların maaşı TL cinsindendir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-007",
+      "process": "Brüt Ücret Kaynakları",
+      "order": 7,
+      "question": "Bir çalışanın aylık toplam Brüt Ücretini oluşturan kazanç kalemleri ve brütleşme (Netten Brüte Hesaplama) kuralları sistemde nasıl tanımlanmaktadır?",
+      "description": "Toplam brüt kazanç matrahı, net anlaşmalı çalışanların brütleştirilme algoritması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_netten_brute_ve_brutten_nete_cift_yonlu_hesaplama_motoruna_sahiptir",
+          "label": "Sistem hem brütten nete hem netten brüte çift yönlü hesaplama motoruyla tüm kazançları otomatik brütleştirir"
+        },
+        {
+          "value": "yalnizca_brutten_nete_hesaplama_yapilir_net_anlasmali_kisiler_icin_manuel_brut_hesaplanir",
+          "label": "Yalnızca brütten nete hesaplama yapılır; net maaşlı personelin brütü harici Excel ile bulunup girilir"
+        },
+        {
+          "value": "tum_calisanlar_brut_ucret_uzerinden_calisir_netten_brute_hesaplama_ihtiyaci_yoktur",
+          "label": "Tüm çalışanlarımız brüt ücret sözleşmelidir; netten brüte dönüştürme ihtiyacı bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-008",
+      "process": "Brüt Ücret Kaynakları",
+      "order": 8,
+      "question": "Yıl içerisinde yapılan genel ücret artışları (Zam oranları, enflasyon farkı, asgari ücret artışı) veya kişiye özel ücret revizyonları sistemde nasıl uygulanmaktadır?",
+      "description": "Toplu zam uygulama, yüzde/tutar artışı, geriye dönük zam farkı (Retro) ve onay akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "toplu_ucret_artisi_veya_yuzdesel_zam_simulasyonu_sistemden_tek_islemle_tum_personel_kartlarina_yansitilir",
+          "label": "Evet; departman/unvan bazında toplu yüzde veya tutar zammı simüle edilip tek işlemle onaylanarak güncellenir"
+        },
+        {
+          "value": "yeni_maaslar_excel_tablosunda_hazirlanip_sisteme_excelden_toplu_veri_yukleme_ile_aktarilir",
+          "label": "Yeni maaşlar Excel tablosunda onaylanır; sisteme Excel yüklemesi yapılarak güncellenir"
+        },
+        {
+          "value": "her_calisanin_kartina_tek_tek_girilerek_yeni_ucret_manuel_yazilir",
+          "label": "Her çalışanın personel kartına tek tek girilerek yeni ücret manuel yazılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-009",
+      "process": "Sabit Kazançlar",
+      "order": 9,
+      "question": "Temel kök ücret haricinde personele her ay düzenli ve sabit olarak ödenen ek kazançlar (Görev tazminatı, yabancı dil tazminatı, unvan tazminatı, aile/çocuk yardımı) nasıl tanımlanmaktadır?",
+      "description": "Düzenli sabit ek ödemeler, tazminatlar, kasa tazminatı ve çocuk yardımları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gorev_unvan_veya_sorumluluk_tazminati",
+          "label": "Görev, Unvan, Kasa veya Yönetici Sorumluluk Tazminatı"
+        },
+        {
+          "value": "yabanci_dil_tazminati",
+          "label": "Yabancı Dil Tazminatı / Sertifika Ek Ödemesi"
+        },
+        {
+          "value": "sabit_aile_ve_cocuk_yardimi",
+          "label": "Sabit Aile, Çocuk ve Yakacak Yardımı"
+        },
+        {
+          "value": "kidem_ve_hizmet_yili_tesvik_tazminati",
+          "label": "Kıdem ve Hizmet Yılı Teşvik Tazminatı"
+        },
+        {
+          "value": "sabit_ek_kazanc_kalemi_yoktur_yalnizca_temel_ucret_odenir",
+          "label": "Sabit ek kazanç kalemi yoktur; personele yalnızca temel ücret ödenir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-010",
+      "process": "Sabit Kazançlar",
+      "order": 10,
+      "question": "Sabit kazançların SGK matrahına, gelir vergisi matrahına ve damga vergisine tabi olma kuralları parametrik olarak ayarlanabilmekte midir?",
+      "description": "Kazanç kodlarının vergi ve SGK tabiilik parametreleri (Vergiye tabi, SGK'ya muaf vb.).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "her_kazanc_kalemi_icin_sgk_gelir_vergisi_ve_damga_vergisi_tabiilik_oranlari_parametrik_tanimlanabilir",
+          "label": "Evet; her kazanç kodunun SGK, Gelir Vergisi, Damga Vergisi ve Kıdem matrahına dahil olma durumu parametrik seçilir"
+        },
+        {
+          "value": "sistemde_kazanc_turleri_sabittir_yeni_kazanc_ve_vergi_kurallari_icin_yazilimciya_ihtiyac_duyulur",
+          "label": "Sistemde kazanç kodları sabittir; vergi tabiilikleri kullanıcı tarafından değiştirilemez"
+        },
+        {
+          "value": "tum_ek_kazanclar_istisnasiz_tum_vergilere_dahil_edilir",
+          "label": "Tüm ek ödemeler ayrım yapılmaksızın brüte eklenip tam vergilendirilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-011",
+      "process": "Değişken Kazançlar",
+      "order": 11,
+      "question": "Ay içerisinde dönemsel veya durumsal olarak tahakkuk eden Değişken Kazançlar (Gece vardiyası zammı, bayram çalışma farkı, seyahat harcırahı, çağrı üzerine çalışma farkı) bordroya nasıl dahil edilmektedir?",
+      "description": "Değişken puantaj ek ödemeleri, gece çalışma primi, harcırah ve nöbet ücretleri.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gece_vardiyasi_zammi_veya_gece_calisma_primi",
+          "label": "Gece Vardiyası Zammı / Gece Çalışma Primi (%7,5 veya sözleşmeli oran)"
+        },
+        {
+          "value": "resmi_ve_dini_bayram_tatili_ek_calisma_ucreti",
+          "label": "Resmi ve Dini Bayram Tatili Ek Çalışma Ücreti (%100 veya %200 zamlı)"
+        },
+        {
+          "value": "nobet_ve_cagri_uzerine_calisma_icap_ucreti",
+          "label": "Nöbet ve Çağrı Üzerine Çalışma (İcapçı) Ücreti"
+        },
+        {
+          "value": "seyahat_harcirahi_ve_gorev_yollugu",
+          "label": "Seyahat Harcırahı ve Görev Yolluğu (İstisna limitli)"
+        },
+        {
+          "value": "degisken_kazanc_kalemi_uygulanmamaktadir",
+          "label": "Değişken kazanç kalemi uygulanmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-012",
+      "process": "Değişken Kazançlar",
+      "order": 12,
+      "question": "Fabrika veya saha personeline ödenen vardiya zammı ve gece çalışma primi saatleri PDKS vardiya loglarından otomatik hesaplanabilmekte midir?",
+      "description": "Gece saati (20:00 - 06:00 arası) log tespiti, vardiya farkı hesaplama otomasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "pdks_gece_saatlerini_ve_vardiya_farkini_otomatik_tespit_eder_ve_bordro_kazanc_satirina_yazar",
+          "label": "Evet; PDKS gece saatlerini (20:00-06:00) otomatik tespit eder ve bordro kazanç hanesine yazar"
+        },
+        {
+          "value": "vardiya_amirleri_tarafindan_hazirlanan_excel_cizelgelerinden_manuel_bordroya_aktarilir",
+          "label": "Vardiya amirleri Excel'de hazırlar; bordro uzmanı değişken kazanç satırına elle girer"
+        },
+        {
+          "value": "gece_calisma_veya_vardiya_farki_ayrica_hesaplanmamaktadir",
+          "label": "Gece çalışma veya vardiya farkı ayrıca hesaplanmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-013",
+      "process": "Prim ve Bonus",
+      "order": 13,
+      "question": "Şirketinizde çalışanlara ödenen dönemsel Prim, Bonus, Satış Primi, Üretim/Hedef Primi veya Yıllık İkramiye uygulaması bulunmakta mıdır?",
+      "description": "Prim ve bonus türleri, satış primi, üretim hedef primi, kâr paylaşımı ve ikramiyeler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "evet_aylik_veya_donemsel_satis_uretim_ve_performans_primleri_duzenli_uygulanir",
+          "label": "Evet; aylık veya dönemsel satış, üretim ve performans primleri düzenli uygulanmaktadır"
+        },
+        {
+          "value": "evet_yilda_1_veya_birkac_kez_donemsel_ikramiye_veya_yil_sonu_bonusu_odenir",
+          "label": "Evet; yılda 1 veya birkaç kez dönemsel ikramiye veya yıl sonu bonusu ödenmektedir"
+        },
+        {
+          "value": "prim_veya_bonus_uygulanmamaktadir",
+          "label": "Şirketimizde prim, bonus veya ikramiye uygulaması bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-014",
+      "process": "Prim ve Bonus",
+      "order": 14,
+      "question": "Prim ve ikramiye tutarları bordroya hangi yöntemle aktarılmakta ve vergilendirmesi (Aynı ay bordrosunda veya ayrı prim bordrosunda) nasıl yapılmaktadır?",
+      "description": "Prim bordro aktarımı, ayrı bordro çalıştırma, SGK tavan aşımı ve kümülatif vergi matrahı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PAY-013",
+        "operator": "not_equals",
+        "value": "prim_veya_bonus_uygulanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "prim_ve_ikramiyeler_ayri_bir_ek_bordro_off_cycle_calistirilarak_veya_ay_sonu_maasina_eklenerek_hesaplanir",
+          "label": "Ayrı bir prim bordrosu (Off-Cycle) ile hesaplanıp ödenir veya ay sonu bordrosuna eklenip kümülatif vergilendirilir"
+        },
+        {
+          "value": "prim_tutarlari_harici_excelden_bordro_kazanc_hanesine_tek_tutari_manuel_yazilir",
+          "label": "Prim listesi Excel'de onaylanır; bordro uzmanı çalışan kartındaki prim satırına manuel yazar"
+        },
+        {
+          "value": "prim_odemeleri_bordro_disi_avans_veya_gider_makbuzu_ile_yapilmaktadir",
+          "label": "Prim ödemeleri bordro dışı avans veya gider makbuzuyla yapılmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-015",
+      "process": "Fazla Mesai",
+      "order": 15,
+      "question": "Çalışanların fazla mesai çalışmaları (Haftalık 45 saati aşan %50 zamlı mesai, Hafta tatili %100 mesaisi, Resmi/Dini bayram %100 mesaisi) için ücret tahakkuku nasıl yürütülmektedir?",
+      "description": "Fazla mesai ücretlendirmesi, yasal katsayılar (%50, %100), serbest zaman kullanımı veya nakit ödeme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_mesai_turleri_50_hafta_tatili_100_bayram_100_sistemde_ayri_katsayilarla_hesaplanir",
+          "label": "Tüm mesai türleri (Normal %50, Hafta Tatili %100, Bayram %100) sistemde ayrı saatlik katsayılarla hesaplanır"
+        },
+        {
+          "value": "tum_fazla_mesailer_tek_bir_standart_katsayi_uzerinden_toplu_hesaplanir",
+          "label": "Tüm fazla mesailer gün ayrımı yapılmadan tek bir sabit katsayı üzerinden hesaplanır"
+        },
+        {
+          "value": "fazla_mesai_ucreti_odenmez_yerine_yasal_serbest_zaman_izin_kullandirilir",
+          "label": "Fazla mesai ücreti ödenmez; çalışanlara yasal 1,5 kat serbest zaman (izin) kullandırılır"
+        },
+        {
+          "value": "fazla_mesai_ucreti_odenmemektedir",
+          "label": "Fazla mesai ücreti ödenmemektedir (Maaşa dahildir / Fazla mesai yoktur)"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-016",
+      "process": "Fazla Mesai",
+      "order": 16,
+      "question": "Fazla mesai saatlik ücret hesabı (Brüt Ücret / 225 saat esası) ve mesai türlerine göre farklı katsayılar sistem tarafından otomatik işletilmekte midir?",
+      "description": "Aylık 225 saat böleni, saatlik brüt ücret formülü ve otomatik tahakkuk.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "PAY-015",
+        "operator": "not_equals",
+        "value": "fazla_mesai_ucreti_odenmemektedir"
+      },
+      "options": [
+        {
+          "value": "brut_ucret_225_saat_uzerinden_saatlik_ucret_ve_mesai_zammi_sistemde_otomatik_hesaplanir",
+          "label": "Evet; (Brüt Ücret / 225) formülüyle saat ücreti bulunur ve mesai saatleriyle çarpılarak otomatik tahakkuk eder"
+        },
+        {
+          "value": "mesai_tutarlari_excelde_manuel_hesaplanip_bordroya_tl_tutari_olarak_aktarilir",
+          "label": "Mesai tutarları Excel'de manuel hesaplanır; sisteme doğrudan TL tutarı olarak girilir"
+        },
+        {
+          "value": "sabit_bir_mesai_saat_ucreti_vardir_kisi_bazli_maas_bolunmesi_yapilmaz",
+          "label": "Tüm personele aynı sabit saat ücreti uygulanır; kişinin maaşına göre 225'e bölünmez"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-017",
+      "process": "İzin ve Devamsızlık Etkisi",
+      "order": 17,
+      "question": "Çalışanların kullandığı ücretli izinler, ücretsiz izinler, devamsızlıklar ve SGK istirahat raporları bordro brüt ücretine ve eksik gün sayısına nasıl yansıtılmaktadır?",
+      "description": "Eksik gün bildirimi, ücretsiz izin kesintisi, rapor günleri ve SGK gün kaybı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "puantajdaki_ucretsiz_izin_rapor_ve_devamsizlik_gunleri_otomatik_eksik_gun_ve_ucret_kesintisi_yapar",
+          "label": "Puantajdaki devamsızlık, ücretsiz izin ve raporlar SGK gününden düşer ve brüt ücretten otomatik kesilir"
+        },
+        {
+          "value": "eksik_gun_ve_kesinti_tutarlari_bordro_uzmani_tarafindan_manuel_hesaplanip_girilir",
+          "label": "Eksik gün ve kesintiler İK uzmanı tarafından incelenip bordroya manuel girilir"
+        },
+        {
+          "value": "ucretli_izinler_haricinde_kesinti_yapilmaz_personel_her_zaman_tam_30_gun_gosterilir",
+          "label": "Devamsızlık veya raporlarda maaş kesintisi yapılmaz; personel her zaman tam 30 gün bildirilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-018",
+      "process": "İzin ve Devamsızlık Etkisi",
+      "order": 18,
+      "question": "SGK tarafından ödenen geçici iş göremezlik ödeneği (rapor parası) şirket tarafından personele tam maaş ödenip sonradan mahsup mu edilmektedir (İşverenin rapor parasını mahsup etmesi), yoksa bordrodan doğrudan kesilmekte midir?",
+      "description": "Rapor parası mahsubu, çalışana tam maaş ödeme ve SGK emanet hesabı yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sirket_personele_tam_maas_oder_sgknin_odegidigi_is_goremezlik_ucreti_bordrodan_mahsup_edilir",
+          "label": "Şirket tam maaş öder; çalışanın SGK'dan aldığı iş göremezlik parası bordrodan mahsup edilir"
+        },
+        {
+          "value": "raporlu_gunlerin_ucreti_bordrodan_dogrudan_kesilir_personel_parasini_sgkdan_kendisi_alir",
+          "label": "Raporlu günlerin ücreti doğrudan kesilir; personel SGK'dan parasını kendi PTT/banka hesabından alır"
+        },
+        {
+          "value": "raporlu_gunler_icin_hicbir_kesinti_yapilmaz_sgk_odemesi_de_sirketce_aranmaz",
+          "label": "Raporlu günler için maaş kesintisi yapılmaz ve SGK ödeneği mahsup edilmez (Şirket jesti)"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-019",
+      "process": "Puantajdan Bordroya Veri Akışı",
+      "order": 19,
+      "question": "Ay sonunda PDKS ve puantaj sisteminde kesinleşen normal çalışma günü, hafta tatili, fazla mesai, izin ve eksik gün verileri bordro motoruna nasıl aktarılmaktadır?",
+      "description": "Puantaj-bordro köprüsü, veri entegrasyonu, dosya aktarımı veya tek veritabanı senkronizasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "puantaj_onaylandigi_an_tek_tikla_veya_otomatik_olarak_bordro_hesaplama_tablosuna_akar",
+          "label": "Puantaj onaylandığı an tek tıkla veya otomatik olarak bordro hesaplama tablosuna aktarılır"
+        },
+        {
+          "value": "pdks_yazilimindan_excel_veya_txt_disari_aktarilir_bordro_programina_dosyadan_yuklenir",
+          "label": "PDKS yazılımından Excel/TXT dışa aktarılır; bordro programına dosya yükleme ile aktarılır"
+        },
+        {
+          "value": "puantaj_ozeti_excelden_bakilarak_bordroya_kisi_bazinda_elle_yazilir",
+          "label": "Puantaj özetine bakılarak bordro ekranına kişi bazında çalışma günleri ve saatleri elle yazılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-020",
+      "process": "Puantajdan Bordroya Veri Akışı",
+      "order": 20,
+      "question": "Puantaj aktarımı öncesinde İK, Vardiya Amirleri ve Bordro birimleri arasında puantaj mutabakatı ve veri doğrulama kontrol adımı işletilmekte midir?",
+      "description": "Puantaj kapatma kontrolü, eksik basışların tamamlanması ve amir onay mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "resmi_puantaj_kilitleme_ve_amir_onay_adimi_tamamlanmadan_bordro_hesabi_baslatilamaz",
+          "label": "Evet; tüm amirler puantajı onaylayıp kilitler; İK mutabakatı sağlandıktan sonra bordro hesaplanır"
+        },
+        {
+          "value": "bordro_uzmani_hatali_veya_eksik_basislari_kendi_inisiyatifiyle_duzeltip_bordroyu_calistirir",
+          "label": "Bordro uzmanı hatalı basışları amirlerle telefon/mesajla çözerek doğrudan bordroyu çalıştırır"
+        },
+        {
+          "value": "resmi_bir_puantaj_onay_ve_mutabakat_adimi_yoktur",
+          "label": "Resmi bir puantaj onay ve mutabakat süreci işletilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-021",
+      "process": "SGK Parametreleri",
+      "order": 21,
+      "question": "SGK İşçi Payı (%14), İşsizlik İşçi Payı (%1), SGK İşveren Payı (%20.5), İşsizlik İşveren Payı (%2) ve SGK Taban / Tavan (PEK Tavanı) sınırları sistemde nasıl yönetilmektedir?",
+      "description": "Yasal SGK oranları, Prime Esas Kazanç (PEK) tavan aşımı ve katsayı güncellemeleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yasal_sgk_oranlari_ve_pek_tavan_taban_limitleri_sistem_parametrelerinde_merkezi_ve_tarih_gecerli_tutulur",
+          "label": "Yasal SGK oranları ve PEK tavan/taban limitleri parametre tablosunda tarih geçerliliğiyle yönetilir"
+        },
+        {
+          "value": "yasal_degisikliklerde_yazilim_firmasi_tarafindan_guncelleme_paketi_yuklenmesi_gerekir",
+          "label": "Yasal limitler değiştikçe yazılım firmasının güncelleme göndermesi beklenir; parametrik değiştirilemez"
+        },
+        {
+          "value": "sgk_hesaplamalari_harici_muhasebe_veya_smmm_tarafindan_kontrol_edilir",
+          "label": "SGK hesaplamaları şirket içi yazılımda değil, harici mali müşavir / bordro ofisinde yönetilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-022",
+      "process": "SGK Parametreleri",
+      "order": 22,
+      "question": "Emekli çalışanlar (SGDP - Sosyal Güvenlik Destek Primi) ve yabancı uyruklu personelin farklılaşan SGK prim oranları sistemde personel bazında otomatik uygulanmakta mıdır?",
+      "description": "SGDP emekli primi (%7.5 işçi, %24.5 işveren), yabancı personel istisnaları ve SGK statü ayrımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "personelin_sgk_turu_sgdp_normal_yabanci_secildiginde_ilgili_oranlar_otomatik_uygulanir",
+          "label": "Evet; personel kartında SGK türü (Normal, SGDP, Çırak/Stajyer) seçildiğinde prim oranları otomatik değişir"
+        },
+        {
+          "value": "emekli_ve_normal_personel_icin_ayri_bordro_hesaplama_sablonlari_manuel_secilir",
+          "label": "Emekli ve normal çalışanlar için bordro hesaplanırken manuel şablon seçimi yapılır"
+        },
+        {
+          "value": "emekli_veya_farkli_sgk_statusunde_calisan_bulunmamaktadir",
+          "label": "Farklı SGK statüsünde veya emekli çalışanımız bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-023",
+      "process": "SGK Teşvikleri",
+      "order": 23,
+      "question": "Şirketinizde çalışanlar için 5510 sayılı %5 Hazine indirimi, 6111, 7103, Ar-Ge (5746) veya bölgesel/sektörel SGK İstihdam Teşvikleri uygulanmakta mıdır?",
+      "description": "SGK istihdam teşvikleri, 5510 %5 indirimi, genç istihdamı, Ar-Ge ve imalat teşvikleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "evet_5510_bes_puanlik_indirim_ve_birden_fazla_ozel_istihdam_tesviki_aktif_uygulanmaktadir",
+          "label": "Evet; 5510 %5 indirimi ile birlikte 6111, 7103, Ar-Ge vb. çoklu istihdam teşvikleri aktif uygulanır"
+        },
+        {
+          "value": "yalnizca_standart_5510_bes_puanlik_hazine_indirimi_uygulanir_ozel_tesvikler_kullanilmaz",
+          "label": "Yalnızca standart 5510 %5 Hazine indirimi uygulanır; diğer teşvikler takip edilmez"
+        },
+        {
+          "value": "sgk_istihdam_tesviki_kullanilmamaktadir",
+          "label": "Şirketimizde herhangi bir SGK istihdam teşviki veya indirimi kullanılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-024",
+      "process": "SGK Teşvikleri",
+      "order": 24,
+      "question": "Bir çalışanın birden fazla teşvik maddesine uygun olması durumunda en avantajlı teşvikin seçimi ve teşvik tasarruf raporlaması nasıl yönetilmektedir?",
+      "description": "Teşvik optimizasyonu, teşvik danışmanlık yazılımı entegrasyonu ve aylık SGK teşvik tasarrufu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PAY-023",
+        "operator": "not_equals",
+        "value": "sgk_istihdam_tesviki_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "harici_tesvik_yazilimi_veya_sistem_ici_optimizasyonla_en_yuksek_tasarruf_saglayan_kanun_secilir",
+          "label": "Harici teşvik yazılımı veya entegre motorla her çalışan için en yüksek avantaj sağlayan teşvik seçilir"
+        },
+        {
+          "value": "bordro_uzmani_veya_muhasebe_mevzuata_gore_manuel_karar_verip_kanun_kodunu_karta_isler",
+          "label": "Bordro uzmanı veya mali müşavir manuel inceleyerek ilgili teşvik kanun kodunu karta yazar"
+        },
+        {
+          "value": "tesvik_secimi_ve_hesabi_sistemik_olarak_degil_harici_danisman_tarafindan_sgk_portalinda_yapilir",
+          "label": "Teşvik seçimi şirket yazılımında yapılmaz; harici danışman tarafından SGK portalı üzerinden bildirilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-025",
+      "process": "Gelir Vergisi",
+      "order": 25,
+      "question": "Çalışanların Gelir Vergisi Matrahı, Kümülatif Gelir Vergisi Matrahı (GV Dilimleri: %15, %20, %27, %35, %40) ve yıl içi dilim geçişleri sistemde nasıl izlenmektedir?",
+      "description": "Kümülatif gelir vergisi matrahı takibi, vergi dilimleri geçişi ve yıl içi kümülasyon.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kumulatif_vergi_matrahi_aylar_boyunca_otomatik_tasinir_dilim_gecislerinde_vergi_otomatik_artar",
+          "label": "Kümülatif matrah her ay otomatik devredilir; %15-%40 dilim geçişlerinde artan oranlı vergi tam hesaplanır"
+        },
+        {
+          "value": "kumulatif_matrah_ve_dilim_hesabi_ay_sonlarinda_excel_tablosundan_kontrol_edilir",
+          "label": "Kümülatif matrah harici Excel'de takip edilir; dilim geçişleri bordroya manuel girilir"
+        },
+        {
+          "value": "gelir_vergisi_hesaplamalari_harici_bordro_ofisi_veya_smmm_tarafindan_yapilir",
+          "label": "Gelir vergisi hesaplamaları şirket içinde değil, harici bordro ofisi tarafından yapılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-026",
+      "process": "Gelir Vergisi",
+      "order": 26,
+      "question": "Yıl içinde başka bir iş yerinden transfer olan veya grup şirketleri arasında nakil olan personelin önceki iş yerinden gelen kümülatif vergi matrahı sisteme işlenebilmekte midir?",
+      "description": "Önceki iş yeri kümülatif matrah devri, çalışan nakli ve doğru vergi diliminden başlatma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "personel_kartina_onceki_isyeri_kumulatif_matrahi_girilir_ve_hesaplama_kalan_dilimden_devam_eder",
+          "label": "Evet; personel kartına önceki iş yeri kümülatif matrahı yazılır ve vergi dilimi kaldığı yerden devam eder"
+        },
+        {
+          "value": "onceki_matrah_girilemez_her_yeni_giriste_vergi_matrahi_sifirdan_baslatilir",
+          "label": "Sistemde önceki matrah alanı yoktur; işe giren herkes yıl ortasında dahi %15 diliminden başlar"
+        },
+        {
+          "value": "onceki_isyerinden_kumulatif_matrah_yazisi_talep_edilmemektedir",
+          "label": "Önceki iş yerinden kümülatif matrah yazısı talep edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-027",
+      "process": "Damga Vergisi",
+      "order": 27,
+      "question": "Ücret bordrolarında binde 7,59 oranındaki yasal Damga Vergisi kesintisi ve istisnaları sistem tarafından nasıl hesaplanmaktadır?",
+      "description": "Damga vergisi hesaplaması (Binde 7,59), brüt ücret matrahı ve istisna tutarı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "toplam_brut_kazanc_uzerinden_yasal_binde_7_59_oraninda_damga_vergisi_otomatik_hesaplanir",
+          "label": "Toplam brüt kazanç üzerinden binde 7,59 oranında damga vergisi otomatik hesaplanır"
+        },
+        {
+          "value": "damga_vergisi_tutari_ay_sonunda_toplu_olarak_hesaplanip_muhasebelestirilir",
+          "label": "Damga vergisi kişi bazında değil, ay sonunda toplam brüt üzerinden muhasebe fişinde hesaplanır"
+        },
+        {
+          "value": "damga_vergisi_takibi_ve_hesaplamasi_harici_smmm_tarafindan_yapilmaktadir",
+          "label": "Damga vergisi hesaplamaları harici mali müşavir tarafından yürütülmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-028",
+      "process": "Damga Vergisi",
+      "order": 28,
+      "question": "Ücret bordrosu haricinde personele yapılan avans makbuzları, ikramiye, ihbar/kıdem tazminatı veya özel ödemeler için damga vergisi kesintileri ayrı ayrı raporlanabilmekte midir?",
+      "description": "Tazminat damga vergisi, avans makbuzu damga vergisi ve ayrı bildirim.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tum_odeme_turleri_icin_ayri_damga_vergisi_tutarlari_muhsgk_uyumlu_raporlanabilir",
+          "label": "Evet; ücret, ikramiye ve tazminat ödemelerinin damga vergileri ayrı ayrı listelenip raporlanabilir"
+        },
+        {
+          "value": "yalnizca_aylik_ana_bordronun_damga_vergisi_gorulur_digerleri_manuel_hesaplanir",
+          "label": "Yalnızca aylık ana bordronun damga vergisi görülür; diğer ödemeler için manuel hesaplama yapılır"
+        },
+        {
+          "value": "ayri_damga_vergisi_raporlama_ihtiyaci_bulunmamaktadir",
+          "label": "Ayrı damga vergisi raporlama ihtiyacı bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-029",
+      "process": "İstisna / Muafiyetler",
+      "order": 29,
+      "question": "Asgari Ücret Vergi İstisnası (Gelir ve Damga Vergisi istisnası), yemek parası istisnası, yol parası istisnası ve kreş yardımı muafiyetleri bordroda nasıl hesaplanmaktadır?",
+      "description": "7349 sayılı Kanun asgari ücret vergi istisnası, yemek/yol SGK ve vergi muafiyetleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "asgari_ucrete_kadar_olan_gelir_ve_damga_vergisi_istisnasi_tum_personel_icin_otomatik_duser",
+          "label": "Asgari ücrete kadar olan gelir ve damga vergisi istisnası tüm çalışanlar için otomatik uygulanır"
+        },
+        {
+          "value": "istisnalar_harici_bordro_programinda_hesaplanir_ve_muhasebeye_net_olarak_iletilir",
+          "label": "İstisna hesaplamaları harici bordro yazılımında yapılır; ERP'ye net sonuçlar aktarılır"
+        },
+        {
+          "value": "istisna_ve_muafiyetler_excel_formulleriyle_manuel_hesaplanmaktadir",
+          "label": "İstisna ve muafiyetler Excel tablolarındaki formüllerle manuel hesaplanmaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-030",
+      "process": "İstisna / Muafiyetler",
+      "order": 30,
+      "question": "Günlük ayni veya nakdi yemek ve yol bedellerinin SGK ve Gelir Vergisi günlük yasal muafiyet tavanlarını aşan kısımlarının otomatik vergilendirilmesi desteklenmekte midir?",
+      "description": "Yemek ve yol günlük yasal istisna tavanı kontrolü, aşan tutarın brüte eklenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "gunluk_yemek_ve_yol_yardiminin_yasal_istisnayi_asan_kismi_otomatik_sgk_ve_gelir_vergisine_tabi_tutulur",
+          "label": "Evet; günlük istisna limitini aşan yemek/yol tutarları otomatik olarak vergi ve SGK matrahına eklenir"
+        },
+        {
+          "value": "yemek_ve_yol_odemeleri_tamamen_istisna_kapsaminda_tutulur_asmasina_izin_verilmez",
+          "label": "Yemek ve yol ödemeleri yasal tavanla sınırlandırılmıştır; aşan kısım ödenmez"
+        },
+        {
+          "value": "yemek_veya_yol_istisna_tavan_ayrimi_yapilmamaktadir",
+          "label": "Yemek veya yol yardımı istisna tavanı ayrımı yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-031",
+      "process": "Yan Haklar",
+      "order": 31,
+      "question": "Personele sağlanan ayni ve nakdi Yan Haklar (Yemek kartı, servis/yol yardımı, şirket aracı özel kullanım payı, özel sağlık sigortası, erzak/hediye çeki) bordroda nasıl vergilendirilip gösterilmektedir?",
+      "description": "Yan hakların bordrolaştırılması, ayni yardımlar, hediye çekleri ve şirket aracı vergi matrahı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yemek_karti_veya_nakit_yemek_bedeli",
+          "label": "Yemek Kartı (Sodexo/Multinet) veya Nakit Yemek Bedeli"
+        },
+        {
+          "value": "personel_servisi_veya_nakit_yol_ucreti",
+          "label": "Personel Servisi veya Nakit / Akbil Yol Yardımı"
+        },
+        {
+          "value": "ozel_saglik_veya_tamamlayici_saglik_sigortasi_isveren_payi",
+          "label": "Özel Sağlık veya Tamamlayıcı Sağlık Sigortası (TSS) İşveren Payı"
+        },
+        {
+          "value": "sirket_araci_ozel_kullanim_degeri_ve_yakit_hakki",
+          "label": "Şirket Aracının Şahsi Kullanım Değeri ve Yakıt Gider Payı"
+        },
+        {
+          "value": "erzak_bayram_hediye_ceki_veya_ayni_yardimlar",
+          "label": "Erzak, Bayram Hediye Çeki veya Ayni Yardım Paketleri"
+        },
+        {
+          "value": "yan_hak_kalemleri_bordroya_yansitilmamaktadir",
+          "label": "Yan hak kalemleri bordroya yansıtılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-032",
+      "process": "Yan Haklar",
+      "order": 32,
+      "question": "Şirket tarafından karşılanan Özel Sağlık Sigortası veya Hayat Sigortası primlerinin Gelir Vergisi matrahından indirilebilen azami yasal limit kontrolü sistemde yapılmakta mıdır?",
+      "description": "GVK 63/3 şahıs sigortası indirimi (Brüt ücretin %15'i ve asgari ücret yıllık tutarı sınırı).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sigorta_priminin_brut_ucretin_15i_ve_yillik_asgari_ucret_siniri_kontrol_edilerek_matrahtan_indirilir",
+          "label": "Evet; brüt ücretin %15'i ve asgari ücret sınırına göre vergi matrahından indirim otomatik denetlenir"
+        },
+        {
+          "value": "sigorta_sirketinden_gelen_fatura_tutari_manuel_kontrol_edilerek_bordroya_yazilir",
+          "label": "Sigorta faturasındaki kişi bazlı tutar bordro uzmanı tarafından kontrol edilip elle yazılır"
+        },
+        {
+          "value": "ozel_saglik_veya_hayat_sigortasi_saglanmamaktadir",
+          "label": "Çalışanlara özel sağlık veya hayat sigortası sağlanmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-033",
+      "process": "Kesintiler",
+      "order": 33,
+      "question": "Çalışan bordrosundan yapılan Yasal ve Özel Kesintiler (BES / Otomatik Katılım Payı, Sendika Aidatı, Kefalet Sandığı, Lojman/Kira Kesintisi) nasıl tanımlanmakta ve kesilmektedir?",
+      "description": "Bordro kesintileri, BES kesintisi, sendika aidatı ve kurum içi özel kesintiler.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bireysel_emeklilik_sistemi_bes_otomatik_katilim_3_kesintisi",
+          "label": "Bireysel Emeklilik Sistemi (Otomatik Katılım BES %3 Kesintisi)"
+        },
+        {
+          "value": "isci_sendikasi_aidat_kesintisi_toplu_is_sozlesmesi",
+          "label": "İşçi Sendikası Aidat Kesintisi (Toplu İş Sözleşmesi Kapsamı)"
+        },
+        {
+          "value": "kefalet_sandigi_veya_yardimlasma_sandigi_kesintisi",
+          "label": "Kefalet Sandığı veya Şirket İçi Yardımlaşma Sandığı Kesintisi"
+        },
+        {
+          "value": "lojman_kira_veya_elektrik_su_kesintisi",
+          "label": "Şirket Lojmanı Kira / Gider Kesintisi"
+        },
+        {
+          "value": "personel_ozel_harcama_veya_zarar_kesintisi",
+          "label": "Personel Özel Harcama, Trafik Cezası veya Şirket Zarar Kesintisi"
+        },
+        {
+          "value": "ozel_kesinti_uygulanmamaktadir",
+          "label": "Yasal vergiler haricinde özel bir kesinti uygulanmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-034",
+      "process": "Kesintiler",
+      "order": 34,
+      "question": "Bireysel Emeklilik Sistemi (Otomatik Katılım BES %3) kesintileri, cayma hakkını kullanan personelin iptal takibi ve emeklilik şirketine veri aktarımı sistemde nasıl yönetilmektedir?",
+      "description": "BES veri aktarımı, emeklilik şirketi formatı, cayma/ara verme statüsü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "bes_kesintisi_otomatik_hesaplanir_ve_emeklilik_sirketi_formatinda_dosya_disari_aktarilir",
+          "label": "Evet; BES kesintisi otomatik hesaplanır ve emeklilik şirketi portalına uygun dosya üretilir"
+        },
+        {
+          "value": "bes_kesintileri_ve_cayma_talepleri_excel_tablolarinda_manuel_takip_edilir",
+          "label": "BES kesintileri ve cayma talepleri İK uzmanı tarafından Excel'de manuel takip edilir"
+        },
+        {
+          "value": "otomatik_katilim_bes_kapsaminda_personel_yoktur_veya_tum_personel_caymistir",
+          "label": "Otomatik katılım BES kapsamında personel yoktur veya tüm çalışanlar cayma hakkını kullanmıştır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-035",
+      "process": "İcra / Nafaka / Avans",
+      "order": 35,
+      "question": "Personele ait İcra Dairesi Kesintileri, Nafaka Kararları ve Maaş Avansı Mahsupları bordroda nasıl yönetilmekte ve önceliklendirilmektedir?",
+      "description": "İcra kesintisi, nafaka önceliği, maaş avansı mahsubu ve net ücret kontrolü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "icra_nafaka_ve_avans_kartlari_tanimlidir_sistem_yasal_oncelik_ve_limit_siralamasina_gore_otomatik_keser",
+          "label": "İcra, nafaka ve avans kartları tanımlıdır; sistem yasal sıra ve 1/4 limit kurallarına göre otomatik keser"
+        },
+        {
+          "value": "icra_ve_avans_kesinti_tutarlari_bordro_uzmani_tarafindan_manuel_hesaplanarak_girilir",
+          "label": "İcra ve avans kesintileri her ay İK/muhasebe tarafından manuel hesaplanıp sisteme girilir"
+        },
+        {
+          "value": "avans_veya_icra_kesintisi_uygulanmamaktadir",
+          "label": "Şirketimizde avans, icra veya nafaka kesintisi süreci işletilmemektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-036",
+      "process": "İcra / Nafaka / Avans",
+      "order": 36,
+      "question": "Birden fazla icra dosyası olan çalışanlarda icra sıra takibi, yasal 1/4 kesinti limiti ve nafakanın öncelikli kesilmesi kuralı sistem tarafından otomatik denetlenmekte midir?",
+      "description": "İcra dosya sırası, bakiye borç takibi, nafakanın tam kesilmesi ve icra dairesine ödeme listesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PAY-035",
+        "operator": "not_equals",
+        "value": "avans_veya_icra_kesintisi_uygulanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "sistem_dosya_siralamasini_kalan_borcu_ve_1_4_yasal_maas_sinirini_otomatik_takip_eder",
+          "label": "Evet; sistem icra sıra numarasını, kalan borcu ve yasal 1/4 net sınırını otomatik denetleyip keser"
+        },
+        {
+          "value": "icra_dosyalarinin_bakiye_ve_sirasi_excel_listesinde_manuel_tutulur",
+          "label": "İcra dosyalarının sıra ve bakiye takibi Excel listesinde manuel yapılır; yazılımda kilit yoktur"
+        },
+        {
+          "value": "ayni_kisiye_ait_birden_fazla_icra_dosyasi_bulunmamaktadir",
+          "label": "Birden fazla icra dosyası olan çalışanımız bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-037",
+      "process": "İşveren Maliyetleri",
+      "order": 37,
+      "question": "Şirketin toplam personel istihdam maliyetini gösteren Tam İşveren Maliyeti (Brüt Ücret + SGK İşveren Payı + İşsizlik İşveren Payı - Teşvik İndirimleri + Yan Haklar) nasıl hesaplanmakta ve raporlanmaktadır?",
+      "description": "Toplam işveren maliyeti hesaplama kapsamı, teşviklerin maliyet düşürücü etkisi ve net maliyet.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_isveren_maliyeti_tum_sgk_isveren_paylari_tesvik_kazanclari_ve_yan_haklarla_anlik_raporlanir",
+          "label": "Tam işveren maliyeti; brüt ücret, SGK işveren primleri, teşvik indirimleri ve yan haklarla anlık raporlanır"
+        },
+        {
+          "value": "yalnizca_brut_ucret_ve_sgk_isveren_payi_toplanir_yan_hak_ve_tesvik_detaylari_harici_incelenir",
+          "label": "Yalnızca brüt ücret ve SGK işveren payı toplanır; yan haklar ve teşvik etkileri harici Excel'de bakılır"
+        },
+        {
+          "value": "isveren_maliyeti_hesaplanmaz_yalnizca_net_ve_brut_maas_toplami_takip_edilir",
+          "label": "İşveren maliyeti hesaplanmaz; yalnızca net maaş ve brüt bordro toplamı takip edilir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-038",
+      "process": "İşveren Maliyetleri",
+      "order": 38,
+      "question": "İşveren maliyetleri çalışanların bağlı olduğu Masraf Merkezlerine (Cost Center), Departmanlara, Projelere veya Üretim Siparişlerine göre ayrıştırılıp maliyetlendirme modülüne aktarılmakta mıdır?",
+      "description": "Bordro maliyet merkezi dağılımı, direkt/endirekt işçilik ayrımı ve proje bazlı maliyet dağıtımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "bordro_maliyetleri_masraf_merkezi_proje_ve_uretim_hatti_bazinda_otomatik_dagitilir_ve_aktarilir",
+          "label": "Evet; bordro maliyetleri departman, masraf merkezi, proje ve üretim hattı bazında otomatik dağıtılır"
+        },
+        {
+          "value": "muhasebe_departmani_ay_sonunda_toplam_bordro_giderini_oranlara_gore_manuel_dagitir",
+          "label": "Muhasebe departmanı ay sonunda toplam gideri tahmini oranlarla masraf merkezlerine manuel dağıtır"
+        },
+        {
+          "value": "masraf_merkezi_veya_proje_bazli_maliyet_ayrimi_yapilmamaktadir",
+          "label": "Masraf merkezi veya proje bazlı işçilik maliyet ayrımı yapılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-039",
+      "process": "Bordro Kontrol ve Onay",
+      "order": 39,
+      "question": "Bordro hesaplaması tamamlandıktan sonra bordro kapatılmadan önce hangi çapraz kontroller (Önceki aya göre net/brüt farkı, kişi sayısı farkı, negatif net ücret, sıra dışı mesai/prim) ve onay adımları işletilmektedir?",
+      "description": "Bordro denetim kontrolleri, ay-ay fark analizleri, negatif ücret engeli ve çok adımlı onay akışı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "onceki_aya_gore_toplam_net_brut_ve_kisi_sayisi_karsilastirma_raporu",
+          "label": "Önceki Aya Göre Toplam Net, Brüt ve Kişi Sayısı Karşılaştırma Kontrolü"
+        },
+        {
+          "value": "negatif_net_ucret_veya_asgari_ucretin_altinda_kalan_maas_kontrolu",
+          "label": "Negatif Net Maaş veya Hatalı Kesinti Nedeniyle Sıfır Kalan Maaş Kontrolü"
+        },
+        {
+          "value": "sira_disi_fazla_mesai_veya_yuksek_prim_tutarlari_kontrolu",
+          "label": "Sıra Dışı Yüksek Fazla Mesai Saati veya Olağan Dışı Prim Tutarları Kontrolü"
+        },
+        {
+          "value": "ise_yeni_giren_ve_isten_ayrilan_personelin_kist_maas_ve_tazminat_kontrolu",
+          "label": "Yeni Giren ve Ayrılan Personelin Kıst Maaş ve Çıkış Ödemesi Kontrolü"
+        },
+        {
+          "value": "cok_kademeli_yonetim_onayi_ik_finans_genel_mudur",
+          "label": "Çok Kademeli Yönetim Onay Akışı (İK Müdürü → Finans Direktörü → Genel Müdür)"
+        },
+        {
+          "value": "sistematik_bir_on_kontrol_yoktur_hata_olursa_sonradan_fark_edilir",
+          "label": "Sistematik bir çapraz kontrol listesi yoktur; hatalar sonradan fark edilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-040",
+      "process": "Bordro Kontrol ve Onay",
+      "order": 40,
+      "question": "Bordro hesaplama dönemi İK ve Finans onayıyla Kilitlenmekte (Payroll Period Lock) ve yetkisiz geriye dönük müdahalelere karşı korunmakta mıdır?",
+      "description": "Dönem kilidi, onay sonrası değişiklik engeli, kilit açma yetkisi ve audit trail.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bordro_onaylandiktan_sonra_donem_kilitlenir_yalnizca_ust_yetkili_onayli_tutanakla_acabilir",
+          "label": "Evet; onaylanan dönem kilitlenir; geriye dönük hiçbir veri değiştirilemez, kilit açma loglanır"
+        },
+        {
+          "value": "donem_kilidi_yoktur_gecmis_aylarin_kayitlarina_her_zaman_mudahale_edilebilmektedir",
+          "label": "Dönem kilitleme özelliği yoktur; geçmiş ayların verileri sonradan değiştirilebilir"
+        },
+        {
+          "value": "yalnizca_muhasebe_fisi_kesilince_muhasebe_tarafinda_kilitlenir_bordro_acik_kalir",
+          "label": "Yalnızca muhasebe fişi kilitlenir; bordro yazılımında dönem açık kalabilmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-041",
+      "process": "Bordro Düzeltme / Ek Bordro",
+      "order": 41,
+      "question": "Geçmiş aylara ilişkin hatalı puantaj, geciken prim veya eksik bildirilen günlerin düzeltilmesi için Geriye Dönük Fark Bordrosu (Retroactive Payroll) veya Ek Bordro süreci nasıl yürütülmektedir?",
+      "description": "Geriye dönük düzeltme, retro fark hesaplama, ek bordro ve ek MUHSGK bildirimleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistem_gecmise_donuk_fark_hesaplamasini_retro_otomatik_yapar_ve_guncel_aya_fark_olarak_tasir",
+          "label": "Sistem geçmiş döneme ait farkları otomatik hesaplar ve güncel aya 'Geçmiş Dönem Farkı' olarak taşır"
+        },
+        {
+          "value": "gecmis_ay_icin_bagimsiz_bir_ek_bordro_calistirilir_ve_ek_sgk_bildirgesi_verilir",
+          "label": "Geçmiş ay için ayrı bir ek bordro çalıştırılır ve ilgili aya ek SGK bildirgesi verilir"
+        },
+        {
+          "value": "farklar_excelde_manuel_hesaplanip_guncel_ayin_ek_kazanc_veya_kesinti_satirina_yazilir",
+          "label": "Fark tutarı Excel'de manuel hesaplanır; güncel ayın ek kazanç veya kesinti satırına elle yazılır"
+        },
+        {
+          "value": "ek_veya_donem_disi_bordro_calistirilmamaktadir",
+          "label": "Ek bordro veya geriye dönük fark bordrosu çalıştırılmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-042",
+      "process": "Bordro Düzeltme / Ek Bordro",
+      "order": 42,
+      "question": "Normal dönem dışında bağımsız çalışan Dönem Dışı Bordro (Off-Cycle Payroll — Yalnızca prim ödemesi, bayram avansı veya işten çıkış tazminat bordrosu) çalıştırılabilmekte midir?",
+      "description": "Off-cycle bordro kabiliyeti, kıdem/ihbar çıkış bordrosu, ara dönem ikramiye bordrosu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "PAY-041",
+        "operator": "not_equals",
+        "value": "ek_veya_donem_disi_bordro_calistirilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "ana_bordroyu_etkilemeyen_bagimsiz_off_cycle_prim_ikramiye_ve_cikis_bordrolari_calistirilabilir",
+          "label": "Evet; ana maaş bordrosundan bağımsız olarak prim, bayram avansı ve çıkış bordroları ayrı çalıştırılabilir"
+        },
+        {
+          "value": "tum_odemeler_zorunlu_olarak_ay_sonundaki_tek_ana_bordro_icinde_birlestirilmek_zorundadir",
+          "label": "Tüm ara ödemeler zorunlu olarak ay sonundaki tek ana bordro içinde birleştirilmek zorundadır"
+        },
+        {
+          "value": "ara_donem_odemeleri_bordrosuz_olarak_avans_makbuzuyla_yapilir",
+          "label": "Ara dönem ödemeleri bordrosuz olarak avans makbuzuyla muhasebeden yapılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-043",
+      "process": "Banka Ödeme Dosyaları",
+      "order": 43,
+      "question": "Bordro onaylandıktan sonra personele net maaş, avans ve prim ödemelerinin yapılması için Banka Maaş Ödeme Dosyası (Excel, TXT, XML, Banka Özel Formatı) nasıl oluşturulmakta ve bankaya iletilmektedir?",
+      "description": "Banka ödeme dosyası üretimi, banka özel txt/excel formatları, online bankacılık aktarımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "anlasmali_bankalarin_ozel_txt_excel_formatinda_sistemden_tek_tikla_sifreli_odeme_dosyasi_uretilir",
+          "label": "Anlaşmalı bankaların özel TXT/Excel formatında sistemden tek tıkla şifreli maaş ödeme dosyası üretilir"
+        },
+        {
+          "value": "bordro_ozet_listesi_excelde_duzenlenerek_bankanin_istedigi_formata_manuel_kopyalanir",
+          "label": "Bordro dökümünden Excel'e kopyalanır; banka şablonuna göre sütunlar manuel düzenlenip yüklenir"
+        },
+        {
+          "value": "banka_dosyasi_kullanilmaz_maaslar_internet_bankaciligindan_tek_tek_manuel_havale_edilir",
+          "label": "Banka dosyası kullanılmaz; internet bankacılığından kişilere tek tek manuel havale yapılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-044",
+      "process": "Banka Ödeme Dosyaları",
+      "order": 44,
+      "question": "Personelin banka IBAN bilgileri, banka şube kodları ve hesap numarası değişiklikleri sistemde denetlenmekte ve ödeme dosyasıyla tam tutar mutabakatı yapılmakta mıdır?",
+      "description": "IBAN algoritma doğrulaması, hesap sahibi ad kontrolü ve toplam ödeme tutarı mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "iban_numaralari_algoritmik_olarak_denetlenir_ve_banka_dosyasi_toplami_ile_net_maas_mutabik_olur",
+          "label": "Evet; TR IBAN formatı doğrulanır ve banka dosyasındaki genel toplam net maaşla kuruşu kuruşuna denetlenir"
+        },
+        {
+          "value": "iban_kontrolu_manuel_yapilir_hatali_iban_oldugunda_bankadan_iade_donunce_anlasilir",
+          "label": "IBAN kontrolü sistemde yoktur; hatalı numara olduğunda bankadan iade dönünce fark edilir"
+        },
+        {
+          "value": "personel_maaslari_elden_veya_kasa_makbuzuyla_odenmektedir",
+          "label": "Personel maaşları elden veya kasa makbuzuyla nakit ödenmektedir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-045",
+      "process": "Muhasebe Entegrasyonu",
+      "order": 45,
+      "question": "Bordro tahakkuk sonuçları (335 Personele Borçlar, 360 Ödenecek Vergi, 361 Ödenecek SGK, 770/720/730 Gider Hesapları) Muhasebe modülüne mahsup/tahakkuk fişi olarak nasıl aktarılmaktadır?",
+      "description": "Bordro muhasebe entegrasyonu, otomatik mahsup fişi, hesap planı eşleşmesi ve masraf dağıtımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "bordro_kapatildiginda_masraf_merkezleri_ve_gider_hesaplariyla_otomatik_muhasebe_yevmiye_fisi_olusur",
+          "label": "Bordro onaylandığında masraf merkezleri ve 770/720/335 hesaplarıyla otomatik mahsup fişi oluşur"
+        },
+        {
+          "value": "bordro_icmali_excelden_bakilarak_muhasebe_uzmani_tarafindan_manuel_yevmiye_fisi_olarak_yazilir",
+          "label": "Bordro icmaline bakılarak muhasebe uzmanı tarafından genel yevmiye fişi elle kaydedilir"
+        },
+        {
+          "value": "muhasebe_fisi_harici_muhasebeci_veya_smmm_tarafindan_ay_sonunda_kendi_sistemine_islenir",
+          "label": "Muhasebe fişi şirket içinde değil, harici mali müşavir tarafından kendi sistemine işlenir"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-046",
+      "process": "Yasal Bildirimler",
+      "order": 46,
+      "question": "Aylık Muhtasar ve Prim Hizmet Beyannamesi (MUHSGK), SGK Aylık Prim Bildirgesi ve E-Bordro / Ücret Hesap Pusulası çıktıları sistem üzerinden nasıl üretilmekte ve çalışanlara iletilmektedir?",
+      "description": "MUHSGK XML çıktısı, SGK prim bildirimi, dijital e-bordro / ücret pusulası dağıtımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "muhsgk_xml_dosyasi_sistemden_uretilir_calisanlara_sifreli_e_bordro_portal_veya_eposta_ile_iletilir",
+          "label": "MUHSGK XML paketi sistemden üretilir; çalışanlara şifreli E-Bordro / mobil bildirim olarak dağıtılır"
+        },
+        {
+          "value": "muhsgk_gib_ebeyanname_programinda_elle_doldurulur_bordrolar_kagit_olarak_bastirilip_imzalattirilir",
+          "label": "MUHSGK beyanname programında elle hazırlanır; ücret pusulaları basılı kağıt olarak personele imzalatılır"
+        },
+        {
+          "value": "tum_yasal_bildirimler_ve_bordro_dagitimi_harici_smmm_danismanlik_firmasi_tarafindan_yapilir",
+          "label": "Tüm beyanname ve bildirim süreçleri harici mali müşavir tarafından yürütülür"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "PAY-047",
+      "process": "Bordro Raporlama ve KPI",
+      "order": 47,
+      "question": "Bordro yönetimi kapsamında Toplam Bordro Maliyeti, Kişi Başı Ortalama İşveren Maliyeti, Fazla Mesai Maliyet Oranı, Teşvik Tasarruf Tutarı, Departman Bazlı Ücret Dağılımı ve Net/Brüt Oranları gibi yönetim raporları nasıl alınmaktadır?",
+      "description": "Bordro KPI göstergeleri, toplam işçilik maliyeti, fazla mesai yükü, SGK teşvik kazancı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "toplam_ve_kisi_basi_ortalama_isveren_maliyeti_raporu",
+          "label": "Toplam Bordro ve Kişi Başı Ortalama İşveren Maliyeti Raporu"
+        },
+        {
+          "value": "departman_ve_masraf_merkezi_bazinda_iscilik_gider_dagilimi",
+          "label": "Departman ve Masraf Merkezi Bazında İşçilik Gider Dağılım Raporu"
+        },
+        {
+          "value": "aylik_sgk_istihdam_tesviki_tasarruf_ve_kazanc_raporu",
+          "label": "Aylık SGK İstihdam Teşviki Tasarruf ve Net Kazanç Raporu"
+        },
+        {
+          "value": "fazla_mesai_ve_primlerin_toplam_maliyete_orani_analizi",
+          "label": "Fazla Mesai ve Primlerin Toplam Ücret Maliyetine Oranı Analizi"
+        },
+        {
+          "value": "kumulatif_vergi_matrahlari_ve_dilim_dagilimi_icmali",
+          "label": "Kümülatif Vergi Matrahları ve Personel Vergi Dilimi Dağılım İcmali"
+        },
+        {
+          "value": "donemler_arasi_maas_ve_maliyet_artis_fark_raporu",
+          "label": "Dönemler Arası Maaş, Enflasyon ve Maliyet Artış Fark Raporu"
+        },
+        {
+          "value": "bordro_yonetim_raporlari_ve_kpi_panosu_duzenli_alinamamaktadir",
+          "label": "Bordro yönetim raporları ve KPI panoları düzenli olarak alınamamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}

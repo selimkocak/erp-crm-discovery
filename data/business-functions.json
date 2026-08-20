@@ -308,5 +308,15 @@
     "category_en": "Management",
     "sort_order": 31,
     "is_active": true
+  },
+  {
+    "code": "COSTING",
+    "legacy_code": "MLYT_YNT",
+    "name_tr": "Maliyetlendirme",
+    "name_en": "Costing",
+    "category_tr": "Muhasebe & Finans",
+    "category_en": "Accounting & Finance",
+    "sort_order": 32,
+    "is_active": true
   }
 ]

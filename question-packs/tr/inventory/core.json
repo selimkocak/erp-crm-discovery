@@ -1,0 +1,633 @@
+{
+  "meta": {
+    "pack_id": "tr.inventory.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "INVENTORY",
+    "name": "Stok Yönetimi Ön Analizi",
+    "description": "ERP implementasyonu öncesinde Stok Yönetimi departmanının AS-IS süreçlerini, malzeme ana verisi, varyantlar, ölçü birimleri, konsinye stok, emniyet stoğu, ATP rezervasyonu, negatif stok, stok değerleme (FIFO/Ortalama/Standart), yaşlandırma, envanter muhasebesi ve KPI operasyonlarını anlamaya yönelik temel discovery soru paketi."
+  },
+  "questions": [
+    {
+      "id": "INV-001",
+      "process": "Stok Ana Veri Yapısı ve Kodlama",
+      "order": 1,
+      "question": "Stok kartları (malzeme ana verisi) hangi kurallara göre ve kimler tarafından sisteme açılıyor?",
+      "description": "Stok kartı açma disiplini, yetkilendirme ve mükerrer kart oluşumunun önlenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_yetkili_ekip", "label": "Sadece tanımlı merkezi bir ana veri (MDM) / ürün yönetimi ekibi onaylı taleple açar", "allow_note": false, "is_other": false },
+        { "value": "departman_bazli_serbest", "label": "Departman personeli (Satın alma, satış veya üretim) ihtiyaç duydukça doğrudan stok kartı açabilir", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_kod_verir", "label": "Teknik ekip ürünü belirler, muhasebe/finans kod vererek sisteme girer", "allow_note": false, "is_other": false },
+        { "value": "standartsiz_serbest", "label": "Herhangi bir yetki kısıtı yoktur, herkes açabildiği için mükerrer kartlar oluşmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-002",
+      "process": "Stok Ana Veri Yapısı ve Kodlama",
+      "order": 2,
+      "question": "Stok kodlama yapınız nasıl kurgulanmıştır (anlamlı/akıllı kod mu, sıralı/otomatik numara mı)?",
+      "description": "Stok kodunda ürün özelliklerinin gömülü olup olmadığı (Smart Code vs. Sequential Numbering).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "akilli_kodlama", "label": "Anlamlı kodlama; kodun içinde ürün grubu, hammadde tipi, ölçü vb. kurallar şifrelenmiştir", "allow_note": true, "is_other": false },
+        { "value": "sirali_otomatik_numara", "label": "Sıralı otomatik numara (ör. 100001, 100002); ürün özellikleri kodda değil nitelik alanlarında tutulur", "allow_note": false, "is_other": false },
+        { "value": "tedarikci_veya_oem_kodu", "label": "Doğrudan tedarikçinin veya üreticinin parça/katalog kodu kullanılır", "allow_note": true, "is_other": false },
+        { "value": "karma_standartsiz", "label": "Eski ve yeni ürünlerde farklı yapılar var, kural birliği bulunmuyor", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-003",
+      "process": "Stok Ana Veri Yapısı ve Kodlama",
+      "order": 3,
+      "question": "Aynı fiziksel malzemenin birden fazla farklı stok koduyla sistemde mükerrer açılması nasıl engelleniyor?",
+      "description": "Mükerrer stok kartı kirliliğinin sistemsel veya operasyonel kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_kontrol", "label": "Sistem parça no, üretici kodu, barkod veya teknik parametre eşleşmesinde uyarı verip açılışı engeller", "allow_note": false, "is_other": false },
+        { "value": "manuel_arama_kontrol", "label": "Kartı açan personel önce sistemde benzer isim ve kodları manuel arayarak kontrol eder", "allow_note": false, "is_other": false },
+        { "value": "mukerrer_engelleme_yok", "label": "Sistemde veya süreçte kontrol yoktur; aynı ürün için sık sık mükerrer kartlar açılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-004",
+      "process": "Malzeme Sınıflandırması ve Nitelik Yönetimi",
+      "order": 4,
+      "question": "Malzemeler (stoklar) ERP sisteminde kaç seviyeli bir hiyerarşi ve sınıflandırma ile gruplanmaktadır?",
+      "description": "Stok Ana Grup, Alt Grup, Kategori, Malzeme Türü (Hammadde, Yarı Mamul, Mamul, Ticari Mal, Sarf, Hizmet) hiyerarşisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "cok_seviyeli_tam_hiyerarsi", "label": "3 veya daha fazla seviyeli hiyerarşik yapı (Ana Grup -> Alt Grup -> Kategori -> Tip) tanımlıdır", "allow_note": true, "is_other": false },
+        { "value": "iki_seviyeli_temel_grup", "label": "Sadece 2 seviyeli (Ana Grup ve Alt Grup) temel sınıflandırma kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "tek_seviyeli_veya_duz", "label": "Sadece tek bir stok grubu alanı vardır, alt kırılımlar bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "siniflandirma_yok", "label": "Herhangi bir grup hiyerarşisi tanımlı değildir, stoklar serbest listelenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-005",
+      "process": "Malzeme Sınıflandırması ve Nitelik Yönetimi",
+      "order": 5,
+      "question": "Renk, beden, ölçü, alaşım, kalınlık gibi varyantlı (nitelikli) ürünler sistemde nasıl yönetilmektedir?",
+      "description": "Varyant matrisi kullanımı vs. her kombinasyon için bağımsız stok kartı açılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tek_ana_kart_varyant_matrisi", "label": "Tek bir ana model kartı altında dinamik Varyant/Nitelik matrisi ile yönetilir", "allow_note": true, "is_other": false },
+        { "value": "her_varyanta_ayri_stok_karti", "label": "Her renk, beden veya ölçü kombinasyonu için tamamen ayrı ve bağımsız bir stok kartı açılır", "allow_note": true, "is_other": false },
+        { "value": "konfigurator_ozel_kod", "label": "Ürün konfigüratörü ile sipariş anında dinamik parametrik stok kodu ve reçete üretilir", "allow_note": true, "is_other": false },
+        { "value": "varyantli_urunumuz_yok", "label": "Ürünlerimizde varyant/matris ihtiyacı yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-006",
+      "process": "Ölçü Birimleri ve Birim Dönüşümleri",
+      "order": 6,
+      "question": "Malzemeler için birden fazla ölçü birimi (stok birimi, satın alma birimi, satış birimi) kullanılıyor mu?",
+      "description": "Çift veya çoklu ölçü birimi yönetimi (Base UoM vs. Purchasing/Sales UoM).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "coklu_birim_ve_donusum", "label": "Evet, ürünler ana stok biriminden farklı birimlerle satın alınıp veya satılabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "sabit_tek_olcu_birimi", "label": "Hayır, her ürün tek bir standart ölçü birimiyle işlem görür", "allow_note": false, "is_other": false },
+        { "value": "paket_koli_iliski", "label": "Sadece koli içi adet / palet içi koli gibi standart ambalaj katları takip edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-007",
+      "process": "Ölçü Birimleri ve Birim Dönüşümleri",
+      "order": 7,
+      "question": "Ölçü birimleri arasındaki dönüşüm katsayıları sabit midir yoksa partiye/harekete göre değişken (kesirli/dinamik) midir?",
+      "description": "Sabit katsayı vs. değişken/ağırlık bazlı katsayı (Catch Weight / Paralel Birim).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sabit_donusum_katsayisi", "label": "Sabittir; her ürünün birim dönüşüm katsayısı stok kartında tanımlıdır ve değişmez", "allow_note": false, "is_other": false },
+        { "value": "degisken_dinamik_agirlik", "label": "Değişkendir; aynı adetteki ürünün ağırlığı partiden partiye değişir (Catch Weight / Paralel Birim takibi gerekir)", "allow_note": true, "is_other": false },
+        { "value": "boyut_ve_yogunluk_formulu", "label": "Formüle bağlıdır; en x boy x kalınlık x yoğunluk hesaplamasıyla miktar türetilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "INV-006",
+        "operator": "equals",
+        "value": "coklu_birim_ve_donusum"
+      }
+    },
+    {
+      "id": "INV-008",
+      "process": "Stok Türleri ve Özel Sahiplikler (Konsinye & Emanet)",
+      "order": 8,
+      "question": "Tedarikçiye ait olup firmanızın deposunda duran ve kullanıldıkça faturalanan 'Konsinye Giriş Stoğu' var mı?",
+      "description": "Tedarikçi konsinye stoklarının mülkiyet ve stok değerlemesinden ayrılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tedarikci_konsinye_var", "label": "Evet, tedarikçi konsinye malzemeleri tutuyoruz; tüketime/üretime çekildikçe fatura kesilir", "allow_note": true, "is_other": false },
+        { "value": "tedarikci_konsinye_yok", "label": "Hayır, depomuza giren tüm malzemelerin mülkiyeti doğrudan şirketimize aittir", "allow_note": false, "is_other": false },
+        { "value": "nadir_proje_bazli", "label": "Sadece belirli büyük projelerde istisnai olarak uygulanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-009",
+      "process": "Stok Türleri ve Özel Sahiplikler (Konsinye & Emanet)",
+      "order": 9,
+      "question": "Şirketinize ait olup müşteride duran (müşteri konsinyesi) veya fason tedarikçide işlenmeyi bekleyen stoklarınız var mı?",
+      "description": "Şirket dışındaki mülkiyeti bize ait harici stokların (Subcontracting / Customer Consignment) izlenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "hem_fason_hem_musteri_konsinye", "label": "Evet, hem fason üreticideki hammadde stoğumuzu hem de müşterideki konsinye mamul stoğumuzu izliyoruz", "allow_note": true, "is_other": false },
+        { "value": "sadece_fasoncu_stogu", "label": "Sadece fason tedarikçilere gönderdiğimiz malzeme ve yarı mamul stoklarını izliyoruz", "allow_note": true, "is_other": false },
+        { "value": "sadece_musteri_konsinye", "label": "Sadece bayilerde / müşterilerde duran konsinye ürünlerimizi izliyoruz", "allow_note": true, "is_other": false },
+        { "value": "harici_stok_yok", "label": "Şirket dışındaki tesislerde mülkiyeti bize ait hiçbir stok bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-010",
+      "process": "Stok Türleri ve Özel Sahiplikler (Konsinye & Emanet)",
+      "order": 10,
+      "question": "Müşteriye ait olup tamir, bakım veya fason işleme amacıyla deponuzda tutulan 'Emanet Stoklar' nasıl izleniyor?",
+      "description": "Şirket aktiflerine girmeyen emanet malzemelerin (Customer Custody / Third-Party Stock) yasal ve sistemsel takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_ozel_stok_tipi", "label": "Sistemde maliyetsiz 'Emanet / Müşteri Malı' özel stok statüsünde izlenir, şirket envanterine girmez", "allow_note": true, "is_other": false },
+        { "value": "ayri_sanal_depo", "label": "Sistemde 'Müşteri Emanet Deposu' adı altında ayrı bir depoda tutulur", "allow_note": false, "is_other": false },
+        { "value": "sisteme_alinmaz_fiziksel_tutanak", "label": "Sisteme girilmez, kâğıt teslim tutanağı ve Excel ile fiziksel olarak takip edilir", "allow_note": true, "is_other": false },
+        { "value": "emanet_stok_alinmiyor", "label": "Depomuzda müşteriye ait emanet malzeme tutulmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-011",
+      "process": "Stok Seviyeleri ve Yeniden Sipariş Politikaları",
+      "order": 11,
+      "question": "Malzemeler için Minimum ve Maksimum stok seviyeleri tanımlanmakta ve sistem tarafından takip edilmekte midir?",
+      "description": "Stok seviye eşikleri ve kritik stok uyarı altyapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sistemde_urun_bazli_aktif", "label": "Evet, ERP sisteminde ürün bazında Min/Max seviyeleri tanımlıdır ve sistem kritik seviyede uyarı üretir", "allow_note": true, "is_other": false },
+        { "value": "urun_grubu_bazli_tanimli", "label": "Ürün bazında değil, malzeme grupları veya kategoriler bazında genel sınırlar tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "excelde_takip_edilir", "label": "Sistemde tanımlı değildir, stok sorumluları Excel tablolarında manuel takip eder", "allow_note": true, "is_other": false },
+        { "value": "min_max_seviye_tanimi_yok", "label": "Minimum veya maksimum stok seviye kuralı uygulanmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-012",
+      "process": "Stok Seviyeleri ve Yeniden Sipariş Politikaları",
+      "order": 12,
+      "question": "Emniyet Stoğu (Safety Stock) ve Yeniden Sipariş Noktası (Reorder Point) hesaplamaları nasıl yapılmaktadır?",
+      "description": "Tedarik süresi (Lead Time) ve tüketim değişkenliğine göre dinamik vs. statik emniyet stoğu hesabı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_tuketim_leadtime_hesaplar", "label": "Sistem geçmiş tüketim hızı ve tedarikçi temin süresine (lead time) göre dinamik hesaplar/önerir", "allow_note": true, "is_other": false },
+        { "value": "sabit_gunluk_tuketim_carpani", "label": "Planlamacı sabit bir formülle (ör. 15 günlük ortalama tüketim) hesaplayıp sisteme sabit yazar", "allow_note": false, "is_other": false },
+        { "value": "tamamen_tecrube_ve_goz_karari", "label": "Matematiksel hesaplama yapılmaz; sorumluların tecrübesine ve göz kararına göre belirlenir", "allow_note": false, "is_other": false },
+        { "value": "emniyet_stogu_kullanilmiyor", "label": "Emniyet stoğu tutulmaz; sadece gelen sipariş kadar malzeme alınır (JIT/Sıfır Stok)", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-013",
+      "process": "Stok Seviyeleri ve Yeniden Sipariş Politikaları",
+      "order": 13,
+      "question": "Minimum sipariş miktarı (MOQ) veya sipariş katları (katı miktar kısıtı) stok planlamasında dikkate alınıyor mu?",
+      "description": "Tedarikçi koli/palet/kamyon bazlı sipariş kısıtları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_moq_ve_katlari_tam_uygular", "label": "Evet, sistem ihtiyaç miktarını otomatik olarak tedarikçi MOQ ve paket katlarına yuvarlar", "allow_note": false, "is_other": false },
+        { "value": "manuel_yuvarlama_yapilir", "label": "Sistem net ihtiyacı çıkarır, satın alma personeli tedarikçiye geçerken manuel yuvarlar", "allow_note": true, "is_other": false },
+        { "value": "moq_kisiti_yok", "label": "Minimum sipariş veya paket katı kısıtımız bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-014",
+      "process": "Stok Kullanılabilirliği ve Rezervasyon Mantığı (ATP)",
+      "order": 14,
+      "question": "Kullanılabilir Stok (ATP - Available to Promise) miktarınız sistemde nasıl hesaplanmaktadır?",
+      "description": "Fiziksel Stok - Rezerve Stok - Kalite Bloke + Yoldaki Sipariş formülü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_atp_formulasyonu", "label": "Fiziksel Stoktan; Satış Rezervasyonları, Üretim Rezervasyonları ve Karantina düşülüp, onaylı Satın Alma Siparişleri eklenerek anlık hesaplanır", "allow_note": true, "is_other": false },
+        { "value": "sadece_fizikselden_rezerve_dusulur", "label": "Fiziksel stoktan sadece onaylı satış siparişleri düşülür, bekleyen satın almalar hesaba katılmaz", "allow_note": false, "is_other": false },
+        { "value": "ayrim_yok_sadece_fiziksel", "label": "Kullanılabilir stok ayrımı yoktur, sistemde sadece deponun anlık fiziksel miktarı görünür", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-015",
+      "process": "Stok Kullanılabilirliği ve Rezervasyon Mantığı (ATP)",
+      "order": 15,
+      "question": "Stok yetersizliğinde sipariş rezervasyonlarında önceliklendirme kuralı (müşteri segmenti, sözleşme, sipariş tarihi vb.) uygulanıyor mu?",
+      "description": "Stok tahsisinde öncelik algoritmaları (Allocation Priority Rules).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_oncelik_skoruna_gore", "label": "Evet, sistem müşteri grubu, VIP statüsü veya teslim tarihine göre otomatik öncelikli rezervasyon yapar", "allow_note": true, "is_other": false },
+        { "value": "ilk_siparis_ilk_rezerve", "label": "Sipariş onay tarihine göre kesin kronolojik sıra (FIFO rezervasyon) uygulanır", "allow_note": false, "is_other": false },
+        { "value": "yonetim_manuel_tahsis_eder", "label": "Kritik durumlarda satış/genel müdürlük manuel müdahale ile kime verileceğine karar verir", "allow_note": true, "is_other": false },
+        { "value": "oncelik_kurali_yok", "label": "Öncelik kuralı yoktur, faturası/irsaliyesi ilk kesilen stoku alır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-016",
+      "process": "Negatif Stok Politikası ve Stok Bütünlüğü",
+      "order": 16,
+      "question": "ERP sisteminde stok miktarlarının ve maliyetlerinin negatife (eksi bakiyeye) düşmesine izin verilmekte midir?",
+      "description": "Negatif stok kilidi ve maliyet bozulması riski.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kesinlikle_engellenmistir", "label": "Hayır, sistem negatif stoka kesinlikle izin vermez; giriş belgesi işlenmeden çıkış yapılamaz", "allow_note": false, "is_other": false },
+        { "value": "izin_verilir_maliyet_sonra_duzelir", "label": "Evet, operasyon durmasın diye negatif çıkışa izin verilir, giriş faturası gelince bakiye kapanır", "allow_note": true, "is_other": false },
+        { "value": "sadece_belirli_urun_ve_depolarda", "label": "Sadece sarf malzemelerde veya üretim hat içi depolarında izin verilir, mamulde yasaktır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-017",
+      "process": "Negatif Stok Politikası ve Stok Bütünlüğü",
+      "order": 17,
+      "question": "Negatif stok durumunda ürün maliyetleri ve kârlılık raporları sistemde nasıl etkilenmektedir?",
+      "description": "Eksi stokta çıkış yapıldığında COGS (Satılan Malın Maliyeti) sapmaları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "son_alis_fiyatindan_gecici_maliyet", "label": "Sistem son alış fiyatından geçici maliyet atar, asıl fatura girilince otomatik fark fişi üretir", "allow_note": true, "is_other": false },
+        { "value": "sifir_veya_hatali_maliyet_olur", "label": "Maliyet sıfır veya hatalı görünür, dönem sonlarında muhasebe manuel düzeltme yapar", "allow_note": true, "is_other": false },
+        { "value": "etkisi_takip_edilmiyor", "label": "Negatif stokların maliyet üzerindeki etkisi ölçülmemektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ],
+      "condition": {
+        "question_id": "INV-016",
+        "operator": "not_equals",
+        "value": "kesinlikle_engellenmistir"
+      }
+    },
+    {
+      "id": "INV-018",
+      "process": "Stok Değerleme ve Maliyet Yöntemleri",
+      "order": 18,
+      "question": "Stok değerleme ve maliyet takibinde hangi yöntem kullanılmaktadır?",
+      "description": "Yürüyen Ağırlıklı Ortalama, FIFO, Standart Maliyet, Aylık Ortalama vb.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "yuruyen_agirlikli_ortalama", "label": "Yürüyen Ağırlıklı Ortalama Maliyet (Moving Average Cost)", "allow_note": false, "is_other": false },
+        { "value": "fifo_ilk_giren_ilk_cikar", "label": "Fiili FIFO (İlk Giren İlk Çıkar Maliyeti)", "allow_note": false, "is_other": false },
+        { "value": "standart_maliyet_ve_sapma", "label": "Standart Maliyet (Standard Cost) + Ay Sonu Fiili Sapma Dağıtımı", "allow_note": true, "is_other": false },
+        { "value": "aylik_agirlikli_ortalama", "label": "Aylık Ağırlıklı Ortalama Maliyet (Dönem Sonu Kapatma ile)", "allow_note": false, "is_other": false },
+        { "value": "lot_parti_bazli_fiili", "label": "Lot / Parti bazında bağımsız gerçek fiili maliyet", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-019",
+      "process": "Stok Değerleme ve Maliyet Yöntemleri",
+      "order": 19,
+      "question": "Farklı depo, fabrika veya şirketleriniz için farklı stok maliyetleme/değerleme ihtiyacınız var mı?",
+      "description": "Şirket geneli tek maliyet vs. Depo/Tesis bazında bağımsız değerleme (Valuation Area Level: Company vs. Plant).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tesis_fabrika_bazinda_bagimsiz", "label": "Evet, her fabrika veya tesisin stok maliyeti kendi girdi maliyetine göre bağımsız hesaplanmalıdır", "allow_note": true, "is_other": false },
+        { "value": "sirket_geneli_tek_maliyet", "label": "Hayır, tüm depolarda aynı ürün için şirket genelinde tek bir ağırlıklı maliyet geçerlidir", "allow_note": false, "is_other": false },
+        { "value": "grup_sirketleri_arasi_farkli", "label": "Farklı tüzel kişilikli grup şirketlerimiz arasında bağımsız maliyet takip edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-020",
+      "process": "Stok Değerleme ve Maliyet Yöntemleri",
+      "order": 20,
+      "question": "Stok maliyetleri Türk Lirası dışında döviz (USD, EUR vb.) cinsinden de anlık takip ediliyor mu?",
+      "description": "Çift para birimli stok muhasebesi (Parallel Currencies / Multi-Currency Valuation).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "cift_para_birimli_anlik", "label": "Evet, hem TL hem de raporlama dövizi (USD/EUR) cinsinden anlık paralel stok maliyeti tutulur", "allow_note": true, "is_other": false },
+        { "value": "sadece_ithal_urunlerde_doviz", "label": "Sadece ithal hammaddelerin alış dövizi saklanır, genel stok TL değerlenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_tl_degerleme", "label": "Hayır, tüm stoklarımız sadece Türk Lirası olarak değerlenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-021",
+      "process": "Stok Değerleme ve Maliyet Yöntemleri",
+      "order": 21,
+      "question": "Satın alma fiyatı dışındaki hangi ek maliyet unsurları doğrudan stok maliyetine (ürün birim maliyetine) dahil edilmektedir?",
+      "description": "Navlun, gümrük, sigorta, elleçleme ve millileştirme masraflarının maliyete yedirilmesi (Landed Cost).",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "gumruk_ve_ithalat_masraflari", "label": "Gümrük vergisi, ordino, konşimento ve ithalat dosya masrafları", "allow_note": false, "is_other": false },
+        { "value": "nakliye_navlun_faturasi", "label": "Malzeme nakliye ve navlun faturaları", "allow_note": false, "is_other": false },
+        { "value": "nakliyat_sigortasi", "label": "Emtia nakliyat sigortası bedeli", "allow_note": false, "is_other": false },
+        { "value": "fason_iscilik_bedeli", "label": "Dışarıda yaptırılan fason işçilik faturaları", "allow_note": false, "is_other": false },
+        { "value": "masraflar_stoga_degil_gidere_yazilir", "label": "Ek masraflar ürün maliyetine yedirilmez, doğrudan dönem gideri yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-022",
+      "process": "Stok Yaşlandırma, Yavaş Hareket Eden ve Ölü Stok",
+      "order": 22,
+      "question": "Stok Yaşlandırma Raporu (Inventory Aging) düzenli olarak alınıp analiz edilmekte midir?",
+      "description": "Giriş tarihinden itibaren stokta bekleme gün aralıklarının (0-30, 31-90, 91-180, 180-365, 365+ gün) izlenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemden_duzenli_alinir", "label": "Evet, sistemden FIFO bazlı gün aralıklı stok yaşlandırma raporu aylık/haftalık çekilir", "allow_note": true, "is_other": false },
+        { "value": "excelde_manuel_hesaplanir", "label": "Sistemde standart rapor yoktur, giriş ve çıkışlar Excel'e aktarılarak manuel hesaplanır", "allow_note": true, "is_other": false },
+        { "value": "yaslandirma_takibi_yapilmiyor", "label": "Stok yaşlandırma analizi yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-023",
+      "process": "Stok Yaşlandırma, Yavaş Hareket Eden ve Ölü Stok",
+      "order": 23,
+      "question": "Hareketsiz (Non-moving), Yavaş Dönen (Slow-moving) ve Ölü (Dead) stok kriterleriniz nasıl tanımlanmıştır?",
+      "description": "Kaç gün veya ay hareket görmeyen malzemenin atıl stok sınıfına alınacağı kuralı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tanimli_gun_kurali_var", "label": "Evet, kesin kuralımız vardır (ör. 90 gün = yavaş, 180 gün = hareketsiz, 365 gün = ölü)", "allow_note": true, "is_other": false },
+        { "value": "urun_grubuna_gore_degisir", "label": "Ürün grubuna göre değişir; yedek parçada 1 yıl normal iken mamulde 45 gün ölü sayılır", "allow_note": true, "is_other": false },
+        { "value": "tanimli_bir_kriter_yok", "label": "Sistematik bir kriter tanımlı değildir, stok fazlası çıktıkça incelenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-024",
+      "process": "Stok Yaşlandırma, Yavaş Hareket Eden ve Ölü Stok",
+      "order": 24,
+      "question": "Ölü ve hareketsiz stoklar için sistemde Değer Düşüklüğü Karşılığı (Stok Amortismanı / Provizyon) ayrılmakta mıdır?",
+      "description": "TFRS/VUK stok değer düşüklüğü karşılıklarının muhasebeleştirilmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_otomatik_karsilik_hesaplar", "label": "Evet, bekleme süresine göre belirli oranlarda (%20, %50, %100) otomatik değer düşüklüğü hesaplanır", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_donem_sonunda_manuel_ayirir", "label": "Mali işler yıl sonunda denetim raporu için Excel'de hesaplayıp manuel karşılık kaydı atar", "allow_note": true, "is_other": false },
+        { "value": "stok_karsiligi_ayrilmiyor", "label": "Stok değer düşüklüğü karşılığı ayrılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-025",
+      "process": "Envanter Muhasebesi ve Defter Entegrasyonu",
+      "order": 25,
+      "question": "Stok hareketleri gerçekleştiği anda genel muhasebe hesap planına (150, 151, 152, 153, 620 vb.) anlık entegre olmakta mıdır?",
+      "description": "Sürekli Envanter Sistemi (Perpetual Inventory) vs. Aralıklı Envanter (Dönem Sonu Manuel Entegrasyon).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "surekli_envanter_anlik_entegrasyon", "label": "Evet, her mal kabul, üretim çıkışı, sevk ve sayım anında ilgili muhasebe fişi sistem tarafından otomatik kesilir (Sürekli Envanter)", "allow_note": false, "is_other": false },
+        { "value": "gunluk_veya_aylik_toplu_entegrasyon", "label": "Stok hareketleri gün veya ay sonunda topluca muhasebe fişine dönüştürülür", "allow_note": true, "is_other": false },
+        { "value": "muhasebe_ayri_manuel_isler", "label": "Stok modülü ile muhasebe entegre değildir; muhasebe faturalardan ayrı kayıt girer (Aralıklı Envanter)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-026",
+      "process": "Envanter Muhasebesi ve Defter Entegrasyonu",
+      "order": 26,
+      "question": "Malzeme hareketlerinde muhasebe hesap kodları malzeme grubuna göre mi, depo tipine göre mi, yoksa hareket koduna göre mi belirlenir?",
+      "description": "Hesap tayin matrisi kuralları (Account Determination Matrix).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "malzeme_grubu_ve_hareket_tipi", "label": "Malzeme değerleme sınıfı + Hareket tipi kombinasyonu ile tam otomatik eşleşir", "allow_note": true, "is_other": false },
+        { "value": "sadece_depo_bazli_hesap", "label": "Hangi depodan hareket gördüğüne bağlı olarak ilgili depo muhasebe hesabı çalışır", "allow_note": false, "is_other": false },
+        { "value": "kullanici_manuel_hesap_secer", "label": "Kullanıcı her harekette muhasebe hesap kodunu manuel seçer veya teyit eder", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-027",
+      "process": "Stok Transferleri ve Şubeler Arası Değer Takibi",
+      "order": 27,
+      "question": "Depolar veya şubeler arası stok transferlerinde transfer maliyeti ve navlun masrafı nasıl yönetilmektedir?",
+      "description": "Transfer anında ürün maliyetinin aynen korunması vs. transfer navlununun stok maliyetine eklenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "maliyet_aynen_korunur", "label": "Ürün maliyeti değişmez, çıkış deponun maliyetiyle varış deposuna aktarılır", "allow_note": false, "is_other": false },
+        { "value": "transfer_navlunu_stoga_eklenir", "label": "Şubeler arası taşıma navlunu varış deposundaki ürünün maliyetine eklenir", "allow_note": true, "is_other": false },
+        { "value": "farkli_sirketler_arasi_faturali_satis", "label": "Farklı tüzel kişilikli şubeler arasında transferler kârlı/faturalı satış işlemi olarak yürür (Intercompany)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-028",
+      "process": "Sayım Mutabakatı ve Stok Doğruluk Yönetimi",
+      "order": 28,
+      "question": "Stok doğruluk oranı (Inventory Record Accuracy) düzenli olarak hesaplanmakta ve takip edilmekte midir?",
+      "description": "Sistemdeki adet ve tutar ile fiziksel sayım sonuçlarının mutabakat disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "duzenli_ira_olculur_yuzde_95_ustu", "label": "Evet, düzenli ölçülür; stok doğruluk oranımız adet ve tutar bazında %95'in üzerindedir", "allow_note": true, "is_other": false },
+        { "value": "olculur_ancak_farklar_yuksek", "label": "Ölçülmektedir ancak uyuşmazlıklar ve fark oranları hedeflenen seviyenin altındadır", "allow_note": true, "is_other": false },
+        { "value": "sadece_yil_sonu_sayiminda_gorulur", "label": "Düzenli ölçülmez, sadece yıl sonu genel sayımında toplam fark tutarı ortaya çıkar", "allow_note": false, "is_other": false },
+        { "value": "hic_olculmuyor", "label": "Stok doğruluk oranı ölçülmemektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-029",
+      "process": "Sayım Mutabakatı ve Stok Doğruluk Yönetimi",
+      "order": 29,
+      "question": "Sayım farklarının muhasebeleştirilmesinde yetki onay sınırları ve tutarsal limitler uygulanmakta mıdır?",
+      "description": "Sayım fark fişi onay hiyerarşisi (Tolerance Limits for Inventory Difference).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tutar_limitli_onay_matrisi", "label": "Evet, belirli bir parasal tutarı aşan farklar Genel Müdür / Mali İşler onayına düşer", "allow_note": true, "is_other": false },
+        { "value": "tum_farklar_tek_yetkiliye_gider", "label": "Tutar fark etmeksizin tüm sayım farkları fabrika/mali işler müdürünün onayına gider", "allow_note": false, "is_other": false },
+        { "value": "onay_limiti_yok_depocu_kapatir", "label": "Onay kuralı yoktur, sayım farkları doğrudan sisteme işlenip bakiye eşitlenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-030",
+      "process": "Stok Raporlama, Devir Hızı ve KPI'lar",
+      "order": 30,
+      "question": "Stok yönetimi kapsamında düzenli olarak takip edilen veya ihtiyaç duyulan temel envanter KPI'ları nelerdir?",
+      "description": "Stok finansal ve operasyonel yönetim göstergeleri.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "stok_devir_hizi", "label": "Stok Devir Hızı (Inventory Turnover Ratio)", "allow_note": false, "is_other": false },
+        { "value": "ortalama_stok_gun_sayisi", "label": "Ortalama Stokta Kalma Gün Sayısı (Days Sales of Inventory - DSI)", "allow_note": false, "is_other": false },
+        { "value": "stok_tutma_maliyeti", "label": "Stok Finansman ve Tutma Maliyeti (Inventory Holding Cost)", "allow_note": false, "is_other": false },
+        { "value": "hizmet_seviyesi_siparis_karsilama", "label": "Stoktan Sipariş Karşılama Oranı (Fill Rate / Service Level)", "allow_note": false, "is_other": false },
+        { "value": "atil_ve_olu_stok_orani", "label": "Toplam Envanter İçinde Atıl/Ölü Stok Oranı (% Dead Stock)", "allow_note": false, "is_other": false },
+        { "value": "brut_marj_stok_yatirimi_getirisi", "label": "Stok Yatırımı Kârlılık Oranı (GMROI - Gross Margin Return on Investment)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-031",
+      "process": "Stok Raporlama, Devir Hızı ve KPI'lar",
+      "order": 31,
+      "question": "Stok raporları anlık (real-time) olarak çekilebilmekte midir, yoksa dönem kapatma / maliyet çalıştırma sonrasında mı güncellenir?",
+      "description": "Stok envanter ve mizan raporlarının anlık güvenilirliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "anlik_canli_raporlanir", "label": "Evet, miktar ve değer bazlı tüm stok raporları anlık canlı olarak çekilir", "allow_note": false, "is_other": false },
+        { "value": "miktar_anlik_deger_donem_sonu", "label": "Miktar anlık izlenir ancak parasal maliyet değerleri dönem sonu maliyet kapatmasından sonra netleşir", "allow_note": true, "is_other": false },
+        { "value": "raporlar_gecikmeli_ve_guvensiz", "label": "Raporlar gecikmeli üretilir, sistemdeki stok tutarlarına tam güvenilememektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-032",
+      "process": "Stok Raporlama, Devir Hızı ve KPI'lar",
+      "order": 32,
+      "question": "ABC / XYZ Stok Analizi (değer ve tüketim sıklığına göre matris gruplama) yapılmakta mıdır?",
+      "description": "ABC analizi ve XYZ analizi matris gruplama olgunluğu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_otomatik_abc_xyz_yapar", "label": "Evet, sistem ürünleri ciro ve talep değişkenliğine göre otomatik ABC/XYZ kategorisine ayırır", "allow_note": true, "is_other": false },
+        { "value": "sadece_ciroya_gore_abc_var", "label": "Sadece satış/tüketim tutarına göre ABC analizi Excel'de manuel yapılır", "allow_note": false, "is_other": false },
+        { "value": "abc_analizi_yapilmiyor", "label": "ABC veya XYZ analizi yapılmamaktadır, tüm ürünlere aynı stok politikası uygulanır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-033",
+      "process": "Stok Raporlama, Devir Hızı ve KPI'lar",
+      "order": 33,
+      "question": "Gelecek dönem stok seviyeleri ve bütçesi için Envanter Bütçelemesi ve Simülasyonu yapılıyor mu?",
+      "description": "Stok yatırım bütçesi ve nakit akış planlama entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "erp_entegre_stok_butcesi", "label": "Evet, yıllık/çeyreklik hedeflere göre stok bağlama bütçesi planlanır ve ERP'de izlenir", "allow_note": true, "is_other": false },
+        { "value": "excelde_ust_duzey_tahmin", "label": "Finans tarafından Excel'de makro seviyede toplam stok hedefi belirlenir", "allow_note": false, "is_other": false },
+        { "value": "stok_butcelemesi_yapilmiyor", "label": "Geleceğe dönük stok bütçelemesi yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-034",
+      "process": "İkame (Alternatif) Malzeme ve Revizyon Yönetimi",
+      "order": 34,
+      "question": "Stokta bulunmayan bir malzeme yerine kullanılabilecek 'İkame / Alternatif Malzeme' tanımları sistemde tutuluyor mu?",
+      "description": "Bir ürün bittiğinde otomatik veya öneri olarak alternatif stok kartının devreye alınması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_ikame_onerir", "label": "Evet, her ürünün teknik olarak onaylanmış ikame kodları tanımlıdır; stok yoksa sistem alternatifi önerir", "allow_note": true, "is_other": false },
+        { "value": "personel_bilgisine_gore_secilir", "label": "Sistemde ikame tanımı yoktur, personel tecrübesiyle seçer", "allow_note": false, "is_other": false },
+        { "value": "ikame_kullanimi_yasaktir", "label": "Ürünlerimizde ikame malzeme kullanımı kesinlikle yasaktır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-035",
+      "process": "İkame (Alternatif) Malzeme ve Revizyon Yönetimi",
+      "order": 35,
+      "question": "Teknik resim veya formül değişikliği geçiren malzemelerde 'Mühendislik Revizyon / Versiyon Seviyesi' stokta nasıl izleniyor?",
+      "description": "Revizyon A, B, C değişikliklerinde eski stokların tüketim kuralları (Engineering Change Management - ECM).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "ayni_karta_revizyon_seviyesi_atanir", "label": "Aynı stok kodu altında Revizyon seviyesi (Rev 01, Rev 02) tutulur; eski revizyon bitmeden yenisi verilmez", "allow_note": true, "is_other": false },
+        { "value": "her_revizyona_yeni_stok_kodu", "label": "Her teknik değişiklikte eski kod kapatılıp tamamen yeni bir stok kodu açılır", "allow_note": false, "is_other": false },
+        { "value": "revizyon_takibi_yapilmaz", "label": "Revizyon takibi yapılmaz, ürün aynı kodla güncellenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-036",
+      "process": "Promosyon, Set ve Takım (Kitting) Stokları",
+      "order": 36,
+      "question": "Birden fazla stok kartının bir araya gelerek tek bir ürün gibi satıldığı 'Set / Paket / Kit' ürünler nasıl yönetilmektedir?",
+      "description": "Satış anında alt bileşenlerin stoktan düşülmesi (Dinamik Kit) vs. Önceden montajlanmış set stoku (Statik Kit).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "dinamik_kit_satista_patlar", "label": "Sistemde Set Kodu girilir, fatura/irsaliye anında alt bileşenler kendi stoklarından otomatik düşülür (Sales Kit)", "allow_note": true, "is_other": false },
+        { "value": "onceden_paketlenen_fiziksel_set", "label": "Setler depoda önceden birleştirilip ayrı bir set stok kartı olarak üretilir ve raflanır", "allow_note": false, "is_other": false },
+        { "value": "manuel_tek_tek_girilir", "label": "Setteki tüm parçalar sipariş satırına tek tek manuel yazılır", "allow_note": false, "is_other": false },
+        { "value": "set_veya_kit_urunumuz_yok", "label": "Set / Paket / Kit şeklinde ürünümüz bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-037",
+      "process": "İade, Hurda ve Fire Stok Muhasebeleştirmesi",
+      "order": 37,
+      "question": "Üretim ve depolama sırasında oluşan doğal fireler veya kusurlu hurda malzemelerin stoktan düşümü ve maliyet kaydı nasıl işlemektedir?",
+      "description": "Standart fire toleransı vs. fiili hurda çıkışlarının maliyete / gidere yansıtılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "onayli_fire_fisi_ile_gider_yazilir", "label": "Sistemde onaylı Fire/Hurda Çıkış Fişi kesilir; ilgili gider ve stok hesaplarına otomatik aktarılır", "allow_note": true, "is_other": false },
+        { "value": "standart_recete_firesi_otomatik_duser", "label": "Ürün ağacındaki (BOM) tanımlı standart fire oranı kadar stoktan otomatik düşülür", "allow_note": false, "is_other": false },
+        { "value": "donem_sonu_sayim_farkina_atilir", "label": "Fireler anlık işlenmez, dönem sonu sayım açığı olarak genel farka atılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

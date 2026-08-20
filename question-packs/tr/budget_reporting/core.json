@@ -1,0 +1,1591 @@
+{
+  "meta": {
+    "pack_id": "tr.budget_reporting.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "BUDGET_REPORTING",
+    "name": "Bütçe ve Raporlama Ön Analizi",
+    "description": "Kurumsal bütçe organizasyonu, yıllık bütçe takvimi, departman ve masraf merkezi bütçeleri, gelir/gider planlaması, proje ve CAPEX yatırım bütçesi, nakit bütçesi entegrasyonu, bütçe onay ve operasyonel blokaj kontrolleri, versiyonlama, rolling forecast, bütçe-gerçekleşen ve analitik sapma analizleri, yönetim raporlama paketi, kurumsal KPI kokpitleri, tek doğruluk kaynağı güvenilirliği, Excel bağımlılığı ve satır bazlı yetkilendirme süreçlerinin AS-IS durumu ve ERP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "BGT-001",
+      "process": "Bütçe Organizasyonu",
+      "order": 1,
+      "question": "Şirketinizde kurumsal bütçe hazırlama süreci bulunuyor mu ve bütçe yönetimi hangi organizasyonel modelle (Merkezi Finans / Dağıtık Departman Katılımlı / Şirketler Grubu) yürütülmektedir?",
+      "description": "Bütçe hazırlama kültürü, sahipliği ve organizasyonel yaklaşım.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "dagitik_katilimli_merkezi_finans_konsolidasyonlu",
+          "label": "Tüm departmanlar kendi bütçelerini hazırlar; Bütçe/Kontroling departmanı konsolide eder ve koordine eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "merkezi_finans_ekibi_tum_sirket_butcesini_hazirlar",
+          "label": "Departman katılımı sınırlıdır; Bütçe/Mali İşler ekibi geçmiş verilere dayanarak tüm bütçeyi merkezi hazırlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "grup_holding_merkezi_butce_modeli",
+          "label": "Holding/Grup bütçe direktörlüğü tarafından belirlenen şablon ve hedefler doğrultusunda hazırlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "butce_hazirlanmamaktadir",
+          "label": "Şirketimizde resmi/yazılı bir bütçe süreci işletilmemektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-002",
+      "process": "Bütçe Organizasyonu",
+      "order": 2,
+      "question": "Bütçe hazırlık takvimi nasıl işletilmektedir (Bütçe başlangıç ayı, bütçe rehberi yayınlanması, departman teslim tarihleri ve yönetim kurulu nihai onay takvimi)?",
+      "description": "Bütçe döngüsü, başlangıç zamanı ve onay takvimi disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "eylul_ekim_baslangicli_resmi_takvim_ve_yil_sonu_yonetim_onayi",
+          "label": "Eylül/Ekim aylarında bütçe rehberi yayınlanır, departmanlar Kasım'da teslim eder ve Aralık'ta Yönetim Kurulu onaylar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aralik_ayinda_hizli_butce_calismasi_yapilir",
+          "label": "Yılın son ayında (Aralık) hızlandırılmış tek seferlik bir bütçe çalışması yapılarak yeni yıla girilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yil_basladiktan_sonra_ocak_subatta_tamamlanir",
+          "label": "Bütçe takvimi gecikmeli işler; yeni yıl başladıktan sonra Ocak veya Şubat aylarında bütçe tamamlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "belirli_bir_butce_takvimi_yoktur",
+          "label": "Belirlenmiş resmi bir bütçe takvimi veya teslim disiplini bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-003",
+      "process": "Yıllık Bütçe Süreci",
+      "order": 3,
+      "question": "Yıllık bütçe hangi teknolojik ortamda (ERP Entegre Bütçe Modülü, Kurumsal CPM/Bütçe Yazılımı, Excel Şablonları) hazırlanmaktadır?",
+      "description": "Bütçe hazırlama altyapısı ve araç bağımlılığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_entegre_butce_modulunde_hazirlanir",
+          "label": "Bütçe doğrudan ERP'nin entegre bütçe modülünde kullanıcı girişleri ve onaylarıyla hazırlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ozel_kurumsal_cpm_butce_yazilimi_kullanilir",
+          "label": "ERP dışında özel bir Kurumsal Performans Yönetimi (CPM / Bütçe Yazılımı) kullanılır ve ERP ile entegredir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_sablonlarinda_hazirlanip_erpye_yuklenir",
+          "label": "Bütçe departmanlardan Excel ile toplanır, konsolide edilip ERP'ye toplu veri olarak yüklenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tamamen_bagimsiz_excel_dosyalarinda_kalir",
+          "label": "Bütçe tamamen Excel çalışma kitaplarında hazırlanır ve ERP'ye hiçbir zaman aktarılmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-004",
+      "process": "Yıllık Bütçe Süreci",
+      "order": 4,
+      "question": "Bütçe hazırlama yöntemi ve yaklaşımı (Sıfır Tabanlı Bütçeleme - Zero-Based Budgeting, Geçmiş Yıl Gerçekleşenlerine Artış Oranı, Aktivite Tabanlı Bütçeleme) nasıldır?",
+      "description": "Bütçe hesaplama metodolojisi ve mantığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "BGT-001",
+        "operator": "not_equals",
+        "value": "butce_hazirlanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "sifir_tabanli_butcele_zbb_tum_giderler_gerekcelendirilir",
+          "label": "Sıfır Tabanlı Bütçeleme (ZBB); her harcama kalemi sıfırdan gerekçelendirilerek bütçelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gecmis_yil_gercekleseni_uzerine_enflasyon_artis_orani",
+          "label": "Geçmiş yıl gerçekleşenlerine büyüme ve enflasyon artış oranı eklenerek artış bazlı bütçe yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aktivite_ve_hacim_tabanli_surucu_odakli_butce",
+          "label": "Sürücü Odaklı (Driver-Based); üretim hacmi, çalışan sayısı, sipariş adedi gibi operasyonel sürücülerle hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-005",
+      "process": "Departman Bütçeleri",
+      "order": 5,
+      "question": "Departman yöneticileri (Satış, Pazarlama, Üretim, İK, IT, Lojistik vb.) kendi operasyonel bütçelerini doğrudan hazırlar ve bütçe sorumlusu olarak takip eder mi?",
+      "description": "Bütçe sahipliği ve departman bazlı hesap verebilirlik.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_departman_yoneticileri_kendi_butcesinden_tam_sorumludur",
+          "label": "Evet; tüm departman müdürleri kendi bütçe kalemlerini girer, harcamaları onaylar ve bütçe aşımından sorumludur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_ana_departmanlar_hazirlar_genel_giderler_merkezdedir",
+          "label": "Yalnızca Satış ve Üretim gibi ana birimler hazırlar; destek birimlerin giderleri finans tarafından bütçelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "departmanlarin_butce_farkindaligi_ve_takibi_yoktur",
+          "label": "Departman yöneticilerinin bütçe hedefi yoktur; bütçe yalnızca finans ve üst yönetim arasında tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-006",
+      "process": "Departman Bütçeleri",
+      "order": 6,
+      "question": "Departmanlar arası bütçe aktarımı (Virement / Bütçe Revirmanı) kuralları ve yetki sınırları nasıl yönetilmektedir?",
+      "description": "Bütçe kalemleri arası ödenek aktarımı ve esneklik kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "BGT-001",
+        "operator": "not_equals",
+        "value": "butce_hazirlanmamaktadir"
+      },
+      "options": [
+        {
+          "value": "katı_kurallar_dahilinde_cfo_genel_mudur_onayi_ile_yapilir",
+          "label": "Kalemler veya departmanlar arası aktarım katı onay akışına bağlıdır (CFO / Genel Müdür onayı zorunludur)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "departman_kendi_alt_kalemleri_arasinda_serbestce_aktarabilir",
+          "label": "Departman müdürü toplam bütçesini aşmamak kaydıyla kendi alt gider hesapları arasında aktarım yapabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "butce_aktarimi_uygulanmaz_asimlarda_ek_butce_istenir",
+          "label": "Kalemler arası aktarım yasaktır; bütçe yetmediğinde resmi ek bütçe talebi oluşturulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-007",
+      "process": "Gelir Bütçesi",
+      "order": 7,
+      "question": "Satış ve Gelir Bütçesi hangi analitik boyutlarda (Müşteri/Bayi, Ürün/Ürün Grubu, Satış Kanalı, Bölge/Ülke, Para Birimi) ve hangi detayda hazırlanmaktadır?",
+      "description": "Gelir bütçesinin detay seviyesi ve çok boyutlu kırılımları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cok_boyutlu_musteri_urun_kanal_bolge_ve_doviz_bazli",
+          "label": "Müşteri/bayi, ürün grubu, satış kanalı (B2B, B2C, İhracat), bölge ve para birimi bazında çok boyutlu hazırlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "urun_grubu_ve_kanal_bazinda_toplu_hazirlanir",
+          "label": "Müşteri detayı olmadan yalnızca ürün grubu ve ana satış kanalları bazında bütçelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_sirket_toplam_ciro_hedefi_olarak_belirlenir",
+          "label": "Detaylı boyut kırılımı yoktur; yalnızca şirketin yıllık toplam ciro büyüme hedefi belirlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-008",
+      "process": "Gelir Bütçesi",
+      "order": 8,
+      "question": "Gelir bütçesinde fiyat artışları, kur beklentileri, kampanya iskontoları ve hacim/miktar hedefleri nasıl modellenmektedir?",
+      "description": "Fiyat x Miktar ayrımı ve kur varsayımları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "fiyat_ve_miktar_ayri_modellenir_kur_ve_iskonto_senaryolari_calisilir",
+          "label": "Satış miktarı ve birim fiyat ayrı bütçelenir; döviz kurları ve kampanya iskontoları parametrik simüle edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_tutar_bazli_tahmin_yapilir_fiyat_miktar_ayrismaz",
+          "label": "Miktar ve birim fiyat ayrımı yapılmaz; doğrudan hedeflenen TL/Döviz ciro tutarı girilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gecmis_ciroya_toptan_fiyat_artisi_uygulanir",
+          "label": "Geçmiş yılın cirosuna genel bir fiyat artış yüzdesi uygulanarak basit tahmin yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-009",
+      "process": "Gelir Bütçesi",
+      "order": 9,
+      "question": "Satış bütçesinde satış kotaları, prim/komisyon hedefleri ve müşteri iskonto bütçeleri nasıl ilişkilendirilmektedir?",
+      "description": "Satış personeli kotaları ve iskonto bütçesi kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "satis_kotalari_ve_primler_butce_hedefleriyle_birebir_baglidir",
+          "label": "Plasiyer satış kotaları ve iskonto yetki bütçeleri ana satış bütçesiyle sistem üzerinden tam entegredir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kotalar_ayri_excel_tablolarinda_yonetilir_butceye_manuel_baglanir",
+          "label": "Satış kotaları ve prim hesaplamaları satış yöneticisinin Excel tablolarında bağımsız yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "bireysel_kota_ve_iskonto_butcesi_uygulanmaz",
+          "label": "Bireysel satış kotası veya iskonto bütçe sınırı uygulanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-010",
+      "process": "Gider Bütçesi",
+      "order": 10,
+      "question": "Operasyonel Gider (OPEX) bütçesinde sabit giderler (Kira, Sigorta, Bakım vb.) ile değişken giderler nasıl ayrıştırılmakta ve bütçelenmektedir?",
+      "description": "Gider yapısı, sabit/değişken maliyet ayrımı ve bütçeleme kuralları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sabit_ve_degisken_giderler_ayri_hesap_ve_davranis_modelleriyle_butcelenir",
+          "label": "Sabit giderler sözleşmelere göre, değişken giderler üretim/satış hacmine endeksli dinamik kurallarla bütçelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_giderler_tekduzen_hesap_kodlari_bazinda_aylik_girilir",
+          "label": "Sabit/değişken ayrımı olmadan tüm giderler muhasebe hesap kodu (770/760/740) bazında aylık tutar olarak bütçelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "giderler_departman_bazli_toplu_tavan_rakam_olarak_belirlenir",
+          "label": "Detaylı hesap bazında değil; her departmana yıllık harcayabileceği toplu bir masraf tavanı verilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-011",
+      "process": "Gider Bütçesi",
+      "order": 11,
+      "question": "Personel ve Bordro bütçesi (Mevcut kadro, planlanan yeni işe alımlar, ücret artış zam oranları, SGK/Vergi yükleri, prim ve yan haklar) nasıl bütçelenmektedir?",
+      "description": "İnsan kaynakları bütçesi, kadro planlaması ve işgücü maliyet modellemesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kisi_ve_pozisyon_bazli_kadro_plani_zam_ve_yan_haklarla_detayli_modellenir",
+          "label": "Pozisyon bazında mevcut çalışanlar, zam oranları, yeni işe alım ayları, SGK tavanı ve yan haklar tam detaylı hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "departman_toplam_bordro_giderine_toplu_artis_yuzdesi_uygulanir",
+          "label": "Kişi bazlı değil; departman bazında toplam bordro maliyetine tahmini zam ve yeni personel payı eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ik_tarafindan_excelde_kabataslak_tahmin_edilir",
+          "label": "İnsan kaynakları ekibi tarafından Excel'de yaklaşık toplam personel maliyeti tahmin edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-012",
+      "process": "Gider Bütçesi",
+      "order": 12,
+      "question": "Pazarlama, reklam, seyahat ve temsil-ağırlama gider bütçelerinin kampanya ve departman bazında sınırlandırılması nasıl yürütülmektedir?",
+      "description": "Özel gider kalemlerinde bütçe tavanı ve kampanya maliyeti takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kampanya_ve_etkinlik_kodlari_uzerinden_butce_asimi_anlik_izlenir",
+          "label": "Her pazarlama kampanyası veya etkinlik için ayrı bütçe kodu açılır ve harcamalar anlık bütçeden düşülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "departman_aylik_masraf_limitiyle_manuel_takip_edilir",
+          "label": "Aylık departman temsil/seyahat limitleri vardır; harcamalar Excel'de takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "pazarlama_ve_seyahat_giderlerinde_onceden_butce_tahsis_edilmez",
+          "label": "Önceden sınır tahsis edilmez; harcama yapıldıkça yönetim onayına sunulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-013",
+      "process": "Masraf Merkezi Bütçesi",
+      "order": 13,
+      "question": "Bütçe planlaması Masraf Merkezleri (Cost Centers) ve Kâr Merkezleri (Profit Centers) bazında detaylandırılmakta mıdır?",
+      "description": "Bütçenin sorumluluk merkezleri ve organizasyonel birimler bazında dağılımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_gelir_ve_giderler_masraf_ve_kar_merkezleri_bazinda_butcelenir",
+          "label": "Evet; tüm gelirler kâr merkezleri, tüm giderler ise hiyerarşik masraf merkezleri bazında planlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_ana_departmanlar_masraf_merkezi_olarak_tanimlidir",
+          "label": "Yalnızca ana departman düzeyinde masraf merkezi ayrımı vardır, alt detay merkezler kullanılmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "masraf_merkezi_yapisi_kullanilmaz_sadece_hesap_plani_vardir",
+          "label": "Masraf merkezi bazlı bütçeleme yoktur; bütçe yalnızca Tekdüzen Hesap Planı kodları üzerinden yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-014",
+      "process": "Masraf Merkezi Bütçesi",
+      "order": 14,
+      "question": "Ortak genel giderlerin (Merkez yönetim, bina/güvenlik, IT altyapı vb.) kâr merkezlerine veya üretim hatlarına dağıtım anahtarları bütçede nasıl kurgulanmaktadır?",
+      "description": "İkincil maliyet dağıtımları ve genel gider dağıtım anahtarları (Allocation Keys).",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "dinamik_dagitim_anahtarlari_metrekare_calisan_ciro_ile_sistemde_hesaplanir",
+          "label": "Metrekare, çalışan sayısı, makine saati veya ciro oranına göre sistem otomatik ikincil bütçe dağıtımı yapar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sabit_yuzdelerle_excel_tablolarinda_dagitilir",
+          "label": "Yıl başında belirlenen sabit yüzdelerle Excel üzerinde kâr merkezlerine dağıtım yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ortak_giderler_dagitilmaz_merkez_gideri_olarak_kalir",
+          "label": "Ortak giderler kâr merkezlerine dağıtılmaz; doğrudan şirket genel gideri olarak bilançoda/gelir tablosunda kalır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-015",
+      "process": "Proje Bütçesi",
+      "order": 15,
+      "question": "Şirketinizde proje bazlı işler, Ar-Ge projeleri, danışmanlık veya pazarlama kampanyaları için bağımsız Proje Bütçeleri (WBS / İş Kırılımı) oluşturuluyor mu?",
+      "description": "Dönemsel bütçeden bağımsız proje yaşam döngüsü bütçelemesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "her_proje_icin_wbs_kirilimli_bagimsiz_proje_butcesi_acilir",
+          "label": "Evet; her proje için İş Kırılım Yapısı (WBS) tanımlanır, gelir ve giderleri çok yıllı proje bütçesinde takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "projeler_departman_butcesi_icinde_alt_kalem_olarak_tutulur",
+          "label": "Ayrı bir proje bütçe yapısı yoktur; harcamalar ilgili departmanın yıllık bütçesi içinden karşılanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proje_bazli_butce_kullanilmamaktadir",
+          "label": "Şirketimizde proje bazlı iş veya proje bütçelemesi kullanılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-016",
+      "process": "Proje Bütçesi",
+      "order": 16,
+      "question": "Proje bütçelerinin gerçekleşen maliyet takibi, taahhüt (Commitment) kontrolü ve proje kârlılık sapmaları nasıl izlenmektedir?",
+      "description": "Proje maliyet aşımları, açık sipariş taahhütleri ve proje kârlılık kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "BGT-015",
+        "operator": "not_equals",
+        "value": "proje_bazli_butce_kullanilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "erp_proje_modulunde_fiili_maliyet_ve_acik_siparis_taahhutleri_anlik_izlenir",
+          "label": "Faturalaşan fiili maliyetler ve verilen sipariş taahhütleri proje bütçesinden anlık düşülerek kârlılık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proje_maliyetleri_excel_tablolarinda_manuel_takip_edilir",
+          "label": "Muhasebeden proje kodlu masraflar çekilip Excel tablosunda bütçeyle manuel karşılaştırılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "proje_butce_asimlari_takip_edilememektedir",
+          "label": "Proje bütçe aşımları veya taahhütler sistem üzerinden düzenli olarak takip edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-017",
+      "process": "Yatırım / CAPEX Bütçesi",
+      "order": 17,
+      "question": "Makine, bina, tesis, taşıt, yazılım/lisans gibi Duran Varlık Yatırımları (CAPEX Bütçesi) operasyonel giderlerden ayrı olarak bütçelenip takip ediliyor mu?",
+      "description": "Sermaye harcamaları bütçesi ve duran varlık yatırımlarının yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ayri_capex_yatirim_butcesi_tanimlidir_proje_bazli_izlenir",
+          "label": "Evet; tüm duran varlık yatırımları için ayrı CAPEX bütçesi açılır ve amortisman/nakit etkisi modellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yatirimlar_genel_butce_icinde_tek_satir_olarak_yer_alir",
+          "label": "Ayrı detaylı yatırım bütçesi yoktur; yıllık genel bütçede toplu bir yatırım payı ayrılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "capex_yatirim_butcesi_tutulmamaktadir",
+          "label": "Şirketimizde düzenli bir CAPEX veya yatırım bütçelemesi yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-018",
+      "process": "Yatırım / CAPEX Bütçesi",
+      "order": 18,
+      "question": "Yatırım harcaması onaylarında bütçe kontrolü (Yatırım Onay Formu / AFEs / Bütçe Aşılamazlık Kuralı) ve yatırım geri dönüş (ROI/NPV) analizi nasıl yapılmaktadır?",
+      "description": "Yatırım harcama onay süreci ve finansal fizibilite kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "BGT-017",
+        "operator": "not_equals",
+        "value": "capex_yatirim_butcesi_tutulmamaktadir"
+      },
+      "options": [
+        {
+          "value": "resmi_afe_onay_formu_ve_roi_hesabi_ile_butceden_tahsis_edilir",
+          "label": "Sistem üzerinden Yatırım Harcama Onayı (AFE) açılır; ROI/Geri dönüş fizibilitesi onaylanmadan sipariş açılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yonetim_kurulu_veya_genel_mudur_imzasiyla_manuel_onaylanir",
+          "label": "Bütçe aşımı veya harcama fizibilitesi Yönetim Kurulu / Genel Müdür yazılı onayı ile manuel işletilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yatirim_harcamalarinda_onceden_fizibilite_ve_butce_kontrolu_yapilmaz",
+          "label": "İhtiyaç doğdukça yönetim sözlü kararıyla yatırım satın alması gerçekleştirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-019",
+      "process": "Nakit Bütçesi Bağlantısı",
+      "order": 19,
+      "question": "Gelir, gider ve yatırım bütçelerinden türetilen dinamik bir Yıllık/Çeyreklik Nakit Bütçesi (Tahakkuktan Nakde Dönüşüm) hazırlanıyor mu?",
+      "description": "Tahakkuk esaslı gelir/gider bütçesinin tahsilat ve ödeme vadelerine göre nakit bütçesine çevrilmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_tahakkuk_butcesini_vadelere_gore_otomatik_nakit_butcesine_cevirir",
+          "label": "Evet; ERP bütçe modülü satış ve alım vadelerini dikkate alarak bütçelenmiş nakit giriş/çıkış tablosunu otomatik üretir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_excelde_ayri_bir_yillik_nakit_butcesi_modeller",
+          "label": "Evet; gelir ve gider bütçeleri baz alınarak finans ekibi tarafından Excel üzerinde yıllık nakit bütçesi hazırlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "nakit_butcesi_hazirlanmamaktadir",
+          "label": "Nakit bütçesi hazırlanmaz; bütçe yalnızca tahakkuk esaslı gelir tablosu olarak takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-020",
+      "process": "Nakit Bütçesi Bağlantısı",
+      "order": 20,
+      "question": "Nakit bütçesi ile Hazine (Treasury) operasyonel nakit akış tahminleri arasındaki mutabakat ve köprü (Reconciliation) nasıl kurulmaktadır?",
+      "description": "Stratejik nakit bütçesi hedefleri ile hazine günlük/haftalık fiili nakit akışının uyumlaştırılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "butce_nakit_hedefi_ile_hazine_fiili_nakit_akisi_sistemde_karsilastirilir",
+          "label": "Hazine fiili nakit akış gerçekleşmeleri ile bütçelenen nakit akış hedefleri aylık olarak sistemde karşılaştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hazine_ve_butce_ekipleri_ay_sonu_excelde_mutabakat_yapar",
+          "label": "Hazine uzmanı ile bütçe uzmanı ay sonlarında Excel tablolarını birleştirerek farkları analiz eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "hazine_ile_butce_arasinda_herhangi_bir_kopru_veya_karsilastirma_yoktur",
+          "label": "Hazine operasyonu ve bütçe planlaması tamamen birbirinden kopuk yürütülmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-021",
+      "process": "Bütçe Onay Süreci",
+      "order": 21,
+      "question": "Hazırlanan bütçelerin onay hiyerarşisi (Departman Müdürü -> Bütçe/Kontroling Müdürü -> CFO -> Genel Müdür/Yönetim Kurulu) nasıl işletilmektedir?",
+      "description": "Bütçe onay iş akışı, konsolidasyon adımları ve yönetim onay zinciri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_uzerinde_hiyerarsik_dijital_onay_ve_kilit_mekanizmasi_vardir",
+          "label": "Bütçe girişi tamamlandığında ERP üzerinden onay akışına girer; onaylanan bütçe revizyona karşı sistemce kilitlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_dosyalari_eposta_ve_toplanti_notuyla_yonetime_onaylatilir",
+          "label": "Bütçe sunumu toplantıda yapılır; Yönetim Kurulu/Genel Müdür onayı e-posta veya ıslak imzalı tutanakla alınır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "resmi_bir_butce_onay_hiyerarsisi_yoktur",
+          "label": "Resmi bir onay akışı yoktur; bütçe finans müdürü tarafından hazırlanıp doğrudan uygulamaya alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-022",
+      "process": "Bütçe Onay Süreci",
+      "order": 22,
+      "question": "Günlük operasyonel işlemlerde (Satın Alma Talebi, Sipariş Açma, Masraf Girişi) sistemsel Bütçe Kontrolü ve Blokaj (Advisory / Warning / Soft Block / Hard Block) uygulanmakta mıdır?",
+      "description": "İşlem anında bütçe uygunluk kontrolü (Budget Availability Control).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "hard_block_butce_asildiginda_sistem_islemi_kesinlikle_engeller",
+          "label": "Sert Blokaj (Hard Block); bütçesi yetersiz olan satın alma talebi veya sipariş sistem tarafından kesinlikle durdurulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "soft_block_ek_onay_veya_cfo_onayi_ile_asima_izin_verilir",
+          "label": "Yumuşak Blokaj (Soft Block); bütçe aşıldığında ek onay akışı (CFO / Genel Müdür onayı) tetiklenerek devam edilebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uyari_verir_ancak_islemi_engellemez_advisory",
+          "label": "Uyarıcı (Warning); kullanıcıya bütçenin aşıldığı uyarısını gösterir fakat işleme engel olmaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "islem_aninda_kontrol_yoktur_yalnizca_ay_sonu_raporlanir",
+          "label": "Operasyon anında bütçe kontrolü yoktur; aşımlar yalnızca ay sonu gerçekleşen raporlarında fark edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-023",
+      "process": "Bütçe Versiyonları ve Revizyonlar",
+      "order": 23,
+      "question": "Bütçe versiyonlama yapısı (İlk Onaylı Bütçe - Version 0 / Base Budget, Revize Bütçeler - V1, V2, Simülasyon Senaryoları) nasıl yönetilmektedir?",
+      "description": "Bütçe ana tabanı, revizyon versiyonları ve senaryo saklama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erpde_v0_baz_butce_sabit_kalir_v1_v2_versiyonlari_ayri_saklanir",
+          "label": "İlk onaylanan V0 baz bütçe asla ezilmez; yapılan revizyonlar V1, V2 ve simülasyon senaryosu olarak ayrı saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "revizyon_yapildiginda_eski_butcenin_uzerine_yazilir",
+          "label": "Yeni bütçe onaylandığında eski bütçe verisi ezilir veya arşivlenmeden güncellenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "versiyonlar_farkli_excel_dosya_isimleriyle_arsivlenir",
+          "label": "ERP'de versiyonlama yoktur; her revizyon farklı Excel dosya adıyla (örn. Butce_2026_Revize_V2.xlsx) saklanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-024",
+      "process": "Bütçe Versiyonları ve Revizyonlar",
+      "order": 24,
+      "question": "Bütçe revizyonları hangi periyotta (Yılda 1 kez 6+6, Çeyreklik 3+9 / 9+3, Olağanüstü Ekonomik Dalgalanmalarda) ve hangi onay akışıyla yapılmaktadır?",
+      "description": "Revizyon sıklığı, tetikleyici şartlar ve revizyon onay disiplini.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "ceyrek_donemlerde_duzenli_3_9_6_6_9_3_revizyonu_yapilir",
+          "label": "Her çeyrek dönem sonunda (3+9, 6+6, 9+3) gerçekleşen verilerle güncellenerek düzenli revize edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yilda_yalnizca_bir_kez_yil_ortasinda_6_6_revize_edilir",
+          "label": "Yılda sadece bir kez, 6. ayın (Haziran) sonunda yılın ikinci yarısı için revize bütçe hazırlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_asiri_kur_enflasyon_veya_kriz_anlarinda_revize_edilir",
+          "label": "Düzenli revizyon yapılmaz; olağanüstü kur, enflasyon veya pazar dalgalanması olduğunda revize edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yil_icinde_hic_revizyon_yapilmaz",
+          "label": "Yıl içinde bütçe revizyonu yapılmaz; yıl sonuna kadar ilk onaylanan bütçe hedefi takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-025",
+      "process": "Forecast ve Rolling Forecast",
+      "order": 25,
+      "question": "Yıl içinde gerçekleşen aylar ile kalan ayların beklentilerini birleştiren Dinamik Tahmin (Forecast / Rolling Forecast) çalışması yapılıyor mu?",
+      "description": "Statik bütçeden dinamik tahminleme modeline geçiş düzeyi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "aylik_veya_ceyrek_bazli_surekli_rolling_forecast_yapilir",
+          "label": "Evet; gerçekleşen aylar kilitlenip kalan aylar için sürekli dinamik Rolling Forecast güncellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_yil_sonu_kapanis_tahmini_year_end_forecast_yapilir",
+          "label": "Sürekli rolling yapılmaz; yalnızca yıl sonunun nasıl kapanacağını görmek için yıl ortasında tahmin yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "forecast_calismasi_yapilmamaktadir",
+          "label": "Hayır; yıl içinde dinamik forecast yapılmaz, yalnızca statik bütçe ile çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-026",
+      "process": "Forecast ve Rolling Forecast",
+      "order": 26,
+      "question": "Rolling Forecast ufku (12-18 Aylık Dinamik Bütçe), tahmin sıklığı (Aylık/Çeyreklik) ve tahmin doğruluk oranı (Forecast Accuracy) nasıl ölçülmektedir?",
+      "description": "Tahmin ufku, güncelleme periyodu ve tahmin sapma performansı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "BGT-025",
+        "operator": "not_equals",
+        "value": "forecast_calismasi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "12_18_aylik_surekli_ufuk_ve_tahmin_dogruluk_kpi_olculur",
+          "label": "Daima önümüzdeki 12-18 ayı görecek şekilde güncellenir ve departman bazlı tahmin doğruluğu (Accuracy KPI) ölçülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "icinde_bulunulan_mali_yil_sonuna_kadar_olan_donem_tahmin_edilir",
+          "label": "Ufuk bir sonraki yıla taşmaz; sadece içinde bulunulan takvim yılı sonuna kadar olan aylar güncellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tahmin_dogruluk_orani_olculmemektedir",
+          "label": "Forecast yapılır ancak tahminin ne kadar isabetli olduğu geriye dönük ölçülmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-027",
+      "process": "Bütçe-Gerçekleşen Analizi",
+      "order": 27,
+      "question": "Bütçe ile fiili gerçekleşenlerin karşılaştırması (Budget vs Actual) hangi sıklıkla ve hangi araçla hazırlanmaktadır?",
+      "description": "Gerçekleşen verilerin bütçeyle kıyaslanma periyodu ve otomasyon seviyesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_veya_bi_uzerinden_anlik_ve_otomatik_raporlanir",
+          "label": "Muhasebe kayıtları oluştukça ERP veya BI sistemi üzerinden bütçe-gerçekleşen anlık ve otomatik izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ay_kapanisindan_sonra_excel_raporu_olarak_hazirlanir",
+          "label": "Aylık mali kapanış tamamlandıktan sonra finans ekibi tarafından Excel'de karşılaştırmalı tablo üretilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ceyrek_donemlerde_veya_duzensiz_araliklarla_bakilir",
+          "label": "Aylık düzenli karşılaştırma yapılmaz; 3 aylık dönemlerde veya talep edildikçe hazırlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "duzenli_butce_gerceklesen_karsilastirmasi_yapilmaz",
+          "label": "Şirketimizde bütçe ile fiili gerçekleşenlerin düzenli bir karşılaştırması yapılmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-028",
+      "process": "Bütçe-Gerçekleşen Analizi",
+      "order": 28,
+      "question": "Muhasebe fiili kayıtları (Defteri Kebir / THP 7'li hesaplar) ile bütçe kalemleri arasındaki hesap tayin ve eşleştirme matrisi (Mapping) ERP'de nasıl kurgulanmıştır?",
+      "description": "Muhasebe hesap planı ile bütçe satırları arasındaki eşleştirme mantığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tam_birebir_veya_n_1_otomatik_hesap_tayini_matrisi_tanimlidir",
+          "label": "Tüm muhasebe hesapları bütçe kalemlerine kurallarla bağlanmıştır; her yevmiye kaydı anında ilgili bütçe satırına işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_vlookup_ile_manuel_eslestirme_yapilir",
+          "label": "Sistemde otomatik eşleştirme yoktur; muhasebe mizanı çekilip Excel'de formüllerle bütçe satırlarına dağıtılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "muhasebe_hesaplari_ile_butce_kalemleri_uyumsuzdur",
+          "label": "Muhasebe hesap planı ile bütçe kalemleri farklı dillerde kurgulandığı için eşleştirme zor ve zahmetlidir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-029",
+      "process": "Sapma Analizi",
+      "order": 29,
+      "question": "Bütçe sapmaları (Fiyat Farkı Sapması, Hacim/Miktar Sapması, Kur Sapması, Verimsizlik Sapması) analitik olarak ayrıştırılabilmekte midir?",
+      "description": "Sapmanın kök neden analizi ve etken faktörlere ayrıştırılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "fiyat_hacim_kur_ve_miktor_sapmalari_analitik_ayristirilir",
+          "label": "Sapmanın ne kadarının döviz kurundan, ne kadarının fiyat artışından, ne kadarının miktar/hacimden kaynaklandığı ayrıştırılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_tutar_bazinda_artis_azalis_farki_gorulebilir",
+          "label": "Kök neden ayrıştırılmaz; yalnızca bütçelenen tutar ile gerçekleşen tutar arasındaki net TL/Döviz farkı raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sapma_analizi_yapilamaz_detay_gorulemez",
+          "label": "Sapma analizi yapılamamaktadır; farkların nedeni finans ekibi tarafından tek tek araştırılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-030",
+      "process": "Sapma Analizi",
+      "order": 30,
+      "question": "Belirli bir yüzdeyi (örn. %10) veya tutarı aşan olumsuz bütçe sapmalarında departmanlardan Bütçe Sapma Gerekçe Raporu ve Düzeltici Aksiyon Planı istenmekte midir?",
+      "description": "Bütçe disiplini, sapma hesap verebilirliği ve aksiyon takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "esik_asildiginda_sistem_gerekce_ve_aksiyon_girisini_zorunlu_tutar",
+          "label": "Belirlenen tolerans eşiği aşıldığında sistem ilgili departman müdüründen yazılı gerekçe ve aksiyon planı talep eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_kontroling_toplantisinda_sozlu_veya_sunumla_aciklanir",
+          "label": "Sistemsel zorunluluk yoktur; aylık yönetim toplantısında departman müdürü sapmayı sözlü/sunumla açıklar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sapma_gerekcesi_ve_aksiyon_raporu_istenmemektedir",
+          "label": "Bütçe aşımlarında departmanlardan herhangi bir resmi gerekçe veya düzeltici plan talep edilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-031",
+      "process": "Sapma Analizi",
+      "order": 31,
+      "question": "Ürün, müşteri ve kanal bazında marj ve kârlılık sapma analizi (Price-Volume-Mix PVM analizi) yapılabilmekte midir?",
+      "description": "Fiyat-Hacim-Ürün Karışımı (PVM) analizi ile brüt kâr sapması tespiti.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "pvm_analizi_otomatik_yapilir_marj_sapmasi_aninda_gorulur",
+          "label": "Evet; sistem kârlılık sapmasını Fiyat Etkisi, Hacim Etkisi ve Ürün Karışımı (Mix) bazında otomatik ayrıştırır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excelde_donemsel_olarak_manuel_hesaplanir",
+          "label": "Sistemde otomatik PVM yoktur; finans uzmanları çeyreklik dönemlerde Excel üzerinden hesaplar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "pvm_ve_marj_sapma_analizi_yapilamamaktadir",
+          "label": "Kârlılık sapmasının hangi üründen veya fiyattan kaynaklandığı analitik olarak hesaplanamamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-032",
+      "process": "Yönetim Raporları",
+      "order": 32,
+      "question": "Üst Yönetim ve İcra Kurulu için hazırlanan Aylık Yönetim Raporlama Paketi (Management Reporting Pack / P&L, Bilanço, Nakit Akım, Segment Kârlılıkları) neleri içerir ve nasıl hazırlanır?",
+      "description": "Yönetim raporlama paketi kapsamı, formatı ve üretim yöntemi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_kapsamli_yonetsel_gelir_tablosu_nakit_akim_ve_karlilik_paketi",
+          "label": "Yönetsel Gelir Tablosu, Bilanço, Nakit Akım, Segment Kârlılıkları ve KPI özetlerini içeren standart paket sunulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yalnizca_satis_ve_brut_kar_ozeti_sunulur",
+          "label": "Tam yönetim paketi yoktur; sadece satış cirosu, tahsilat durumu ve brüt kâr rakamları raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "resmi_mizan_ve_gelir_tablosu_ozeti_verilir",
+          "label": "Yönetsel özel raporlama yoktur; muhasebenin ürettiği yasal mizan ve gelir tablosu yönetime iletilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-033",
+      "process": "Yönetim Raporları",
+      "order": 33,
+      "question": "Aylık yönetim raporlama paketinin hazırlanıp sunulması ay kapanışından (Mali Kapanış) sonra kaç iş günü sürmektedir?",
+      "description": "Raporlama çevikliği, veri tazeliği ve rapor teslim hızı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hizli_kapanis_1_3_is_gunu_icinde_hazirdir",
+          "label": "Hızlı Kapanış (Fast Close); ay sonundan sonraki 1-3 iş günü içinde tüm yönetim raporları hazırdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_sure_4_7_is_gunu_icinde_tamamlanir",
+          "label": "Standart süre; ay sonunu takip eden 4-7 iş günü içinde raporlar hazırlanıp yönetime sunulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "uzun_sure_8_15_is_gunu_veya_daha_gec_surmektedir",
+          "label": "Uzun süre; verilerin toparlanması ve raporun çıkması ayın 15'ini veya daha geç bir tarihi bulmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-034",
+      "process": "Yönetim Raporları",
+      "order": 34,
+      "question": "Yönetim kurulu ve icra kurulu için interaktif görsel gösterge panelleri (Executive Dashboards) ve mobil raporlama kullanılıyor mu?",
+      "description": "Görsel yönetici kokpitleri, mobil erişim ve grafiksel KPI sunumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "interaktif_bi_ve_mobil_yonetici_kokpiti_aktif_kullanilir",
+          "label": "Evet; Yönetim Kurulu ve yöneticiler BI/ERP mobil kokpitleri üzerinden anlık interaktif grafikleri takip eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "statik_pdf_veya_powerpoint_sunumu_olarak_dagitilir",
+          "label": "İnteraktif ekran yoktur; raporlar statik PDF veya PowerPoint sunumu formatında hazırlanıp e-posta ile iletilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_basili_veya_excel_rapor_kullanilir",
+          "label": "Görsel gösterge paneli yoktur; sadece yazdırılmış kağıt veya Excel tabloları incelenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-035",
+      "process": "KPI ve Performans Raporlama",
+      "order": 35,
+      "question": "Şirket genelinde ve departmanlar bazında takip edilen Kurumsal KPI ve Performans Göstergeleri (EBITDA Marjı, Brüt Kâr Marjı, ROIC, Kapasite Kullanım, OEE vb.) tanımlı mıdır?",
+      "description": "Kurumsal performans göstergeleri ve hedef takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kurumsal_ve_departman_bazli_kpi_sozlugu_tam_tanimlidir",
+          "label": "Evet; şirket genelinde ve her departmanda formülleri, hedefleri ve sahipleri net belirlenmiş KPI sözlüğü vardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_temel_finansal_ve_satis_kpilari_takip_edilir",
+          "label": "Yalnızca ciro, brüt kâr, EBITDA ve tahsilat süresi gibi temel finansal göstergeler takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kurumsal_kpi_takibi_yapilmamaktadir",
+          "label": "Şirketimizde standartlaştırılmış bir KPI ve performans göstergesi takip sistemi bulunmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-036",
+      "process": "KPI ve Performans Raporlama",
+      "order": 36,
+      "question": "KPI hedefleri, gerçekleşen değerleri, hesaplama formülleri ve KPI sorumluları bir Performans Kokpiti / Dashboard üzerinden görsel olarak izlenmekte midir?",
+      "description": "KPI panelleri, sapma alarmları ve hedef-gerçekleşen görünürlüğü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "BGT-035",
+        "operator": "not_equals",
+        "value": "kurumsal_kpi_takibi_yapilmamaktadir"
+      },
+      "options": [
+        {
+          "value": "sistem_uzerinde_kpi_kokpiti_hedef_sapma_alarmlariyla_izlenir",
+          "label": "Sistem üzerinden hedef/gerçekleşen grafikleri, trafik ışığı alarmları (Kırmızı/Sarı/Yeşil) ile anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ay_sonlarinda_excel_kpi_tablosunda_manuel_hesaplanir",
+          "label": "Sistemsel kokpit yoktur; KPI gerçekleşmeleri ay sonunda Excel tablosunda manuel hesaplanıp doldurulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kpi_sonuclari_gorsellestirilmemektedir",
+          "label": "KPI sonuçları görselleştirilmez, yalnızca ham liste olarak raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-037",
+      "process": "Rapor Veri Kaynakları",
+      "order": 37,
+      "question": "Yönetim raporlarının üretildiği veri kaynakları (ERP Tek Doğruluk Kaynağı / Kurumsal Veri Ambarı DWH / İş Zekası BI / Bağımsız Excel Tabloları) nasıldır?",
+      "description": "Raporlama mimarisi ve tek doğruluk kaynağı (Single Source of Truth) varlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tek_dogruluk_kaynagi_erp_ve_entegre_kurumsal_dwh_bi_mimarisi",
+          "label": "Tüm raporlar tek doğruluk kaynağı olan ERP ve entegre Veri Ambarı (DWH / BI) üzerinden doğrudan üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hibrit_model_erp_verileri_harici_excel_tablolariyla_birlestirilir",
+          "label": "ERP'den ham veriler alınır, departmanların harici Excel tablolarıyla birleştirilerek rapor üretilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "cok_sayida_bagimsiz_ve_parcali_excel_kaynagi_kullanilir",
+          "label": "Merkezi veri kaynağı yoktur; her departman kendi bağımsız Excel veritabanından rapor üretir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-038",
+      "process": "Rapor Veri Kaynakları",
+      "order": 38,
+      "question": "Farklı departmanların (örn. Satış vs Muhasebe) yönetim kurulu veya genel müdüre sunduğu rapor rakamlarında uyumsuzluk / çelişki (Data Discrepancy) yaşanmakta mıdır?",
+      "description": "Veri tutarlılığı, mutabakat sorunları ve rakam güvenilirliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "asla_yasanmaz_tum_departmanlar_ayni_sistem_verisini_gorur",
+          "label": "Hayır, yaşanmaz; tüm departmanlar aynı merkezi veritabanı üzerinden rapor aldığı için rakamlar birebir tutarlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sik_sik_yasanir_toplantilarda_rakam_tartismasi_olur",
+          "label": "Evet, sıkça yaşanır; satış cirosu veya kârlılık rakamları departmanlar arasında farklı çıkar ve toplantılarda tartışma yaratır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "zaman_zaman_tanim_veya_zamanlama_farkindan_kaynaklanir",
+          "label": "Bazen yaşanır; faturalaşma zamanlaması veya iade/iskonto tanımlarındaki farklılıklardan kaynaklı geçici farklar oluşur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-039",
+      "process": "Excel Bağımlılığı",
+      "order": 39,
+      "question": "Yönetim raporları ve bütçe süreçlerinin yürütülmesinde Manuel Excel Bağımlılığı ve kişiye bağımlılık düzeyi nedir?",
+      "description": "Raporlama operasyonunda Excel iş yükü ve kurumsal hafıza riski.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cok_yuksek_bagimlilik_excel_ve_ilgili_kisi_olmadan_rapor_cikmaz",
+          "label": "Çok yüksek; tüm bütçe ve raporlama belirli kişilerin hazırladığı karmaşık Excel modellerine ve makrolara bağımlıdır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "orta_duzey_bagimlilik_erpden_veri_cekilip_excelde_bicimlendirilir",
+          "label": "Orta düzey; veriler ERP'den güvenle çekilir ancak son görselleştirme ve analiz Excel üzerinde yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dusuk_bagimlilik_tum_raporlar_sistem_tarafindan_otomatik_uretilir",
+          "label": "Düşük; tüm raporlar ve bütçe takipleri ERP/BI sistemi üzerinden doğrudan alınır, Excel'e bağımlılık yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-040",
+      "process": "Excel Bağımlılığı",
+      "order": 40,
+      "question": "Excel üzerinde elle yapılan veri birleştirme, formül hataları, sürüm karışıklığı veya makro bozulmaları sebebiyle yaşanan zaman ve güven kaybı ne boyuttadır?",
+      "description": "Manuel operasyon hataları, formül riskleri ve raporlama güveni.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ciddi_zaman_ve_guven_kaybi_yasaniyor_yanlis_karar_riski_var",
+          "label": "Ciddi boyutta; formül kaymaları, yanlış kopyalamalar veya bozuk dosyalar sebebiyle raporlarda sıkça hatalar ve gecikmeler yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kontrollerle_hata_onleniyor_ancak_cok_fazla_is_gucu_harcaniyor",
+          "label": "Hatalar çift kontrollerle yakalanıyor; ancak personelin zamanının büyük kısmı formül düzeltmek ve veri birleştirmekle geçiyor",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_kaynakli_herhangi_bir_guven_veya_hata_sorunu_yasanmiyor",
+          "label": "Excel modellerimiz oturmuştur, formül veya sürüm hatası yaşanmamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-041",
+      "process": "Rapor Yetkilendirme ve Dağıtım",
+      "order": 41,
+      "question": "Yönetim raporlarında Rol Bazlı Güvenlik ve Satır Bazlı Yetkilendirme (Row-Level Security / Departman yöneticisinin sadece kendi birimini görmesi, kârlılık gizliliği) nasıl sağlanmaktadır?",
+      "description": "Rapor veri gizliliği, satır bazlı kısıtlama ve yetki matrisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistem_uzerinde_rol_ve_satir_bazli_dinamik_yetki_tanimlidir",
+          "label": "Kullanıcı sisteme girdiğinde satır bazlı yetkilendirme (RLS) ile yalnızca kendi departmanının veya bölgesinin bütçe/maliyetini görür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_her_departmana_kendi_sayfasini_ayri_dosya_olarak_gonderir",
+          "label": "Sistemsel satır yetkisi yoktur; finans personeli Excel dosyasını departmanlara göre bölerek ayrı ayrı e-posta atar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yetkilendirme_yoktur_raporlar_tum_yoneticilere_aciktir",
+          "label": "Özel satır kısıtlaması yoktur; hazırlanan genel yönetim raporu tüm yöneticilerle paylaşılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "BGT-042",
+      "process": "Rapor Yetkilendirme ve Dağıtım",
+      "order": 42,
+      "question": "Yönetim raporlarının otomatik dağıtımı (Zamanlanmış E-posta Rapor Gönderimi, Mobil Bildirim, Self-Service BI Portalı) işletilmekte midir?",
+      "description": "Rapor servis otomasyonu, zamanlanmış dağıtım ve self-servis erişim.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "zamanlanmis_otomatik_eposta_ve_self_service_portal_aktif",
+          "label": "Evet; yöneticilere her sabah/hafta başı otomatik PDF/Excel raporları postalanır ve portal üzerinden self-servis çalışabilirler",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_hazirladikca_manuel_eposta_ile_gonderir",
+          "label": "Otomatik dağıtım yoktur; finans uzmanı raporu hazırladıktan sonra ilgili dağıtım listesine manuel e-posta atar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "rapor_dagitimi_yapilmaz_isteyen_talep_eder",
+          "label": "Düzenli bir rapor dağıtımı yapılmaz; yönetici ihtiyaç duyduğunda finans ekibinden talep eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

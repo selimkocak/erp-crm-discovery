@@ -65,7 +65,7 @@ const allScopeItems: ReportScopeItem[] = BUSINESS_FUNCTION_REGISTRY.map((bf) => 
   totalQuestionCount: bf.code === "SALES" ? 21 : 0,
 }));
 
-assert(allScopeItems.length === 31, "Kapsam tablosunda 31 fonksiyonun tamamı mevcuttur");
+assert(allScopeItems.length === 32, "Kapsam tablosunda 32 fonksiyonun tamamı mevcuttur");
 assert(allScopeItems.find((s) => s.code === "SALES")?.status === "completed", "SALES kapsamda tamamlandı durumunda");
 assert(allScopeItems.find((s) => s.code === "PROCUREMENT")?.status === "not_started", "PROCUREMENT kapsamda başlanmadı durumunda");
 
