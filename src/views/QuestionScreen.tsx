@@ -393,8 +393,16 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   };
 
   const handleSaveAndExit = async () => {
-    await flushPendingSave();
-    onBack();
+    try {
+      setSaveStatus("saving");
+      await flushPendingSave();
+      setSaveStatus("saved");
+      onBack();
+    } catch (err: any) {
+      console.error("Kaydetme hatası:", err);
+      setSaveStatus("error");
+      alert(`Kaydetme sırasında bir hata oluştu: ${err?.message || "Bilinmeyen hata"}`);
+    }
   };
 
   const handleOpenReportClick = async () => {
@@ -631,46 +639,52 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
       {/* ── Main Question Content ────────────────────────────────────────── */}
       <div className="question-screen" style={{ flex: 1, minWidth: 0 }}>
-        {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="question-screen__header">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        {/* ── Fixed Toolbar Header (CSS Grid Architecture) ───────────────── */}
+        <header className="question-screen-toolbar question-screen__header">
+          {/* Sol: Geri Dön & Soru Sayısı / Navigatör */}
+          <div className="question-screen-toolbar__left">
             <button
               className="question-screen__back-btn"
               onClick={handleSaveAndExit}
-              title="Analiz detayına dön (Kayıtlar saklanır)"
+              title={`${bfNameTr} - Analiz detayına dön (Kayıtlar saklanır)`}
             >
               <ChevronLeft size={16} />
-              {bfNameTr}
+              <span>{bfNameTr}</span>
             </button>
 
             <button
               type="button"
-              className={`btn btn--sm ${isNavigatorOpen ? "btn--primary" : "btn--secondary"}`}
+              className={`btn btn--sm question-screen__nav-toggle-btn ${
+                isNavigatorOpen ? "btn--primary" : "btn--secondary"
+              }`}
               onClick={() => setIsNavigatorOpen((prev) => !prev)}
               title="Soru Listesi / Navigatörü Aç/Kapat"
-              style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}
             >
               <Layers size={14} />
               <span>Sorular ({visibleQuestions.length})</span>
             </button>
-
-            <div className="question-screen__meta">
-              <span className="question-screen__process">{currentQuestion?.process}</span>
-              <span className="question-screen__position">
-                Soru {safeIndex + 1} / {visibleQuestions.length}
-              </span>
-            </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          {/* Orta: Süreç Adı & Soru X / Y */}
+          <div className="question-screen-toolbar__center question-screen__meta">
+            <span className="question-screen__process" title={currentQuestion?.process}>
+              {currentQuestion?.process}
+            </span>
+            <span className="question-screen__position">
+              Soru {safeIndex + 1} / {visibleQuestions.length}
+            </span>
+          </div>
+
+          {/* Sağ: Özel Soru, Ara Rapor, Kaydet ve Çık */}
+          <div className="question-screen-toolbar__right">
             <button
               type="button"
-              className="btn btn--secondary btn--sm"
+              className="btn btn--secondary btn--sm btn-custom-question"
               onClick={handleAddCustomQuestion}
               title="Bu iş fonksiyonuna yeni bir özel soru ekle"
             >
               <PlusCircle size={14} />
-              + Özel Soru
+              <span>+ Özel Soru</span>
             </button>
 
             <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
@@ -678,26 +692,26 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
             {onOpenReport && (
               <button
                 type="button"
-                className="btn btn--secondary btn--sm"
+                className="btn btn--secondary btn--sm btn-interim-report"
                 onClick={handleOpenReportClick}
                 title="Mevcut durum ara raporunu incele / dışa aktar"
               >
                 <FileText size={14} />
-                Ara Rapor
+                <span>Ara Rapor</span>
               </button>
             )}
 
             <button
               type="button"
-              className="btn btn--outline btn--sm"
+              className="btn btn-save-exit btn--sm"
               onClick={handleSaveAndExit}
               title="Değişiklikleri doğrula ve proje ekranına dön"
             >
               <Save size={14} />
-              Kaydet ve Çık
+              <span>Kaydet ve Çık</span>
             </button>
           </div>
-        </div>
+        </header>
 
         {/* ── Progress bar ────────────────────────────────────────────────── */}
         <ProgressBar

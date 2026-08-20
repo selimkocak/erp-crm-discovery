@@ -102,8 +102,7 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div
-        className="modal-content"
-        style={{ maxWidth: 540 }}
+        className="modal-content followup-modal-container"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
@@ -128,79 +127,59 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-            <div style={{ padding: "0.75rem", background: "var(--surface-muted)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-color)" }}>
-              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.25rem" }}>
+          <div className="modal-body" style={{ display: "flex", flexDirection: "column", gap: "1rem", padding: "1.25rem 1.5rem" }}>
+            <div style={{ padding: "0.75rem 1rem", background: "var(--bg-surface-subtle)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-subtle)" }}>
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginBottom: "0.25rem", fontWeight: 600 }}>
                 {questionId}
               </div>
-              <div style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-color)" }}>
+              <div style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--text-primary)", lineHeight: 1.4 }}>
                 {questionText}
               </div>
             </div>
 
-            {/* Bayrak Tipi Seçimi */}
+            {/* Bayrak Tipi Seçimi (Symmetrical Grid) */}
             <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.5rem", color: "var(--text-primary)" }}>
                 Bayrak Türü <span style={{ color: "var(--danger)" }}>*</span>
               </label>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <div className="followup-flag-grid">
                 <button
                   type="button"
                   onClick={() => handleFlagTypeChange("revisit")}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "0.5rem",
-                    padding: "0.75rem",
-                    borderRadius: "var(--radius-md)",
-                    border: `2px solid ${flagType === "revisit" ? "var(--warning)" : "var(--border-color)"}`,
-                    background: flagType === "revisit" ? "rgba(245, 158, 11, 0.08)" : "var(--surface-color)",
-                    cursor: "pointer",
-                    textAlign: "left",
-                  }}
+                  className={`followup-flag-card ${flagType === "revisit" ? "followup-flag-card--revisit-selected" : ""}`}
                 >
-                  <span style={{ fontSize: "1.25rem", lineHeight: 1 }}>🟡</span>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: "0.875rem", color: flagType === "revisit" ? "var(--warning)" : "var(--text-color)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ fontSize: "1.25rem", lineHeight: 1 }}>🟡</span>
+                    <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: flagType === "revisit" ? "var(--color-warning-700, #b45309)" : "var(--text-primary)" }}>
                       Sonra Dön
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
-                      Bilgi eksik, başka departmandan teyit gerekli.
-                    </div>
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.35 }}>
+                    Bilgi eksik, başka departmandan teyit gerekli.
                   </div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleFlagTypeChange("critical")}
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "0.5rem",
-                    padding: "0.75rem",
-                    borderRadius: "var(--radius-md)",
-                    border: `2px solid ${flagType === "critical" ? "var(--danger)" : "var(--border-color)"}`,
-                    background: flagType === "critical" ? "rgba(239, 68, 68, 0.08)" : "var(--surface-color)",
-                    cursor: "pointer",
-                    textAlign: "left",
-                  }}
+                  className={`followup-flag-card ${flagType === "critical" ? "followup-flag-card--critical-selected" : ""}`}
                 >
-                  <span style={{ fontSize: "1.25rem", lineHeight: 1 }}>🔴</span>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: "0.875rem", color: flagType === "critical" ? "var(--danger)" : "var(--text-color)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span style={{ fontSize: "1.25rem", lineHeight: 1 }}>🔴</span>
+                    <span style={{ fontWeight: 700, fontSize: "0.9375rem", color: flagType === "critical" ? "var(--color-danger-700, #dc2626)" : "var(--text-primary)" }}>
                       Kritik Takip
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.2rem" }}>
-                      Yönetim onayı / mutlaka netleşmesi gereken konu.
-                    </div>
+                    </span>
+                  </div>
+                  <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.35 }}>
+                    Yönetim onayı / mutlaka netleşmesi gereken açık konu.
                   </div>
                 </button>
               </div>
             </div>
 
-            {/* Neden / Açıklama Notu */}
+            {/* Neden / Açıklama Notu (Full Width Textarea) */}
             <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.35rem" }}>
+              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.35rem", color: "var(--text-primary)", textAlign: "left" }}>
                 Neden / Takip Notu{" "}
                 {flagType === "critical" ? (
                   <span style={{ fontSize: "0.75rem", color: "var(--danger)", fontWeight: 500 }}>
@@ -215,12 +194,11 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
               <textarea
                 ref={noteTextareaRef}
                 autoFocus
-                className="input input--textarea"
+                className="followup-modal-textarea"
                 rows={3}
                 placeholder="Örn: Muhasebe müdüründen teyit alınacak, iskonto onay yetkisi sorulacak..."
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                style={{ width: "100%", resize: "vertical", fontSize: "0.875rem" }}
               />
             </div>
 
@@ -237,9 +215,11 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
             style={{
               display: "flex",
               justifyContent: existingFollowup ? "space-between" : "flex-end",
+              alignItems: "center",
               gap: "0.5rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid var(--border-color)",
+              padding: "1rem 1.5rem",
+              borderTop: "1px solid var(--border-subtle)",
+              background: "var(--bg-surface-subtle)",
             }}
           >
             {existingFollowup && (

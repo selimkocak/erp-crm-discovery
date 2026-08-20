@@ -11,7 +11,7 @@
  */
 
 import React, { useState } from "react";
-import { Edit2, Trash2, Sparkles } from "lucide-react";
+import { Edit2, Trash2, Sparkles, Clock, AlertTriangle } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
 import type { QuestionFollowup, FollowupFlagType, QuestionAttachment } from "../types";
 import { ChoiceOption } from "./ChoiceOption";
@@ -131,7 +131,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div className={`question-card ${showError ? "question-card--error" : ""}`}>
       {/* Soru başlığı ve Custom Question Yönetimi */}
       <div className="question-card__header">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem", marginBottom: "0.75rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <span style={{ fontSize: "0.8125rem", color: "var(--text-muted)", fontWeight: 600 }}>
               {question.process}
@@ -143,122 +143,53 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             )}
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-            {onOpenFollowup && (
-              <>
+          {question.is_custom && (
+            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+              {onEditCustom && (
                 <button
                   type="button"
-                  className={`btn btn--xs ${followup?.flag_type === "revisit" ? "btn-warning" : "btn--outline"}`}
-                  onClick={() => onOpenFollowup(question, "revisit")}
-                  title="Sonra Dön (Teyit Bekliyor)"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                    fontSize: "0.6875rem",
-                    padding: "0.2rem 0.45rem",
-                    borderColor: followup?.flag_type === "revisit" ? "var(--warning)" : "var(--border-color)",
-                  }}
+                  className="btn btn--outline btn--xs"
+                  onClick={() => onEditCustom(question)}
+                  title="Özel soruyu düzenle"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
                 >
-                  🟡 Sonra Dön
+                  <Edit2 size={12} /> Düzenle
                 </button>
+              )}
+              {onDeleteCustom && (
                 <button
                   type="button"
-                  className={`btn btn--xs ${followup?.flag_type === "critical" ? "btn-danger" : "btn--outline"}`}
-                  onClick={() => onOpenFollowup(question, "critical")}
-                  title="Kritik Takip (Açık Konu)"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                    fontSize: "0.6875rem",
-                    padding: "0.2rem 0.45rem",
-                    borderColor: followup?.flag_type === "critical" ? "var(--danger)" : "var(--border-color)",
-                  }}
+                  className="btn btn--outline btn--xs"
+                  onClick={() => onDeleteCustom(question)}
+                  title="Özel soruyu sil"
+                  style={{ color: "var(--danger)", borderColor: "var(--danger-border)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
                 >
-                  🔴 Kritik Takip
+                  <Trash2 size={12} /> Sil
                 </button>
-              </>
-            )}
-
-            {question.is_custom && (
-              <>
-                {onEditCustom && (
-                  <button
-                    type="button"
-                    className="btn btn--outline btn--xs"
-                    onClick={() => onEditCustom(question)}
-                    title="Özel soruyu düzenle"
-                    style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
-                  >
-                    <Edit2 size={12} /> Düzenle
-                  </button>
-                )}
-                {onDeleteCustom && (
-                  <button
-                    type="button"
-                    className="btn btn--outline btn--xs"
-                    onClick={() => onDeleteCustom(question)}
-                    title="Özel soruyu sil"
-                    style={{ color: "var(--danger)", borderColor: "var(--danger-border)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
-                  >
-                    <Trash2 size={12} /> Sil
-                  </button>
-                )}
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Aktif Takip Bayrağı Bilgilendirme Bandı */}
-        {followup && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "0.75rem",
-              background:
-                followup.flag_type === "critical"
-                  ? "rgba(239, 68, 68, 0.08)"
-                  : "rgba(245, 158, 11, 0.08)",
-              border: `1px solid ${
-                followup.flag_type === "critical"
-                  ? "rgba(239, 68, 68, 0.3)"
-                  : "rgba(245, 158, 11, 0.3)"
-              }`,
-              borderRadius: "var(--radius-md)",
-              padding: "0.5rem 0.75rem",
-              marginBottom: "0.875rem",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "1.125rem", lineHeight: 1 }}>
-                {followup.flag_type === "critical" ? "🔴" : "🟡"}
+        {followup ? (
+          <div className={`active-flag-banner active-flag-banner--${followup.flag_type}`} style={{ marginBottom: "1rem" }}>
+            <div className="active-flag-banner__left">
+              <span className="active-flag-banner__icon">
+                {followup.flag_type === "critical" ? (
+                  <AlertTriangle size={18} />
+                ) : (
+                  <Clock size={18} />
+                )}
               </span>
-              <div>
-                <div
-                  style={{
-                    fontWeight: 600,
-                    fontSize: "0.8125rem",
-                    color:
-                      followup.flag_type === "critical"
-                        ? "var(--danger)"
-                        : "var(--warning)",
-                  }}
-                >
+              <div className="active-flag-banner__text">
+                <div className="active-flag-banner__title">
                   {followup.flag_type === "critical"
                     ? "Kritik Takip — Açık Konu Olarak İzleniyor"
-                    : "Sonra Dönülecek — Bilgi / Teyit Bekliyor"}
+                    : "Sonra Dön — Bilgi / Teyit Bekliyor"}
                 </div>
                 {followup.note && (
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--text-color)",
-                      marginTop: "0.15rem",
-                    }}
-                  >
+                  <div className="active-flag-banner__note">
                     Not: <em>{followup.note}</em>
                   </div>
                 )}
@@ -268,14 +199,37 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             {onOpenFollowup && (
               <button
                 type="button"
-                className="btn btn--outline btn--xs"
-                onClick={() => onOpenFollowup(question)}
-                style={{ fontSize: "0.6875rem", padding: "0.2rem 0.4rem", whiteSpace: "nowrap" }}
+                className="btn btn--outline btn--sm active-flag-banner__edit-btn"
+                onClick={() => onOpenFollowup(question, followup.flag_type)}
+                title="Takip bayrağını ve notunu düzenle"
               >
                 Bayrağı Düzenle
               </button>
             )}
           </div>
+        ) : (
+          onOpenFollowup && (
+            <div className="flag-actions" style={{ marginBottom: "1rem" }}>
+              <button
+                type="button"
+                className="flag-button flag-button--revisit"
+                onClick={() => onOpenFollowup(question, "revisit")}
+                title="Sonra Dön (Bilgi / Teyit Bekliyor)"
+              >
+                <Clock size={16} />
+                <span>Sonra Dön</span>
+              </button>
+              <button
+                type="button"
+                className="flag-button flag-button--critical"
+                onClick={() => onOpenFollowup(question, "critical")}
+                title="Kritik Takip (Açık Konu)"
+              >
+                <AlertTriangle size={16} />
+                <span>Kritik Takip</span>
+              </button>
+            </div>
+          )
         )}
 
         <h2 className="question-card__question">

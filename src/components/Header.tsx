@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, ArrowLeft } from "lucide-react";
+import { Plus, ArrowLeft, Home } from "lucide-react";
 import { AppLogo } from "./AppLogo";
 
 interface HeaderProps {
@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="app-header">
       <div className="header-inner">
-        <div className="logo-area" onClick={onNavigateHome}>
+        <div className="logo-area" onClick={onNavigateHome} style={{ cursor: "pointer" }}>
           <AppLogo size={36} />
           <div className="logo-titles">
             <h1>ERP CRM Discovery</h1>
@@ -26,9 +26,14 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
           {currentView !== "home" ? (
-            <button className="btn btn-outline" onClick={onNavigateHome}>
-              <ArrowLeft size={16} />
-              Ana Sayfaya Dön
+            <button
+              className="btn btn-nav-home"
+              onClick={onNavigateHome}
+              title="Ana Sayfaya Dön"
+            >
+              <ArrowLeft size={15} />
+              <Home size={15} />
+              <span>Ana Sayfaya Dön</span>
             </button>
           ) : (
             onNewProject && (
