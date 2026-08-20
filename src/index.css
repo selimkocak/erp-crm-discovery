@@ -9,6 +9,15 @@
   --color-primary-subtle: #eff6ff;
   --color-primary-border: #bfdbfe;
 
+  --color-report-500: #6366f1;
+  --color-report-600: #4f46e5;
+  --color-report-700: #4338ca;
+  --color-report-800: #3730a3;
+  --color-report-subtle: #eef2ff;
+  --color-report-border: #c7d2fe;
+  --color-report-text: #ffffff;
+  --color-report-focus-ring: rgba(79, 70, 229, 0.4);
+
   --color-secondary-500: #14b8a6;
   --color-secondary-600: #0f766e;
   --color-secondary-700: #115e59;
@@ -225,7 +234,49 @@ body {
   box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
 }
 
-/* ── Secondary Action: Deep Teal / Slate (Rapor Önizleme, Ara Rapor, Özel Soru) */
+/* ── Report Primary Action: Deep Indigo / Purple-Blue (Rapor Önizleme / Merkezi Rapor) ─── */
+.btn-report-primary,
+.btn--report-primary,
+.btn-report,
+.btn--report {
+  background-color: var(--color-report-600);
+  color: var(--color-report-text);
+  border-color: var(--color-report-700);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3), 0 1px 2px -1px rgba(79, 70, 229, 0.2);
+}
+
+.btn-report-primary:hover:not(:disabled),
+.btn--report-primary:hover:not(:disabled),
+.btn-report:hover:not(:disabled),
+.btn--report:hover:not(:disabled) {
+  background-color: var(--color-report-700);
+  border-color: var(--color-report-800);
+  color: #ffffff;
+  box-shadow: 0 4px 8px -1px rgba(79, 70, 229, 0.4), 0 2px 4px -2px rgba(79, 70, 229, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-report-primary:active:not(:disabled),
+.btn--report-primary:active:not(:disabled),
+.btn-report:active:not(:disabled),
+.btn--report:active:not(:disabled) {
+  background-color: var(--color-report-800);
+  border-color: var(--color-report-800);
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
+}
+
+.btn-report-primary:focus-visible,
+.btn--report-primary:focus-visible,
+.btn-report:focus-visible,
+.btn--report:focus-visible {
+  outline: 2px solid var(--color-report-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--color-report-focus-ring);
+}
+
+/* ── Secondary Action: Deep Teal / Slate (Ara Rapor, Özel Soru, İkincil Aksiyonlar) */
 .btn-secondary,
 .btn--secondary {
   background-color: var(--color-secondary-subtle);

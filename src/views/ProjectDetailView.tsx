@@ -221,9 +221,9 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <button
-            className="btn btn--secondary btn--sm"
+            className="btn btn-report-primary btn--sm"
             onClick={() => setIsViewingReport(true)}
-            title="ERP/CRM Ön Analiz Raporunu İncele"
+            title="Raporu hazırla ve incele"
           >
             <FileText size={15} /> Rapor Önizleme
           </button>

@@ -60,6 +60,9 @@ const cssContent = fs.readFileSync(path.join(ROOT_DIR, "src/index.css"), "utf-8"
 const requiredTokens = [
   "--color-primary-600",
   "--color-primary-700",
+  "--color-report-600",
+  "--color-report-700",
+  "--color-report-800",
   "--color-secondary-600",
   "--color-secondary-700",
   "--color-success-600",
@@ -84,6 +87,8 @@ const requiredClasses = [
   ".btn",
   ".btn-primary",
   ".btn--primary",
+  ".btn-report-primary",
+  ".btn--report-primary",
   ".btn-secondary",
   ".btn--secondary",
   ".btn-success",
@@ -111,23 +116,29 @@ console.log("\n=== T03: WCAG AA Color Contrast Verification ===");
 const primaryHoverRatio = contrastRatio("#1d4ed8", "#ffffff");
 assert(primaryHoverRatio >= 4.5, `Primary Hover (#1d4ed8 vs #ffffff) Kontrast: ${primaryHoverRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 2. Secondary Action (Teal #0f766e vs #ffffff)
+// 2. Report Primary Action (Indigo #4f46e5 / #4338ca vs #ffffff)
+const reportRatio = contrastRatio("#4f46e5", "#ffffff");
+assert(reportRatio >= 4.5, `Report Primary (#4f46e5 vs #ffffff) Kontrast: ${reportRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
+const reportHoverRatio = contrastRatio("#4338ca", "#ffffff");
+assert(reportHoverRatio >= 4.5, `Report Hover (#4338ca vs #ffffff) Kontrast: ${reportHoverRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
+
+// 3. Secondary Action (Teal #0f766e vs #ffffff)
 const secondaryRatio = contrastRatio("#0f766e", "#ffffff");
 assert(secondaryRatio >= 4.5, `Secondary (#0f766e vs #ffffff) Kontrast: ${secondaryRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 3. Success Action (Green #15803d vs #ffffff)
+// 4. Success Action (Green #15803d vs #ffffff)
 const successRatio = contrastRatio("#15803d", "#ffffff");
 assert(successRatio >= 4.5, `Success (#15803d vs #ffffff) Kontrast: ${successRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 4. Warning Action (Amber #b45309 vs #ffffff)
+// 5. Warning Action (Amber #b45309 vs #ffffff)
 const warningRatio = contrastRatio("#b45309", "#ffffff");
 assert(warningRatio >= 4.5, `Warning (#b45309 vs #ffffff) Kontrast: ${warningRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 5. Danger Action (Crimson #dc2626 vs #ffffff)
+// 6. Danger Action (Crimson #dc2626 vs #ffffff)
 const dangerRatio = contrastRatio("#dc2626", "#ffffff");
 assert(dangerRatio >= 4.5, `Danger (#dc2626 vs #ffffff) Kontrast: ${dangerRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 6. Base Text (#0f172a on #f8fafc)
+// 7. Base Text (#0f172a on #f8fafc)
 const bodyTextRatio = contrastRatio("#0f172a", "#f8fafc");
 assert(bodyTextRatio >= 7.0, `Body Text (#0f172a vs #f8fafc) Kontrast: ${bodyTextRatio.toFixed(2)}:1 (>= 7.0:1 AAA PASS)`);
 
@@ -137,7 +148,7 @@ console.log("\n=== T04: Core Views Button Semantic Alignment ===");
 const projectDetailCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/ProjectDetailView.tsx"), "utf-8");
 assert(projectDetailCode.includes("btn--primary") && projectDetailCode.includes("Başlat"), "ProjectDetailView: Başlat butonu btn--primary sınıfına sahip");
 assert(projectDetailCode.includes("btn--primary") && projectDetailCode.includes("Devam"), "ProjectDetailView: Devam butonu btn--primary sınıfına sahip");
-assert(projectDetailCode.includes("btn--secondary") && projectDetailCode.includes("Rapor Önizleme"), "ProjectDetailView: Rapor Önizleme butonu btn--secondary (Teal) sınıfına sahip");
+assert((projectDetailCode.includes("btn-report-primary") || projectDetailCode.includes("btn--report-primary")) && projectDetailCode.includes("Rapor Önizleme"), "ProjectDetailView: Rapor Önizleme butonu btn-report-primary (Indigo) sınıfına sahip");
 
 const questionScreenCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/QuestionScreen.tsx"), "utf-8");
 assert(questionScreenCode.includes("btn--secondary") && questionScreenCode.includes("Özel Soru"), "QuestionScreen: + Özel Soru butonu btn--secondary sınıfına sahip");
