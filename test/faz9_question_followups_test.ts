@@ -30,6 +30,7 @@ import { PDFParse } from "pdf-parse";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { fileURLToPath } from "node:url";
 
 let passCount = 0;
 let failCount = 0;
@@ -439,7 +440,7 @@ async function testSqliteFollowups() {
 
 async function testFollowupModalFocusBehavior() {
   console.log("\n=== T09: Followup Modal Textarea Focus & UX Integrity ===");
-  const modalSourcePath = path.join(path.dirname(new URL(import.meta.url).pathname), "../src/components/FollowupModal.tsx");
+  const modalSourcePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "../src/components/FollowupModal.tsx");
   const modalCode = fs.readFileSync(modalSourcePath, "utf-8");
 
   // 1. Ref and autoFocus presence
