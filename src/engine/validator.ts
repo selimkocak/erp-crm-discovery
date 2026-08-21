@@ -10,6 +10,7 @@ import type {
   PackValidationResult,
 } from "./types";
 import { CANONICAL_BUSINESS_FUNCTION_CODE_SET } from "../generated/businessFunctions";
+import { CANONICAL_CODE_TO_PACK_ID } from "../generated/questionPacks";
 
 const VALID_ANSWER_TYPES = new Set([
   "single_choice",
@@ -51,7 +52,8 @@ export function validateQuestionPack(pack: unknown): PackValidationResult {
     if (
       typeof meta.business_function_code === "string" &&
       meta.business_function_code.length > 0 &&
-      !CANONICAL_BUSINESS_FUNCTION_CODE_SET.has(meta.business_function_code)
+      !CANONICAL_BUSINESS_FUNCTION_CODE_SET.has(meta.business_function_code) &&
+      !(meta.business_function_code in CANONICAL_CODE_TO_PACK_ID)
     ) {
       errors.push({
         code: "INVALID_BUSINESS_FUNCTION_CODE",

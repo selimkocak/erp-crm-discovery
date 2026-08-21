@@ -91,10 +91,28 @@ export async function buildReportModel(
   });
 
   const packVersions: Record<string, string> = {};
-
   // 3. Question lookup maps for source question text & process resolution
+  // Scoped keys (${bfCode}::${questionId}) prevent collisions between modules (e.g. INVENTORY / INV-001 vs INVOICING / INV-001)
   const questionTextMap = new Map<string, string>();
   const questionProcessMap = new Map<string, string>();
+
+  const getResolvedQuestionText = (questionId: string | null | undefined, bfCode?: string | null): string | null => {
+    if (!questionId) return null;
+    if (bfCode) {
+      const scoped = questionTextMap.get(`${bfCode}::${questionId}`);
+      if (scoped) return scoped;
+    }
+    return questionTextMap.get(questionId) ?? null;
+  };
+
+  const getResolvedProcessName = (questionId: string | null | undefined, bfCode?: string | null, fallback = "Genel Süreç"): string => {
+    if (!questionId) return fallback;
+    if (bfCode) {
+      const scoped = questionProcessMap.get(`${bfCode}::${questionId}`);
+      if (scoped) return scoped;
+    }
+    return questionProcessMap.get(questionId) ?? fallback;
+  };
 
   // 4. Build Business Functions and Scope
   const reportScope: ReportScopeItem[] = [];
@@ -113,8 +131,14 @@ export async function buildReportModel(
         loadedPack = loadResult.pack;
         packVersions[fn.code] = `${loadedPack.meta.pack_id} v${loadedPack.meta.version}`;
         for (const q of loadedPack.questions) {
-          questionTextMap.set(q.id, q.question);
-          questionProcessMap.set(q.id, q.process);
+          questionTextMap.set(`${fn.code}::${q.id}`, q.question);
+          questionProcessMap.set(`${fn.code}::${q.id}`, q.process);
+          if (!questionTextMap.has(q.id)) {
+            questionTextMap.set(q.id, q.question);
+          }
+          if (!questionProcessMap.has(q.id)) {
+            questionProcessMap.set(q.id, q.process);
+          }
         }
       }
     }
@@ -132,8 +156,14 @@ export async function buildReportModel(
     }
 
     for (const cq of customQuestionsList) {
-      questionTextMap.set(cq.id, cq.question_text);
-      questionProcessMap.set(cq.id, cq.process_name);
+      questionTextMap.set(`${fn.code}::${cq.id}`, cq.question_text);
+      questionProcessMap.set(`${fn.code}::${cq.id}`, cq.process_name);
+      if (!questionTextMap.has(cq.id)) {
+        questionTextMap.set(cq.id, cq.question_text);
+      }
+      if (!questionProcessMap.has(cq.id)) {
+        questionProcessMap.set(cq.id, cq.process_name);
+      }
     }
 
     // Visibility (Branching) + Adapted Custom Questions
@@ -155,7 +185,6 @@ export async function buildReportModel(
         fnFollowupsMap.set(fol.question_id, fol);
       }
     }
-
     const progress = loadedPack
       ? calculateProgress(visibleQuestions, answersMap, fnFollowupsMap)
       : { answered: 0, total: 0, percentage: 0 };
@@ -188,7 +217,7 @@ export async function buildReportModel(
         priority: f.priority,
         status: f.status,
         questionId: f.question_id,
-        sourceQuestionText: f.question_id ? questionTextMap.get(f.question_id) ?? null : null,
+        sourceQuestionText: getResolvedQuestionText(f.question_id, fn.code),
         createdAt: f.created_at,
       }));
 
@@ -201,7 +230,7 @@ export async function buildReportModel(
         priority: r.priority,
         status: r.status,
         questionId: r.question_id,
-        sourceQuestionText: r.question_id ? questionTextMap.get(r.question_id) ?? null : null,
+        sourceQuestionText: getResolvedQuestionText(r.question_id, fn.code),
         createdAt: r.created_at,
       }));
 
@@ -216,7 +245,7 @@ export async function buildReportModel(
         mitigationNote: r.mitigation_note,
         status: r.status,
         questionId: r.question_id,
-        sourceQuestionText: r.question_id ? questionTextMap.get(r.question_id) ?? null : null,
+        sourceQuestionText: getResolvedQuestionText(r.question_id, fn.code),
         createdAt: r.created_at,
       }));
 
@@ -227,7 +256,7 @@ export async function buildReportModel(
         note: n.note,
         businessFunctionCode: n.business_function_code,
         questionId: n.question_id,
-        sourceQuestionText: n.question_id ? questionTextMap.get(n.question_id) ?? null : null,
+        sourceQuestionText: getResolvedQuestionText(n.question_id, fn.code),
         createdAt: n.created_at,
       }));
 
@@ -336,7 +365,7 @@ export async function buildReportModel(
         risks: fnRisks,
         notes: fnNotes,
       });
-    }
+    };
   }
 
   // Sort business functions deterministically by sortOrder
@@ -355,7 +384,7 @@ export async function buildReportModel(
     priority: f.priority,
     status: f.status,
     questionId: f.question_id,
-    sourceQuestionText: f.question_id ? questionTextMap.get(f.question_id) ?? null : null,
+    sourceQuestionText: getResolvedQuestionText(f.question_id, f.business_function_code),
     createdAt: f.created_at,
   });
 
@@ -366,7 +395,7 @@ export async function buildReportModel(
     priority: r.priority,
     status: r.status,
     questionId: r.question_id,
-    sourceQuestionText: r.question_id ? questionTextMap.get(r.question_id) ?? null : null,
+    sourceQuestionText: getResolvedQuestionText(r.question_id, r.business_function_code),
     createdAt: r.created_at,
   });
 
@@ -379,7 +408,7 @@ export async function buildReportModel(
     mitigationNote: r.mitigation_note,
     status: r.status,
     questionId: r.question_id,
-    sourceQuestionText: r.question_id ? questionTextMap.get(r.question_id) ?? null : null,
+    sourceQuestionText: getResolvedQuestionText(r.question_id, r.business_function_code),
     createdAt: r.created_at,
   });
 
@@ -388,7 +417,7 @@ export async function buildReportModel(
     note: n.note,
     businessFunctionCode: n.business_function_code,
     questionId: n.question_id,
-    sourceQuestionText: n.question_id ? questionTextMap.get(n.question_id) ?? null : null,
+    sourceQuestionText: getResolvedQuestionText(n.question_id, n.business_function_code),
     createdAt: n.created_at,
   });
 
@@ -404,9 +433,9 @@ export async function buildReportModel(
       id: f.id,
       businessFunctionCode: f.business_function_code,
       businessFunctionNameTr: bf ? bf.name_tr : f.business_function_code,
-      processName: questionProcessMap.get(f.question_id) || "Genel Süreç",
+      processName: getResolvedProcessName(f.question_id, f.business_function_code, "Genel Süreç"),
       questionId: f.question_id,
-      questionText: questionTextMap.get(f.question_id) || f.question_id,
+      questionText: getResolvedQuestionText(f.question_id, f.business_function_code) || f.question_id,
       flagType: f.flag_type,
       note: f.note,
       createdAt: f.created_at,
@@ -429,9 +458,9 @@ export async function buildReportModel(
       id: a.id,
       businessFunctionCode: a.business_function_code,
       businessFunctionNameTr: bf ? bf.name_tr : a.business_function_code,
-      processName: questionProcessMap.get(a.question_id) || "Genel Süreç",
+      processName: getResolvedProcessName(a.question_id, a.business_function_code, "Genel Süreç"),
       questionId: a.question_id,
-      questionText: questionTextMap.get(a.question_id) || `Soru (${a.question_id})`,
+      questionText: getResolvedQuestionText(a.question_id, a.business_function_code) || `Soru (${a.question_id})`,
       originalFileName: a.original_file_name,
       storedFileName: a.stored_file_name,
       relativePath: a.relative_path,

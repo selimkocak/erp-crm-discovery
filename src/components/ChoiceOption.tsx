@@ -52,7 +52,22 @@ export const ChoiceOption: React.FC<ChoiceOptionProps> = ({
   const needsNote = option.is_other && isSelected && noteValue.trim() === "";
 
   return (
-    <div className={`choice-option ${isSelected ? "choice-option--selected" : ""} ${needsNote ? "choice-option--needs-note" : ""}`}>
+    <div
+      className={`choice-option ${isSelected ? "choice-option--selected" : ""} ${needsNote ? "choice-option--needs-note" : ""}`}
+      role={inputType}
+      aria-checked={isSelected}
+      tabIndex={isReadOnly ? -1 : 0}
+      onKeyDown={(e) => {
+        if (isReadOnly) return;
+        if (e.key === " " || e.key === "Enter") {
+          // If focus is in note textarea, don't trigger option toggle
+          const target = e.target as HTMLElement;
+          if (target && target.tagName.toLowerCase() === "textarea") return;
+          e.preventDefault();
+          handleToggle();
+        }
+      }}
+    >
       <label className="choice-option__label" onClick={handleToggle}>
         <span className={`choice-option__input choice-option__input--${inputType} ${isSelected ? "choice-option__input--checked" : ""}`}>
           {inputType === "checkbox" && isSelected && (

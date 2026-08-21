@@ -10,8 +10,8 @@
  * - [Özel Soru] rozeti ve Proje Yöneticisi Düzenle/Sil aksiyonları
  */
 
-import React, { useState } from "react";
-import { Edit2, Trash2, Sparkles, Clock, AlertTriangle } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Edit2, Trash2, Sparkles, Clock, AlertTriangle, RotateCcw } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
 import type { QuestionFollowup, FollowupFlagType, QuestionAttachment } from "../types";
 import { ChoiceOption } from "./ChoiceOption";
@@ -67,6 +67,37 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   const canAdvance = canAdvanceToNextQuestion(question, answerData, followup);
   const showError = showValidation && !canAdvance;
 
+  const isChoice =
+    question.answer_type === "single_choice" ||
+    question.answer_type === "multiple_choice" ||
+    question.answer_type === "yes_no";
+
+  // ── Seçimi Kaldır (Clear Selection) ────────────────────────────────────
+  const handleClearSelection = useCallback(() => {
+    onChange({
+      ...answerData,
+      selected: [],
+    });
+  }, [answerData, onChange]);
+
+  // ── Klavye Kısayolu: Escape ile seçimi kaldır ──────────────────────────
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (isChoice && selected.length > 0) {
+          const activeTag = document.activeElement?.tagName?.toLowerCase();
+          if (activeTag === "textarea" || activeTag === "input") {
+            return;
+          }
+          e.preventDefault();
+          handleClearSelection();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isChoice, selected.length, handleClearSelection]);
+
   // ── Toggle seçenek ─────────────────────────────────────────────────────
   const handleToggle = (value: string) => {
     if (question.answer_type === "single_choice" || question.answer_type === "yes_no") {
@@ -119,11 +150,6 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   const isOptionSelected = (value: string): boolean => {
     return selected.some((s) => s.value === value);
   };
-
-  const isChoice =
-    question.answer_type === "single_choice" ||
-    question.answer_type === "multiple_choice" ||
-    question.answer_type === "yes_no";
 
   const isShortText =
     question.answer_type === "short_text" || question.answer_type === "text";
@@ -261,9 +287,26 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         {/* Choice (single / multiple / yes_no) */}
         {isChoice && (
           <div className="question-card__options">
-            {question.answer_type === "multiple_choice" && (
-              <p className="question-card__multi-hint">Birden fazla seçenek seçebilirsiniz.</p>
-            )}
+            <div className="question-card__options-header">
+              {question.answer_type === "multiple_choice" ? (
+                <p className="question-card__multi-hint">Birden fazla seçenek seçebilirsiniz.</p>
+              ) : (
+                <span className="question-card__single-hint">Tek bir seçenek belirleyin.</span>
+              )}
+              {selected.length > 0 && (
+                <button
+                  type="button"
+                  className="btn btn--secondary btn--xs question-card__clear-btn"
+                  onClick={handleClearSelection}
+                  title="Seçimi kaldır (Escape)"
+                  aria-label="Seçimi kaldır"
+                >
+                  <RotateCcw size={12} />
+                  <span>Seçimi kaldır</span>
+                  <kbd className="question-card__clear-kbd">Esc</kbd>
+                </button>
+              )}
+            </div>
             {(question.options ?? []).map((opt) => (
               <ChoiceOption
                 key={opt.value}
