@@ -1,17 +1,19 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.0 | Git HEAD: 9416532 (main)
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_managed_attachment_vault_and_fixed_toolbar_closure_2026_08_20
-Doğrulama Durumu: 39 Test Paketinde 1200+ Test %100 PASS, npm run build (0 Hata), cargo check (0 Hata)
+Mevcut Sürüm: v0.1.0 | Git Durumu: FAZ-39 Mühürlü (Temiz Çalışma Ağacı)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz35_to_faz39_closure_2026_08_21
+Doğrulama Durumu: 46 Test Paketinde 1.470+ Test %100 PASS, npm run build (0 Hata), cargo check (0 Hata)
 Çoklu Platform Paketleri: macOS Apple Silicon (11.16 MB, ID: 9412445412) & Windows Native (3.93 MB, ID: 9412513418)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
 ======================================================================
+- Temel Konumlandırma: Field-first · Data-first · Analysis-first · Offline-first · Evidence-first · Human-led. Bu proje bir AI uygulaması değildir; AI modeli, tahmin veya otomatik yorum içermez; çekirdek uygulamanın sıfır bulut bağımlılığı vardır.
 - Kabuk: Tauri 2 (Rust) + React 18 + TypeScript + Vite + Vanilla CSS (Design Tokens) + Lucide Icons
 - Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 16 Kanonik Tablo, 8 Migrasyon (Tauri plugin-sql)
-- Soru Motoru: 32 Kanonik Fonksiyon kataloğu, 23 Kanonik Soru Paketi (975 Soru, ~488 Zorunlu, 120 Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Soru Motoru: 33 Kanonik Fonksiyon kataloğu, 29 Kanonik Soru Paketi (1.257 Soru, ~639 Zorunlu, 168 Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Tek Seçimli Sorularda Seçimi Kaldırma (Clear Selection): Platform bağımsız React mimarisinde (QuestionCard, ChoiceOption) görünür ikincil "Seçimi kaldır" butonu ve Escape klavye dinleyicisi; seçimi selected: [] yaparak soruyu cevapsız duruma döndürme, SQLite kalıcılığı ve ilerleme sayacını anında düşürme; bayraklı zorunlu cevapsız soruda Sonraki ile geçebilme, bayraksızken ilerlemeyi açıklayıcı uyarıyla engelleme; checkbox çoklu seçim bağımsızlığını koruma
 - Semantik Katman: Bulgular (Findings), Gereksinimler (Requirements), Riskler (Risks), Proje Notları (Notes)
 - Takip & Navigasyon: 🟡 Sonra Dön (revisit) & 🔴 Kritik Takip (critical) Bayrakları, Proje Özel Soruları (project_custom_questions), Sol Soru Navigatörü, Autosave & Resumable Analiz
 - Soru Ekranı Üst Bar & Geometrik Simetri: .question-screen-toolbar 3-kolonlu CSS Grid (190px / 240px / auto), buton min-width sınırları (.btn-save-exit 142px zümrüt #047857 WCAG AA 5.48:1, .btn-nav-home 150px, .btn-custom-question 126px, .btn-interim-report 118px), .flag-actions 2-kolon simetrik grid, .active-flag-banner ve .followup-modal-container (560px max / 420px min)
@@ -22,7 +24,7 @@ Doğrulama Durumu: 39 Test Paketinde 1200+ Test %100 PASS, npm run build (0 Hata
 - Kurulum Rehberleri: Kök dizinde ve artifact ZIP'lerinde WINDOWS_KURULUM_YARDIMI.txt & MACOS_KURULUM_YARDIMI.txt
 
 ======================================================================
-2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-33)
+2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-39)
 ======================================================================
 - FAZ-1 / FAZ-2.2: 31/32 Fonksiyon, soru paketi motoru, SQLite tohumlama ve clean install
 - FAZ-3: Semantik analiz katmanı (Bulgu, Gereksinim, Risk, Not)
@@ -56,11 +58,17 @@ Doğrulama Durumu: 39 Test Paketinde 1200+ Test %100 PASS, npm run build (0 Hata
 - FAZ-31: LEGAL_COMPLIANCE — Hukuk ve Mevzuat Uyum Soru Paketi (tr.legal_compliance.core v0.1.0, 46 soru, 25 req, 25 süreç)
 - FAZ-32: IT_INFRASTRUCTURE — Bilgi Teknolojileri Altyapısı Soru Paketi (tr.it_infrastructure.core v0.1.0, 47 soru, 26 req, 25 süreç)
 - FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri (Question Evidence & Attachments), Managed Attachment Vault (Yönetilen Kanıt Kasası), Tıklanabilir DOCX/PDF file:/// Hyperlink'leri, Soru Ekranı Sabit Grid Üst Bar & Simetrik Takip Bayrakları Düzeni
+- FAZ-34: MASTER_DATA_MANAGEMENT — Ana Veri ve Veri Kalitesi Yönetimi Soru Paketi (tr.master_data_management.core v0.1.0, 47 soru, 25 req, 25 süreç, 7 branching, 0 mükerrerlik) ve Tek Seçimli Cevabı Geri Alma (Clear Selection & Escape) kalıcı çözümü
+- FAZ-35: PROJECT_MANAGEMENT — Proje Yönetimi Soru Paketi (tr.project_management.core v0.1.0, 47 soru, 25 req, 25 süreç, 7 branching)
+- FAZ-36: E_TRANSFORMATION — E-Dönüşüm Yönetimi Soru Paketi (33. Kanonik Fonksiyon, tr.e_transformation.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
+- FAZ-37: INVOICING — Faturalama ve Gider Yönetimi Soru Paketi (tr.invoicing.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
+- FAZ-38: DOCUMENT_MANAGEMENT — Doküman Yönetimi Soru Paketi (tr.document_management.core v0.1.0, 47 soru, 27 req, 25 süreç, 8 branching)
+- FAZ-39: IMPORT — İthalat ve Gümrük Yönetimi Soru Paketi (tr.import.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching, Landed Cost maliyet dağıtımı & GÇB/GTİP takibi)
 
 ======================================================================
 3. AKTİF KÜLLİYAT VE MODÜL SIRASI
 ======================================================================
-- Mevcut Tamamlanan Külliyat (23 Modül / 975 Soru):
+- Mevcut Tamamlanan Külliyat (29 Modül / 1.257 Soru):
   1. SALES (38 Soru) [Kabul Edildi]
   2. PROCUREMENT (40 Soru) [Kabul Edildi]
   3. WAREHOUSE (38 Soru) [Kabul Edildi]
@@ -84,29 +92,37 @@ Doğrulama Durumu: 39 Test Paketinde 1200+ Test %100 PASS, npm run build (0 Hata
   21. PAYROLL (47 Soru) [Kabul Edildi]
   22. LEGAL_COMPLIANCE (46 Soru) [Kabul Edildi]
   23. IT_INFRASTRUCTURE (47 Soru) [Kabul Edildi]
+  24. MASTER_DATA_MANAGEMENT (47 Soru, Yatay) [Kabul Edildi]
+  25. PROJECT_MANAGEMENT (47 Soru) [Kabul Edildi]
+  26. E_TRANSFORMATION (47 Soru) [Kabul Edildi]
+  27. INVOICING (47 Soru) [Kabul Edildi]
+  28. DOCUMENT_MANAGEMENT (47 Soru) [Kabul Edildi]
+  29. IMPORT (47 Soru) [Kabul Edildi]
 
-- Henüz Paketi Olmayan Kanonik Fonksiyonlar (9 Modül):
+- Henüz Paketi Olmayan Kanonik Fonksiyonlar (5 Modül):
   1. MANAGEMENT (Genel Yönetim)
   2. STRATEGY (Stratejik Planlama)
   3. TRAINING (Eğitim ve Gelişim)
-  4. INVOICING (Faturalama ve Gider)
-  5. PROJECT_MANAGEMENT (Proje Yönetimi)
-  6. IMPORT (İthalat ve Gümrük)
-  7. EXPORT (İhracat)
-  8. ECOMMERCE (E-Ticaret)
-  9. DOCUMENT_MANAGEMENT (Doküman Yönetimi)
+  4. EXPORT (İhracat ve Dış Ticaret)
+  5. ECOMMERCE (E-Ticaret)
 
 - Kural: Tek Modül = Tek Faz = Tek Kabul
-- Sıradaki Modül / Faz Adayı: FAZ-34 MASTER_DATA_MANAGEMENT (Ana Veri Yönetimi) veya PROJECT_MANAGEMENT (Proje Yönetimi)
+- Sıradaki Modül / Faz Adayı: FAZ-40 EXPORT (İhracat ve Dış Ticaret) veya ECOMMERCE (E-Ticaret)
 - Çapraz Denetim Kuralı: Cross-Pack Duplication Audit (Kelimeleri değiştirip aynı soruyu tekrar sorma YASAK, net sınır ayrımı zorunlu)
 
 ======================================================================
 4. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- Tüm Testler (39 Suite): npm test
+- Tüm Testler (46 Suite, 1.470+ Test): npm test
 - Windows Test Paritesi: npm run test:windows
-- Tekil Test Çalıştırma: ./node_modules/.bin/tsx test/managed_attachment_vault_test.ts
+- Tekil Test (İthalat & Gümrük): npx tsx test/faz39_import_question_pack_test.ts
+- Tekil Test (Doküman Yönetimi): npx tsx test/faz38_document_management_question_pack_test.ts
+- Tekil Test (Faturalama): npx tsx test/faz37_invoicing_question_pack_test.ts
+- Tekil Test (E-Dönüşüm): npx tsx test/faz36_e_transformation_question_pack_test.ts
+- Tekil Test (Proje Yönetimi): npx tsx test/faz35_project_management_question_pack_test.ts
+- Tekil Test (Ana Veri Yönetimi): npx tsx test/faz34_master_data_management_question_pack_test.ts
 - Frontend Üretim Derlemesi: npm run build
 - Backend Rust Derlemesi: cargo check --manifest-path src-tauri/Cargo.toml
+- Kod Üretim Senkronizasyonu: npm run generate
 
 Belleği bu bağlamla tazele ve yeni vereceğim görev için hazır olduğunu bildir.
