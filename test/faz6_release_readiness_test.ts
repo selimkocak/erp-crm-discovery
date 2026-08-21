@@ -214,10 +214,10 @@ const {
 } = await import('../src/generated/questionPacks.js');
 
 // 1. Pack ID listesi ve mevcudiyet
-assert(AVAILABLE_PACK_IDS.length === 23, `Tam 23 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
-assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 23, `Tam 23 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
+assert(AVAILABLE_PACK_IDS.length === 31, `Tam 31 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
+assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 31, `Tam 31 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
 
-// 2. Tüm 23 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
+// 2. Tüm 31 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
 for (const bfCode of AVAILABLE_BUSINESS_FUNCTION_CODES) {
   assert(hasQuestionPack(bfCode) === true, `hasQuestionPack("${bfCode}") === true`);
   assert(getPackStatus(bfCode) === 'available', `getPackStatus("${bfCode}") === "available"`);
@@ -233,10 +233,9 @@ for (const bfCode of AVAILABLE_BUSINESS_FUNCTION_CODES) {
   }
 }
 
-// 3. Henüz geliştirilmemiş 9 fonksiyon için hasQuestionPack === false ve in_development
+// 3. Henüz geliştirilmemiş 3 fonksiyon için hasQuestionPack === false ve in_development
 const unreadyCodes = [
-  'PROJECT_MANAGEMENT', 'MANAGEMENT', 'STRATEGY', 'TRAINING',
-  'INVOICING', 'IMPORT', 'EXPORT', 'ECOMMERCE', 'DOCUMENT_MANAGEMENT'
+  'MANAGEMENT', 'STRATEGY', 'TRAINING'
 ];
 for (const code of unreadyCodes) {
   assert(hasQuestionPack(code) === false, `Unready fonksiyon hasQuestionPack("${code}") === false`);

@@ -51,11 +51,11 @@ console.log("══════════════════════�
 console.log("PRODUCTION RUNTIME QUESTION PACK SMOKE TEST");
 console.log("══════════════════════════════════════════════════════\n");
 
-// ── BÖLÜM 1: Manifest Envanteri ve Tüm 23 Paketin Yüklenmesi ──
-console.log("=== BÖLÜM 1: 23 Soru Paketi Manifest & Yükleme Denetimi ===");
+// ── BÖLÜM 1: Manifest Envanteri ve Tüm 31 Paketin Yüklenmesi ──
+console.log("=== BÖLÜM 1: 31 Soru Paketi Manifest & Yükleme Denetimi ===");
 const manifestKeys = Object.keys(CANONICAL_QUESTION_PACKS);
 console.log(`Toplam Kayıtlı Paket Sayısı: ${manifestKeys.length}`);
-assert(manifestKeys.length === 23, `Object.keys(CANONICAL_QUESTION_PACKS) tam 23 adet (Bulunan: ${manifestKeys.length})`);
+assert(manifestKeys.length === 31, `Object.keys(CANONICAL_QUESTION_PACKS) tam 31 adet (Bulunan: ${manifestKeys.length})`);
 
 const packSummaryTable: Array<{ packId: string; bfCode: string; name: string; qCount: number; loadOk: boolean }> = [];
 

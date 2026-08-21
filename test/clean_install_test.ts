@@ -147,7 +147,7 @@ console.log("\n=== T3: Canonical Business Function Seed ===");
 const bfCount = (
   db1.prepare("SELECT COUNT(*) as c FROM business_functions").get() as { c: number }
 ).c;
-assert(bfCount === 32, `Toplam 32 fonksiyon seed edildi (gerçek: ${bfCount})`);
+assert(bfCount === 33, `Toplam 33 fonksiyon seed edildi (gerçek: ${bfCount})`);
 
 // ─── TEST 4: SALES Canonical Code ───────────────────────────────────────────
 console.log("\n=== T4: SALES Canonical Code ===");
@@ -187,7 +187,7 @@ console.log("\n=== T6: Idempotency (İkinci Startup) ===");
 const bfCount2 = (
   db2.prepare("SELECT COUNT(*) as c FROM business_functions").get() as { c: number }
 ).c;
-assert(bfCount2 === 32, `İkinci startuptan sonra hâlâ 32 fonksiyon (gerçek: ${bfCount2})`);
+assert(bfCount2 === 33, `İkinci startuptan sonra hâlâ 33 fonksiyon (gerçek: ${bfCount2})`);
 
 const tableCount2 = (
   db2
