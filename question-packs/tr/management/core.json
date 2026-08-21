@@ -1,0 +1,831 @@
+{
+  "meta": {
+    "pack_id": "tr.management.core",
+    "name": "Genel Yönetim ve Kurumsal Yönetişim Soru Paketi",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "business_function_code": "MANAGEMENT",
+    "description": "ERP ve CRM dönüşüm projelerinde şirketlerin genel yönetim yapısını, kurumsal yönetişim mekanizmalarını, karar alma süreçlerini, yetki ve imza sirküleri düzenini, yönetim raporlama altyapısını, KPI ve performans izleme olgunluğunu, kriz yönetimi hazırlığını ve stratejik portföy gözetim mekanizmalarını keşfeden saha soru paketi. Bu paket MANAGEMENT'ı STRATEGY'dan (vizyon ve uzun vadeli hedefler) ve PROJECT_MANAGEMENT'tan (proje yürütme ve teslimat) net olarak ayırarak yönetişim, karar, yetki ve koordinasyon boyutuna odaklanır.",
+    "language": "tr",
+    "author": "Antigravity Discovery Engine",
+    "tags": [
+      "management",
+      "governance",
+      "kurumsal_yonetisim",
+      "yonetim_kurulu",
+      "karar_alma",
+      "yetki_sirküleri",
+      "kpi",
+      "yonetim_raporu",
+      "kriz_yonetimi",
+      "organizasyon",
+      "grup_sirketi",
+      "ust_yonetim"
+    ]
+  },
+  "questions": [
+    {
+      "id": "MGT-001",
+      "order": 1,
+      "process": "Genel Yönetim Organizasyonu",
+      "question": "Şirketin genel yönetim sorumluluğu kim tarafından, hangi unvan ve yetkiyle yürütülmektedir?",
+      "description": "Şirkette fiili yönetim otoritesinin yapısı ve sorumluların tespiti ERP/CRM karar birimi analizinin temelidir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "ceo_genel_mudur_tam_yetkili", "label": "CEO / Genel Müdür tam yetkiyle tüm yönetimi yürütmektedir", "allow_note": false, "is_other": false },
+        { "value": "kurucu_ortak_dogrudan_yonetim", "label": "Kurucu ortak(lar) doğrudan yönetimde aktif olarak görev yapmaktadır", "allow_note": true, "is_other": false },
+        { "value": "yonetim_kurulu_baskani_ve_gm_ayri", "label": "Yönetim Kurulu Başkanı ve Genel Müdür ayrı kişilerdir; yetki ayrışımı belgelenmiştir", "allow_note": false, "is_other": false },
+        { "value": "kolektif_yonetim_komite_bazli", "label": "Kolektif yönetim modeli uygulanmaktadır; icra komitesi kararları ortaklaşa alır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-002",
+      "order": 2,
+      "process": "Yönetim Kurulu ve İcra Kurulu Yapısı",
+      "question": "Şirkette yasal veya kurumsal bir Yönetim Kurulu (Board of Directors) ya da icra kurulu bulunuyor mu?",
+      "description": "Kurulun varlığı, üye yapısı ve karar alma yetkisi ERP/CRM sponsor yönetiminin düzeyini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "yonetim_kurulu_aktif_ve_duzensiz_toplaniyor", "label": "Resmi Yönetim Kurulu mevcuttur ve düzenli aralıklarla (aylık/çeyreklik) toplanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "yonetim_kurulu_var_sekil_olarak", "label": "Yönetim Kurulu yasal olarak mevcuttur ancak düzenli toplanmamakta; kararlar yönetim tarafından alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "icra_komitesi_var_yk_yok", "label": "Yönetim Kurulu yoktur; bir icra komitesi ya da üst yönetim komitesi görev yapmaktadır", "allow_note": true, "is_other": false },
+        { "value": "kurulsuz_bireysel_karar_yonetimi", "label": "Resmi bir kurul yoktur; tüm kararlar tek kişi veya küçük ortak grubu tarafından alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-003",
+      "order": 3,
+      "process": "Yönetim Kurulu ve İcra Kurulu Yapısı",
+      "question": "Yönetim Kurulu veya icra kurulunun toplantı sıklığı, gündem belirleme süreci ve karar tutanakları nasıl yönetilmektedir?",
+      "description": "Kurumsal hafıza ve karar izlenebilirliği açısından toplantı disiplini ve kayıt düzeni kritiktir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MGT-002",
+        "operator": "not_equals",
+        "value": "kurulsuz_bireysel_karar_yonetimi"
+      },
+      "options": [
+        { "value": "duzenli_gundem_ve_tutanak_var", "label": "Toplantılar önceden belirlenen gündemle yapılmakta ve resmi tutanaklar düzenlenmektedir", "allow_note": false, "is_other": false },
+        { "value": "toplanti_var_tutanak_yok", "label": "Toplantılar yapılmaktadır ancak formel tutanak veya karar belgesi düzenlenmemektedir", "allow_note": true, "is_other": false },
+        { "value": "durumsala_gore_toplaniliyor", "label": "Gündem ve toplantı sıklığı belirli bir planı yoktur; ihtiyaca göre toplanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-004",
+      "order": 4,
+      "process": "Ortaklık ve Karar Alma Modeli",
+      "question": "Şirketin ortaklık yapısı ve hisse dağılımı karar alma süreçlerini nasıl etkilemektedir?",
+      "description": "Ortaklık konsantrasyonu, ERP/CRM bütçe ve kapsam kararlarında gerekli onay mekanizmasını doğrudan şekillendirir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tek_hakim_ortak_kararlar_hizli", "label": "Tek hakim ortak veya kurucu vardır; kararlar hızlı ve merkezden alınmaktadır", "allow_note": false, "is_other": false },
+        { "value": "cok_ortakli_konsensus_gerektiriyor", "label": "Birden fazla ortak vardır ve önemli kararlar için ortaklar arası mutabakat gerekmektedir", "allow_note": true, "is_other": false },
+        { "value": "kurumsal_yatirimci_ve_raporlama_yuku", "label": "Kurumsal yatırımcı ortaklar mevcuttur; düzenli raporlama ve onay yükümlülükleri bulunmaktadır", "allow_note": false, "is_other": false },
+        { "value": "halka_acik_genel_kurul_sartlari", "label": "Şirket halka açıktır; genel kurul onayı gerektiren kararlar düzenleyici çerçeveye tabidir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-005",
+      "order": 5,
+      "process": "Üst Yönetim Sorumluluk Dağılımı",
+      "question": "C-suite veya üst yönetim ekibindeki rollerin sorumluluk ve yetki sınırları yazılı olarak tanımlanmış mıdır?",
+      "description": "ERP/CRM projesinde hangi üst yöneticinin hangi kapsam ve bütçe kararını onaylayabileceği projenin yönetim yapısını belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "yazili_gorev_tanimi_ve_yetki_belgesi_var", "label": "Tüm üst yönetim rollerinin yazılı görev tanımları ve yetki belgeleri mevcuttur; günceldir", "allow_note": false, "is_other": false },
+        { "value": "yazili_tanim_eski_fiiliyat_farkli", "label": "Yazılı görev tanımları mevcuttur ancak güncel değildir; fiili sorumluluklar farklılaşmıştır", "allow_note": true, "is_other": false },
+        { "value": "sorunluluk_sozlu_anlasmayla_belirlenmis", "label": "Rol ve sorumluluklar yazılı değil; sözlü anlaşma veya kurum kültürüyle belirlenmiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-006",
+      "order": 6,
+      "process": "Organizasyon Şeması ve Yönetim Katmanları",
+      "question": "Şirketin güncel organizasyon şeması mevcut mudur ve kaç yönetim katmanı bulunmaktadır?",
+      "description": "Organizasyonel derinlik, ERP/CRM çözümünün hiyerarşi, onay akışı ve raporlama yapısını doğrudan etkiler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "guncel_org_semasi_iki_alti_katman", "label": "Güncel ve onaylanmış organizasyon şeması mevcuttur (2–4 katman)", "allow_note": false, "is_other": false },
+        { "value": "guncel_org_semasi_bes_alti_katman", "label": "Güncel ve onaylanmış organizasyon şeması mevcuttur (5–6+ katman); derin hiyerarşik yapı", "allow_note": true, "is_other": false },
+        { "value": "eski_org_semasi_var_guncel_degil", "label": "Organizasyon şeması mevcuttur ancak güncel değildir; yapı fiilen değişmiştir", "allow_note": true, "is_other": false },
+        { "value": "org_semasi_hic_yok", "label": "Resmi bir organizasyon şeması hiç hazırlanmamıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-007",
+      "order": 7,
+      "process": "Şube ve Grup Şirketleri Yönetimi",
+      "question": "Şirket başka şirketler, şubeler veya holding bünyesindeki iştirakleri yönetiyor mu?",
+      "description": "Grup yapısı, konsolidasyon gereksinimleri, çoklu şirket ERP mimarisi ve merkezi/dağıtık yönetim kararını doğrudan belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tek_tuzel_kisilik_sube_yok", "label": "Tek tüzel kişilik; bağımsız şube veya iştiraki bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "birden_fazla_sube_ayni_tuzel", "label": "Birden fazla fiziksel şube/lokasyon mevcuttur ancak tek tüzel kişilik altında faaliyet göstermektedir", "allow_note": true, "is_other": false },
+        { "value": "holding_veya_grup_yapisi_var", "label": "Holding veya grup yapısı mevcuttur; birden fazla bağımsız tüzel kişilik bulunmaktadır", "allow_note": false, "is_other": false },
+        { "value": "uluslararasi_operasyon_var", "label": "Uluslararası operasyonlar ve yurt dışı tüzel kişilikler mevcuttur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-008",
+      "order": 8,
+      "process": "Şube ve Grup Şirketleri Yönetimi",
+      "question": "Grup yapısında bağlı şirketler veya şubeler arasındaki yönetim koordinasyonu ve konsolidasyon raporlaması nasıl sağlanmaktadır?",
+      "description": "ERP çok şirket/çok para birimi/konsolidasyon modülü gereksinimleri bu soruyla tespit edilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "MGT-007",
+        "operator": "not_equals",
+        "value": "tek_tuzel_kisilik_sube_yok"
+      },
+      "options": [
+        { "value": "merkezi_erp_tum_sirketi_kapsıyor", "label": "Merkezi ERP sistemi tüm grup şirketlerini/şubelerini kapsamaktadır; otomatik konsolidasyon yapılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "ayri_sistemler_manuel_konsolidasyon", "label": "Her şirket/şube ayrı sistem kullanmaktadır; konsolidasyon Excel veya manuel süreçle yapılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "merkezi_finans_diger_sistemler_dagitik", "label": "Merkezi muhasebe/finans entegrasyonu vardır; operasyonel sistemler dağıtıktır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-009",
+      "order": 9,
+      "process": "Yönetim Toplantıları",
+      "question": "Üst yönetim toplantıları ne sıklıkla yapılmakta ve hangi konular standart gündemin parçasıdır?",
+      "description": "Toplantı ritmi ve gündem kapsamı, ERP/CRM süreç sahipliği ve değişim yönetiminin etkinliğini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "haftalik_veya_iki_haftada_bir_standart_gundem", "label": "Haftalık veya iki haftada bir yapılmakta; finansal, operasyonel ve stratejik gündem standartlaşmıştır", "allow_note": false, "is_other": false },
+        { "value": "aylik_toplanti_sinirli_gundem", "label": "Aylık toplanılmaktadır; gündem sınırlıdır, ağırlıklı olarak finansal konular ele alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "durumsala_gore_ihtiyac_oldukca", "label": "Belirli bir plan yoktur; önemli konular ortaya çıktığında toplantı düzenlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "yonetim_toplantisi_yapilmiyor", "label": "Düzenli üst yönetim toplantısı yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-010",
+      "order": 10,
+      "process": "Yönetim Kararlarının Kayıt Altına Alınması",
+      "question": "Üst yönetim kararları (yatırım, organizasyon değişikliği, politika güncellemesi vb.) resmi olarak kayıt altına alınıyor mu?",
+      "description": "Karar izlenebilirliği ERP projesi kapsam değişikliklerinde sorumluluğun belirlenmesi için kritiktir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_karar_kaydi_ve_arsivleme_var", "label": "Kararlar resmi tutanakla kayıt altına alınmakta ve arşivlenmektedir", "allow_note": false, "is_other": false },
+        { "value": "e_posta_ve_mesajlasma_ile_kayit", "label": "Kararlar e-posta veya mesajlaşma uygulamalarıyla kayıt altına alınmaktadır; resmi tutanak yoktur", "allow_note": true, "is_other": false },
+        { "value": "sozlu_karar_kayit_yok", "label": "Kararlar ağırlıklı olarak sözlü alınmakta; sistematik bir kayıt mekanizması bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-011",
+      "order": 11,
+      "process": "Yetki ve İmza Sirküleri",
+      "question": "Şirkette güncel ve resmi bir yetki ve imza sirküleri belgesi mevcut mudur?",
+      "description": "İmza sirküleri ERP onay akışları, fatura onayı ve sözleşme yetkisi tanımlarında doğrudan kullanılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "guncel_sirkuler_ilan_edilmis", "label": "Güncel imza sirküleri mevcuttur, ilgili tüm taraflara ilan edilmiştir ve düzenli güncellenmektedir", "allow_note": false, "is_other": false },
+        { "value": "sirkuler_var_eski_guncel_degil", "label": "İmza sirküleri mevcuttur ancak son organizasyon değişikliklerini yansıtmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "sirkuler_yok_fiili_yetki_uygulamayla", "label": "Resmi sirküleri yoktur; imzalama yetkileri fiili uygulamayla belirlenmiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-012",
+      "order": 12,
+      "process": "Yetki ve İmza Sirküleri",
+      "question": "İmza yetkisi dışında yönetim kararı alma süreçleri için yazılı bir yetki matrisi (onay hiyerarşisi) kullanılıyor mu?",
+      "description": "Yetki matrisi, ERP iş akışı tasarımında onay seviyelerinin doğru yapılandırılması için zorunludur.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MGT-011",
+        "operator": "equals",
+        "value": "guncel_sirkuler_ilan_edilmis"
+      },
+      "options": [
+        { "value": "detayli_yetki_matrisi_belgelenms", "label": "Karar türlerine ve tutara göre ayrıntılı yetki matrisi yazılı olarak belgelenmiş ve uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "sinirli_yetki_matrisi_bazi_konular", "label": "Bazı kritik kararlar için yetki matrisi mevcuttur; kapsam sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "yetki_matrisi_yok_sirkuler_yeterli", "label": "İmza sirküleri dışında ayrı bir yetki matrisi kullanılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-013",
+      "order": 13,
+      "process": "Harcama ve Yatırım Onay Limitleri",
+      "question": "Şirkette harcama ve yatırım kararları için tutara dayalı onay limit seviyeleri tanımlanmış mıdır?",
+      "description": "ERP satın alma onay akışı (Purchase Order approval), yatırım bütçe onayı ve gider onayları bu limitlere göre yapılandırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "cok_seviyeli_onay_limiti_var_belgeli", "label": "Birden fazla onay seviyesi ve tutara göre net limit seviyeleri yazılı olarak tanımlanmıştır", "allow_note": false, "is_other": false },
+        { "value": "basit_iki_seviyeli_limit", "label": "Basit iki seviyeli onay vardır (örn. bölüm müdürü / genel müdür); tutar limitleri gayriresmidir", "allow_note": true, "is_other": false },
+        { "value": "limit_yok_gm_tum_kararlari_onayliyor", "label": "Belirli bir limit tanımlı değildir; tüm önemli harcamalar tek elden onaylanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-014",
+      "order": 14,
+      "process": "Bütçe ve Hedef Onayları",
+      "question": "Yıllık bütçe ve hedef onayları hangi süreçle yapılmakta ve üst yönetime/ortaklara nasıl sunulmaktadır?",
+      "description": "Bütçe onay süreci, ERP bütçe modülü ve planlama entegrasyonu gereksinimlerini doğrudan şekillendirir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_butce_sunum_ve_onayi_var", "label": "Yıllık bütçe, üst yönetim/YK sunumunu takiben resmi onay mekanizmasıyla kesinleşmektedir", "allow_note": false, "is_other": false },
+        { "value": "butce_yapiliyor_ama_gayriresmi_onay", "label": "Bütçe hazırlanmaktadır ancak onay süreci gayriresmidir; yazılı karar belgesi üretilmemektedir", "allow_note": true, "is_other": false },
+        { "value": "sadece_finansal_hedef_belirleniyor", "label": "Kapsamlı bütçe yoktur; yalnızca üst düzey finansal hedefler belirlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "yillik_butce_yapilmiyor", "label": "Sistematik yıllık bütçe süreci uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-015",
+      "order": 15,
+      "process": "Kurumsal Politika ve Prosedür Sahipliği",
+      "question": "Şirket genelinde uygulanan politika ve prosedürlerin güncelliği ve sahipliği nasıl yönetilmektedir?",
+      "description": "Politika yönetimi, ERP uyumluluk, iç denetim ve dokuman yönetimi modüllerinin kapsamını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "her_politikanin_sahibi_ve_revizyon_takvimi_var", "label": "Her politika ve prosedürün tanımlı sahibi (policy owner), revizyon takvimi ve onay akışı mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "politikalar_var_guncel_degil_sahip_belirsiz", "label": "Yazılı politikalar mevcuttur ancak güncellenmemektedir; sahiplik belirsizdir", "allow_note": true, "is_other": false },
+        { "value": "politika_yoktur_cevre_sartina_gore_yapiliyor", "label": "Kapsamlı yazılı politikalar yoktur; kararlar duruma göre alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-016",
+      "order": 16,
+      "process": "İç Kontrol ve Görevler Ayrılığı",
+      "question": "Şirkette çıkar çatışmasını ve hata/dolandırıcılık riskini azaltmak için görevler ayrılığı prensibi uygulanıyor mu?",
+      "description": "Görevler ayrılığı ERP rol ve yetki tasarımının (segregation of duties) temelini oluşturur.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "gorevler_ayriligi_resmi_belgelenms_uygulanmakta", "label": "Görevler ayrılığı ilkesi yazılı olarak tanımlanmış ve kritik süreçlerde fiilen uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "kismen_uygulanmakta_bazı_riskler_var", "label": "Bazı süreçlerde görevler ayrılığı uygulanmaktadır; ancak personel sayısı kısıtı nedeniyle boşluklar mevcuttur", "allow_note": true, "is_other": false },
+        { "value": "uygulanmiyor_tek_kisi_tum_islemleri_yapabilir", "label": "Görevler ayrılığı bilinçli olarak uygulanmamaktadır; tek kişi çok sayıda hassas işlemi yapabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-017",
+      "order": 17,
+      "process": "Yönetim Raporları",
+      "question": "Üst yönetime sunulan periyodik yönetim raporları hangi içerikleri kapsamakta ve ne sıklıkla hazırlanmaktadır?",
+      "description": "Mevcut raporlama kapsamı ve sıklığı, ERP yönetici raporu ve gösterge paneli gereksinimlerini doğrudan belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "haftalik_veya_aylik_kapsamli_rapor_var", "label": "Haftalık veya aylık; finansal, operasyonel ve satış performansını kapsayan kapsamlı yönetim raporları hazırlanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_finansal_periyodik_rapor", "label": "Periyodik raporlar yalnızca finansal konuları (gelir, gider, nakit) kapsamaktadır; operasyonel raporlama yoktur", "allow_note": true, "is_other": false },
+        { "value": "on_demand_gayriresmi_rapor", "label": "Periyodik ve standart raporlama yoktur; yönetim bilgilere gerektiğinde talep yoluyla ulaşmaktadır", "allow_note": true, "is_other": false },
+        { "value": "yonetim_raporu_hazirlanmiyor", "label": "Yöneticilere sunulan raporlar hazırlanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-018",
+      "order": 18,
+      "process": "KPI ve Performans İzleme",
+      "question": "Şirkette üst yönetim düzeyinde izlenen resmi Temel Performans Göstergeleri (KPI) tanımlanmış mıdır?",
+      "description": "KPI varlığı ve ölçüm mekanizması, ERP/BI gösterge paneli ve hedef takip modüllerinin tasarımını belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_kpi_seti_sahip_izleniyor", "label": "Tanımlı KPI seti mevcuttur; her göstergenin sahibi ve izleme sıklığı belirlenmiştir", "allow_note": false, "is_other": false },
+        { "value": "bazi_kpiler_var_tam_degil", "label": "Bazı KPI'lar ölçülmektedir ancak kapsamlı ve standart bir KPI seti oluşturulmamıştır", "allow_note": true, "is_other": false },
+        { "value": "kpi_yok_sezgisel_performans_degerlendirme", "label": "Resmi KPI sistemi yoktur; performans değerlendirmesi sezgiye ve üst yönetimin gözlemine dayanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-019",
+      "order": 19,
+      "process": "KPI ve Performans İzleme",
+      "question": "KPI'ların hangi sistemde veya araçla ölçüldüğü ve kimin tarafından sahiplenildiği belirlenmiş midir?",
+      "description": "KPI ölçüm altyapısı, ERP raporlama modülü ile BI entegrasyonunun kapsamını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "MGT-018",
+        "operator": "equals",
+        "value": "resmi_kpi_seti_sahip_izleniyor"
+      },
+      "options": [
+        { "value": "erp_bi_entegre_olcum_sistemi", "label": "KPI'lar ERP veya entegre BI araçlarından otomatik olarak ölçülmekte; sahiplik tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "excel_veya_manuel_kpi_guncellemesi", "label": "KPI'lar periyodik olarak Excel veya manuel raporlamalarla güncellenmektedir", "allow_note": true, "is_other": false },
+        { "value": "olcum_mekanizmasi_net_degil", "label": "KPI'lar tanımlanmıştır ancak ölçüm mekanizması ve sahiplik belirsizliğini korumaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-020",
+      "order": 20,
+      "process": "Üst Yönetim Risk Takibi",
+      "question": "Kurumsal riskler (operasyonel, finansal, yasal, teknolojik) üst yönetim düzeyinde sistematik olarak takip ediliyor mu?",
+      "description": "Kurumsal risk yönetimi olgunluğu, ERP iç denetim ve uyum modüllerinin kapsamını ve aciliyetini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kurumsal_risk_yonetimi_olgun_komite_var", "label": "Kurumsal risk yönetimi çerçevesi mevcuttur; risk komitesi veya sorumlusu düzenli izlemektedir", "allow_note": false, "is_other": false },
+        { "value": "sinirli_risk_izleme_finansal_odakli", "label": "Risk izleme yapılmaktadır ancak ağırlıklı olarak finansal risklerle sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "risk_yonetimi_olgun_degil_reaktif", "label": "Sistematik risk yönetimi yoktur; riskler ortaya çıktıkça tepkisel olarak ele alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-021",
+      "order": 21,
+      "process": "Üst Yönetim Risk Takibi",
+      "question": "Risk komitesi veya risk yönetim sorumlusu; riskleri nasıl sınıflandırmakta, önceliklendirmekte ve raporlamaktadır?",
+      "description": "Risk sınıflandırma ve raporlama mekanizması, ERP iç kontrol ve denetim izi modülünün tasarımını etkiler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MGT-020",
+        "operator": "equals",
+        "value": "kurumsal_risk_yonetimi_olgun_komite_var"
+      },
+      "options": [
+        { "value": "risk_matrisi_ve_sicil_kullaniliyor", "label": "Risk matrisi ve risk sicili kullanılmakta; periyodik risk raporları üst yönetime sunulmaktadır", "allow_note": false, "is_other": false },
+        { "value": "nitel_derecelendirme_raporlanmiyor", "label": "Riskler nitel olarak değerlendirilmektedir ancak standart matrisi veya periyodik raporlama yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-022",
+      "order": 22,
+      "process": "Kriz ve Olağanüstü Durum Yönetimi",
+      "question": "Şirkette operasyonel kriz durumları (sistem arızası, tedarik zinciri kesintisi, anahtar personel kaybı vb.) için yazılı bir kriz veya iş sürekliliği planı mevcut mudur?",
+      "description": "İş sürekliliği olgunluğu, ERP proje risk analizi ve olağanüstü durum planlamasına doğrudan katkı sağlar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "bcp_veya_kriz_plani_test_edilmis", "label": "İş Sürekliliği Planı (BCP) veya kriz prosedürü mevcuttur; periyodik olarak test edilmekte ve güncellenmektedir", "allow_note": false, "is_other": false },
+        { "value": "plan_var_test_edilmemis", "label": "Kriz planı hazırlanmıştır ancak gerçek senaryoda test edilmemiştir", "allow_note": true, "is_other": false },
+        { "value": "plan_yok_deneyime_gore_mudahale", "label": "Yazılı plan yoktur; kriz durumları deneyime ve anlık inisiyatife göre yönetilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-023",
+      "order": 23,
+      "process": "Kriz ve Olağanüstü Durum Yönetimi",
+      "question": "Kriz durumunda karar alma, yetki devri ve iletişim zinciri nasıl işlemektedir?",
+      "description": "Kriz karar akışı ERP canlıya geçiş acil durum planı ve servis sürekliliği tasarımı için kritik bilgi sağlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MGT-022",
+        "operator": "not_equals",
+        "value": "plan_yok_deneyime_gore_mudahale"
+      },
+      "options": [
+        { "value": "kriz_karar_agi_ve_iletisim_protokolu_belgelenmis", "label": "Kriz karar ağacı, yetki devir mekanizması ve iletişim protokolü belgelenmiş ve ilan edilmiştir", "allow_note": false, "is_other": false },
+        { "value": "kismen_belgelenmis_bosluklar_var", "label": "Kriz iletişim zinciri kısmen belgelenmiştir; boşluklar mevcuttur", "allow_note": true, "is_other": false },
+        { "value": "gayriresmi_telefon_listesi_var", "label": "Resmi karar ağacı yoktur; kriz durumunda yöneticiler telefon listesiyle iletişim kurmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-024",
+      "order": 24,
+      "process": "Stratejik Girişim Yönetişimi",
+      "question": "Şirkette ERP/CRM gibi kurumsal dönüşüm girişimlerinin yönetişimi (proje onayı, bütçe, sponsor atama, portföy önceliği) nasıl yönetilmektedir?",
+      "description": "Kurumsal dönüşüm yönetişimi, ERP projesinin desteklendiği üst yönetim sahiplenme düzeyini ortaya koyar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "resmi_proje_onay_ve_sponsor_atama_mekanizmasi", "label": "Kurumsal dönüşüm girişimleri resmi onay, üst yönetim sponsoru atama ve bütçe tahsis süreciyle yönetilmektedir", "allow_note": false, "is_other": false },
+        { "value": "yazilmamis_ama_pratikte_isliyor", "label": "Resmi mekanizma yoktur ancak fiiliyatta üst yönetim desteği ve kapsam yönetimi görece etkin işlemektedir", "allow_note": true, "is_other": false },
+        { "value": "proje_yonetimi_tamamen_gayriresmi", "label": "Kurumsal dönüşüm projeleri gayriresmi süreçlerle yönetilmektedir; net sponsor veya onay mekanizması yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-025",
+      "order": 25,
+      "process": "Proje ve Dönüşüm Portföyü",
+      "question": "Şirkette eş zamanlı yürütülen kurumsal girişim ve dönüşüm projeleri (IT, süreç iyileştirme, yatırım vb.) nasıl önceliklendirilmektedir?",
+      "description": "Portföy önceliklendirme mekanizması, ERP projesinin rekabet ettiği kaynaklar ve üst yönetim bant genişliğini ortaya koyar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_portfoy_yonetim_sureci_var", "label": "Resmi portföy yönetim süreci mevcuttur; stratejik değer, ROI ve kaynak yeterliliğine göre önceliklendirme yapılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "gayriresmi_onceliklendirme_ust_yonetim_yonlendirmesiyle", "label": "Eş zamanlı projeler gayriresmi süreçle önceliklendirilmektedir; karar ağırlıklı olarak üst yönetim yönlendirmesiyle şekillenmektedir", "allow_note": true, "is_other": false },
+        { "value": "onceliklendirme_mekanizmasi_yok_hepsi_esit_oncelikli", "label": "Net önceliklendirme yoktur; projeler paralel yürütülmekte, kaynak çatışmaları reaktif olarak yönetilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-026",
+      "order": 26,
+      "process": "Proje ve Dönüşüm Portföyü",
+      "question": "Aktif dönüşüm veya yatırım portföyünde önceliklendirme kararlarını kim veriyor ve hangi kriterlere dayanılıyor?",
+      "description": "Portföy karar sahibinin belirlenmesi, ERP projesinin organizasyondaki gerçek sponsorluk düzeyini ortaya koyar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "MGT-025",
+        "operator": "not_equals",
+        "value": "onceliklendirme_mekanizmasi_yok_hepsi_esit_oncelikli"
+      },
+      "options": [
+        { "value": "yonetim_komitesi_veya_yk_karar_veriyor", "label": "Portföy öncelikleri Yönetim Komitesi veya Yönetim Kurulu tarafından stratejik kriterlere göre belirlenmektedir", "allow_note": false, "is_other": false },
+        { "value": "ceo_gm_bireysel_karar_veriyor", "label": "CEO / Genel Müdür portföy kararlarını bireysel olarak vermektedir", "allow_note": true, "is_other": false },
+        { "value": "bt_veya_finans_komitesi_onceliklendiriyor", "label": "BT veya Finans Komitesi portföy önceliklendirmesini yönetmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-027",
+      "order": 27,
+      "process": "Departmanlar Arası Koordinasyon",
+      "question": "Departmanlar arası iş süreçleri ve kararlar (çapraz departman ihtiyaçlar, çatışma çözümü) nasıl koordine edilmektedir?",
+      "description": "Departmanlar arası koordinasyon mekanizması, ERP entegrasyon noktaları ve süreç sahipliği tasarımı için kritiktir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "duzenli_cros_dept_toplanti_ve_koordinasyon", "label": "Düzenli çapraz departman toplantıları ve belirlenmiş koordinasyon mekanizmaları mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "gerektiginde_ad_hoc_koordinasyon", "label": "İhtiyaç doğduğunda ad-hoc toplantılar yapılmaktadır; sistematik bir mekanizma yoktur", "allow_note": true, "is_other": false },
+        { "value": "ust_yonetim_arabulucu_her_catismada", "label": "Departmanlar arası çatışmalar çoğunlukla üst yönetim kanalıyla çözülmektedir; yapısal koordinasyon yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-028",
+      "order": 28,
+      "process": "Yönetim-Saha Bilgi Akışı",
+      "question": "Operasyonel sahadaki bilgiler (üretim sorunları, müşteri şikayetleri, stok sapmaları) üst yönetime nasıl ve ne sürede ulaşmaktadır?",
+      "description": "Bilgi akışı hızı ve güvenilirliği ERP raporlama, uyarı ve eskalasyon mekanizmalarının tasarımını doğrudan etkiler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "gercek_zamanli_veya_gunluk_sistem_bildirimleri", "label": "Kritik sapma ve uyarılar sistem üzerinden gerçek zamanlı veya günlük olarak üst yönetime ulaşmaktadır", "allow_note": false, "is_other": false },
+        { "value": "haftalik_aylik_toplantilarda_aktariliyor", "label": "Operasyonel bilgiler haftalık/aylık yönetim toplantılarında raporlanmaktadır; acil durumlarda telefon/e-posta kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "bilgi_akisi_yavais_ve_filtreleniyor", "label": "Bilgi akışı yavaştır; kritik sorunlar zaman zaman yönetimden gizlenmekte veya gecikmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-029",
+      "order": 29,
+      "process": "Kritik Pozisyon ve Yedekleme Yönetimi",
+      "question": "Şirkette kritik pozisyonlar (kilit çalışanlar) belirlenmiş ve yedekleme/ardıl planlama (succession planning) uygulanıyor mu?",
+      "description": "Yedekleme planlaması eksikliği ERP proje ekibi ve sürekliliği için doğrudan risk oluşturur.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kritik_pozisyonlar_tanimli_ardil_plani_var", "label": "Kritik pozisyonlar belirlenmiştir; ardıl planlaması yapılmış ve yedek adaylar yetiştirilmektedir", "allow_note": false, "is_other": false },
+        { "value": "kritik_pozisyonlar_biliniyor_ama_plan_yok", "label": "Kritik pozisyonlar gayriresmi olarak bilinmektedir ancak formel ardıl planlaması yapılmamıştır", "allow_note": true, "is_other": false },
+        { "value": "yedekleme_planlamasi_yapilmiyor", "label": "Yedekleme ya da ardıl planlaması bilinçli olarak yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-030",
+      "order": 30,
+      "process": "Danışman, Denetçi ve Kurul İlişkileri",
+      "question": "Şirket, dış denetçi, danışman, bağımsız kurul üyesi veya düzenleyici kurumlarla düzenli ilişki yürütüyor mu?",
+      "description": "Dış paydaş ilişkileri, ERP denetim izi, mevzuat uyumu ve raporlama gereksinimlerinin kapsamını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "bagimiz_denetim_danismanlik_duzenli", "label": "Bağımsız denetim, danışmanlık ve düzenleyici kurum ilişkileri düzenli ve yapılandırılmış biçimde yürütülmektedir", "allow_note": false, "is_other": false },
+        { "value": "yillik_denetim_varsa_da_sinirli", "label": "Yıllık bağımsız denetim yapılmaktadır ancak danışmanlık ve düzenleyici ilişkiler sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "dis_paydas_iliskisi_minimal", "label": "Dış danışman, denetçi veya düzenleyici kurum ilişkisi minimumdur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-031",
+      "order": 31,
+      "process": "Karar Arşivi ve Kurumsal Hafıza",
+      "question": "Önemli yönetim kararları, politika değişiklikleri ve kurumsal taahhütler nerede saklanmakta ve nasıl erişilmektedir?",
+      "description": "Kurumsal hafıza yönetimi ERP başlangıç veri temizliği, politika entegrasyonu ve süreç standartlaştırma için kritiktir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "merkezi_dijital_arsiv_erisim_kontrollu", "label": "Merkezi dijital belge yönetim sistemi mevcuttur; kararlar ve politikalar erişim kontrolüyle saklanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "kisisel_surucu_ve_e_posta_dagitik", "label": "Kararlar ve belgeler bireylerin bilgisayarlarında veya e-posta kutularında dağıtık biçimde saklanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "fiziksel_arsiv_veya_kagit_tabanli", "label": "Önemli kararlar fiziksel evrak olarak arşivlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "kurumsal_hafiza_yok_kisi_bagimli", "label": "Kurumsal hafıza bireylerin zihnine bağlıdır; personel ayrılığında bilgi kaybı yaşanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-032",
+      "order": 32,
+      "process": "Yönetim Olgunluğu ve Gelişim Yol Haritası",
+      "question": "Üst yönetim, mevcut yönetim sisteminin güçlü ve zayıf yanlarını değerlendiriyor ve sistematik iyileştirme hedefleri koyuyor mu?",
+      "description": "Yönetim olgunluk değerlendirmesi, ERP projesinin getireceği yönetim transformasyonunun hazırlık düzeyini ortaya koyar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "periyodik_yonetim_olgunluk_degerlendirmesi_var", "label": "Yönetim sistemi periyodik değerlendirilmektedir; güçlü/zayıf yönler belgelenmiş ve iyileştirme hedefleri koyulmuştur", "allow_note": false, "is_other": false },
+        { "value": "gayriresmi_degerlendirilme_yapiliyor", "label": "Üst yönetim mevcut durumu gayriresmi olarak değerlendirmektedir; sistematik bir süreç yoktur", "allow_note": true, "is_other": false },
+        { "value": "yonetim_olgunlugu_gundem_degil", "label": "Yönetim sistemi değerlendirmesi gündemdeki bir konu değildir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-033",
+      "order": 33,
+      "process": "Genel Yönetim Organizasyonu",
+      "question": "ERP ve CRM dönüşümü için üst yönetimin belirlediği kurumsal sponsor (executive sponsor) kim olacaktır?",
+      "description": "Üst yönetim sponsorunun belirlenmesi ERP projesinin bütçe, kapsam ve eskalasyon mekanizmasını doğrudan etkiler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "ceo_veya_gm_bizzat_sponsor", "label": "CEO / Genel Müdür bizzat kurumsal sponsor olarak projeye liderlik edecektir", "allow_note": false, "is_other": false },
+        { "value": "cfo_veya_coo_sponsor_atanacak", "label": "CFO, COO veya ilgili üst düzey yönetici sponsor olarak atanacaktır", "allow_note": true, "is_other": false },
+        { "value": "yonetim_kurulu_veya_komite_gozetiminde", "label": "Yönetim Kurulu veya icra komitesi gözetiminde projeye ortak sahiplenme modeli uygulanacaktır", "allow_note": true, "is_other": false },
+        { "value": "sponsor_henuz_belirlenmedi", "label": "Üst yönetim sponsoru henüz belirlenmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-034",
+      "order": 34,
+      "process": "Organizasyon Şeması ve Yönetim Katmanları",
+      "question": "Şirkette raporlama ilişkileri (kim kime raporluyor) ERP sistem kullanıcı rolleri ve erişim hiyerarşisi açısından nasıl yapılandırılmalıdır?",
+      "description": "Raporlama hiyerarşisi, ERP kullanıcı yetkilendirme ve organizasyonel varlık yapısının temelini oluşturur.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "net_hiyerarsi_sistemde_modellenebilir", "label": "Net raporlama hiyerarşisi mevcuttur; ERP organizasyon yapısına doğrudan yansıtılabilir", "allow_note": false, "is_other": false },
+        { "value": "matris_yonetim_coklu_raporlama", "label": "Matris yönetim yapısı mevcuttur; çalışanlar birden fazla yöneticiye raporlamaktadır", "allow_note": true, "is_other": false },
+        { "value": "yatay_ve_proje_bazli_raporlama", "label": "Yatay organizasyon veya proje bazlı raporlama hakimdir; hiyerarşi belirgin değildir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-035",
+      "order": 35,
+      "process": "Kurumsal Politika ve Prosedür Sahipliği",
+      "question": "ERP projesi kapsamında politika ve prosedür revizyonu hangi sıklıkla ve hangi mekanizmayla planlanmaktadır?",
+      "description": "Politika revizyonu planlaması ERP canlıya geçiş hazırlığı ve değişim yönetimi programının kapsamını şekillendirir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "erp_canli_doneminde_tum_prosedurler_gozden_gecirilecek", "label": "ERP canlıya geçiş öncesinde tüm ilgili politika ve prosedürler gözden geçirilip güncellenecektir", "allow_note": false, "is_other": false },
+        { "value": "kritik_prosedurler_guncellecek_diger_sonra", "label": "Yalnızca kritik süreçlere ait prosedürler güncellenecek; kapsamlı revizyon ertelenecektir", "allow_note": true, "is_other": false },
+        { "value": "prosedur_revizyonu_planlanmamis", "label": "ERP projesine bağlı politika/prosedür revizyonu henüz planlanmamıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-036",
+      "order": 36,
+      "process": "Yönetim Toplantıları",
+      "question": "ERP/CRM projesi için ayrı bir yönetim komitesi veya proje izleme toplantısı planlanıyor mu?",
+      "description": "Proje yönetim komitesi varlığı, ERP değişim yönetiminde üst yönetim görünürlüğünü garanti eder.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "steering_committee_kurulacak_duzenli_toplanti", "label": "Proje yönlendirme komitesi (steering committee) kurulacak ve düzenli ilerleme toplantıları yapılacaktır", "allow_note": false, "is_other": false },
+        { "value": "mevcut_ust_yonetim_toplantilarina_entegre", "label": "ERP projesi mevcut üst yönetim toplantılarının gündemine dahil edilecektir; ayrı komite kurulmayacaktır", "allow_note": true, "is_other": false },
+        { "value": "proje_ekibi_kendi_raporlayacak_ust_yonetime", "label": "Proje ekibi periyodik raporlama yapacak; ayrı bir toplantı mekanizması öngörülmemektedir", "allow_note": true, "is_other": false },
+        { "value": "belirsiz_henuz_kararlasmadi", "label": "Yönetim yapısı henüz netleşmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-037",
+      "order": 37,
+      "process": "Bütçe ve Hedef Onayları",
+      "question": "ERP/CRM projesi bütçesinin onay süreci ve finansman kaynağı (CAPEX, OPEX, kredi vb.) belirlenmiş midir?",
+      "description": "Proje bütçesinin onay seviyesi ve finansman yapısı doğrudan proje başlangıç ve kapsam kararını etkiler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "butce_onaylandi_finansman_hazir", "label": "ERP projesi bütçesi üst yönetim/YK tarafından onaylanmış ve finansman kaynağı belirlenmiştir", "allow_note": false, "is_other": false },
+        { "value": "on_onay_var_nihai_onay_bekleniyor", "label": "Ön onay verilmiştir; nihai bütçe onayı proje kapsamı kesinleştikten sonra alınacaktır", "allow_note": true, "is_other": false },
+        { "value": "butce_tartisma_asamasinda", "label": "Bütçe tartışma aşamasındadır; üst yönetim onayı henüz alınmamıştır", "allow_note": true, "is_other": false },
+        { "value": "butce_henuz_belirlenmedi", "label": "ERP projesi için ayrılmış bütçe henüz belirlenmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-038",
+      "order": 38,
+      "process": "İç Kontrol ve Görevler Ayrılığı",
+      "question": "Şirkette periyodik iç denetim veya süreç uyumluluk kontrolleri yapılıyor mu ve sonuçlar üst yönetime raporlanıyor mu?",
+      "description": "İç denetim mekanizması ERP denetim izi (audit trail) ve iç kontrol modülü gereksinimlerini belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "periyodik_ic_denetim_ve_rapor_var", "label": "Periyodik iç denetim yapılmakta ve sonuçları üst yönetime/YK'ya raporlanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_dis_denetim_var", "label": "Yalnızca yıllık bağımsız dış denetim yapılmaktadır; iç denetim mekanizması yoktur", "allow_note": true, "is_other": false },
+        { "value": "ic_denetim_yapilmiyor", "label": "İç denetim veya uyumluluk kontrolleri yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-039",
+      "order": 39,
+      "process": "Üst Yönetim Sorumluluk Dağılımı",
+      "question": "ERP/CRM dönüşümünde operasyonel değişimlerin kabulünden (change acceptance) hangi üst yönetici sorumlu olacaktır?",
+      "description": "Değişim sahipliği ve kabulü, ERP canlıya geçiş ve kullanıcı adaptasyon sürecinin kritik yönetim boyutudur.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "coo_veya_operasyon_direktoru_sahipleniyor", "label": "COO veya Operasyon Direktörü operasyonel değişikliklerin kabul sürecini sahiplenmektedir", "allow_note": false, "is_other": false },
+        { "value": "bolum_yoneticileri_kendi_bolumlerinden_sorumlu", "label": "Her bölüm yöneticisi kendi departmanındaki değişim kabulünden sorumlu tutulacaktır", "allow_note": true, "is_other": false },
+        { "value": "proje_ekibi_sorumlu_ust_yonetim_sinirli_sahiplenme", "label": "Değişim kabulü ağırlıklı olarak proje ekibinin sorumluluğundadır; üst yönetim sahiplenmesi sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "henuz_belirsiz", "label": "Değişim sahipliği henüz netleşmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-040",
+      "order": 40,
+      "process": "Yönetim-Saha Bilgi Akışı",
+      "question": "Çalışanlar ve orta kademe yöneticiler, kurumsal değişiklikler ve stratejik kararlar hakkında nasıl bilgilendirilmektedir?",
+      "description": "İç iletişim mekanizması ERP değişim yönetimi planının etkinliğini ve kullanıcı adaptasyonunu doğrudan etkiler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "ic_iletisim_plani_ve_kanallari_var", "label": "İç iletişim planı mevcuttur; intranet, toplantı, e-posta bülteni gibi yapılandırılmış kanallar kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "yonetici_basamaklari_uzerinden_iletisim", "label": "Bilgilendirme yönetim basamakları üzerinden yapılmaktadır; standart bir iletişim kanalı yoktur", "allow_note": true, "is_other": false },
+        { "value": "gayriresmi_dedikodu_ve_sozlu_iletisim", "label": "Kurumsal bilgilendirme büyük ölçüde gayriresmi kanallar üzerinden gerçekleşmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-041",
+      "order": 41,
+      "process": "Karar Arşivi ve Kurumsal Hafıza",
+      "question": "Geçmişte alınan ve ERP/CRM kapsam ve gereksinimlerini etkileyebilecek önemli yönetim kararları (satın alma, bölünme, ortaklık, ürün çıkışı vb.) belgelenerek paylaşılabilir durumda mıdır?",
+      "description": "Geçmiş kararların erişilebilirliği ERP kapsam belirleme ve gereksinimlerin anlaşılması için kritiktir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_kritik_kararlar_arsivde_erisileblir", "label": "Tüm kritik yönetim kararları arşivlenmiş ve proje ekibiyle paylaşılabilir durumdadır", "allow_note": false, "is_other": false },
+        { "value": "bazi_kararlar_arsivde_bazi_kisi_bagimli", "label": "Bazı kararlar arşivlenmiştir; ancak önemli bir kısmı bireylerin zihninde veya kişisel dosyalarındadır", "allow_note": true, "is_other": false },
+        { "value": "gecmis_kararlar_belgelenmemis", "label": "Geçmiş kararlar büyük ölçüde belgelenmemiştir; kurumsal hafıza zayıftır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-042",
+      "order": 42,
+      "process": "Ortaklık ve Karar Alma Modeli",
+      "question": "ERP/CRM projesi gibi stratejik bir karar alınırken ortak veya yatırımcı onayı gerektiren bir süreç işletilmekte midir?",
+      "description": "Ortak onayı gereksinimleri proje başlangıç süresi ve karar çevrim hızını doğrudan etkiler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "ortak_onay_zorunlu_imzali_karar_gerekli", "label": "Stratejik kararlar tüm ortakların yazılı onayını gerektirmektedir; yönetim tek başına karar verememektedir", "allow_note": true, "is_other": false },
+        { "value": "hakim_ortak_onay_yeterli", "label": "Hakim ortağın onayı yeterlidir; diğer ortaklar bilgilendirilmektedir", "allow_note": false, "is_other": false },
+        { "value": "yonetim_tam_yetkili_ortaklara_raporlama_sonradan", "label": "Yönetim stratejik kararlarda tam yetkilidir; ortaklar düzenli raporlarla bilgilendirilmektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-043",
+      "order": 43,
+      "process": "Kritik Pozisyon ve Yedekleme Yönetimi",
+      "question": "ERP/CRM projesi süreci boyunca ayrılma veya görev değişikliği riski taşıyan kritik proje rolleri (proje yöneticisi, key user, sponsor) için yedekleme düşünülmüş müdür?",
+      "description": "Proje özgülünde yedekleme planlaması olmadığında tek kişi bağımlılığı proje sürekliliğini tehdit eder.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "proje_rolleri_icin_yedek_belirlenmis", "label": "Kritik proje rolleri için yedek adaylar belirlenmiştir ve bilgi aktarımı planlanmıştır", "allow_note": false, "is_other": false },
+        { "value": "yedek_dusunulmemis_kisi_bagimli", "label": "Proje rolleri için yedekleme planlanmamıştır; tek kişi bağımlılığı yönetilememektedir", "allow_note": true, "is_other": false },
+        { "value": "danismanlik_firmasi_sureyi_garantiliyor", "label": "Danışmanlık firması süreyi garanti etmektedir; iç yedekleme gerekmediği düşünülmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-044",
+      "order": 44,
+      "process": "Danışman, Denetçi ve Kurul İlişkileri",
+      "question": "ERP/CRM proje sürecinde harici danışmanlar, sistem entegratörü veya denetim firmasıyla ilişki yönetimi nasıl yapılandırılacaktır?",
+      "description": "Harici ilişki yönetimi, ERP sözleşme yönetimi, hizmet seviyesi anlaşması (SLA) ve denetim gereksinimlerini şekillendirir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "proje_yonetici_ve_ust_yonetim_birlikte_yonetir", "label": "Proje yöneticisi teknik koordinasyonu, üst yönetim stratejik ilişkiyi yönetmektedir", "allow_note": false, "is_other": false },
+        { "value": "satin_alma_veya_hukuk_sozlesme_yukumlu", "label": "Satın Alma veya Hukuk birimi sözleşme ve ilişki yönetiminden birincil sorumludur", "allow_note": true, "is_other": false },
+        { "value": "henuz_belirsiz_danismanlik_firmasi_secilmedi", "label": "Danışmanlık firması henüz seçilmemiştir; ilişki yönetimi yapısı netleşmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-045",
+      "order": 45,
+      "process": "Yönetim Olgunluğu ve Gelişim Yol Haritası",
+      "question": "ERP/CRM projesinin tamamlanmasından sonra kurumsal yönetim altyapısında hangi iyileştirmelerin gerçekleşmesi beklenmektedir?",
+      "description": "Yönetim iyileştirme beklentileri, ERP proje kapsam ve başarı kriterlerinin yönetim boyutunu ortaya koyar.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "gercek_zamanli_yonetim_raporlama", "label": "Gerçek zamanlı yönetim raporlama ve gösterge paneli", "allow_note": false, "is_other": false },
+        { "value": "otomatik_onay_akislari", "label": "Otomatik onay akışları ve yetki kontrolü", "allow_note": false, "is_other": false },
+        { "value": "kpi_takip_sistemi_entegre", "label": "KPI takip sistemi ve performans izleme entegrasyonu", "allow_note": false, "is_other": false },
+        { "value": "risk_uyari_ve_denetim_izi", "label": "Risk uyarı mekanizmaları ve tam denetim izi (audit trail)", "allow_note": false, "is_other": false },
+        { "value": "konsolidayon_otomatik_rapor", "label": "Grup/çok şirket konsolidasyonu ve otomatik raporlama", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-046",
+      "order": 46,
+      "process": "Departmanlar Arası Koordinasyon",
+      "question": "Genel yönetim açısından ERP/CRM projesinde en kritik departmanlar arası koordinasyon noktaları hangileridir?",
+      "description": "Koordinasyon kritik noktalarının tespiti, ERP entegrasyon haritasının önceliklendirmesini sağlar.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "finans_ve_muhasebe_merkez", "label": "Finans/Muhasebe ve operasyonel birimlerin entegrasyonu", "allow_note": false, "is_other": false },
+        { "value": "satis_ve_operasyon_planlama", "label": "Satış talebi ile üretim/operasyon planlaması uyumu", "allow_note": false, "is_other": false },
+        { "value": "insan_kaynaklari_ve_bordro", "label": "İnsan Kaynakları ve bordro ile operasyonel zaman takibi", "allow_note": false, "is_other": false },
+        { "value": "satin_alma_ve_depo_lojistik", "label": "Satın Alma, Depo ve Lojistik tedarik zinciri koordinasyonu", "allow_note": false, "is_other": false },
+        { "value": "bt_ve_dijital_donusum", "label": "BT/Dijital dönüşüm ile tüm departmanların süreç uyumu", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MGT-047",
+      "order": 47,
+      "process": "Stratejik Girişim Yönetişimi",
+      "question": "ERP/CRM projesinin başarısını üst yönetim perspektifinden ölçmek için belirlenmiş başarı kriterleri (Success Criteria) var mıdır?",
+      "description": "Üst yönetimin başarı tanımı, ERP projesinin kapsam, kabul kriterleri ve canlıya geçiş onayı mekanizmasının temelini oluşturur.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "nicel_kriter_tanimi_yapilmis_yer_alacak_sb", "label": "Nicel başarı kriterleri (maliyet azaltma, süre kısalması, hata oranı vb.) tanımlanmış ve proje sözleşmesine yansıyacaktır", "allow_note": false, "is_other": false },
+        { "value": "nitel_beklentiler_var_olcum_mekanizmasi_yok", "label": "Genel nitel beklentiler belirlenmiştir (\"süreçler iyileşsin\", \"raporlama kolaylaşsın\") ancak ölçüm mekanizması yoktur", "allow_note": true, "is_other": false },
+        { "value": "basari_kriteri_belirlenmemis", "label": "Başarı kriterleri henüz belirlenmemiştir; kapsam netleştikten sonra tanımlanacaktır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

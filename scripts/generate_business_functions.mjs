@@ -225,6 +225,10 @@ ${packDefinitions.map((p) => `  ${JSON.stringify(p.packId)}: ${p.varName} as unk
  */
 export const CANONICAL_CODE_TO_PACK_ID: Readonly<Record<string, string>> = {
 ${packDefinitions.map((p) => `  ${JSON.stringify(p.businessFunctionCode)}: ${JSON.stringify(p.packId)},`).join("\n")}
+  "GENEL_YONETIM": "tr.management.core", // MANAGEMENT için Türkçe alias
+  "UST_YONETIM": "tr.management.core", // Alias
+  "KURUMSAL_YONETIM": "tr.management.core", // Alias
+  "MANAGEMENT_GOVERNANCE": "tr.management.core", // Alias
   "IT_INFRASTRUCTURE": "tr.it_infrastructure.core", // INFORMATION_TECHNOLOGY için kanonik alias
   "MASTER_DATA": "tr.master_data_management.core", // MASTER_DATA_MANAGEMENT için kanonik alias
   "ANA_VERI": "tr.master_data_management.core", // Türkçe alias
