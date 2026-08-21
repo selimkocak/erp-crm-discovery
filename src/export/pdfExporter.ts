@@ -11,7 +11,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatStatusLabel, type ReportModel } from "../report/types";
 import { registerPdfFonts, PDF_FONT_FAMILY } from "./fonts/fontBundle";
-import { attachmentPathToFileUrl } from "../storage/attachmentLinks";
+import { resolveAttachmentFileUrlFromRelative } from "../storage/attachmentLinks";
 
 export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   const { metadata, profile, company, scope, businessFunctions, projectNotes, summaryStats } = report;
@@ -481,20 +481,24 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY += 5;
 
     const attachmentUrlMap = new Map<number, string>();
-    const attRows = report.attachments.map((a, idx) => {
+    const attRows: string[][] = [];
+    for (let idx = 0; idx < report.attachments.length; idx++) {
+      const a = report.attachments[idx];
       const sizeStr =
         a.fileSize < 1024 * 1024
           ? `${(a.fileSize / 1024).toFixed(1)} KB`
           : `${(a.fileSize / (1024 * 1024)).toFixed(1)} MB`;
-      const fileUrl = a.fileUrl || attachmentPathToFileUrl(a.relativePath);
+      // Windows: relative → appLocalDataDir → backslash absolute → file:/// RFC-8089 encode
+      const fileUrl = a.fileUrl || await resolveAttachmentFileUrlFromRelative(a.relativePath);
       attachmentUrlMap.set(idx, fileUrl);
-      return [
+      attRows.push([
         `${a.businessFunctionNameTr}\n(${a.processName})`,
         `[${a.questionId}]\n${a.questionText}`,
         `📎 ${a.originalFileName}\n[${a.fileExtension.toUpperCase()} • ${sizeStr}]\n${a.relativePath}`,
         a.description || "—",
-      ];
-    });
+      ]);
+    }
+
 
     autoTable(doc, {
       startY: currentY,

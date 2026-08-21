@@ -2,15 +2,27 @@
 //
 // Veri zinciri: React → Tauri IPC → @tauri-apps/plugin-sql → SQLite (disk)
 // Dışa aktarım: React → @tauri-apps/plugin-dialog & @tauri-apps/plugin-fs → Yerel Disk
+//
+// HOTFIX: Windows open_attachment_path — explorer.exe ile güvenilir açma
 
+/// Attachment Vault'tan yönetilen dosyayı işletim sisteminin varsayılan uygulamasıyla açar.
+///
+/// Windows: explorer.exe "C:\...\dosya.pdf"
+///   - cmd /C start bazen backslash içeren path'lerde başarısız olur.
+///   - explorer.exe her zaman backslash path ile çalışır.
+///
+/// macOS: open /Users/.../dosya.pdf
+/// Linux: xdg-open /home/.../dosya.pdf
 #[tauri::command]
 fn open_attachment_path(path: String) -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
-        std::process::Command::new("cmd")
-            .args(["/C", "start", "", &path])
+        // Windows: explorer.exe ile aç
+        // Path'i backslash formatında bekler (resolveAttachmentAbsolutePath bunu zaten sağlıyor)
+        std::process::Command::new("explorer.exe")
+            .arg(&path)
             .spawn()
-            .map_err(|e| format!("Windows dosya acilamadi: {}", e))?;
+            .map_err(|e| format!("Windows dosya acilamadi (explorer): {}", e))?;
         Ok(())
     }
 

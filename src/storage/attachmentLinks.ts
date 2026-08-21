@@ -2,6 +2,7 @@
  * ERP CRM Discovery — Attachment Links & Native Opener Service
  *
  * FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri - Tıklanabilir Hyperlink ve Native Dosya Açıcı
+ * HOTFIX: Windows 11 file:/// üçlü-slash ve relative path çözümleme düzeltmeleri
  *
  * Temel Özellikler:
  * 1. Managed Vault Path -> Standardized file:/// URL dönüşümü (Windows, macOS, Linux).
@@ -9,6 +10,12 @@
  * 3. Tauri Native Opener & In-Memory / Web fallback köprüsü.
  * 4. Güvenlik: Path traversal koruması ve eksik dosya dostça hata yönetimi.
  * 5. Yalnızca Managed Kopyayı Açma: Asla kaynak path veya ham dosya adı kullanılmaz.
+ *
+ * Windows Kuralları:
+ *   - file:///C:/Users/...  (3 slash — RFC 8089 uyumlu)
+ *   - Backslash → forward-slash
+ *   - Boşluk ve Türkçe karakter → %XX encode
+ *   - cmd /C start "" "C:\..." şeklinde native açma (backslash)
  */
 
 import {
@@ -17,34 +24,79 @@ import {
   getManagedVaultBaseDir,
 } from "./attachmentManager";
 
+// ─────────────────────────────────────────────────────────────
+// 1. Path Çözümleme — Relative → Absolute
+// ─────────────────────────────────────────────────────────────
+
 /**
  * Göreli yoldan platformun mutlak native işletim sistemi yolunu üretir.
+ * Windows: C:\Users\selim\AppData\Local\com.erpcrm.discovery\projects\...
+ * macOS:   /Users/selim/Library/Application Support/com.erpcrm.discovery/projects/...
  */
 export async function resolveAttachmentAbsolutePath(
   relativePath: string,
   baseDirOverride?: string
 ): Promise<string> {
-  validateRelativePath(relativePath);
+  // Path traversal guard — validateRelativePath false döndürürse throw
+  const isValid = validateRelativePath(relativePath);
+  if (!isValid) {
+    throw new Error(
+      `Geçersiz veya güvensiz relative path: "${relativePath}". Path traversal reddedildi.`
+    );
+  }
 
   const baseDir = baseDirOverride || (await getManagedVaultBaseDir());
 
-  // Normalize path separators
-  const isWindows = /^[a-zA-Z]:[\\/]/.test(baseDir) || baseDir.includes("\\");
+  // Normalize path separators to forward-slash for joining
   const cleanBase = baseDir.replace(/\\/g, "/").replace(/\/+$/, "");
-  const fullPath = `${cleanBase}/${relativePath}`.replace(/\/+/g, "/");
+  const cleanRel = relativePath.replace(/\\/g, "/").replace(/^\/+/, "");
+  const joined = `${cleanBase}/${cleanRel}`;
 
+  // ".." segmentlerini çöz — path traversal'ın startsWith kontrolünü atlatmasını engeller
+  const segments = joined.split("/");
+  const resolved: string[] = [];
+  for (const seg of segments) {
+    if (seg === "..") {
+      resolved.pop();
+    } else if (seg !== ".") {
+      resolved.push(seg);
+    }
+  }
+  const fullPath = resolved.join("/");
+
+  // Vault-root kontrolü: çözümlenmiş yol vault kökü altında olmalı
+  const normalizedBase = cleanBase.replace(/\/+$/, "");
+  if (!fullPath.startsWith(normalizedBase + "/")) {
+    throw new Error("Path traversal engellendi: Yol vault kökü dışına çıkıyor.");
+  }
+
+  // Windows: sürücü harfi tespiti
+  const isWindows = /^[a-zA-Z]:/.test(cleanBase);
   if (isWindows) {
+    // Windows native path: forward-slash → backslash
     return fullPath.replace(/\//g, "\\");
   }
   return fullPath;
 }
 
+
+// ─────────────────────────────────────────────────────────────
+// 2. Absolute Path → file:/// URL
+// ─────────────────────────────────────────────────────────────
+
 /**
- * Mutlak veya göreli dosya yolunu standart `file:///...` URL formatına dönüştürür.
+ * Mutlak dosya yolunu RFC-8089 uyumlu `file:///` URL formatına dönüştürür.
  *
- * Örnek macOS: /Users/selim/Library/Application Support/test.pdf -> file:///Users/selim/Library/Application%20Support/test.pdf
- * Örnek Windows: C:\Users\Selim\AppData\Local\test.xlsx -> file:///C:/Users/Selim/AppData/Local/test.xlsx
- * Türkçe karakterler: İskonto_Raporu.xlsx -> %C4%B0skonto_Raporu.xlsx
+ * Örnek macOS:  /Users/selim/Library/Application Support/test.pdf
+ *            →  file:///Users/selim/Library/Application%20Support/test.pdf
+ *
+ * Örnek Windows: C:\Users\Selim\AppData\Local\test.xlsx
+ *             →  file:///C:/Users/Selim/AppData/Local/test.xlsx
+ *
+ * Kurallar:
+ *   - file:///C:/...  (3 slash — RFC 8089)
+ *   - Boşluk → %20, Türkçe → %XX
+ *   - Backslash → forward-slash
  */
 export function attachmentPathToFileUrl(filePath: string): string {
   if (!filePath || typeof filePath !== "string") {
@@ -53,26 +105,25 @@ export function attachmentPathToFileUrl(filePath: string): string {
 
   let normalized = filePath.trim();
 
-  // Eğer zaten file:// ile başlıyorsa temizle
-  if (normalized.startsWith("file://")) {
-    normalized = normalized.substring(7);
+  // Zaten file:// ile başlıyorsa tüm prefix'i soy
+  if (normalized.startsWith("file:///")) {
+    normalized = normalized.substring(8); // "file:///" sonrası
+  } else if (normalized.startsWith("file://")) {
+    normalized = normalized.substring(7); // "file://" sonrası
   }
 
-  // Windows backslash ayraçlarını forward-slash'a çevir
+  // Windows backslash → forward-slash
   normalized = normalized.replace(/\\/g, "/");
 
   // Windows sürücü harfi kontrolü (örn: C:/Users/...)
   const isWindowsDrive = /^[a-zA-Z]:/.test(normalized);
 
-  // Parçalara ayır ve her bir segmenti encode et (sürücü harfi iki nokta hariç)
+  // Segmentlere böl ve encode et
   const segments = normalized.split("/");
   const encodedSegments = segments.map((seg, idx) => {
-    if (idx === 0 && isWindowsDrive) {
-      // C: kısmını aynen koru
-      return seg;
-    }
+    // Windows sürücü harfi "C:" → aynen koru
+    if (idx === 0 && isWindowsDrive) return seg;
     if (seg === "") return "";
-    // encodeURIComponent kullan ancak dosya adı için güvenli karakterleri koru
     return encodeURIComponent(seg)
       .replace(/'/g, "%27")
       .replace(/\(/g, "%28")
@@ -83,21 +134,23 @@ export function attachmentPathToFileUrl(filePath: string): string {
 
   let joined = encodedSegments.join("/");
 
-  if (isWindowsDrive) {
-    if (!joined.startsWith("/")) {
-      joined = "/" + joined;
-    }
-    return `file://${joined}`;
-  }
-
+  // RFC-8089: file:/// + path
+  // Windows: file:///C:/Users/...  (slash önce sürücü harfi)
+  // POSIX:   file:///home/...      (slash önce kök)
   if (!joined.startsWith("/")) {
     joined = "/" + joined;
   }
+  // Daima 3 slash: file:// + /path = file:///path
   return `file://${joined}`;
 }
 
+// ─────────────────────────────────────────────────────────────
+// 3. Relative Path → file:/// URL  (DOCX/PDF export için)
+// ─────────────────────────────────────────────────────────────
+
 /**
  * Göreli yoldan yönetilen kopyanın tam `file:///...` hyperlink URL'sini üretir.
+ * appLocalDataDir ile mutlak yola çevirip RFC-8089 encode eder.
  */
 export async function resolveAttachmentFileUrl(
   relativePath: string,
@@ -106,6 +159,27 @@ export async function resolveAttachmentFileUrl(
   const absPath = await resolveAttachmentAbsolutePath(relativePath, baseDirOverride);
   return attachmentPathToFileUrl(absPath);
 }
+
+/**
+ * DOCX ve PDF export'u için:
+ * att.relativePath → appLocalDataDir çözümleme → file:/// URL
+ *
+ * Hata durumunda boş string döner (export çökmez).
+ */
+export async function resolveAttachmentFileUrlFromRelative(
+  relativePath: string
+): Promise<string> {
+  if (!relativePath) return "";
+  try {
+    return await resolveAttachmentFileUrl(relativePath);
+  } catch {
+    return "";
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 4. Dosya Varlık Kontrolü
+// ─────────────────────────────────────────────────────────────
 
 /**
  * Dosyanın Managed Vault diskinde veya sanal depoda var olup olmadığını kontrol eder.
@@ -123,13 +197,28 @@ export async function attachmentExists(relativePath: string): Promise<boolean> {
   }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 5. Native OS Dosya Açıcı
+// ─────────────────────────────────────────────────────────────
+
 export interface OpenAttachmentResult {
   success: boolean;
   error?: string;
 }
 
 /**
- * Ek dosyayı Managed Vault kopyasından işletim sisteminin varsayılan uygulamasıyla (veya web önizlemesiyle) açar.
+ * Ek dosyayı Managed Vault kopyasından işletim sisteminin varsayılan uygulamasıyla açar.
+ *
+ * Akış:
+ *   attachment.relative_path
+ *     → resolveAttachmentAbsolutePath   (appLocalDataDir + relative → native absolute)
+ *     → validatePathInsideVault         (traversal guard)
+ *     → invoke("open_attachment_path")  (Tauri Rust command → OS opener)
+ *     → Blob fallback                   (web/test ortamı)
+ *
+ * Windows:  cmd /C start "" "C:\...\dosya.pdf"
+ * macOS:    open /Users/.../dosya.pdf
+ * Linux:    xdg-open /home/.../dosya.pdf
  */
 export async function openAttachment(attachment: {
   relative_path?: string;
@@ -156,26 +245,26 @@ export async function openAttachment(attachment: {
   if (!exists) {
     return {
       success: false,
-      error: `Dosya bulunamadı: "${originalName}". Dosya yerel depolamadan silinmiş veya taşınmış olabilir.`,
+      error: `Kanıt dosyası yerel Attachment Vault içinde bulunamadı: "${originalName}". Dosya silinmiş veya taşınmış olabilir.`,
     };
   }
 
   try {
+    // Platforma özgü mutlak yolu çöz (Windows: backslash, POSIX: forward-slash)
     const absPath = await resolveAttachmentAbsolutePath(relPath);
 
-    // 1. Tauri Invoke varsa çağır (sadece Tauri runtime içinde)
+    // 1. Tauri Runtime: open_attachment_path Rust command
     if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
       try {
         const { invoke } = await import("@tauri-apps/api/core");
         await invoke("open_attachment_path", { path: absPath });
         return { success: true };
       } catch (invokeErr: any) {
-        // Eğer komut bulunamadıysa fallback'e geç
         console.warn("Tauri open_attachment_path invoke fallback:", invokeErr);
       }
     }
 
-    // 2. Web / Blob Fallback
+    // 2. Web / Blob Fallback (geliştirme ortamı / test)
     const buffer = await readAttachmentFile(relPath);
     if (buffer) {
       if (
@@ -193,7 +282,7 @@ export async function openAttachment(attachment: {
         document.body.appendChild(tempLink);
         tempLink.click();
         document.body.removeChild(tempLink);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10_000);
       }
       return { success: true };
     }

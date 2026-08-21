@@ -25,7 +25,7 @@ import {
   PageNumber,
 } from "docx";
 import { formatStatusLabel, type ReportModel } from "../report/types";
-import { attachmentPathToFileUrl } from "../storage/attachmentLinks";
+import { resolveAttachmentFileUrlFromRelative } from "../storage/attachmentLinks";
 
 // Design Tokens (Word Hex)
 const COLOR_PRIMARY = "0284C7";    // Sky Blue 600
@@ -693,7 +693,8 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
                 att.fileSize < 1024 * 1024
                   ? `${(att.fileSize / 1024).toFixed(1)} KB`
                   : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
-              const fileUrl = att.fileUrl || attachmentPathToFileUrl(att.relativePath);
+              // Windows: relative → appLocalDataDir → backslash absolute → file:/// RFC-8089 encode
+              const fileUrl = att.fileUrl || await resolveAttachmentFileUrlFromRelative(att.relativePath);
               docChildren.push(
                 new Paragraph({
                   spacing: { after: 20 },
@@ -1035,7 +1036,8 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         att.fileSize < 1024 * 1024
           ? `${(att.fileSize / 1024).toFixed(1)} KB`
           : `${(att.fileSize / (1024 * 1024)).toFixed(1)} MB`;
-      const fileUrl = att.fileUrl || attachmentPathToFileUrl(att.relativePath);
+      // Windows: relative → appLocalDataDir → backslash absolute → file:/// RFC-8089 encode
+      const fileUrl = att.fileUrl || await resolveAttachmentFileUrlFromRelative(att.relativePath);
       attachmentRows.push(
         new TableRow({
           children: [
