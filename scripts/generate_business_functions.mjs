@@ -36,8 +36,8 @@ if (!Array.isArray(entries)) {
 }
 
 // ── Validations ──
-if (entries.length !== 32) {
-  console.error(`[generate] FAIL: Expected exactly 32 business functions, found ${entries.length}`);
+if (entries.length !== 33) {
+  console.error(`[generate] FAIL: Expected exactly 33 business functions, found ${entries.length}`);
   process.exit(1);
 }
 
@@ -226,6 +226,31 @@ ${packDefinitions.map((p) => `  ${JSON.stringify(p.packId)}: ${p.varName} as unk
 export const CANONICAL_CODE_TO_PACK_ID: Readonly<Record<string, string>> = {
 ${packDefinitions.map((p) => `  ${JSON.stringify(p.businessFunctionCode)}: ${JSON.stringify(p.packId)},`).join("\n")}
   "IT_INFRASTRUCTURE": "tr.it_infrastructure.core", // INFORMATION_TECHNOLOGY için kanonik alias
+  "MASTER_DATA": "tr.master_data_management.core", // MASTER_DATA_MANAGEMENT için kanonik alias
+  "ANA_VERI": "tr.master_data_management.core", // Türkçe alias
+  "PROJECTS": "tr.project_management.core", // PROJECT_MANAGEMENT için alias
+  "PROJE_YONETIMI": "tr.project_management.core", // Türkçe alias
+  "E_DONUSUM": "tr.e_transformation.core", // E_TRANSFORMATION için Türkçe alias
+  "EDONUSUM": "tr.e_transformation.core", // Alias
+  "FATURALAMA": "tr.invoicing.core", // INVOICING için Türkçe alias
+  "FATURA_GDR": "tr.invoicing.core", // Legacy alias
+  "INVOICE": "tr.invoicing.core", // Alias
+  "BELGE_YNT": "tr.document_management.core", // DOCUMENT_MANAGEMENT için legacy alias
+  "DOKUMAN_YONETIMI": "tr.document_management.core", // Türkçe alias
+  "DOCS": "tr.document_management.core", // Alias
+  "DOCUMENT": "tr.document_management.core", // Alias
+  "ITHALAT": "tr.import.core", // IMPORT için legacy ve Türkçe alias
+  "ITHALAT_GUMRUK": "tr.import.core", // Alias
+  "DIS_TICARET_IMPORT": "tr.import.core", // Alias
+  "IMPORT_CUSTOMS": "tr.import.core", // Alias
+  "IHRACAT": "tr.export.core", // EXPORT için legacy ve Türkçe alias
+  "IHRACAT_GUMRUK": "tr.export.core", // Alias
+  "DIS_TICARET_EXPORT": "tr.export.core", // Alias
+  "EXPORT_CUSTOMS": "tr.export.core", // Alias
+  "E_TICARET": "tr.ecommerce.core", // ECOMMERCE için legacy ve Türkçe alias
+  "ETICARET": "tr.ecommerce.core", // Alias
+  "ONLINE_SATIS": "tr.ecommerce.core", // Alias
+  "DIGITAL_COMMERCE": "tr.ecommerce.core", // Alias
 } as const;
 
 /**

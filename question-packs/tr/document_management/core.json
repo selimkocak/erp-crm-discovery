@@ -1,0 +1,1745 @@
+{
+  "meta": {
+    "pack_id": "tr.document_management.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "DOCUMENT_MANAGEMENT",
+    "name": "Doküman Yönetimi Soru Paketi",
+    "description": "Kurumsal dokümanların yaşam döngüsünü, sınıflandırmasını, versiyon/revizyon kontrolünü, onay ve yayın akışlarını, erişim yetkilerini, saklama ve arşiv politikalarını keşfeden kanonik soru paketi."
+  },
+  "questions": [
+    {
+      "id": "DOC-001",
+      "order": 1,
+      "process": "Doküman yönetimi organizasyonu ve sorumluluklar",
+      "question": "Şirketinizde kurumsal doküman yönetimi organizasyonu, prosedürleri ve yönetim sorumlulukları nasıl yapılandırılmıştır?",
+      "description": "Doküman yönetim prosedürünün varlığı, merkezi kütüphane veya dağınık dosya yönetim yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_dokuman_yonetim_proseduru_ve_sorumlusu_var",
+          "label": "Şirket genelinde yazılı doküman yönetim prosedürü, standart şablonlar ve atanmış doküman yöneticisi/ekibi mevcuttur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "departman_bazli_ayri_dokuman_duzeni_mevcut",
+          "label": "Her departman kendi dokümanlarını bağımsız kurallarla ve kendi dosya yapısıyla yönetmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kisisel_bilgisayarlarda_ve_dolasimda_daginik",
+          "label": "Merkezi bir standart yoktur; dokümanlar çalışanların kişisel bilgisayarlarında ve e-postalarda dağınık tutulmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer kurumsal doküman organizasyon yapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-002",
+      "order": 2,
+      "process": "Doküman yönetimi organizasyonu ve sorumluluklar",
+      "question": "Doküman yönetim sistemi (DMS/EDMS) veya dosya sunucusu kullanım standardı ve kullanıcı adaptasyonu ne düzeydedir?",
+      "description": "Doküman yönetim teknolojisinin kurum geneline yayılımı ve kullanıcıların sisteme uyumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tam_entegre_kurumsal_edms_tum_personel_aktif",
+          "label": "Kurumsal EDMS/DMS yazılımı tüm şirket çalışanları tarafından zorunlu ve aktif olarak kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ortak_ag_klasoru_veya_bulut_surucu_kullaniliyor",
+          "label": "Ağ dosya sunucusu (file server) veya temel bulut depolama klasörleri ortak alan olarak kullanılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kullanici_direnci_ve_sistem_disi_dosyalama_yaygin",
+          "label": "Sistem olmasına rağmen kullanıcılar dosyaları lokal diskte tutmaya devam etmekte, adaptasyon düşüktür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-003",
+      "order": 3,
+      "process": "Doküman sahipliği ve veri sorumluları",
+      "question": "Kurumsal dokümanların sahipliği (Document Owner) ve içerik/güncellik sorumluları nasıl belirlenmektedir?",
+      "description": "Dokümanın içeriğinden, güncelliğinden ve revizyonundan sorumlu kişi veya rollerin tanımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "her_dokumanin_acik_bir_sahibi_ve_yetki_rolu_tanimlidir",
+          "label": "Her doküman kartında içerik sahibi (departman/unvan) ve gözden geçirme sorumlusu net olarak tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokumani_sisteme_ilk_yukleyen_kisi_sahip_kabul_edilir",
+          "label": "Resmi bir sahiplik kuralı yoktur; dosyayı oluşturan veya ilk yükleyen kişi sorumlu sayılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dokuman_sahipligi_belirsiz_ve_takipsizdir",
+          "label": "Doküman sahipliği tanımlı değildir; güncelliğini yitirmiş dokümanların sorumlusu tespit edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-004",
+      "order": 4,
+      "process": "Doküman sahipliği ve veri sorumluları",
+      "question": "Doküman sahibinin şirketten ayrılması veya görev değişikliği durumunda sahiplik devri ve vekalet nasıl yürütülür?",
+      "description": "Personel ayrılışlarında veya görev devirlerinde doküman yönetim yetkilerinin kesintisiz aktarımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sistem_uzerinden_toplu_vekalet_ve_sahiplik_devri_yapilir",
+          "label": "İK çıkış sürecine bağlı olarak doküman sahiplikleri yeni sorumluya sistem üzerinden topluca devredilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "manuel_olarak_tek_tek_talep_uzerine_aktarilir",
+          "label": "İhtiyaç duyuldukça IT veya departman yöneticisi tarafından manuel olarak yetki aktarımı yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ayrilan_personelin_dosyalari_erisilemez_veya_sahipsiz_kalir",
+          "label": "Devir mekanizması yoktur; ayrılan personelin dokümanlarına erişimde ve sahiplik takibinde aksamalar yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-005",
+      "order": 5,
+      "process": "Doküman sınıflandırma ve kategori yapısı",
+      "question": "Şirket genelinde standart bir doküman sınıflandırma ve kategori hiyerarşisi (klasör/kategori ağacı) bulunmakta mıdır?",
+      "description": "Kurumsal düzeyde standartlaştırılmış kategori yapısı ve taksonomi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "standart_kurumsal_taksonomi_ve_kategori_agaci_var",
+          "label": "Tüm departmanlar için standartlaştırılmış, merkezi kontrol edilen kategori ve süreç bazlı doküman ağacı mevcuttur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "her_departman_kendi_klasor_hiyerarsisini_olusturur",
+          "label": "Merkezi bir taksonomi yoktur; her birim kendi mantığına göre serbestçe klasörler açmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "siniflandirma_yoktur_duzensiz_dosya_yiginlari_vardir",
+          "label": "Herhangi bir sınıflandırma standardı yoktur; dosyalar rastgele isimlendirme ve yerleşimle tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-006",
+      "order": 6,
+      "process": "Doküman sınıflandırma ve kategori yapısı",
+      "question": "Dokümanlara dinamik etiketleme (tags), anahtar kelimeler ve çoklu kategori atama imkanı kullanılmakta mıdır?",
+      "description": "Dokümanların hiyerarşik klasör dışında çok boyutlu etiketler ve niteliklerle sınıflandırılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_etiketleme_ve_kontrollu_sozluk_kullanilir",
+          "label": "Dokümanlara kontrollü kurumsal etiketler (tag) ve anahtar kelimeler atanarak çapraz filtreleme sağlanmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kullanicilar_serbest_etiket_ekleyebilmektedir",
+          "label": "Kullanıcılar serbest metin olarak etiket ekleyebilmektedir ancak standart bir sözlük denetimi yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sadece_tekil_klasor_yolu_kullanilir_etiketleme_yoktur",
+          "label": "Etiketleme veya anahtar kelime özelliği kullanılmamakta, sadece tek bir klasör yoluyla erişilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-007",
+      "order": 7,
+      "process": "Doküman türleri ve doküman kodlama",
+      "question": "Şirketinizde doküman türleri için standart bir doküman kodlama ve numaralandırma kuralı uygulanmakta mıdır?",
+      "description": "Departman-Tür-Yıl-SıraNo gibi kurumsal doküman kodlama ve ardışık numara formatı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "otomatik_uretilen_standart_kodlama_formati_var",
+          "label": "Sistem doküman türüne ve departmana göre otomatik ardışık kod üretmektedir (Örn: PR-SAT-2026-001)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "manuel_kodlama_sablonu_var_kullanici_yazar",
+          "label": "Yazılı bir kodlama kuralı vardır ancak kod dokümana kullanıcı tarafından manuel olarak verilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dokuman_kodlama_kurali_yoktur_dosya_adi_kullanilir",
+          "label": "Standart doküman kodu yoktur; doğrudan rastgele serbest dosya isimleriyle kaydedilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-008",
+      "order": 8,
+      "process": "Doküman türleri ve doküman kodlama",
+      "question": "Kurumsal doküman şablonları (antetli kağıt, form, rapor, prosedür formatı) merkezi olarak nasıl yönetilmektedir?",
+      "description": "Kurumsal kimlik ve standart formatlara uygun şablon kütüphanesinin yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "merkezi_sablon_kutuphanesinden_zorunlu_secim_yapilir",
+          "label": "Yeni doküman oluştururken merkezi şablon kütüphanesinden güncel şablon seçimi zorunlu kılınmıştır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sablonlar_ortak_klasorde_durur_kullanici_kopyalar",
+          "label": "Şablon dosyaları ortak klasörde tutulur, çalışanlar kopyalayarak kullanır; güncellik takibi manueldir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "standart_sablon_kullanimi_yoktur_herkes_farkli_yazar",
+          "label": "Kurumsal şablon standardı yoktur; her personel kendi format ve tasarımını kullanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-009",
+      "order": 9,
+      "process": "Doküman metadata alanları",
+      "question": "Doküman kaydedilirken hangi üstveri (metadata) alanlarının doldurulması zorunlu tutulmaktadır?",
+      "description": "Yazar, departman, belge tarihi, geçerlilik süresi, proje/müşteri bağı ve gizlilik seviyesi gibi alanlar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kapsamli_zorunlu_metadata_alanlari_tanimlidir",
+          "label": "Doküman türüne göre yazar, departman, konu, geçerlilik tarihi, gizlilik ve ilişkili kart zorunlu girilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_temel_alanlar_zorunludur",
+          "label": "Yalnızca doküman başlığı ve kategorisi zorunludur; diğer detay alanlar opsiyonel bırakılmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "metadata_girisi_yoktur_sadece_dosya_yuklenir",
+          "label": "Üstveri alanı yoktur; sadece dosya yüklenmekte ve dosya adıyla kaydedilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-010",
+      "order": 10,
+      "process": "Doküman onay akışları",
+      "question": "Dokümanların oluşturulması, revizyonu ve resmi yayına alınması sürecinde onay akışı uygulanmakta mıdır?",
+      "description": "Dokümanın kontrol, inceleme ve onay aşamalarından geçtikten sonra yürürlüğe girmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "resmi_onay_ve_imza_rotasi_uygulanir",
+          "label": "Dokümanlar türüne göre tanımlı onay rotasından (sıralı/paralel) ve yetkili onayından geçerek yayınlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_posta_veya_sozlu_onay_ile_dosya_paylasilir",
+          "label": "Sistem içi otomatik onay akışı yoktur; e-posta veya toplantı onayı sonrası manuel yayınlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "onay_akisi_yoktur_herkes_dogrudan_yukler",
+          "label": "Onay mekanizması yoktur; her kullanıcı oluşturduğu dokümanı doğrudan yayına alabilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-011",
+      "order": 11,
+      "process": "Doküman onay akışları",
+      "question": "Doküman onay rotasında sıralı, paralel onay adımları ve elektronik/mobil imza kullanımı nasıl işletilmektedir?",
+      "description": "Çok adımlı onay matrisi, onaycı vekilliği ve e-imza / mobil imza entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-010",
+        "operator": "equals",
+        "value": "resmi_onay_ve_imza_rotasi_uygulanir"
+      },
+      "options": [
+        {
+          "value": "cok_kademeli_onay_ve_e_imza_destegi_mevcuttur",
+          "label": "Sıralı/paralel dinamik onay matrisi ve 5070 sayılı kanuna uygun e-imza / zaman damgası entegrasyonu vardır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sistem_ici_tekil_yonetici_onay_butonu_vardir",
+          "label": "Sistem içinde sadece tek bir yöneticinin 'Onayla' butonuna basmasıyla onay tamamlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "islak_imzali_taranmis_onay_formu_eklenir",
+          "label": "Doküman fiziksel olarak ıslak imzalatılır ve imzalı onay sayfası taranarak sisteme eklenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-012",
+      "order": 12,
+      "process": "Doküman revizyon ve versiyon yönetimi",
+      "question": "Dokümanlarda revizyon, versiyonlama ve değişiklik geçmişi nasıl kontrol edilmektedir?",
+      "description": "Majör/minör versiyonlama (v1.0, v1.1, v2.0), değişiklik açıklaması ve eski sürümlerin korunması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "major_minor_revizyon_ve_degisiklik_tarihcesi_tutulur",
+          "label": "Sistem majör/minör versiyonları otomatik takip eder; değişiklik gerekçesi zorunlu alınır ve eski sürümler saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dosya_adinda_manuel_v1_v2_son_yazilarak_tutulur",
+          "label": "Versiyonlama dosya adına manuel '_v1', '_v2', '_son_hali' eklenerek kullanıcı inisiyatifiyle yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "eski_dosyanin_uzerine_kaydedilir_gecmis_kaybolur",
+          "label": "Versiyon takibi yoktur; yeni dosya eskisinin üzerine kaydedilir ve değişiklik geçmişi kaybolur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-013",
+      "order": 13,
+      "process": "Doküman revizyon ve versiyon yönetimi",
+      "question": "Eski versiyonlara erişim, revizyon karşılaştırma (diff/compare) ve önceki sürüme geri dönme (rollback) yetkisi nasıl yönetilir?",
+      "description": "Eski sürümlerin salt okunur dondurulması, iki versiyon arası farkların incelenmesi ve rollback kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-012",
+        "operator": "equals",
+        "value": "major_minor_revizyon_ve_degisiklik_tarihcesi_tutulur"
+      },
+      "options": [
+        {
+          "value": "eski_surumler_salt_okunur_kilitli_ve_karsilastirilabilir",
+          "label": "Eski sürümler kilitlidir, yetkililer iki sürümü görsel karşılaştırabilir ve gerekirse rollback yapabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "eski_surumler_arsiv_klasorunde_manuel_durur",
+          "label": "Eski dosyalar manuel olarak bir arşiv klasörüne taşınır, karşılaştırma aracı yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "onceki_surumlere_ulasilamaz_veya_silinir",
+          "label": "Sadece en son versiyon görünür; önceki revizyonlara erişim kısıtlıdır veya silinmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-014",
+      "order": 14,
+      "process": "Taslak, inceleme ve yayın statüleri",
+      "question": "Doküman yaşam döngüsünde taslak, inceleme, yayında ve iptal statüleri sistem tarafından nasıl denetlenmektedir?",
+      "description": "Dokümanın durumuna göre kullanıcıların sadece yetkili oldukları statüdeki dokümanları görmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "statu_gecisleri_otomatiktir_taslaklar_genel_erisi_kapalidir",
+          "label": "Durum geçişleri kurallara bağlıdır; taslak dokümanları sadece yazarı ve onaycılar görür, yayınlanınca genele açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "statu_etiketi_vardir_ancak_erisim_kisiti_uygulanmaz",
+          "label": "Dokümanda durum alanı seçilir ancak taslak veya yayındaki dosya herkes tarafından aynı klasörde görülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dokuman_statusu_kullanilmamaktadir",
+          "label": "Doküman durum takibi yoktur; dosyanın yürürlükte mi yoksa taslak mı olduğu anlaşılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-015",
+      "order": 15,
+      "process": "Yetki, rol ve erişim kontrolü",
+      "question": "Dokümanlara erişim yetkileri (okuma, düzenleme, silme, indirme, yazdırma) nasıl yapılandırılmıştır?",
+      "description": "Kullanıcı, rol ve departman bazlı granular (ayrıntılı) erişim hakları ve yetki matrisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "rol_ve_klasor_bazli_ayrintili_yetki_matrisi_var",
+          "label": "Departman, unvan ve doküman kategorisi bazında okuma/yazma/indirme/yazdırma yetkileri merkezi yönetilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "klasor_bazli_genel_okuma_veya_yazma_yetkisi_var",
+          "label": "Windows/Bulut klasör bazında genel okuma/yazma yetkisi vardır; indirme veya yazdırma kısıtlanamaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tum_calisanlar_tum_dokumanlara_erisebilmektedir",
+          "label": "Yetkilendirme yoktur; şirket ortak alanındaki tüm dokümanlara herkes serbestçe erişebilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-016",
+      "order": 16,
+      "process": "Yetki, rol ve erişim kontrolü",
+      "question": "Dokümanların kurum dışı paydaşlarla (müşteri, tedarikçi, denetçi) güvenli paylaşımı nasıl sağlanmaktadır?",
+      "description": "Süreli, parola korumalı, indirme engelli güvenli paylaşım linkleri veya dış portal erişimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sureli_ve_filigranli_guvenli_paylasim_portali_kullanilir",
+          "label": "Dış paydaşlara süreli, parola korumalı, indirme/yazdırma kısıtlı güvenli bağlantı üzerinden erişim verilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_posta_eki_olarak_dogrudan_gonderilmektedir",
+          "label": "Dokümanlar e-posta eki (attachment) olarak doğrudan gönderilir; paylaşım sonrası kontrolü kaybolur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ucretsiz_bulut_dosya_paylasim_siteleri_kullanilmaktadir",
+          "label": "WeTransfer, Google Drive vb. kişisel/ücretsiz hesaplar üzerinden dosya gönderilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-017",
+      "order": 17,
+      "process": "Gizli, özel ve genel doküman ayrımı",
+      "question": "Şirketinizde dokümanlar için bilgi güvenliği ve gizlilik sınıflandırması (Genel, Hizmete Özel, Gizli, Çok Gizli) uygulanmakta mıdır?",
+      "description": "Bilgi güvenliği standartlarına uygun gizlilik derecelendirmesi ve kısıtlı doküman yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gizli_ve_kisitli_dokuman_kategorileri_mevcuttur",
+          "label": "Dokümanlar gizlilik seviyesine göre etiketlenir ve 'Gizli / Özel' dokümanlara yalnızca özel yetkililer erişebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gayriresmi_olarak_bazi_klasorler_sifrelenmektedir",
+          "label": "Resmi bir sınıflandırma politikası yoktur; sadece belirli hassas klasörlere manuel şifre konulmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "gizlilik_siniflandirmasi_bulunmamaktadir",
+          "label": "Tüm dokümanlar aynı gizlilik seviyesinde kabul edilmekte, özel bir kısıtlama uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-018",
+      "order": 18,
+      "process": "Gizli, özel ve genel doküman ayrımı",
+      "question": "Gizli veya kısıtlı dokümanlara erişimde dinamik filigran (watermark), erişim logu ve veri sızıntısı koruması nasıl uygulanır?",
+      "description": "Görüntüleyen kullanıcının adı/IP'sinin ekrana basılması ve indirme/yazdırma hareketlerinin loglanması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-017",
+        "operator": "equals",
+        "value": "gizli_ve_kisitli_dokuman_kategorileri_mevcuttur"
+      },
+      "options": [
+        {
+          "value": "dinamik_filigran_ve_anlik_guvenlik_logu_mevcuttur",
+          "label": "Doküman açıldığında kullanıcı adı/tarih filigranı basılır; her erişim ve indirme anlık loglanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_kimin_actigina_dair_standart_log_tutulur",
+          "label": "Filigran yoktur ancak dosyanın kim tarafından açıldığına dair temel sunucu erişim kaydı tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "filigran_veya_guvenlik_logu_yoktur",
+          "label": "Gizli doküman açıldığında herhangi bir filigran basılmaz ve özel bir denetim logu tutulmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-019",
+      "order": 19,
+      "process": "Departmanlar arası ortak doküman kullanımı",
+      "question": "Birden fazla departmanın ortak çalıştığı dokümanlarda eşzamanlı çalışma veya check-in / check-out kilitleme nasıl yönetilir?",
+      "description": "Aynı dosya üzerinde iki kişinin aynı anda işlem yaparak birbirinin çalışmasını ezmesinin engellenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "check_in_check_out_veya_es_zamanli_birlikte_calisma_var",
+          "label": "Biri dokümanı açtığında dosya kilitlenir (check-out) veya modern ofis araçlarıyla eşzamanlı güvenli çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dosya_kilitlenir_ancak_kopya_olusturarak_cakisma_yasanir",
+          "label": "Ağ klasöründe dosya salt okunur uyarısı verir; kullanıcılar kopyasını kaydedip birleştirme sorunu yaşar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "cakisma_kontrolu_yoktur_son_kaydeden_digerini_ezer",
+          "label": "Eşzamanlı kilit mekanizması yoktur; son kaydeden personelin verisi önceki çalışmayı siler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-020",
+      "order": 20,
+      "process": "Departmanlar arası ortak doküman kullanımı",
+      "question": "Ortak dokümanlarda yapılan güncellemeler, ilgili departmanlara ve paydaşlara otomatik olarak bildirilir mi?",
+      "description": "Doküman revize edildiğinde veya yeni sürüm yayınlandığında otomatik e-posta / sistem içi bildirim.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "otomatik_abone_olunan_dokuman_bildirimi_gonderilir",
+          "label": "Sistem dokümanı takip eden kullanıcılara ve ilgili departmanlara otomatik bildirim/e-posta iletir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokumani_guncelleyen_kisi_manuel_e_posta_atar",
+          "label": "Otomatik bildirim yoktur; güncelleyen personel ilgili kişilere manuel e-posta yazarak haber verir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "bildirim_yapilmaz_kullanici_kendisi_fark_eder",
+          "label": "Herhangi bir bildirim yapılmaz; çalışanlar dokümana ihtiyaç duyup girdiğinde değişikliği fark eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-021",
+      "order": 21,
+      "process": "Doküman oluşturma ve kayıt süreci",
+      "question": "Yeni dokümanların sisteme yüklenmesi (upload), taranması (scan) ve dizinlenmesi süreci nasıl işlemektedir?",
+      "description": "Fiziksel belgelerin taranarak dijitalleştirilmesi, toplu yükleme ve dizine kayıt adımları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "entegre_tarayici_ve_toplu_dizinleme_profili_kullanilir",
+          "label": "Ağ tarayıcıları doküman sistemine doğrudan aktarır, barkod/ayraç sayfası ile toplu otomatik indeksleme yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "taranan_pdf_ler_masaustunden_manuel_yuklenir",
+          "label": "Belgeler tarayıcıdan e-postaya veya masaüstüne gelir, personel dosyayı manuel seçip yükler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tarama_ve_kayit_standart_degildir_duzensizdir",
+          "label": "Tarama ve dijitalleştirme standardı yoktur; belgelerin büyük kısmı kağıt ortamında kalmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-022",
+      "order": 22,
+      "process": "Kalite sistemi ve ISO dokümanları",
+      "question": "Kalite yönetim sistemi (ISO 9001, 14001, 27001 vb.) prosedür, talimat ve form dokümanları nasıl yönetilmektedir?",
+      "description": "Kalite dokümantasyonu, kalite el kitabı ve entegre yönetim sistemi dökümanlarının kontrolü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "iso_ve_kalite_dokumanlari_yonetilmektedir",
+          "label": "Kalite sistemi dokümanları özel kontrollü doküman kuralları, kalite onayları ve revizyon koduyla yönetilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_dokumanlari_genel_klasorlerde_duran_word_pdf_lerdir",
+          "label": "Kalite dokümanları vardır ancak özel bir kontrol motoru yerine standart klasörlerde tutulmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sertifikali_kalite_dokuman_sistemimiz_yoktur",
+          "label": "Şirketimizde ISO veya benzeri resmi kalite yönetim sistemi dokümantasyonu uygulanmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-023",
+      "order": 23,
+      "process": "Kalite sistemi ve ISO dokümanları",
+      "question": "Kalite dokümanlarında kontrollü kopya dağıtımı ve geçersiz/eski dokümanların sahadan toplanması nasıl güvenceye alınır?",
+      "description": "Üretim veya sahada eski prosedür/talimatın kullanılmasının engellenmesi ve kontrollü kopya takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-022",
+        "operator": "equals",
+        "value": "iso_ve_kalite_dokumanlari_yonetilmektedir"
+      },
+      "options": [
+        {
+          "value": "dijital_dagitim_yapilir_fiziksel_baski_otomatik_kase_alir",
+          "label": "Sahaya sadece dijital güncel versiyon sunulur; çıktı alındığında 'Kontrolsüz Kopya' filigranı zorunlu basılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kalite_ekibi_eski_formlari_sahadan_fiziksel_toplar",
+          "label": "Yeni revizyon yayınlandığında kalite sorumlusu sahayı dolaşarak eski kağıtları toplar ve imha eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sahadaki_kopyalarin_guncelligi_denetlenememektedir",
+          "label": "Sahadaki form ve talimatların eski versiyon olup olmadığı takip edilememekte, denetimlerde bulgu çıkmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-024",
+      "order": 24,
+      "process": "Sözleşme ve hukuki dokümanlar",
+      "question": "Şirketin müşteri, tedarikçi, kira, lisans ve gizlilik sözleşmeleri nasıl arşivlenmekte ve yönetilmektedir?",
+      "description": "Hukuki sözleşmelerin dijital kopyaları, orijinal ıslak imzalı nüshaları ve sözleşme metadata takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sozlesmeler_ve_hukuki_evraklar_takip_edilmektedir",
+          "label": "Sözleşmeler merkezi sözleşme yönetim modülünde taraflar, tutar, süre ve ekleriyle yapılandırılmış olarak tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "hukuk_veya_muhasebe_klasorunde_taranmis_pdf_olarak_durur",
+          "label": "Sözleşmeler taranıp hukuk veya muhasebe ortak klasörüne atılır; detaylı metadata ve alarm takibi yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fiziksel_klasorlerde_tutulur_dijital_arsiv_eksiktir",
+          "label": "Sözleşmeler sadece fiziki dolaplarda saklanır, dijital kopyalarına ve detaylarına hızlı ulaşılamaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-025",
+      "order": 25,
+      "process": "Sözleşme ve hukuki dokümanlar",
+      "question": "Sözleşmelerin bitiş tarihi, otomatik yenileme bildirimleri, ceza şartları ve teminat mektubu vadeleri nasıl izlenmektedir?",
+      "description": "Sözleşme süre sonu yaklaşırken sorumlu kişilere otomatik e-posta/sistem uyarısı gönderilmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-024",
+        "operator": "equals",
+        "value": "sozlesmeler_ve_hukuki_evraklar_takip_edilmektedir"
+      },
+      "options": [
+        {
+          "value": "otomatik_30_60_90_gun_vade_ve_yenileme_alarmlari_vardir",
+          "label": "Sözleşme bitimine 30/60/90 gün kala sistem sorumlulara otomatik uyarı e-postası ve görev atamaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_takip_tablosu_ile_manuel_kontrol_edilir",
+          "label": "Sorumlu personel bir Excel tablosunda tarihleri tutar ve ayda bir manuel kontrol eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tarih_takibi_yapilamaz_sure_doldugunda_fark_edilir",
+          "label": "Otomatik takip yoktur; sözleşmeler genellikle süre dolup fatura kesilmediğinde veya itirazda fark edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-026",
+      "order": 26,
+      "process": "Teknik çizim, proje ve üretim dokümanları",
+      "question": "Şirketinizde CAD çizimleri, teknik şartnameler, montaj kılavuzları ve ürün reçete dokümanları bulunmakta mıdır?",
+      "description": "Mühendislik ve üretim teknik dokümantasyonunun yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "teknik_cizim_ve_muhendislik_dokumanlari_mevcuttur",
+          "label": "Üretim ve Ar-Ge birimlerimizde yoğun CAD, teknik resim, şartname ve montaj dokümanları yönetilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_temel_urun_kataloglari_ve_kullanim_kilavuzlari_var",
+          "label": "Ağır bir teknik çizim akışımız yoktur; sadece standart ürün föyleri ve kullanıcı kılavuzları vardır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teknik_cizim_veya_muhendislik_dokumani_kullanilmaz",
+          "label": "Hizmet veya saf ticaret şirketi olduğumuzdan teknik çizim/üretim dokümantasyonu bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-027",
+      "order": 27,
+      "process": "Teknik çizim, proje ve üretim dokümanları",
+      "question": "Üretim sahasında teknik resim revizyon kontrolü ve eski çizimle hatalı imalat yapılmasının engellenmesi nasıl sağlanır?",
+      "description": "İş emrine bağlı güncel teknik resim gösterimi ve sahada eski çizim kullanım kilidi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-026",
+        "operator": "equals",
+        "value": "teknik_cizim_ve_muhendislik_dokumanlari_mevcuttur"
+      },
+      "options": [
+        {
+          "value": "is_emrine_bagli_dijital_terminalden_guncel_cizim_acilir",
+          "label": "Operatör iş emri barkodunu okutunca terminalde sadece en güncel onaylı teknik resim otomatik açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "cizimler_yazdirilip_is_emri_klasorune_konulur",
+          "label": "Çizimler kağıda basılarak iş emri poşetine konulur; revizyon olursa manuel değiştirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "eski_cizimle_hatali_uretim_riski_yasanmaktadir",
+          "label": "Revizyon takibi zayıftır; zaman zaman sahadaki eski kağıt çizimler nedeniyle hatalı üretim yaşanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-028",
+      "order": 28,
+      "process": "Prosedür, talimat ve politika dokümanları",
+      "question": "Şirket içi standart operasyon prosedürleri (SOP), görev tanımları ve şirket politikaları nasıl yayınlanmaktadır?",
+      "description": "Kurumsal bilgi tabanı (Knowledge Base) veya intranet üzerinden dokümanların yayınlanması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "merkezi_intranet_veya_dokuman_portali_uzerinden_yayinlanir",
+          "label": "Tüm çalışanların erişebildiği intranet/portal üzerinden güncel prosedür ve politikalar yayınlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ortak_ag_klasorunde_pdf_olarak_tutulur",
+          "label": "Ağ klasöründe 'Prosedürler' klasörü altında PDF olarak tutulur; duyurular e-posta ile yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yazili_prosedur_ve_politika_kutuphanesi_yoktur",
+          "label": "Yazılı kurumsal prosedür ve talimat dokümanları henüz oluşturulmamıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-029",
+      "order": 29,
+      "process": "Prosedür, talimat ve politika dokümanları",
+      "question": "Çalışanların kritik prosedür ve politikaları okuyup anladığına dair 'Okudum/Anladım' (Read & Understood) teyidi alınmakta mıdır?",
+      "description": "Mevzuat ve kalite uyumu için personelin güncel prosedürü okuduğuna dair dijital kayıt.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sistem_uzerinden_dijital_okudum_anladim_onayi_ve_raporu_alinir",
+          "label": "Kullanıcı dokümanı açıp okuduktan sonra sistemden onay verir; İK ve Kalite okuma oranını raporlar",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziksel_imza_sirkusu_dolasilarak_imza_toplanir",
+          "label": "Eğitim veya toplantı sonrasında kağıt imza listesi dolaştırılarak personele imzalattırılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "okuma_teyidi_veya_takibi_yapilmamaktadir",
+          "label": "Prosedürün personel tarafından okunup okunmadığına dair herhangi bir teyit veya takip yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-030",
+      "order": 30,
+      "process": "Kontrollü kopya ve yayınlanmış doküman yönetimi",
+      "question": "Resmi yürürlüğe girmiş dokümanların yetkisiz değiştirilmesi ve kontrolsüz kopyalanması nasıl engellenmektedir?",
+      "description": "Dokümanın salt okunur PDF formatına otomatik çevrilmesi, dijital kilit ve düzenleme engeli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "onay_sonrasi_otomatik_pdf_donusumu_ve_dijital_kilit_uygulanir",
+          "label": "Onaylanan doküman otomatik salt okunur PDF'e dönüştürülür, orijinal kaynak dosya yazara kilitlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yazar_manuel_pdf_yapip_klasore_atar_orijinal_word_durur",
+          "label": "Yazar dosyayı manuel PDF olarak kaydeder ancak orijinal Word dosyası da aynı klasörde düzenlemeye açık kalır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dokumanlar_duzenlenebilir_formatta_serbestce_durur",
+          "label": "Tüm dokümanlar Word/Excel olarak açıktır; herhangi bir çalışan dosyayı yanlışlıkla değiştirebilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-031",
+      "order": 31,
+      "process": "Satınalma, tedarikçi ve müşteri dokümanları",
+      "question": "Tedarikçi sözleşmeleri, teklif formları, müşteri teknik şartnameleri ve garanti belgeleri ERP/CRM kartlarına nasıl bağlanır?",
+      "description": "İlgili cari hesap, satınalma siparişi veya satış faturası kartı ile doküman bağlantısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_crm_kartlarina_dogrudan_ilisiklendirilerek_saklanir",
+          "label": "Dokümanlar ERP/CRM içinde ilgili cari, sipariş, teklif veya fatura kartına ek olarak bağlı tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "harici_klasorde_musteri_tedarikci_adiyla_tutulur",
+          "label": "Dosyalar dosya sunucusunda firma adıyla açılan klasörlerde tutulur; ERP kaydıyla otomatik bağı yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dokumanlar_daginiktir_iliski_kurulamamaktadir",
+          "label": "Sipariş ve müşteri dokümanları çalışanların e-postalarında veya fiziksel klasörlerde dağınıktır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-032",
+      "order": 32,
+      "process": "Satınalma, tedarikçi ve müşteri dokümanları",
+      "question": "Tedarikçi yeterlilik belgeleri, ISO sertifikaları ve vergi levhası geçerlilik süreleri nasıl denetlenir?",
+      "description": "Tedarikçilerin güncel yasal ve kalite sertifikalarının takibi ve süresi dolanlara sipariş engeli.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "suresi_dolan_tedarikci_belgesinde_otomatik_siparis_blokesi_konur",
+          "label": "Sertifika bitiş tarihi sistemde tutulur; süresi dolan tedarikçiye yeni satınalma siparişi açılması engellenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satinalma_ekibi_manuel_kontrol_eder_bloke_yoktur",
+          "label": "Belgeler klasörde tutulur, satınalma uzmanı periyodik olarak manuel kontrol eder; sistem uyarısı yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_belge_gecerlilik_takibi_yapilmamaktadir",
+          "label": "Tedarikçiden bir kez belge alınır, sonrasında güncellik ve geçerlilik süresi takip edilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-033",
+      "order": 33,
+      "process": "Personel ve insan kaynakları dokümanları",
+      "question": "Personel özlük dosyaları, iş sözleşmeleri, sağlık raporları ve KVKK açık rıza formları nasıl saklanmaktadır?",
+      "description": "İnsan kaynakları dokümantasyonunun güvenliği, KVKK uyumu ve erişim gizliliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "dijital_ozluk_dosyasinda_sifreli_ve_kvkk_uyumlu_saklanir",
+          "label": "Tüm özlük evrakları dijital özlük dosyasında KVKK uyumlu şifreli alanda ve sadece İK yetkililerine açık tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiziksel_kilitli_dolapta_ve_temel_pdf_klasorunde_durur",
+          "label": "Asılları İK'nın kilitli dolabında, taramaları şifresiz ortak ağ klasöründe saklanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sadece_fiziksel_kagit_ozluk_dosyasi_tutulmaktadir",
+          "label": "Dijital özlük arşivi yoktur; tüm personel evrakları sadece fiziki klasörlerde tutulmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-034",
+      "order": 34,
+      "process": "Personel ve insan kaynakları dokümanları",
+      "question": "Çalışanların kendi özlük belgelerini (bordro, izin formu, zimmet belgesi) dijital ortamda görüntüleme yetkisi var mıdır?",
+      "description": "Personel self-servis portalı üzerinden belgelere erişim imkanı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "calisan_self_servis_portalindan_kendi_belgelerine_erisir",
+          "label": "Personel web/mobil portaldan kendi bordro, zimmet ve izin formlarını güvenle görüntüleyip indirebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "belgeler_e_posta_ile_veya_talep_uzerine_verilir",
+          "label": "Portal yoktur; çalışan İK'dan talep ettiğinde belgeler e-posta ile iletilir veya çıktısı verilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "calisanin_dijital_belge_erisimi_yoktur",
+          "label": "Çalışanın hiçbir dijital belge erişimi yoktur; tüm işlemler fiziki kağıt ve ıslak imza ile yürür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-035",
+      "order": 35,
+      "process": "Finansal ve muhasebesel dokümanlar",
+      "question": "Ticari defterler, mizan/bilanço raporları, banka ekstreleri ve mahkeme/denetim kanıt dosyaları nasıl arşivlenmektedir?",
+      "description": "Mali denetim, vergi incelemesi ve resmi kurum talepleri için finansal kanıt belgelerinin saklanması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "mali_yil_ve_donem_bazinda_yapilandirilmis_dijital_arsivde_tutulur",
+          "label": "Finansal evraklar mali yıl, dönem ve işlem türüne göre ayrılmış dijital ve fiziksel arşivde güvenle tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muhasebe_klasorlerinde_ve_banka_portallarinda_parcali_durur",
+          "label": "Belgeler muhasebe personelinin bilgisayarlarında ve banka internet şubelerinde parçalı tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sadece_klasorlerde_kagit_olarak_saklanir_dijitallesme_yoktur",
+          "label": "Finansal dokümanlar sadece klasörlenip koliyle ardiye/depoya kaldırılır, dijital arşiv yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-036",
+      "order": 36,
+      "process": "Finansal ve muhasebesel dokümanlar",
+      "question": "Muhasebe fişleri, gider pusulaları ve masraf formları taranmış fiş/fatura görselleriyle doğrudan eşleşmekte midir?",
+      "description": "Muhasebe yevmiye maddesinden veya masraf kaydından tek tıkla fatura/fiş görseline ulaşabilme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yevmiye_fisine_tarali_belge_gorseli_eklenir_tek_tikla_acilir",
+          "label": "Muhasebe fişi içine taranmış evrak eklenir; denetçi veya muhasebeci fişten doğrudan görseli açabilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fis_numarasi_fiziki_fatura_uzerine_yazilip_klasorlenir",
+          "label": "Fiş numarası kağıt faturaya kalemle yazılır ve klasöre kaldırılır; sistemde dijital görsel yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "muhasebe_kaydi_ile_belge_eslesmesi_takipsizdir",
+          "label": "Kayıt ile fiziksel fatura arasında bağlantı kurulamaz, geriye dönük evrak aramak çok uzun sürer",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-037",
+      "order": 37,
+      "process": "Doküman arama ve filtreleme",
+      "question": "Şirketinizde kurumsal dokümanların saklanması ve merkezi aranması için özel bir doküman yönetim yazılımı (DMS/EDMS) kullanılmakta mıdır?",
+      "description": "Özel doküman yönetim sistemi varlığı veya işletim sistemi dosya paylaşım yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_dms_veya_harici_dokuman_sistemi_var",
+          "label": "Şirketimizde özel bir Doküman Yönetim Sistemi (OpenText, FileNet, Alfresco, PaperWork, SharePoint vb.) kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "erp_nin_kendi_yerlesik_dokuman_modulu_kullanilmaktadir",
+          "label": "Ayrı bir DMS yoktur; ERP sisteminin kendi standart dosya ekleme ve arşivleme fonksiyonu kullanılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sadece_isletim_sistemi_ag_surucusu_file_server_vardir",
+          "label": "Herhangi bir DMS yazılımı yoktur; Windows/Linux File Server ağ sürücüleri kullanılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-038",
+      "order": 38,
+      "process": "Doküman arama ve filtreleme",
+      "question": "Harici doküman yönetim sisteminin (DMS/EDMS) ERP, CRM ve diğer iş uygulamalarıyla entegrasyonu nasıl sağlanmaktadır?",
+      "description": "API, web servis veya CMIS protokolü üzerinden iki yönlü doküman alışverişi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-037",
+        "operator": "equals",
+        "value": "merkezi_dms_veya_harici_dokuman_sistemi_var"
+      },
+      "options": [
+        {
+          "value": "api_ve_web_servis_ile_tam_otomatik_cift_yonlu_entegrasyon_var",
+          "label": "ERP'den oluşturulan dokümanlar DMS'e otomatik aktarılır ve ERP içinden DMS dokümanları görüntülenebilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokuman_linki_url_olarak_erp_kartina_yapistirilir",
+          "label": "Otomasyon yoktur; kullanıcı DMS'teki dokümanın linkini kopyalayıp ERP kartına manuel yapıştırır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sistemler_tamamen_bagimsizdir_entegrasyon_yoktur",
+          "label": "DMS ve ERP tamamen kopuk çalışır, aynı doküman iki farklı yere mükerrer olarak yüklenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-039",
+      "order": 39,
+      "process": "Doküman arama ve filtreleme",
+      "question": "Dokümanlar içinde arama yaparken tam metin (Full-text search), OCR metin ayrıştırma ve çok kriterli arama yapılabilmekte midir?",
+      "description": "PDF ve taranmış belgelerin içindeki kelimelere göre arama ve gelişmiş filtreleme yeteneği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ocr_ve_icerik_ici_tam_metin_arama_tam_desteklenir",
+          "label": "Taranan belgeler otomatik OCR'dan geçer; hem metadata hem de belgenin iç metni aranabilir ve anında bulunur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_dosya_adi_ve_temel_metadata_ile_arama_yapilir",
+          "label": "Belge içi metin aranamaz; yalnızca dosya adı ve girilmiş olan temel etiket alanlarına göre filtrelenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "arama_motoru_yoktur_klasorler_manuel_aranir",
+          "label": "Merkezi arama imkanı yoktur; kullanıcılar klasörleri tek tek açıp dosyaları gözle aramak zorundadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-040",
+      "order": 40,
+      "process": "E-posta ve dış kaynaklı dokümanların kaydı",
+      "question": "Müşteri ve tedarikçilerden gelen kritik e-postalar, ekler ve resmi yazışmalar merkezi doküman sistemine nasıl aktarılır?",
+      "description": "Outlook/e-posta entegrasyonu, resmi yazı kayıt defteri ve gelen/giden evrak yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "e_posta_eklentisi_ile_tek_tikla_merkezi_arsive_kaydedilir",
+          "label": "Outlook/Mail eklentisiyle e-posta ve ekleri doğrudan ilgili proje, müşteri veya doküman klasörüne kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "personel_eki_bilgisayara_indirip_manuel_yukler",
+          "label": "E-posta eki masaüstüne indirilir, sonrasında ortak klasöre veya ERP'ye manuel yüklenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "e_postalar_kisisel_posta_kutusunda_kalir_sisteme_girmez",
+          "label": "Kritik yazışmalar personelin şahsi posta kutusunda kalır; personel ayrıldığında yazışma geçmişi kaybolur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-041",
+      "order": 41,
+      "process": "Arşivleme, saklama ve imha politikaları",
+      "question": "Şirketinizde fiziksel ve dijital arşiv saklama modeli nasıl işletilmektedir?",
+      "description": "Fiziksel klasörler, arşiv odaları ve elektronik arşivin birlikte yönetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "fiziksel_ve_elektronik_hibrit_arsiv_kullanilmaktadir",
+          "label": "Hem fiziksel arşiv odası/kutuları hem de dijital arşiv eşleştirilmiş ve kurallara bağlı işletilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_dijital_arsiv_kullanilir_kagitlar_imha_edilir",
+          "label": "Şirketimiz kağıtsız ofis hedefindedir; yasal zorunluluk dışındaki belgeler taranıp kağıt ortamı imha edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sadece_geleneksel_fiziki_klasor_arsivi_vardir",
+          "label": "Elektronik arşiv yoktur; tüm belgeler sadece fiziksel dosya dolaplarında ve arşiv odalarında tutulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-042",
+      "order": 42,
+      "process": "Arşivleme, saklama ve imha politikaları",
+      "question": "Fiziksel arşiv kutu/klasör barkodlaması ve dijital sistemdeki raf/lokasyon adresi eşleşmesi nasıl yürütülür?",
+      "description": "Fiziksel evrağın hangi arşiv odasında, hangi rafta ve kutuda olduğunun sistemden anlık sorgulanması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "DOC-041",
+        "operator": "equals",
+        "value": "fiziksel_ve_elektronik_hibrit_arsiv_kullanilmaktadir"
+      },
+      "options": [
+        {
+          "value": "barkodlu_kutu_ve_raf_adresi_sistemde_birebir_eslesir",
+          "label": "Her fiziksel klasör/kutu barkodludur; sistemden belge sorgulandığında tam raf ve kutu adresi listelenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_de_kutu_listesi_tutulur_arama_manueldir",
+          "label": "Arşiv kutu içerikleri bir Excel dosyasında tutulur, fiziki belge ararken listeden kontrol edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fiziksel_arsivde_yerlesim_plani_yoktur_arama_zordur",
+          "label": "Fiziki arşivde adresleme ve barkodlama yoktur; eski evrak aramak günlerce sürebilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-043",
+      "order": 43,
+      "process": "Arşivleme, saklama ve imha politikaları",
+      "question": "Yasal ve kurumsal doküman saklama süreleri (TTK, VUK, KVKK gereği 5-10 yıl vb.) sistemde nasıl tanımlanmıştır?",
+      "description": "Doküman kategorisine göre yasal saklama sürelerinin otomatik işletilmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kategori_bazinda_yasal_saklama_plani_ve_sure_sayaci_var",
+          "label": "Her doküman türünün yasal saklama süresi tanımlıdır; sistem süresi dolan evrakları imha listesine taşır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokumanlar_sonsuza_kadar_saklanir_imha_yapilmaz",
+          "label": "Saklama süresi ayrımı yoktur; tüm dijital ve fiziksel belgeler süresiz olarak biriktirilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yasal_saklama_sureleri_takip_edilmemektedir",
+          "label": "Yasal saklama süreleri bilinmemekte veya takip edilmemekte, yer doldukça rastgele temizlik yapılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-044",
+      "order": 44,
+      "process": "Arşivleme, saklama ve imha politikaları",
+      "question": "Saklama süresi dolan dokümanların imhası için resmi onay, imha tutanağı ve güvenli yok etme prosedürü uygulanır mı?",
+      "description": "KVKK ve kurumsal denetim standartlarına uygun güvenli silme, parçalama ve imha tutanağı düzenleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "imha_komisyonu_onayi_ve_tutanakli_guvenli_imha_uygulanir",
+          "label": "Süresi dolan belgeler imha komisyonunca onaylanır, tutanak düzenlenir ve dijital/fiziksel olarak yok edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kullanicilar_ihtiyac_duyulmadikca_manuel_siler",
+          "label": "Resmi imha prosedürü yoktur; kullanıcılar veya IT disk doldukça dosyaları doğrudan siler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "hicbir_dokuman_imha_edilmez_biriktirilir",
+          "label": "Şirketimizde bugüne kadar hiçbir doküman imha edilmemiştir; tüm arşiv korunmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-045",
+      "order": 45,
+      "process": "Doküman süresi, geçerlilik tarihi ve yenileme takibi",
+      "question": "Süreli dokümanların (lisanslar, yetki belgeleri, işyeri ruhsatları, sertifikalar) geçerlilik süresi nasıl takip edilir?",
+      "description": "Bitiş tarihine göre ilgili departmana ve yöneticiye otomatik hatırlatma uyarıları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gecerlilik_tarihi_sistemde_tanimlidir_ve_otomatik_uyarir",
+          "label": "Tüm süreli belgelerin bitiş tarihi sisteme girilir; süre yaklaşınca ilgili personele otomatik alarm iletilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ilgili_departman_kendi_takviminde_manuel_hatirlatma_tutar",
+          "label": "Sistem uyarısı yoktur; her departman kendi Outlook takvimine veya notlarına göre tarihi hatırlar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sure_takibi_yoktur_denetim_veya_ceza_geldiginde_fark_edilir",
+          "label": "Geçerlilik süresi takip edilememekte; süresi dolan sertifika veya ruhsatlar gecikmeyle yenilenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-046",
+      "order": 46,
+      "process": "Doküman süresi, geçerlilik tarihi ve yenileme takibi",
+      "question": "Geçerlilik süresi dolan dokümanların sistemde otomatik olarak 'Geçersiz / Süresi Doldu' statüsüne alınması sağlanır mı?",
+      "description": "Süresi dolmuş belgenin aktif kullanımının otomatik engellenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "suresi_dolunca_otomatik_pasife_alinir_ve_kullanimi_engellenir",
+          "label": "Bitiş tarihi gelen doküman otomatik olarak 'Süresi Doldu' durumuna geçer ve operasyonlarda kullanılamaz",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dokuman_statu_degistirmez_yeni_belge_gelene_kadar_aktif_gorunur",
+          "label": "Sistem otomatik statü değiştirmez; personel yeni belgeyi yükleyene kadar eski belge aktif kalır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dokuman_statuleri_kullanilmamaktadir",
+          "label": "Statü mekanizması yoktur; süresi geçmiş belgeler de normal doküman gibi görünmeye devam eder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "DOC-047",
+      "order": 47,
+      "process": "Doküman denetim izi, raporlama ve KPI",
+      "question": "Doküman erişim, indirme, revizyon, silme ve yetki değişikliklerinin denetim izi (Audit Trail) ve KPI raporlaması nasıl yapılmaktadır?",
+      "description": "Zaman damgalı işlem logları, kullanıcı hareket geçmişi ve doküman yönetim olgunluk metrikleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "degistirilemez_zaman_damgali_audit_trail_ve_kpi_dashboard_var",
+          "label": "Tüm okuma/yazma/indirme/silme hareketleri değiştirilemez loglanır; doküman işlem hacmi ve revizyon KPI'ları raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_son_degistiren_kullanici_ve_tarih_goruntulenir",
+          "label": "Detaylı log yoktur; yalnızca dosyanın üzerinde 'Son Değiştiren' kişi ve tarih bilgisi görünür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "denetim_izi_veya_raporlama_mekanizmasi_yoktur",
+          "label": "Kimlerin dokümanı görüntülediği, indirdiği veya değiştirdiği geriye dönük tespit edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

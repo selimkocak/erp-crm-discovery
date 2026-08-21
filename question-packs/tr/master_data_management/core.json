@@ -1,0 +1,815 @@
+{
+  "meta": {
+    "pack_id": "tr.master_data_management.core",
+    "name": "Ana Veri ve Veri Kalitesi Yönetimi Soru Paketi",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "business_function_code": "MASTER_DATA_MANAGEMENT",
+    "description": "ERP ve CRM dönüşüm projeleri öncesinde stok, cari, varlık, reçete ve organizasyon ana verilerinin yönetişim olgunluğunu, kodlama standartlarını, mükerrerlik düzeyini ve migrasyon hazırlığını değerlendiren saha keşif soru paketi.",
+    "language": "tr",
+    "author": "Antigravity Discovery Engine",
+    "tags": [
+      "master_data",
+      "data_quality",
+      "data_governance",
+      "stok_karti",
+      "cari_kart",
+      "duran_varlik",
+      "kodlama_standardi",
+      "mukerrer_kayit",
+      "veri_migrasyonu",
+      "erp_hazirlik"
+    ]
+  },
+  "questions": [
+    {
+      "id": "MDM-001",
+      "order": 1,
+      "process": "Ana Veri Yönetişimi ve Strateji",
+      "question": "Şirket genelinde ana veri yönetimi (Master Data Governance) politikası ve veri stratejisi tanımlı mıdır?",
+      "description": "Ana verilerin (malzeme, müşteri, tedarikçi, hesap planı) tek bir kurumsal standartla yönetilmesi ve stratejik veri sahipliği yaklaşımı değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "yazili_politika_ve_merkezi_yonetisim_var", "label": "Yazılı ana veri politikası ve kurumsal veri yönetişim komitesi/yapısı mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "departman_bazli_gayriresmi_kurallar_var", "label": "Yazılı politika yoktur; departmanlar kendi iç teamülleriyle veri yönetmektedir", "allow_note": true, "is_other": false },
+        { "value": "herhangi_bir_politika_veya_kural_yok", "label": "Tanımlı bir veri politikası veya kural seti bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-002",
+      "order": 2,
+      "process": "Ana Veri Yönetişimi ve Strateji",
+      "question": "Yeni ana veri (stok, cari, varlık) oluşturma, güncelleme ve arşivleme süreçleri yazılı bir prosedüre bağlı mıdır?",
+      "description": "Veri yaşam döngüsü adımlarının (kart açılışı, bilgi revizyonu, pasife alma) kurumsal prosedürle güvenceye alınma durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_yazili_prosedur_ve_form_var", "label": "Resmi yazılı prosedür ve standart talep/onay formu kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "kismi_yazili_dokumantasyon_var", "label": "Bazı veri tipleri için kısmi dokümantasyon vardır ancak tüm kartları kapsamaz", "allow_note": true, "is_other": false },
+        { "value": "sozlu_ve_serbest_talep_ile_yurutulur", "label": "Yazılı prosedür yoktur; sözlü veya e-posta ile gelen taleplerle açılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-003",
+      "order": 3,
+      "process": "Veri Sahipliği ve Steward Rolleri",
+      "question": "Ana veri alanlarında (malzeme, müşteri, tedarikçi, muhasebe) veri sahipleri (Data Owner / Data Steward) atanmış mıdır?",
+      "description": "Hangi verinin doğruluğundan, onayından ve güncelliğinden hangi departmanın sorumlu olduğunun netliği araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "rol_ve_sorumluluklar_resmen_tanimli", "label": "Her ana veri alanı için resmi veri sahibi (Data Owner) ve veri yöneticisi (Data Steward) atanmıştır", "allow_note": false, "is_other": false },
+        { "value": "rol_belirsiz_fiilen_bt_veya_operatorde", "label": "Resmi atama yoktur; veri sahipliği fiilen BT veya veri giren operatörlerin üzerindedir", "allow_note": true, "is_other": false },
+        { "value": "veri_sahipligi_kavrami_bulunmamaktadir", "label": "Veri sahipliği veya yönetici rolü kavramı işletmede tanımlı değildir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-004",
+      "order": 4,
+      "process": "Veri Sahipliği ve Steward Rolleri",
+      "question": "Ana veri değişiklik talepleri hangi onay ve doğrulama mekanizması üzerinden sisteme yansıtılmaktadır?",
+      "description": "Fiyat, vade, unvan, vergi no, GTİP gibi kritik veri değişikliklerinde işletilen yetki ve kontrol adımları değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_ici_elektronik_is_akisi_ile", "label": "Sistem üzerinden çok seviyeli elektronik onay iş akışı ile onaylanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "e_posta_veya_ticket_onayi_ile", "label": "E-posta veya destek talebi (ticket) üzerinden yönetici onayı alınarak işlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "onaysiz_yetkili_kullanici_dogrudan_degistirir", "label": "Yetkili kullanıcılar herhangi bir onaya ihtiyaç duymadan doğrudan değiştirebilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-005",
+      "order": 5,
+      "process": "Kodlama ve Numaralandırma Standartları",
+      "question": "Stok, cari ve diğer ana kartlar için standart bir akıllı/otomatik kodlama şablonu uygulanıyor mu?",
+      "description": "Kod yapısının (örn. HAM-MET-001, CAR-M-IST-0042) anlamlı hiyerarşik segmentlere mi yoksa sistemsel artan numaraya mı dayandığı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "standart_akilli_kodlama_ve_otomatik_numaralama", "label": "Standart segmentli akıllı kodlama şablonu ve sistemden otomatik numara üretimi vardır", "allow_note": false, "is_other": false },
+        { "value": "sadece_otomatik_sirali_numara_var", "label": "Segmentli kodlama yoktur; sadece sistemin ürettiği sıralı sayısal numara kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "kullanici_manuel_serbest_kod_yazmaktadir", "label": "Standart kodlama kuralı yoktur; kullanıcılar serbestçe istedikleri kodu yazmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-006",
+      "order": 6,
+      "process": "Kodlama ve Numaralandırma Standartları",
+      "question": "Kart kodlarında ve açıklama alanlarında büyük/küçük harf, Türkçe karakter ve özel karakter standartları denetleniyor mu?",
+      "description": "Arama, raporlama ve entegrasyonlarda problem yaratan tutarsız karakter girişlerinin (noktalı/noktasız I-İ, özel işaretler) kontrolü değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_normalize_ve_kontrol_eder", "label": "Sistem karakterleri otomatik büyütür, boşlukları temizler ve özel karakterleri filtreler", "allow_note": false, "is_other": false },
+        { "value": "manuel_dikkat_edilir_sistemsel_engel_yok", "label": "Kullanıcıların dikkat etmesi beklenir; sistemsel bir zorlama veya temizleme filtresi yoktur", "allow_note": true, "is_other": false },
+        { "value": "karakter_standardi_bulunmamaktadir", "label": "Herhangi bir karakter kuralı yoktur; serbest ve düzensiz girişler mevcuttur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-007",
+      "order": 7,
+      "process": "Malzeme ve Stok Kartı Ana Verisi",
+      "question": "Stok kartı açılışında zorunlu tutulan temel alanlar (ad, birim, tip, KDV, GTİP vb.) standartlaştırılmış mıdır?",
+      "description": "Malzemenin ticari, lojistik ve mali boyutlarını eksiksiz tanımlayan alanların kart açılışındaki zorunluluk düzeyi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tum_temel_alanlar_sistemce_zorunlu_tutulur", "label": "Tüm temel alanlar (malzeme türü, ana birim, KDV oranı, GTİP, muhasebe grubu) zorunludur", "allow_note": false, "is_other": false },
+        { "value": "sadece_kod_ve_ad_zorunlu_digerleri_opsiyonel", "label": "Yalnızca kod ve açıklama zorunludur; diğer teknik ve mali alanlar boş bırakılabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "zorunlu_alan_tanimi_bulunmamaktadir", "label": "Sistemde zorunlu alan kontrolü bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-008",
+      "order": 8,
+      "process": "Kategori Hiyerarşisi ve Sınıflandırma",
+      "question": "Stok kartları için kategori ve ürün sınıflandırma ağacı kaç seviyeli bir hiyerarşide yönetilmektedir?",
+      "description": "Ana grup, grup, alt grup, ürün sınıfı ve özellik ağacının derinliği ve raporlama mimarisine uygunluğu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "cok_seviyeli_hiyerarsi", "label": "3 veya daha fazla seviyeli hiyerarşik kategori ağacı (Ana Grup -> Grup -> Alt Grup -> Sınıf) kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "iki_seviyeli_basit_kategori", "label": "Yalnızca 2 seviyeli basit kategori yapısı (Ana Grup -> Alt Grup) mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "tek_seviyeli_duz_kategori_veya_etiket", "label": "Tek seviyeli düz kategori listesi veya serbest etiketler kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "kategori_agaci_kullanilmamaktadir", "label": "Tanımlı bir kategori ağacı veya sınıflandırma yapısı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-009",
+      "order": 9,
+      "process": "Kategori Hiyerarşisi ve Sınıflandırma",
+      "question": "Çok seviyeli kategori yapısında alt kategorilerin ana kategoriyle bağı ve raporlama standartları nasıl güvenceye alınır?",
+      "description": "Hiyerarşideki parent-child ilişkisinin tutarlılığı ve yanlış kategori seçimine karşı işletilen kurallar araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "MDM-008",
+        "operator": "equals",
+        "value": "cok_seviyeli_hiyerarsi"
+      },
+      "options": [
+        { "value": "iliski_katidir_yanlis_eslesme_sistemce_engellenir", "label": "Hiyerarşik ilişki katıdır; alt kategori seçildiğinde üst hiyerarşi otomatik kilitlenir", "allow_note": false, "is_other": false },
+        { "value": "iliski_esnektir_farkli_kombinasyonlar_olabilir", "label": "İlişki esnektir; zaman zaman uyumsuz ana-alt grup eşleşmeleri yaşanabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "manuel_tablo_ile_kontrol_edilir", "label": "Sistemik kontrol yoktur; Excel eşleme tablosu ile manuel takip edilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-010",
+      "order": 10,
+      "process": "Marka, Model ve Grup Tanımları",
+      "question": "Stok kartlarında marka, model, üretici kodu ve ürün grubu tanımları standart referans tablolardan mı seçilmektedir?",
+      "description": "Serbest metin yazılması sebebiyle oluşan yazım farklılıklarının (örn. Apple / APPLE / Apl) referans tablolarla engellenme durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tum_marka_model_referans_tablodan_secilir", "label": "Tüm marka, model ve üretici bilgileri merkezi referans tablolarından zorunlu seçilir", "allow_note": false, "is_other": false },
+        { "value": "kismi_tablodan_kismi_serbest_metin", "label": "Marka tablodan seçilir ancak model ve üretici kodu serbest metin girilmektedir", "allow_note": true, "is_other": false },
+        { "value": "tamamen_serbest_metin_girilmektedir", "label": "Referans tablosu yoktur; marka ve model tamamen serbest metin olarak yazılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-011",
+      "order": 11,
+      "process": "Ölçü Birimleri ve Çevrim Katsayıları",
+      "question": "Malzemeler için ana ölçü birimi yanında alternatif birimler (koli, paket, palet, ton, m2 vb.) ve çevrim katsayıları tanımlı mıdır?",
+      "description": "Satınalma, depo sayımı ve satış işlemlerinde farklı birimlerin birbirine hatasız dönüştürülmesi için gereken katsayı mimarisi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sabit_ve_dinamik_alternatif_birimler_tanimli", "label": "Tüm ürünlerde ana birim ve geçerli çevrim katsayılarıyla alternatif birimler tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "sadece_bazi_urunlerde_alternatif_birim_var", "label": "Sadece belirli kritik ürünlerde tanımlıdır; çoğunlukta tek ana birim kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "yalnizca_tek_birim_kullanilir_cevrim_manueldir", "label": "Alternatif birim yapısı yoktur; çevrimler manuel hesaplanarak tek birime çevrilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-012",
+      "order": 12,
+      "process": "Ölçü Birimleri ve Çevrim Katsayıları",
+      "question": "Farklı departmanların (satınalma kg, depo adet, satış koli) aynı ürün için farklı birim kullanması durumunda standart çevrim kuralları işletiliyor mu?",
+      "description": "Departmanlar arası birim uyuşmazlığından kaynaklanan stok miktar ve maliyet sapmalarının önlenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistem_otomatik_cevrim_ve_kontrol_yapar", "label": "Sistem işlem tipine göre otomatik çevrim yapar ve stok/maliyet dengesini korur", "allow_note": false, "is_other": false },
+        { "value": "kullanici_giriste_manuel_cevrim_yapar", "label": "Kullanıcılar evrak girişinde katsayıları manuel hesaplayıp ana birime dönüştürür", "allow_note": true, "is_other": false },
+        { "value": "farkli_birimler_ayri_stok_karti_olarak_acilir", "label": "Birim farkı olan durumlar için ayrı ayrı mükerrer stok kartları açılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-013",
+      "order": 13,
+      "process": "Varyant ve Özellik Yönetimi",
+      "question": "Ürün ve malzemelerde renk, beden, boyut, kalınlık veya teknik özellik gibi varyant (matrix) yönetimi bulunmakta mıdır?",
+      "description": "Aynı ana ürünün farklı varyasyonlarının tek ana kart altında mı yoksa bağımsız açılan kartlarla mı yönetildiği değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "evet_varyant_matrisi_kullanilmaktadir", "label": "Evet, renk/beden/boyut gibi çok boyutlu varyant matrisi aktif kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "hayir_her_varyant_icin_ayri_kart_acilir", "label": "Hayır, her renk/beden varyasyonu için bağımsız ayrı stok kartı açılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "urun_yapimizda_varyant_ihtiyaci_yoktur", "label": "Ürün portföyümüzde varyantlı ürün yapısı ve ihtiyacı bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-014",
+      "order": 14,
+      "process": "Varyant ve Özellik Yönetimi",
+      "question": "Varyantlı ürünlerin barkod, fiyat ve stok takibi ana kart altında dinamik matris olarak mı yoksa ayrı bağımsız kartlar olarak mı açılmaktadır?",
+      "description": "Varyant seviyesinde tekil barkod (EAN-13), özel fiyat ve ayrı stok bakiyesi tutulabilme kabiliyeti incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "MDM-013",
+        "operator": "equals",
+        "value": "evet_varyant_matrisi_kullanilmaktadir"
+      },
+      "options": [
+        { "value": "ana_kart_altinda_tekil_barkod_ve_fiyatli_matris", "label": "Ana kart altında her varyantın kendine ait barkodu, fiyatı ve stok bakiyesi mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "sadece_stok_bakiyesi_ayri_barkod_ortaktir", "label": "Stok miktarları varyant bazında ayrılır ancak barkod ve fiyat ana karttan miras alınır", "allow_note": true, "is_other": false },
+        { "value": "aciklama_alaninda_metin_olarak_belirtilir", "label": "Sistemsel matris yoktur; açıklama alanında varyant bilgisi metin olarak yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-015",
+      "order": 15,
+      "process": "Satınalma ve Satış Kartı Entegrasyonu",
+      "question": "Stok kartlarında satınalma ve satış departmanlarına özel parametreler (tedarik süresi, asgari sipariş, satış birimi) ana kartta tanımlı mıdır?",
+      "description": "Operasyonel parametrelerin stok kartı açılışında ilgili departmanlar tarafından doldurulup doldurulmadığı araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tum_departman_parametreleri_ana_kartta_tanimli", "label": "Tedarik süresi, güvenlik stoğu, asgari/azami sipariş ve satış ambalajı tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "kismi_parametreler_tanimlidir", "label": "Sadece belirli parametreler girilmiştir; çoğu alanda varsayılan 0 değeri kalmaktadır", "allow_note": true, "is_other": false },
+        { "value": "departman_parametreleri_kartta_tutulmamaktadir", "label": "Bu parametreler kartta tutulmaz; sipariş anında manuel belirlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-016",
+      "order": 16,
+      "process": "Satınalma ve Satış Kartı Entegrasyonu",
+      "question": "Satışa kapalı veya tedariği durdurulmuş ürünler için kart bazında statü (aktif, pasif, bloke, tükenen) yönetimi yapılıyor mu?",
+      "description": "Kullanılmayan veya üretimden kalkan ürünlerin operasyonel evraklarda yanlışlıkla seçilmesini engelleyen statü kontrolleri değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kapsamli_statu_ve_islem_blokaji_var", "label": "Aktif/Pasif/Bloke statüleri vardır ve pasif ürünlerde evrak girişi sistemce engellenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_aktif_pasif_isareti_var_uyari_verir", "label": "Aktif/pasif bayrağı vardır ancak sadece uyarı verir, işlemi kesin olarak engellemez", "allow_note": true, "is_other": false },
+        { "value": "statu_yonetimi_yok_eski_kartlar_listede_durur", "label": "Statü yönetimi yoktur; yıllar öncesinin kullanılmayan ürünleri listede görünmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-017",
+      "order": 17,
+      "process": "Tedarikçi Ana Verisi ve Kalitesi",
+      "question": "Tedarikçi kartlarında resmi unvan, VKN/TCKN, vergi dairesi ve e-fatura posta kutusu bilgileri nasıl doğrulanmaktadır?",
+      "description": "Tedarikçi ana verisinin mali mevzuata uygunluğu ve vergi kimlik numarası doğrulama metodolojisi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "gib_ve_vergi_levhasi_uzerinden_otomatik_dogrulama", "label": "Vergi levhası kontrol edilir ve GİB servisleri üzerinden VKN/e-Fatura sorgusu yapılır", "allow_note": false, "is_other": false },
+        { "value": "manuel_vergi_levhasi_kontrolu_yapilir", "label": "Vergi levhası manuel kontrol edilir ancak sistemsel entegre sorgu yoktur", "allow_note": true, "is_other": false },
+        { "value": "tedarikci_beyanina_gore_dogrulamasiz_girilir", "label": "Tedarikçinin gönderdiği evraktaki bilgiye göre herhangi bir doğrulama olmadan girilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-018",
+      "order": 18,
+      "process": "Tedarikçi Ana Verisi ve Kalitesi",
+      "question": "Tedarikçi banka hesap ve IBAN bilgileri sisteme girilirken onay süreci ve veri güvenliği kontrolü uygulanmakta mıdır?",
+      "description": "Dolandırıcılık ve yanlış ödeme risklerine karşı IBAN-unvan uyumu ve banka bilgisi değişiklik kontrolleri araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "resmi_banka_yazisi_ve_cift_onay_is_akisi_var", "label": "Resmi kaşeli banka yazısı zorunludur ve IBAN değişiklikleri çift yönetici onayıyla yapılır", "allow_note": false, "is_other": false },
+        { "value": "fatura_uzerindeki_iban_manuel_kontrol_edilir", "label": "Fatura üzerindeki IBAN ile eşleştirilir; sistemde katı bir değişiklik onayı yoktur", "allow_note": true, "is_other": false },
+        { "value": "onaysiz_ve_kontrolsuz_girilmektedir", "label": "E-posta veya telefonla gelen IBAN bilgisi onay aranmaksızın doğrudan güncellenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-019",
+      "order": 19,
+      "process": "Müşteri ve Cari Kart Ana Verisi",
+      "question": "Müşteri kartı açılışında resmi ticari unvan, VKN/TCKN ve GİB e-Fatura/e-İrsaliye mükellefiyet sorgusu otomatik yapılıyor mu?",
+      "description": "Hatalı fatura ve yasal cezaları önlemek amacıyla cari kart açılışındaki otomatik e-Dönüşüm sorgu entegrasyonu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "vkn_ile_otomatik_unvan_ve_gib_sorgusu_var", "label": "VKN girildiğinde ticari unvan, vergi dairesi ve e-Fatura/e-İrsaliye durumu otomatik çekilir", "allow_note": false, "is_other": false },
+        { "value": "manuel_gib_portalinden_bakilip_girilir", "label": "Sistem içi otomatik sorgu yoktur; kullanıcı GİB portalından bakıp elle girmektedir", "allow_note": true, "is_other": false },
+        { "value": "sorgulama_yapilmadan_manuel_yazilir", "label": "Sorgulama yapılmaz; müşterinin bildirdiği unvan ve VKN doğrudan yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-020",
+      "order": 20,
+      "process": "Müşteri ve Cari Kart Ana Verisi",
+      "question": "Müşteri adresleri (fatura adresi, sevk/teslimat adresi, şubeler) ayrıştırılmış ve standart lokasyon yapısında mı saklanmaktadır?",
+      "description": "Fatura ve sevkiyat adreslerinin ayrı tanımlanabilmesi, il/ilçe/posta kodu standardı ve lojistik entegrasyon kalitesi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "ayrik_sevk_adresleri_ve_standart_il_ilce_var", "label": "Fatura ve sevk adresleri ayrı kartlar olarak standart il/ilçe/posta kodu ile tutulmaktadır", "allow_note": false, "is_other": false },
+        { "value": "tek_adres_alani_var_sevk_adresi_manuel_yazilir", "label": "Kartta tek adres alanı vardır; farklı sevk adresleri evrak üzerine manuel yazılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "adresler_serbest_metin_ve_standartsizdir", "label": "Adresler serbest metin olarak tutulur; il/ilçe standardı ve ayrımı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-021",
+      "order": 21,
+      "process": "Cari Hesap Grupları ve Segmentasyon",
+      "question": "Müşteri ve tedarikçiler için cari hesap grubu, sektör, bölge ve kurumsal segmentasyon kodları standart mıdır?",
+      "description": "Mali mizan, risk analizi, satış ve satınalma raporlarında kullanılacak gruplama kriterlerinin tutarlılığı incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "standart_grup_ve_segment_kodlari_zorunludur", "label": "Cari grubu, sektör, bölge ve risk sınıfı zorunlu referans kodlarından seçilmektedir", "allow_note": false, "is_other": false },
+        { "value": "sadece_temel_cari_grubu_tanimlidir", "label": "Yalnızca alıcı/satıcı temel grubu vardır; detaylı sektör veya bölge segmentasyonu yoktur", "allow_note": true, "is_other": false },
+        { "value": "segmentasyon_kullanilmamaktadir", "label": "Herhangi bir cari gruplama veya segmentasyon kodu kullanılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-022",
+      "order": 22,
+      "process": "Müşteri/Tedarikçi Çoklu Sistem Senkronizasyonu",
+      "question": "Müşteri ve tedarikçi kartları birden fazla sistemde (ERP, CRM, B2B/B2C e-ticaret, muhasebe) ayrı ayrı mı tutulmaktadır?",
+      "description": "Farklı yazılımlar arasında cari kart çokluğu, veri tutarsızlığı ve tekilleştirme ihtiyacı araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tek_merkezi_ana_sistemde_tutulur", "label": "Hayır, tek bir merkezi ERP sisteminde tutulur; diğer yazılımlar burayı referans alır", "allow_note": false, "is_other": false },
+        { "value": "birden_fazla_sistemde_ayri_tutuluyor", "label": "Evet, ERP, CRM ve e-ticaret sistemlerinde bağımsız ayrı müşteri/tedarikçi kartları vardır", "allow_note": true, "is_other": false },
+        { "value": "sistem_yok_excel_ve_farkli_programlar_var", "label": "Entegre sistem yoktur; departmanların kendi Excel listeleri ve muhasebe programı vardır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-023",
+      "order": 23,
+      "process": "Müşteri/Tedarikçi Çoklu Sistem Senkronizasyonu",
+      "question": "Farklı sistemlerdeki cari kartların tekilleştirilmesi, ortak tekil ID eşleşmesi ve çift yönlü senkronizasyonu nasıl sağlanmaktadır?",
+      "description": "CRM'de açılan müşterinin ERP'deki cariyle ve e-ticaretteki kullanıcıyla entegrasyon yöntemi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "MDM-022",
+        "operator": "equals",
+        "value": "birden_fazla_sistemde_ayri_tutuluyor"
+      },
+      "options": [
+        { "value": "otomatik_api_ve_ortak_vkn_entegrasyonu_var", "label": "VKN/TCKN ve ortak Master ID üzerinden API ile otomatik çift yönlü senkronizasyon vardır", "allow_note": false, "is_other": false },
+        { "value": "periyodik_manuel_aktarim_ve_esleme_yapilir", "label": "Otomatik entegrasyon yoktur; Excel veya ara dosya ile periyodik manuel aktarım yapılır", "allow_note": true, "is_other": false },
+        { "value": "sistemler_tamamen_kopuktur_esleme_yoktur", "label": "Sistemler tamamen bağımsızdır; aynı müşteri farklı sistemlerde farklı kod ve unvanla kayıtlıdır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-024",
+      "order": 24,
+      "process": "Vergi, Fiyat ve Vade Koşulları",
+      "question": "Cari kartlar üzerinde varsayılan ödeme vadesi, iskonto grubu, fiyat listesi ve kredi limiti ana veri olarak tanımlı mıdır?",
+      "description": "Sipariş ve faturalama aşamasında ticari şartların cariden otomatik gelme düzeyi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_ticari_parametreler_kartta_tanimli_ve_baglayici", "label": "Vade, fiyat listesi, iskonto ve kredi limiti kartta tanımlıdır ve evraklara otomatik yansır", "allow_note": false, "is_other": false },
+        { "value": "kismi_tanimlidir_evrakta_manuel_degistirilebilir", "label": "Bazı parametreler tanımlıdır ancak kullanıcı evrak girişinde serbestçe değiştirebilir", "allow_note": true, "is_other": false },
+        { "value": "kartta_tanimli_degildir_her_islemde_manuel_girilir", "label": "Kartta ticari şartlar tutulmaz; her teklif ve siparişte manuel yazılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-025",
+      "order": 25,
+      "process": "Vergi, Fiyat ve Vade Koşulları",
+      "question": "KDV muafiyetleri, tevkifat kodları ve istisna maddeleri cari ve malzeme ana kartlarında kural bazlı mı yönetilmektedir?",
+      "description": "İhracat, serbest bölge, tevkifatlı faturalar ve özel matrah işlemlerinde vergi kurallarının ana veriden otomatik türetilmesi araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "vergi_ve_istisna_kurallari_otomatik_yonetilir", "label": "Cari ve ürün kartındaki parametrelere göre doğru KDV, tevkifat ve istisna kodu otomatik uygulanır", "allow_note": false, "is_other": false },
+        { "value": "kullanici_faturada_manuel_secer", "label": "Ana veride kural yoktur; fatura kesen personel tevkifat ve istisna kodunu elle seçer", "allow_note": true, "is_other": false },
+        { "value": "istisna_ve_tevkifat_sureci_yoktur", "label": "Şirket işlemlerinde istisna veya tevkifatlı fatura senaryosu bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-026",
+      "order": 26,
+      "process": "Banka, IBAN ve İletişim Veri Doğruluğu",
+      "question": "Cari kartlardaki yetkili kişi ad, unvan, e-posta ve telefon bilgileri periyodik olarak güncellenip doğrulanıyor mu?",
+      "description": "Mutabakat, e-fatura iletimi, tahsilat ve sevkiyat bildirimleri için iletişim verilerinin güncelliği incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "periyodik_teyit_ve_guncelleme_mekanizmasi_var", "label": "Yılda en az bir kez veya mutabakat dönemlerinde iletişim verileri teyit edilip güncellenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_hata_olustugunda_guncellenir", "label": "Periyodik kontrol yoktur; e-posta dönünce veya sorun çıkınca münferit düzeltilir", "allow_note": true, "is_other": false },
+        { "value": "iletisim_verileri_cok_eski_ve_guvensizdir", "label": "İletişim alanlarının büyük çoğunluğu güncel değildir veya eksiktir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-027",
+      "order": 27,
+      "process": "Banka, IBAN ve İletişim Veri Doğruluğu",
+      "question": "Yurtdışı müşteri ve tedarikçiler için SWIFT/BIC kodu, para birimi, ülke kodu ve uluslararası vergi no formatı doğrulanıyor mu?",
+      "description": "Uluslararası ticarette yabancı carilerin IBAN, SWIFT, ISO ülke kodları ve VAT ID doğrulama yapısı incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "uluslararasi_standartlar_ve_swift_kontrolu_var", "label": "ISO ülke kodu, para birimi, SWIFT formatı ve VAT numarası standart tablolardan doğrulanır", "allow_note": false, "is_other": false },
+        { "value": "manuel_evrak_uzerinden_yazilir", "label": "Format kontrolü yoktur; gelen proforma ve evraklardan manuel yazılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "yurtdisi_cari_calismamiz_yoktur", "label": "Yurtdışı müşteri veya tedarikçi ile ticari faaliyetimiz bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-028",
+      "order": 28,
+      "process": "Duran Varlık ve Sabit Kıymet Ana Verisi",
+      "question": "Şirketin tüm duran varlıkları (makine, teçhizat, taşıt, demirbaş, BT donanımı) için tekil ana kart tanımları mevcut mudur?",
+      "description": "Sabit kıymetlerin muhasebede toplu grup olarak mı yoksa her bir fiziksel varlık için bağımsız tekil kartla mı tutulduğu araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "her_varlik_icin_tekil_demirbas_karti_var", "label": "Her bir fiziksel varlık için bağımsız tekil demirbaş/varlık kartı mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "sadece_muhasebede_toplu_hesap_olarak_var", "label": "Tekil varlık kartı yoktur; muhasebede 253/254/255 hesaplarda toplu tutarlar olarak kayıtlıdır", "allow_note": true, "is_other": false },
+        { "value": "excel_listesi_uzerinden_takip_edilir", "label": "Sistemde kayıt yoktur; idari işler veya BT departmanı Excel listesi tutmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-029",
+      "order": 29,
+      "process": "Duran Varlık ve Sabit Kıymet Ana Verisi",
+      "question": "Duran varlık kartları sistem üzerinde amortisman, faydalı ömür, zimmet ve fiziksel lokasyon bazında detaylı takip ediliyor mu?",
+      "description": "Sabit kıymet ana verisinde mali (amortisman oranı, amortisman tipi) ve operasyonel (zimmet, lokasyon) alanların mevcudiyeti incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemde_detayli_takip_ediliyor", "label": "Evet; amortisman tablosu, faydalı ömür, zimmetli personel ve lokasyon sistemde detaylı tutulmaktadır", "allow_note": false, "is_other": false },
+        { "value": "sadece_mali_amortisman_tutulur_zimmet_yoktur", "label": "Yalnızca muhasebe amortismanı hesaplanır; zimmet ve fiziksel lokasyon takibi yoktur", "allow_note": true, "is_other": false },
+        { "value": "sistemde_detayli_varlik_takibi_yapilmamaktadir", "label": "Duran varlıklar için detaylı amortisman veya zimmet verisi tutulmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-030",
+      "order": 30,
+      "process": "Demirbaş Zimmet ve Lokasyon Eşleme",
+      "question": "Duran varlıkların barkod/RFID etiket numaraları, zimmetli personel ve oda/bina lokasyon eşleştirmeleri nasıl yönetilmektedir?",
+      "description": "Fiziksel sayımlarda ve zimmet devirlerinde varlık kartıyla etiket ve lokasyonun eşleşme yöntemi araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "MDM-029",
+        "operator": "equals",
+        "value": "sistemde_detayli_takip_ediliyor"
+      },
+      "options": [
+        { "value": "barkod_etiketli_ve_sistemde_bina_oda_tanimli", "label": "Tüm varlıklar barkodludur; sistemde bina/kat/oda ve zimmetli personel eşleşmesi tamdır", "allow_note": false, "is_other": false },
+        { "value": "etiket_var_ancak_lokasyon_guncellemeleri_aksiyor", "label": "Fiziksel etiket vardır ancak yer değişiklikleri sisteme anında yansıtılamamaktadır", "allow_note": true, "is_other": false },
+        { "value": "etiketleme_ve_lokasyon_kodu_bulunmamaktadir", "label": "Fiziksel barkod etiketi ve standart lokasyon kodu bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-031",
+      "order": 31,
+      "process": "Ürün Ağacı (BOM) ve Reçete Ana Verisi",
+      "question": "Üretim ve montaj yapılan ürünler için ürün ağaçları (BOM / Reçete) sistemde ana veri olarak tanımlı mıdır?",
+      "description": "Hammadde, yarı mamul ve ambalaj bileşenlerinin hiyerarşik ürün ağacı yapısında kayıtlı olma durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_urunlerde_cok_seviyeli_bom_tanimli", "label": "Tüm mamul ve yarı mamuller için çok seviyeli standart ürün ağaçları sistemde tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "tek_seviyeli_basit_recete_var", "label": "Sadece tek seviyeli malzeme listesi vardır; yarı mamul kademeleri ayrı yönetilmez", "allow_note": true, "is_other": false },
+        { "value": "receteler_excel_de_tutulur_sistemde_yoktur", "label": "Reçeteler Excel dosyalarında tutulmakta, sisteme tanımlanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "uretim_faaliyetimiz_bulunmamaktadir", "label": "Şirketimizde üretim/montaj faaliyeti yoktur (salt ticaret veya hizmet şirketi)", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-032",
+      "order": 32,
+      "process": "Ürün Ağacı (BOM) ve Reçete Ana Verisi",
+      "question": "Reçetelerde fire oranları, alternatif hammadde tanımları ve revizyon (versiyon) tarihçesi tutuluyor mu?",
+      "description": "Mühendislik değişiklikleri, mevsimsel hammadde ikameleri ve standart firelerin ana verideki yönetim disiplini değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "fire_alternatif_ve_versiyon_yonetimi_tamdir", "label": "Standart fire oranları, alternatif malzeme kuralları ve versiyon tarihçesi sistemde aktiftir", "allow_note": false, "is_other": false },
+        { "value": "sadece_temel_malzeme_miktarlari_var", "label": "Yalnızca net miktarlar girilmiştir; fire, alternatif malzeme ve versiyon takibi yoktur", "allow_note": true, "is_other": false },
+        { "value": "degisikliklerde_eski_recete_uzerine_yazilir", "label": "Versiyonlama yoktur; reçete değiştiğinde eskisinin üzerine yazılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-033",
+      "order": 33,
+      "process": "İş Merkezi, Rota ve Operasyon Ana Verisi",
+      "question": "Üretim süreçlerinde iş merkezleri, operasyon adımları ve standart rota (routing) ana verisi kullanılmakta mıdır?",
+      "description": "Üretim kapasite planlama ve standart maliyet hesaplaması için gereken rota ve iş merkezi tanımlarının mevcudiyeti araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "recete_ve_bom_kullaniliyor", "label": "Evet; tüm iş merkezleri, operasyonlar ve standart süreleri içeren rotalar tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "sadece_ana_bolumler_tanimli_detayli_rota_yok", "label": "Yalnızca ana atölyeler/bölümler tanımlıdır; operasyon ve süre bazlı rota yoktur", "allow_note": true, "is_other": false },
+        { "value": "rota_ve_is_merkezi_ana_verisi_kullanilmiyor", "label": "İş merkezi veya rota ana verisi tutulmamaktadır / üretim faaliyeti yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-034",
+      "order": 34,
+      "process": "İş Merkezi, Rota ve Operasyon Ana Verisi",
+      "question": "İş merkezlerinin standart hazırlık (setup), işlem süreleri, kapasite ve maliyet merkezi bağlantıları ana veride nasıl tanımlanır?",
+      "description": "Standart işçilik, makine saati, enerji ve genel üretim gideri paylaştırma katsayılarının iş merkezi kartındaki entegrasyonu incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "MDM-033",
+        "operator": "equals",
+        "value": "recete_ve_bom_kullaniliyor"
+      },
+      "options": [
+        { "value": "sure_kapasite_ve_maliyet_merkezi_baglantisi_tam", "label": "Setup süresi, birim çevrim süresi, vardiya kapasitesi ve muhasebe masraf merkezi tam bağlıdır", "allow_note": false, "is_other": false },
+        { "value": "sadece_fiziksel_makine_tanimlidir_maliyet_yoktur", "label": "Makineler listelenmiştir ancak standart süreler ve masraf merkezi bağlantıları eksiktir", "allow_note": true, "is_other": false },
+        { "value": "sureler_tahmini_ve_manueldir", "label": "Süreler standart değildir; üretim şefi tarafından tahmini ve manuel girilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-035",
+      "order": 35,
+      "process": "Depo, Raf ve Lokasyon Ana Verisi",
+      "question": "Şirket bünyesindeki fiziksel depo, alan, koridor ve raf adresleri sistemde hiyerarşik ana veri olarak kayıtlı mıdır?",
+      "description": "Depo içi adresleme (Bina -> Depo -> Koridor -> Raf -> Kat -> Göz) yapısının standartlaştırılması incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "raf_ve_goz_seviyesinde_tam_adresleme_var", "label": "Tüm depolar koridor, raf, kat ve göz seviyesinde hiyerarşik adreslenmiştir", "allow_note": false, "is_other": false },
+        { "value": "sadece_ana_depo_ve_bolum_kodu_var", "label": "Yalnızca ana depo ve genel bölüm tanımlıdır; detaylı raf adresi kartı yoktur", "allow_note": true, "is_other": false },
+        { "value": "raf_ana_verisi_yoktur_serbest_istiflenir", "label": "Sistemde depo lokasyon ana verisi yoktur; malzemeler serbest hafıza ile yerleştirilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-036",
+      "order": 36,
+      "process": "Depo, Raf ve Lokasyon Ana Verisi",
+      "question": "Depo lokasyonlarında hacim, ağırlık kapasitesi, sıcaklık ve ürün grubu kısıtlamaları ana veri seviyesinde tanımlanmakta mıdır?",
+      "description": "Otomatik yerleştirme (putaway) ve toplama (picking) algoritmaları için gereken lokasyon kısıt parametreleri değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "hacim_agirlik_ve_urun_tipi_kisitlari_tanimli", "label": "Lokasyon kartlarında azami ağırlık, hacim ve saklama koşulu kısıtları tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "kismi_kisitlar_vardir", "label": "Yalnızca soğuk hava veya tehlikeli madde alanlarında kısıt vardır; genel depoda yoktur", "allow_note": true, "is_other": false },
+        { "value": "lokasyon_kisiti_tanimlanmamistir", "label": "Lokasyon kapasite veya ürün grubu kısıtı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-037",
+      "order": 37,
+      "process": "Personel ve Organizasyon Veri Uyumu",
+      "question": "Personel, unvan, departman, masraf merkezi ve onay hiyerarşisi ana verisi ERP kullanıcıları ve yetkileriyle senkronize midir?",
+      "description": "İşten ayrılan veya görev değiştiren personelin onay zincirleri ve ERP yetkileriyle organizasyonel ana veri uyumu araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "ik_ve_erp_organizasyon_agaci_tam_entegre", "label": "İK veri tabanı ile ERP kullanıcıları, masraf merkezleri ve onay ağacı tam senkronizedir", "allow_note": false, "is_other": false },
+        { "value": "manuel_bildirim_ve_guncelleme_yapilir", "label": "Entegrasyon yoktur; İK'dan gelen e-posta ile ERP yetkileri ve unvanları manuel güncellenir", "allow_note": true, "is_other": false },
+        { "value": "organizasyon_verileri_guncellenmemektedir", "label": "Personel ve unvan verileri güncel değildir; ayrılan kişilerin yetkileri sistemde kalabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-038",
+      "order": 38,
+      "process": "Mükerrer Kayıt Tespiti ve Konsolidasyon",
+      "question": "Mevcut sistemlerde aynı malzeme veya cari hesabın birden fazla farklı kodla açılmış olması (mükerrerlik) ne düzeydedir?",
+      "description": "Yazım farkları, arama yetersizliği veya denetimsizlik sebebiyle oluşmuş mükerrer kartların boyutu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "ciddi_veya_orta_seviyede_mukerrerlik_var", "label": "Evet; stok ve cari kartlarda tespit edilmiş ciddi veya orta düzeyde mükerrer kayıtlar vardır", "allow_note": true, "is_other": false },
+        { "value": "cok_az_ve_izole_durumlar_vardir", "label": "Çok az düzeydedir; sıkı kontrol sayesinde mükerrer kart açılışı büyük ölçüde engellenmektedir", "allow_note": false, "is_other": false },
+        { "value": "mukerrerlik_durumu_hic_analiz_edilmemistir", "label": "Mükerrerlik düzeyi bilinmemektedir; bugüne kadar bir veri temizliği veya tarama yapılmamıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-039",
+      "order": 39,
+      "process": "Mükerrer Kayıt Tespiti ve Konsolidasyon",
+      "question": "Tespit edilen mükerrer kartların birleştirilmesi (merge), geçmiş hareketlerin aktarılması ve pasife alınması nasıl yürütülecektir?",
+      "description": "Mükerrer kartların temizlenmesinde kullanılacak veri birleştirme stratejisi ve hareket konsolidasyonu araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "MDM-038",
+        "operator": "equals",
+        "value": "ciddi_veya_orta_seviyede_mukerrerlik_var"
+      },
+      "options": [
+        { "value": "yeni_erp_ye_sadece_tekil_ve_temiz_veri_aktarilacak", "label": "Eski hareketler eski sistemde bırakılacak, yeni ERP'ye sadece konsolide tekil ana kartlar taşınacaktır", "allow_note": false, "is_other": false },
+        { "value": "mevcut_db_de_birlestirme_ve_kod_esleme_yapilacak", "label": "Mevcut veritabanında scriptlerle kartlar birleştirilecek ve tek koda yönlendirilecektir", "allow_note": true, "is_other": false },
+        { "value": "nasil_yapilacagi_henuz_belirlenmemistir", "label": "Mükerrer kayıtların nasıl temizleneceği konusunda henüz bir planlama yapılmamıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-040",
+      "order": 40,
+      "process": "Zorunlu Alan ve Veri Bütünlüğü Kontrolleri",
+      "question": "Ana veri giriş ekranlarında eksik veya hatalı bilgi girişini engelleyen zorunlu alan (mandatory field) kuralları uygulanıyor mu?",
+      "description": "Kullanıcıların zorunlu teknik veya ticari alanları doldurmadan kartı kaydetmesini önleyen sistemsel validasyonlar incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "katki_validasyonlar_ve_zorunlu_alanlar_aktif", "label": "Tüm kritik alanlar zorunludur ve format/mantık doğrulama kuralları sistemsel olarak çalışır", "allow_note": false, "is_other": false },
+        { "value": "bazi_alanlar_zorunlu_ancak_format_kontrolu_yok", "label": "Alanlar zorunludur ancak içerik formatı (örn. 10 haneli VKN, e-posta formatı) denetlenmez", "allow_note": true, "is_other": false },
+        { "value": "zorunlu_alan_yoktur_bos_kart_kaydedilebilir", "label": "Zorunlu alan yoktur; sadece ad yazılarak neredeyse tamamen boş kart açılabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-041",
+      "order": 41,
+      "process": "Zorunlu Alan ve Veri Bütünlüğü Kontrolleri",
+      "question": "Farklı ana kartlar arasındaki referans bütünlüğü (Foreign Key / referential integrity) sistem tarafından zorlanmakta mıdır?",
+      "description": "Silinen veya değiştirilen bir kategori, birim, müşteri grubunun hareket görmüş kartlardaki veri bütünlüğünü bozma riski değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "referans_butunlugu_katidir_bagli_kayit_silinemez", "label": "Kullanımda olan ana veri parametrelerinin (birim, grup vb.) silinmesi veya bozulması sistemce engellenir", "allow_note": false, "is_other": false },
+        { "value": "uyari_verir_ancak_zorlamaz", "label": "Silme anında uyarı verir ancak yönetici onayıyla silinip kayıtlar tanımsız kalabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "referans_butunlugu_kontrolu_yoktur", "label": "Referans bütünlüğü yoktur; tanımsız kalmış (orphan) kayıtlar oluşabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-042",
+      "order": 42,
+      "process": "Veri Giriş, Doğrulama ve Onay Akışları",
+      "question": "Yeni bir cari veya stok kartı açıldığında ilgili departman yöneticisinin onayından geçen bir iş akışı (workflow) var mıdır?",
+      "description": "Kartların doğrudan canlıya açılması yerine taslak/onay havuzuna düşerek ilgili sorumlularca onaylanması incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "taslak_ve_coklu_onay_is_akisi_var", "label": "Kart önce taslak kaydedilir; finans, satınalma ve ürün yöneticisi onaylayınca canlıya geçer", "allow_note": false, "is_other": false },
+        { "value": "tek_yonetici_onayi_ile_canliya_alir", "label": "Tek bir birim yöneticisinin onayıyla doğrudan canlı kullanıma açılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "onaysiz_her_kullanici_aninda_acar", "label": "Onay mekanizması yoktur; yetkili her kullanıcı kartı doğrudan canlıya açabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-043",
+      "order": 43,
+      "process": "Eski Sistemden Veri Temizleme ve Migrasyon",
+      "question": "Yeni ERP/CRM sistemine geçişte eski sistemlerdeki geçmiş ana verilerin aktarımı (data migration) planlanmakta mıdır?",
+      "description": "Geçiş sürecinde mevcut kartların yeni sisteme doğrudan mı yoksa filtrelenip temizlenerek mi aktarılacağı araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "eski_sistemden_aktarim_yapilacak", "label": "Evet; eski sistemdeki aktif stok, cari, varlık ve reçete verileri yeni sisteme taşınacaktır", "allow_note": false, "is_other": false },
+        { "value": "sifir_temiz_veri_seti_ile_baslanacak", "label": "Hayır; eski veri aktarılmayacak, sıfırdan oluşturulan temiz veri seti ile başlanacaktır", "allow_note": false, "is_other": false },
+        { "value": "aktarim_stratejisi_henuz_netlesmemistir", "label": "Veri aktarım kapsamı ve stratejisi henüz netleştirilmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-044",
+      "order": 44,
+      "process": "Eski Sistemden Veri Temizleme ve Migrasyon",
+      "question": "Eski verilerin yeni sisteme aktarılmadan önce temizlenmesi (data cleansing), pasif kartların ayıklanması ve alan eşleme nasıl yapılacaktır?",
+      "description": "Son 2-3 yıldır hareket görmeyen pasif kartların elenmesi, kod dönüşüm tabloları ve veri temizleme metodolojisi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "critical",
+      "condition": {
+        "question_id": "MDM-043",
+        "operator": "equals",
+        "value": "eski_sistemden_aktarim_yapilacak"
+      },
+      "options": [
+        { "value": "veri_temizleme_ve_kod_esleme_proseduru_hazir", "label": "Pasifler ayıklanacak, kod eşleme matrisleri (mapping) hazırlanıp temiz veri yüklenecektir", "allow_note": false, "is_other": false },
+        { "value": "tum_eski_veri_oldugu_gibi_aktarilmak_isteniyor", "label": "Temizleme yapılmadan mevcut tüm veri olduğu gibi aktarılmak istenmektedir", "allow_note": true, "is_other": false },
+        { "value": "temizleme_sorumlusu_ve_araci_belirlenmemistir", "label": "Veri temizliğini kimin nasıl yapacağı ve kriterleri henüz belirlenmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-045",
+      "order": 45,
+      "process": "Eski Sistemden Veri Temizleme ve Migrasyon",
+      "question": "Veri migrasyonu öncesinde Excel/CSV şablonları, doğrulama araçları ve deneme (mock migration) testleri planlandı mı?",
+      "description": "Canlıya geçiş öncesinde veri aktarımının deneme ortamlarında test edilmesi ve veri kayıplarının önlenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "standart_sablonlar_ve_coklu_deneme_aktarimi_planlandi", "label": "Standart içe aktarım şablonları hazırlanmış ve en az 2 deneme (mock) migrasyonu planlanmıştır", "allow_note": false, "is_other": false },
+        { "value": "sadece_canliya_gecis_gunu_aktarim_dusunuluyor", "label": "Önceden deneme testi planlanmamıştır; canlıya geçiş haftasonu tek seferde aktarılması düşünülmektedir", "allow_note": true, "is_other": false },
+        { "value": "migrasyon_araclari_ve_sablonlar_henuz_yoktur", "label": "Veri aktarım araçları, formatları ve şablonları henüz tanımlanmamıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-046",
+      "order": 46,
+      "process": "Veri Kalitesi KPI ve Sürekli İyileştirme",
+      "question": "Ana veri kalitesini ölçen metrikler (mükerrerlik oranı, eksik alan yüzdesi, pasif kart oranı, kart açılış süresi) takip edilmekte midir?",
+      "description": "Veri kalitesinin dönemsel olarak ölçülmesi ve yönetime raporlanması disiplini değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "veri_kalitesi_kpi_lari_duzenli_raporlanir", "label": "Eksik veri yüzdesi, mükerrerlik ve kart açılış SLA süreleri düzenli ölçülüp raporlanır", "allow_note": false, "is_other": false },
+        { "value": "gayriresmi_olarak_sorun_ciktikca_bakilir", "label": "Resmi KPI yoktur; yalnızca operasyonda veri kaynaklı aksaklık çıktığında incelenir", "allow_note": true, "is_other": false },
+        { "value": "veri_kalitesi_takibi_yapilmamaktadir", "label": "Veri kalitesi veya eksikliği konusunda herhangi bir ölçüm ve takip yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "MDM-047",
+      "order": 47,
+      "process": "Veri Kalitesi KPI ve Sürekli İyileştirme",
+      "question": "Periyodik olarak ana veri kalitesi denetimleri ve toplu veri temizleme (batch deduplication / cleansing) çalışmaları yapılıyor mu?",
+      "description": "Yılda bir veya dönemsel olarak sistemdeki kartların taranıp pasife alınması ve temizlenmesi araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "yillik_periyodik_denetim_ve_temizlik_yapilir", "label": "Yılda en az bir kez tüm ana veriler taranır, pasifler kapatılır ve veri temizliği yapılır", "allow_note": false, "is_other": false },
+        { "value": "sadece_sistem_gecislerinde_yapilmaktadir", "label": "Periyodik denetim yoktur; yalnızca büyük ERP/yazılım değişimlerinde temizlik yapılır", "allow_note": true, "is_other": false },
+        { "value": "hicbir_zaman_toplu_temizlik_yapilmamistir", "label": "Kuruluştan bu yana hiçbir toplu veri denetimi veya temizleme çalışması yapılmamıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

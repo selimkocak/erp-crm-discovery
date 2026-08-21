@@ -1,0 +1,1745 @@
+{
+  "meta": {
+    "pack_id": "tr.import.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "IMPORT",
+    "name": "İthalat ve Gümrük Yönetimi Soru Paketi",
+    "description": "Kurumsal ithalat operasyonlarını, dış tedarik bağlantılarını, Incoterms ve ödeme şekillerini, gümrükleme, GTİP, menşe, izinler, antrepo, ithalat maliyet dağıtımı ve ERP entegrasyonunu keşfeden kanonik soru paketi."
+  },
+  "questions": [
+    {
+      "id": "IMP-001",
+      "order": 1,
+      "process": "İthalat organizasyonu ve süreç sahipliği",
+      "question": "Şirketinizde ithalat ve gümrük operasyonları nasıl bir organizasyon yapısıyla yönetilmektedir?",
+      "description": "Ayrı dış ticaret/ithalat departmanının varlığı, satınalma bünyesinde yürütülmesi veya müşavire bağımlılık.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_ithalat_ve_dis_ticaret_departmani_var",
+          "label": "Şirket bünyesinde uzman ithalat/dış ticaret departmanı ve atanmış ithalat operasyon sorumluları mevcuttur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "satinalma_veya_lojistik_personeli_ek_gorev_olarak_yurutur",
+          "label": "Ayrı departman yoktur; yerel satınalma veya lojistik personeli ithalat işlemlerini ek görev olarak yürütmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tum_ithalat_operasyonu_harici_araci_ve_gumrukcuye_devredilmistir",
+          "label": "İç operasyon ekibi yoktur; sipariş sonrası tüm gümrük ve ithalat takibi harici gümrük müşavirine bırakılmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer ithalat organizasyon yapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-002",
+      "order": 2,
+      "process": "İthalat organizasyonu ve süreç sahipliği",
+      "question": "İthalat dosyası yaşam döngüsü (siparişten millileşmeye ve dosya kapamaya) sistem üzerinde nasıl izlenmektedir?",
+      "description": "Dosya bazlı ithalat takibi, evrak seti toplama ve dosya statü kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_veya_dis_ticaret_modulunde_ithalat_dosyasi_acilarak_izlenir",
+          "label": "Her ithalat için sistemde benzersiz bir ithalat dosyası açılır; sipariş, evraklar, gümrük ve maliyet bu dosya üzerinden izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_ve_ortak_klasor_uzerinden_manuel_dosya_takibi_yapilir",
+          "label": "İthalat dosyaları bir Excel takip listesinde tutulur ve evraklar ağ klasöründe arşivlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dosya_kavrami_yoktur_sadece_fatura_ve_irsaliye_islenir",
+          "label": "İthalat dosyası kavramı yoktur; sadece malzeme geldiğinde satınalma faturası ve irsaliyesi işlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-003",
+      "order": 3,
+      "process": "İthalat yapılan ülke ve tedarikçi coğrafyası",
+      "question": "İthalat yapılan ana coğrafyalar ve Serbest Ticaret Anlaşması (STA) / Gümrük Birliği kapsamındaki ülkeler nasıl yönetilir?",
+      "description": "AB, Uzak Doğu, Amerika vb. tedarik bölgeleri, ticaret anlaşmaları ve menşe kısıtları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ulke_ve_anlasma_bazinda_gumruk_vergi_kurallari_sistemde_tanimlidir",
+          "label": "İthalat ülkeleri, STA, AB Gümrük Birliği ve tercihli rejim kuralları sistemde tanımlı ve günceldir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ulke_kurallari_ve_vergiler_musavirden_manuel_sorulur",
+          "label": "Ülke bazlı vergi ve anlaşma kuralları sistemde yoktur; her sevkiyatta gümrük müşavirine danışılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ulke_menşei_ve_sta_kurallari_takip_edilmemektedir",
+          "label": "Ülke bazlı rejimler takip edilmez; ithalat anında çıkan vergi ve harçlar doğrudan ödenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-004",
+      "order": 4,
+      "process": "İthalat yapılan ülke ve tedarikçi coğrafyası",
+      "question": "Uzak tedarik coğrafyaları için transit süreler, tedarik termin süreleri ve gecikme riskleri nasıl planlanmaktadır?",
+      "description": "Deniz/hava transit sürelerinin MRP ve emniyet stoklarına yansıtılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tedarikci_ve_ulke_bazli_dinamik_lead_time_mrp_ye_dahildir",
+          "label": "Ülke ve taşıma moduna göre transit süreler ERP'de tanımlıdır; malzeme ihtiyaç planlaması bu süreleri otomatik dikkate alır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "transit_sureler_tahmini_olarak_manuel_hesaplanir",
+          "label": "Transit süreler satınalma uzmanının tecrübesiyle manuel tahmin edilir; sistemik dinamik lead-time hesabı yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "transit_sure_gecikmeleri_uretim_ve_satista_aksamalara_yol_acar",
+          "label": "Transit süre takibi yapılamamakta; gemi/liman gecikmeleri nedeniyle sık sık hammadde/stok krizi yaşanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-005",
+      "order": 5,
+      "process": "İthalat ürün ve malzeme kapsamı",
+      "question": "İthal edilen malzemeler (hammadde, mamul, yedek parça, yatırım teşvikli makine vb.) ERP stok ve kart yapısıyla nasıl eşleşmektedir?",
+      "description": "Yabancı malzeme kodu, yerel stok kodu, GTİP ve üretici parça numarası (MPN) çapraz eşleştirmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tedarikci_kodu_gtip_ve_yerel_stok_karti_birebir_eslesir",
+          "label": "Her ithal kalemin yerel stok kartında tedarikçi parça kodu, üretici kodu, GTİP ve birim çevrimleri tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ithalat_belgesindeki_isim_ile_stok_karti_manuel_eslestirilir",
+          "label": "Tedarikçi faturasındaki yabancı isimler depoya girişte personel tarafından manuel olarak yerel koda çevrilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ithal_urunler_icin_standart_stok_karti_ve_gtip_eslesmesi_yoktur",
+          "label": "Stok kartı ve GTİP eşleşmesi yoktur; her ithalatta serbest metin veya geçici kodlarla işlem yapılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-006",
+      "order": 6,
+      "process": "İthalat tedarikçi seçimi",
+      "question": "Yurtdışı tedarikçi değerlendirme, uluslararası akreditasyon ve onaylı ithalat tedarikçi listesi nasıl yönetilmektedir?",
+      "description": "Yabancı tedarikçilerin finansal güvenilirliği, kalite sertifikaları ve onay süreçleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "onayli_ithalat_tedarikci_listesi_ve_periyodik_performans_puani_var",
+          "label": "Yurtdışı tedarikçiler kalite, termin ve mevzuat uyum kriterlerine göre onaylanır ve periyodik değerlendirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiyat_ve_termin_odakli_calisilir_resmi_tedarikci_degerlendirmesi_yoktur",
+          "label": "Tedarikçiler ihtiyaç oldukça fiyat/termin bazında seçilir; resmi bir onay ve denetim mekanizması yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_guvenilirligi_risk_olusturmakta_sorunlar_yasanmaktadir",
+          "label": "Yabancı tedarikçi doğrulama eksikliği nedeniyle sahte evrak, kalitesiz mal veya para transferi riskleri yaşanmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-007",
+      "order": 7,
+      "process": "İthalat ödeme şekilleri",
+      "question": "Şirketinizde ithalat işlemlerinde hangi uluslararası dış ticaret ödeme şekilleri kullanılmaktadır?",
+      "description": "Peşin ödeme, mal mukabili, vesaik mukabili (CAD), akreditif (L/C) veya kabul kredili ödeme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "akreditif_veya_vadeli_kredili_odeme",
+          "label": "Akreditif (L/C), vesaik mukabili veya kabul kredili vadeli dış ticaret finansmanı yoğun olarak kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_pesin_transfer_veya_mal_mukabili_acik_hesap",
+          "label": "Yalnızca peşin banka havalesi (Cash in Advance) veya güvene dayalı açık hesap / mal mukabili çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kredi_karti_veya_araci_odeme_platformlari_kullanilir",
+          "label": "Küçük hacimli ithalatlarda kurumsal kredi kartı veya uluslararası online ödeme platformları kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer ödeme yöntemi",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-008",
+      "order": 8,
+      "process": "Akreditif ve banka teminatları",
+      "question": "Akreditif (L/C) açılışı, şartname kontrolü, rezerv (discrepancy) yönetimi ve teyit süreçleri nasıl takip edilmektedir?",
+      "description": "UCP 600 kurallarına uygun akreditif şartları, banka komisyonları ve vesaik inceleme.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-007",
+        "operator": "equals",
+        "value": "akreditif_veya_vadeli_kredili_odeme"
+      },
+      "options": [
+        {
+          "value": "sistemik_akreditif_takip_modulu_ve_rezerv_kontrolu_var",
+          "label": "Akreditif vadeleri, vesaik koşulları, rezervler ve banka masrafları sistem üzerinden anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "finans_ekibi_ve_banka_uzerinden_e_posta_ile_manuel_yurutulur",
+          "label": "Akreditif takibi finans sorumlusu ile banka temsilcisi arasında e-posta ve Excel ile manuel yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "rezerv_ve_akreditif_gecikmeleri_maliyet_artisi_yaratmaktadir",
+          "label": "Vesaikteki tutarsızlıklar nedeniyle sık sık rezerv cezaları ve mal çekiminde gecikmeler yaşanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-009",
+      "order": 9,
+      "process": "Incoterms kullanımı",
+      "question": "İthalat siparişlerinde Incoterms 2020 teslim şekilleri (EXW, FOB, CFR, CIF, DAP, DDP vb.) ve masraf/risk paylaşımı nasıl belirlenir?",
+      "description": "Teslim şeklinin siparişte ve faturada zorunlu tanımlanması, navlun ve sigorta sorumluluğunun netliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "incoterms_ve_teslim_yeri_siparis_ve_faturada_zorunlu_tanimlidir",
+          "label": "Tüm sipariş ve proformalarda resmi Incoterms kodu ve net teslim yeri (Örn: FOB Shanghai) zorunludur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "teslim_sekli_bilinir_ancak_sozlesme_ve_siparislerde_eksik_yazilabilir",
+          "label": "Teslim şekli taraflarca konuşulur ancak sistemik siparişte standart kod yerine serbest metin olarak yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teslim_sekilleri_belirsizdir_navlun_ve_gumruk_sorunlari_yasanir",
+          "label": "Incoterms kuralları net uygulanmaz; varışta navlun, tahliye veya sigorta masraflarında anlaşmazlıklar çıkar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-010",
+      "order": 10,
+      "process": "Navlun ve taşıma planlaması",
+      "question": "İthalat sevkiyatlarında kullanılan uluslararası lojistik ve taşıma modları nelerdir?",
+      "description": "Denizyolu konteyner (FCL/LCL), havayolu, karayolu (FTL/LTL), demiryolu veya multimodal taşımacılık.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_kombine_multimodal_veya_deniz_hava_tasima",
+          "label": "Yoğun denizyolu (FCL/LCL), havayolu kargo ve karayolu/demiryolu kombine multimodal taşıma kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_karayolu_tir_tasimaciligi_kullanilir",
+          "label": "İthalatımız çoğunlukla komşu veya Avrupa ülkelerinden standart karayolu TIR sevkiyatıyla yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_hizli_kurye_ve_hava_kargo_kullanilir",
+          "label": "Hacim küçüktür; sadece DHL/FedEx gibi hızlı kurye veya ekspres hava kargo ile taşıma yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer taşıma modu",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-011",
+      "order": 11,
+      "process": "Nakliye türü ve taşıyıcı seçimi",
+      "question": "Forwarder / armatör seçimi, navlun teklifleri, konteyner takibi ve demuraj (demurrage / detention) riskleri nasıl yönetilir?",
+      "description": "Navlun ihaleleri, konteyner serbest süre (free time) takibi ve liman bekleme cezalarının engellenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-010",
+        "operator": "equals",
+        "value": "coklu_kombine_multimodal_veya_deniz_hava_tasima"
+      },
+      "options": [
+        {
+          "value": "forwarder_sozlesmesi_free_time_ve_konteyner_anlik_takip_edilir",
+          "label": "Anlaşmalı forwarder'larla çalışılır; free time süreleri sistemde izlenir ve demuraj oluşmadan çekim yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "spot_navlun_alinir_free_time_manuel_excelde_takip_edilir",
+          "label": "Her yükte spot navlun teklifi toplanır; konteyner varış ve gün sayıları Excel'de manuel takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "konteyner_takipsizligi_nedeniyle_sik_sik_demuraj_odenmektedir",
+          "label": "Konteyner takibi yetersizdir; limanda bekleme ve gecikmeler nedeniyle yüksek demuraj/ardiye faturaları çıkar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-012",
+      "order": 12,
+      "process": "Gümrük müşaviri ve temsil modeli",
+      "question": "Gümrükleme işlemlerinde temsil modeli (doğrudan temsil veya dolaylı temsil / gümrük müşavirliği) nasıl yürütülür?",
+      "description": "Şirket içi yetkilendirilmiş gümrük personeli veya anlaşmalı harici gümrük müşavirlik firması kullanımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "dolayli_temsil_harici_gumruk_musavirligi",
+          "label": "Sözleşmeli ve vekaletnameli yetkili harici Gümrük Müşavirliği firması / firmaları ile çalışılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dogrudan_temsil_sirket_ici_gumruk_ekibi",
+          "label": "Şirket bünyesindeki kendi yetkili gümrük departmanı ve personeli ile doğrudan temsil yoluyla yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lojistik_firmasinin_kendi_gumruk_departmani_yurutur",
+          "label": "Taşımayı yapan lojistik veya kargo firmasının sunduğu entegre gümrükleme hizmeti kullanılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer temsil modeli",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-013",
+      "order": 13,
+      "process": "Gümrük müşaviri ve temsil modeli",
+      "question": "Gümrük müşavirliği yazılımı ile şirketiniz ERP sistemi arasında dijital veri ve evrak entegrasyonu bulunmakta mıdır?",
+      "description": "Fatura/çeki listesi verilerinin müşavire aktarımı ve onaylanan GÇB/dekontların ERP'ye otomatik dönüşü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-012",
+        "operator": "equals",
+        "value": "dolayli_temsil_harici_gumruk_musavirligi"
+      },
+      "options": [
+        {
+          "value": "musavir_programi_ile_cift_yonlu_api_web_servis_entegrasyonu_var",
+          "label": "ERP'den sipariş/fatura müşavir sistemine (Evrim, E-Gümrük vb.) iletilir; tescilli GÇB ve dekontlar ERP'ye otomatik işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_posta_ile_pdf_excel_gonderilir_musavir_tekrar_yazar",
+          "label": "Entegrasyon yoktur; evraklar e-postayla iletilir, müşavir gümrük programına verileri sıfırdan manuel girer",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "evraklar_kargo_veya_kurye_ile_fiziksel_gonderilmektedir",
+          "label": "Orijinal evraklar fiziksel kurye ile müşavire ulaştırılır; beyanname süreci tamamen kağıt ortamında yürür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-014",
+      "order": 14,
+      "process": "GTİP / HS kodu yönetimi",
+      "question": "İthal edilecek ürünlerin Gümrük Tarife İstatistik Pozisyonu (GTİP / HS Kodu) tespiti ve yönetişimi nasıl yapılmaktadır?",
+      "description": "12 haneli GTİP kodunun doğrulanması, tarife cetveli güncellemeleri ve şirket içi tarife havuzu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sirket_ici_ve_musavir_birlikte_gtip_belirler",
+          "label": "Teknik ürün föyü ve kimyasal/mekanik özelliklere göre şirket ve müşavir birlikte resmi GTİP havuzu oluşturur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gtip_tamamen_gumruk_musavirinin_inisiyatifine_birakilmistir",
+          "label": "Şirket içinde tarife kontrolü yoktur; beyanname anında müşavir ne yazarsa o GTİP kabul edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tedarikcinin_faturada_yazdigi_kod_dogrudan_kullanilir",
+          "label": "Yabancı faturadaki 6 haneli HS kodu doğrudan kullanılır; Türkiye 12 haneli detay ayrımı denetlenmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer GTİP belirleme yöntemi",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-015",
+      "order": 15,
+      "process": "GTİP / HS kodu yönetimi",
+      "question": "Bağlayıcı Tarife Bilgisi (BTB), tarife ihtilafları ve periyodik GTİP denetimleri kurumsal olarak yürütülür mü?",
+      "description": "Gümrükler Genel Müdürlüğü BTB başvuruları, tarife cezası risklerine karşı önleyici hukuki incelemeler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-014",
+        "operator": "equals",
+        "value": "sirket_ici_ve_musavir_birlikte_gtip_belirler"
+      },
+      "options": [
+        {
+          "value": "kritik_urunlerde_btb_alinir_ve_yillik_tarife_denetimi_yapilir",
+          "label": "Hassas ve yüksek vergi oranlı ürünlerde resmi BTB alınır; yıllık tarife ve mevzuat revizyon denetimi yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ihtilaf_oldukca_musavirden_gorus_alinir_btb_yoktur",
+          "label": "Resmi BTB başvurusu yapılmaz; sadece gümrük idaresi itiraz ettiğinde savunma hazırlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tarife_degisiklikleri_takip_edilmez_cezalar_cikabilmektedir",
+          "label": "Tarife kontrolleri yetersizdir; geçmişte yanlış GTİP beyanı nedeniyle vergi cezası veya ek tahakkuk yaşanmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-016",
+      "order": 16,
+      "process": "İthalat izinleri ve özel belgeler",
+      "question": "İthal edilen ürünler için ithalat öncesi izin, kayıt belgesi, gözetim belgesi veya lisans gereksinimi bulunmakta mıdır?",
+      "description": "Ticaret Bakanlığı ithalat tebliğleri, gözetim uygulamaları, kota ve ithal lisansı zorunlulukları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ithalatta_on_izin_ve_tareks_tps_onaylari_gerekir",
+          "label": "Ürünlerimizin bir kısmı veya tamamı için İthalat İzin Belgesi, Kayıt Belgesi, Gözetim veya Lisans zorunludur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_serbest_ithalattir_on_izin_gerekmez",
+          "label": "İthal ettiğimiz kalemler genel ticari eşya olup herhangi bir özel ön izin veya lisans zorunluluğuna tabi değildir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "izin_gereksinimi_urun_gumruge_geldiginde_anlasilir",
+          "label": "İzin gereksinimleri önceden taranmaz; eşya gümrüğe indikten sonra izin gerektiği anlaşılıp bekleme yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer izin durumu",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-017",
+      "order": 17,
+      "process": "İthalat izinleri ve özel belgeler",
+      "question": "TAREKS (Dış Ticarette Risk Esaslı Denetim Sistemi), Tek Pencere Sistemi (TPS) e-başvuruları ve izin vadeleri nasıl izlenir?",
+      "description": "Bakanlık e-belge numaraları, TAREKS referans numarası üretimi ve süre sonu kontrolleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-016",
+        "operator": "equals",
+        "value": "ithalatta_on_izin_ve_tareks_tps_onaylari_gerekir"
+      },
+      "options": [
+        {
+          "value": "tps_ve_tareks_e_belgeleri_sistemde_ithalat_dosyasina_baglidir",
+          "label": "23 haneli TPS belge numaraları ve TAREKS onayları sistemde ithalat dosyasına eklenir; süre ve bakiye otomatik takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tps_ve_tareks_basvurulari_gumrukcu_tarafindan_manuel_yurutulur",
+          "label": "İzin başvuruları tamamen gümrük müşaviri portalından yapılır; şirket içinde sadece sonuç PDF'i saklanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "izin_sureleri_ve_tareks_denetimleri_sik_sik_gecikmeye_neden_olur",
+          "label": "TAREKS ve laboratuvar denetim süreçleri planlanamadığından gümrükte malların bekleme süresi uzamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-018",
+      "order": 18,
+      "process": "Menşe ve tercihli menşe belgeleri",
+      "question": "Menşe Şahadetnamesi (Certificate of Origin), A.TR, EUR.1, EUR-MED ve tedarikçi beyanları nasıl temin edilip denetlenir?",
+      "description": "Tercihli ticaret rejimi kapsamında düşük/sıfır gümrük vergisinden yararlanmak için menşe ispat belgeleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "mense_belgeleri_siparis_aninda_zorunlu_talep_edilir_ve_dogrulanir",
+          "label": "Tedarikçiden A.TR/EUR.1/Menşe belgesi sipariş şartı olarak istenir; taslak evrak yüklemeden önce kontrol edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "evraklar_mal_geldikten_sonra_incelenir_eksiklikler_sonradan_tamamlanir",
+          "label": "Menşe belgesi mal geldikten sonra kontrol edilir; hata veya eksiklik varsa düzeltme beklenirken eşya bekler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "mense_belgesi_eksikligi_nedeniyle_fazladan_gumruk_vergisi_odenmektedir",
+          "label": "Menşe belgesi temininde aksamalar yaşanır; bu nedenle hak edilen vergi muafiyeti kaybedilip yüksek vergi ödenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-019",
+      "order": 19,
+      "process": "Menşe ve tercihli menşe belgeleri",
+      "question": "Gümrük idaresi tarafından yapılan menşe sonradan kontrol talepleri ve menşe cezası riskleri nasıl yönetilmektedir?",
+      "description": "Yıllar sonra gelen menşe doğrulama yazıları ve geçmiş ithalatlara ek tahakkuk riski.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tum_mense_ve_tedarikci_beyan_arsivi_5_yil_guvenle_saklanir",
+          "label": "Menşe belgeleri ve ihracatçı beyanları dijital ve fiziksel olarak 5 yıl saklanır; sonradan kontrol talepleri hızla yanıtlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "talep_geldiginde_eski_musavir_ve_tedarikciden_arastirilir",
+          "label": "Menşe arşivi dağınıktır; denetim yazısı geldiğinde eski evrakları bulmak ve tedarikçiye ulaşmak zor olmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "mense_sonradan_kontrol_riskleri_takip_edilmemektedir",
+          "label": "Menşe doğrulaması takip edilmez; süresinde cevap verilemeyen yazılar nedeniyle teminat irat kaydedilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-020",
+      "order": 20,
+      "process": "Antrepo, geçici depolama ve gümrük statüsü",
+      "question": "Şirketinizde ithal eşyaların gümrük antreposuna (Genel/Özel) alınması veya geçici depolama süreçleri kullanılmakta mıdır?",
+      "description": "Antrepo rejiminde vergileri erteleyerek kısmi millileştirme veya doğrudan serbest dolaşıma giriş.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "genel_veya_ozel_antrepo_kullanilmaktadir",
+          "label": "İthal mallar antrepoya (A/C tipi genel veya özel antrepo) alınır; vergiler ödendikçe parça parça millileştirilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dogrudan_serbest_dolasima_giris_antrepo_kullanilmaz",
+          "label": "Antrepo kullanılmaz; mallar limandan/gümrükten doğrudan tam beyanname ile serbest dolaşıma sokulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gecici_depolama_yerinde_bekletilip_tek_seferde_cekilir",
+          "label": "Mallar liman geçici depolama alanında bekletilir ve gümrükleme bitince tek partide fabrikaya sevk edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer antrepo durumu",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-021",
+      "order": 21,
+      "process": "Antrepo, geçici depolama ve gümrük statüsü",
+      "question": "7100 Antrepo Rejimi kapsamındaki antrepo stok kartları, kısmi çekimler ve antrepo sayımları nasıl izlenir?",
+      "description": "Millileşmemiş (gümrüklü) stok ile serbest dolaşımdaki stok ayrımı ve antrepo defter kayıtları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-020",
+        "operator": "equals",
+        "value": "genel_veya_ozel_antrepo_kullanilmaktadir"
+      },
+      "options": [
+        {
+          "value": "antrepo_stoklari_erp_de_gumruklu_stok_koduyla_ayri_izlenir",
+          "label": "Antrepodaki mallar ERP'de ayrı 'Antrepo Deposu'nda tutulur; her 4000 rejimli GÇB ile stok millileşip ana depoya geçer",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "antrepo_stoklari_excel_de_tutulur_millilesince_erp_ye_girer",
+          "label": "Antrepo stoğu ERP'ye girmez, Excel'de tutulur; sadece vergisi ödenip çekilen miktar ERP'ye stok kaydı yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "antrepo_kalan_bakiye_takibi_ile_fiziki_stok_uyumsuzlasmaktadir",
+          "label": "Kısmi çekimlerde bakiye takibi zordur; antrepo kayıtları ile fiili stok arasında mutabakat sorunları yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-022",
+      "order": 22,
+      "process": "Gümrük vergileri ve mali yükümlülükler",
+      "question": "Gümrük Vergisi, İlave Gümrük Vergisi (İGV), Ek Mali Yükümlülük (EMY) ve Dampinge Karşı Vergi hesaplamaları nasıl denetlenir?",
+      "description": "Gümrük kıymeti üzerinden hesaplanan mali yükümlülüklerin doğruluğu ve simülasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ithalat_oncesi_tahmini_gumruk_vergisi_ve_maliyet_simulasyonu_yapilir",
+          "label": "Sipariş anında GTİP'e bağlı GV, İGV, EMY oranları sistemden çekilerek tahmini vergi ve maliyet hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "vergi_tutarlari_beyanname_tescil_edildiginde_musavirden_ogrenilir",
+          "label": "Ön simülasyon yoktur; tahakkuk eden vergi tutarları tescil sonrası gümrük tahakkuk varakasından görülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "beklenmeyen_ek_gumruk_vergileri_maliyet_sapmalarina_yol_acar",
+          "label": "İGV veya damping vergileri önceden tespit edilemediğinden ithalat bütçelerinde ciddi sapmalar yaşanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-023",
+      "order": 23,
+      "process": "Gümrük vergileri ve mali yükümlülükler",
+      "question": "Vadeli ithalat işlemlerinde Kaynak Kullanımını Destekleme Fonu (KKDF %6) muafiyet veya ödeme takibi nasıl yürütülür?",
+      "description": "Kabul kredili, vadeli akreditif veya mal mukabili ithalatta KKDF doğuşu ve transfer süreleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "pesin_transfer_belgesi_veya_kkdf_muafiyet_kodlari_sistemde_denetlenir",
+          "label": "Ödeme transferi gümrük tescilinden önce yapılarak banka yazısıyla KKDF muafiyeti sağlanır veya %6 fon tam hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kkdf_durumu_muhasebe_ve_finans_tarafindan_manuel_incelenir",
+          "label": "Her ithalatta finans personeli ödeme dekontu tarihini kontrol eder; sistemik otomatik kontrol yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kkdf_mevzuati_takipsizligi_nedeniyle_cezai_tahakkuk_riski_dogmaktadir",
+          "label": "Ödeme tarihi ile tescil tarihi uyumsuzlukları nedeniyle geçmişte haksız KKDF cezaları veya faiz ödenmiştir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-024",
+      "order": 24,
+      "process": "KDV, ÖTV ve diğer ithalat vergileri",
+      "question": "İthalatta KDV matrahı (CIF Bedel + Gümrük Vergileri + Yurtdışı/Yuriçi Masraflar), ÖTV ve gümrük makbuzları nasıl muhasebeleştirilir?",
+      "description": "İthalat KDV matrahının oluşturulması, 191 İndirilecek KDV kaydı ve ÖTV 1 veya 2 sayılı liste işlemleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gcb_gumruk_makbuzu_kdv_matrahiyla_erp_ye_otomatik_islenir",
+          "label": "Beyannamedeki KDV matrahı, ödenen KDV, ÖTV ve damga vergisi gümrük makbuzu modülünden muhasebeye tam aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gumruk_makbuzu_muhasebeci_tarafindan_manuel_mahsup_fisi_olarak_girilir",
+          "label": "Gümrük makbuzundaki KDV ve harçlar muhasebe personeli tarafından tek tek manuel mahsup fişiyle işlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kdv_matrah_farki_veya_otv_kayitlarinda_sik_sik_hatalar_olmaktadir",
+          "label": "Yurtdışı fatura ile gümrük KDV matrahı arasındaki farklar doğru ayrıştırılamamakta, beyannamede hatalar çıkmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-025",
+      "order": 25,
+      "process": "İthalat masraflarının maliyete dağıtılması",
+      "question": "İthalat fiili maliyetleri (navlun, gümrük vergisi, sigorta, ardiye, ordino, tahmil/tahliye, müşavirlik) stok maliyetine dağıtılıyor mu?",
+      "description": "Ürünün fabrikaya gerçek iniş maliyetini (Landed Cost) hesaplamak için tüm masrafların stok kalemlerine yüklenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "fiili_ithalat_maliyetleri_stok_maliyetine_dagitilir",
+          "label": "Tüm navlun, gümrük vergisi, sigorta ve yerel masraflar ERP ithalat maliyet dağıtım motoruyla ürün kartlarına yüklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "masraflar_stoga_degil_genel_gider_hesaplarina_770_760_atilir",
+          "label": "Ürün stok maliyetine sadece yabancı fatura bedeli girer; navlun ve gümrük masrafları genel gider olarak yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ithalat_maliyeti_excel_de_yaklasik_hesaplanir_erp_ye_yansimaz",
+          "label": "Maliyet analizi Excel'de yapılır ancak ERP stok kartındaki ürün birim maliyeti fiili masrafları içermez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer maliyet dağıtım yöntemi",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-026",
+      "order": 26,
+      "process": "İthalat masraflarının maliyete dağıtılması",
+      "question": "İthalat masraf dağıtımında hangi anahtarlar (Tutar, Ağırlık/Kg, Hacim/m3, Miktar) kullanılır ve geç gelen faturalar nasıl düzeltilir?",
+      "description": "Navlunun ağırlık/hacme, gümrük vergisinin tutara göre dağıtılması ve dosya kapandıktan sonra gelen ek giderlerin yansıtılması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-025",
+        "operator": "equals",
+        "value": "fiili_ithalat_maliyetleri_stok_maliyetine_dagitilir"
+      },
+      "options": [
+        {
+          "value": "masraf_turune_gore_coklu_dagitim_anahtari_ve_maliyet_farki_fisi_kullanilir",
+          "label": "Navlun ağırlığa, sigorta ve vergi tutara göre dağıtılır; geç gelen masraflar için otomatik maliyet farkı fişi üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_masraflar_sadece_tutar_veya_miktar_oranina_gore_dagitilir",
+          "label": "Tek bir dağıtım anahtarı (genellikle fatura tutarı) kullanılır; ağırlık/hacim ayrımı yapılamaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dosya_kapandiktan_sonra_gelen_faturalar_stoga_dagitilamaz",
+          "label": "Geç gelen ardiye/demuraj faturaları stok çıkışı yapıldığı için dağıtılamaz ve maliyet dengesini bozar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-027",
+      "order": 27,
+      "process": "Dış ticaret sözleşmeleri",
+      "question": "Yurtdışı tedarikçilerle yapılan uluslararası satınalma sözleşmelerinde hukuk, tahkim, kalite garanti ve gecikme cezaları nasıl düzenlenir?",
+      "description": "Uluslararası Ticaret Hukuku (CISG), ICC Tahkim kuralları ve garanti yükümlülükleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hukuk_onayli_uluslararasi_cerceve_sozlesme_ve_ceza_maddeleri_vardir",
+          "label": "Hukuk departmanı onaylı İngilizce/çift dilli çerçeve sözleşmeler kullanılır; gecikme ve kalite cezaları açıkça yazılıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sozlesme_yapilmaz_sadece_proforma_fatura_uzerinden_yurutulur",
+          "label": "Ayrı bir sözleşme imzalanmaz; tedarikçinin gönderdiği proforma fatura teyit edilerek işlem yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sozlesmesiz_calisma_nedeniyle_hukuki_ve_mali_kayiplar_yasanmistir",
+          "label": "Sözleşme olmaması nedeniyle hatalı mal veya teslimat iptallerinde uluslararası tazminat alınamamıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-028",
+      "order": 28,
+      "process": "Proforma fatura ve sipariş süreci",
+      "question": "Tedarikçiden gelen Proforma Fatura (P/I) nasıl onaylanır ve ERP ithalat satınalma siparişine nasıl dönüştürülür?",
+      "description": "Fiyat, miktar, teslim şekli, ödeme vadesi ve banka hesap bilgilerinin proforma ile sipariş arasında mutabakatı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "proforma_onayindan_sonra_sistemde_kilitli_ithalat_siparisi_olusturulur",
+          "label": "Proforma onaylanınca ERP'de dövizli ithalat siparişi açılır; orijinal ticari fatura gelene kadar koşullar kilitlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proforma_e_posta_ile_onaylanir_siparis_sisteme_manuel_girilir",
+          "label": "Proforma e-postayla onaylanır; sipariş sisteme personel tarafından manuel açılır, fiyat kontrolü otomasyonsuzdur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "proforma_takibi_yapilmaz_dogrudan_gelen_fatura_islenir",
+          "label": "Proforma takip edilmez; mal yola çıkıp fatura geldiğinde sistem kaydı oluşturulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-029",
+      "order": 29,
+      "process": "Proforma fatura ve sipariş süreci",
+      "question": "İthalat siparişlerinde parçalı yükleme (partial shipment), sipariş bakiye takibi ve sipariş toleransları nasıl yönetilir?",
+      "description": "Tek bir siparişin birden fazla gemi/konşimento ile parça parça gelmesi durumunda kalan miktarın izlenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sistem_parcali_sevkleri_ithalat_dosyalariyla_eslestirip_bakiyeyi_otomatik_gunceller",
+          "label": "Her partide gelen miktar siparişten düşülür; açık bakiye ve tolerans aşımı sistem tarafından anlık denetlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "parcali_sevklerde_kalan_bakiye_excel_uzerinde_manuel_dusulur",
+          "label": "Sistemde kısmi sipariş takibi zayıftır; ithalat sorumlusu Excel tablosunda kalan sipariş miktarını hesaplar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "parcali_ithalatlarda_mükerrer_siparis_veya_eksik_mal_sorunlari_yasanir",
+          "label": "Parçalı yüklemelerde ne kadar malın yolda ne kadarının geldiği karıştırılmakta, mükerrer sipariş açılabilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-030",
+      "order": 30,
+      "process": "Gümrük beyannamesi hazırlığı",
+      "question": "Gümrük Giriş Beyannamesi (GÇB) tescili, beyanname kalemleri, rejim kodları (4000, 7100, 5100 vb.) ve kapanış süreci nasıl yürütülür?",
+      "description": "BİLGE sistemi üzerinden tescil, vergi tahakkukları, muayene hatları ve beyanname kapanış takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gcb_tescil_ve_kapanis_verileri_anlik_sistemde_arsivlenir_ve_eslesir",
+          "label": "Tescil numarası, kapanış tarihi ve rejim kodu sistemde ithalat dosyasına kaydedilir; GÇB XML/PDF arşive eklenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kapanan_beyannameler_ay_sonunda_musavirden_toplu_liste_olarak_gelir",
+          "label": "Beyanname kapanışları operasyon bittikten sonra müşavirin gönderdiği aylık liste üzerinden takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "beyanname_surecleri_ve_kapanis_durumlari_duzensiz_izlenmektedir",
+          "label": "Beyanname takibi zayıftır; açık kalan veya tescili geciken beyannameler gümrükte ceza riski doğurmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-031",
+      "order": 31,
+      "process": "Gümrük beyannamesi hazırlığı",
+      "question": "Beyanname kalemleri ile tedarikçi faturası ve çeki listesi (Packing List) kalemleri arasında miktar, kilo ve kıymet kontrolü nasıl yapılır?",
+      "description": "Brüt/net kilo, kap adedi, kap cinsi ve fatura kalem tutarlarının beyanname ile çapraz mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "fatura_ceki_listesi_ve_beyanname_kalemleri_sistemde_birebir_eslestirilir",
+          "label": "Her kalemin brüt/net kilosu, kap adedi ve fatura tutarı sistemde beyanname taslağı ile karşılaştırılıp onaylanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kontrol_musavir_ve_personel_tarafindan_gozle_manuel_yapilir",
+          "label": "Çeki listesi ve fatura personelin gözle kontrolünden geçer; sistemik bir kalem doğrulama aracı yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kilo_ve_miktar_tutarsizliklari_gumruk_muayenesinde_sorun_yaratir",
+          "label": "Çeki listesi ile fatura uyumsuzlukları sık yaşanmakta, gümrükte kırmızı hatta düşme veya ceza riski oluşmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-032",
+      "order": 32,
+      "process": "Ürün uygunluk ve teknik mevzuat belgeleri",
+      "question": "İthal edilen ürünlerin CE Uygunluk Beyanı, TSE Belgesi, MSDS ve Analiz Sertifikaları (CoA) nasıl arşivlenir ve denetlenir?",
+      "description": "Teknik düzenlemelere uygunluk, güvenlik bilgi formları ve test raporlarının ithalat dosyasında saklanması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "teknik_belgeler_ve_sertifikalar_dijital_arsivde_urun_kartina_baglidir",
+          "label": "CE deklarasyonu, test raporu ve MSDS güncel olarak ERP stok kartına ve ithalat dosyasına bağlı saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "belgeler_gumruk_icin_alinir_islem_bitince_klasorlerde_daginik_kalir",
+          "label": "Sertifikalar gümrükleme için temin edilir ancak sonrasında merkezi dijital kütüphaneye aktarılmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teknik_mevzuat_belgelerinin_takibi_ve_guncelligi_yetersizdir",
+          "label": "Ürünlerin teknik sertifikaları eksiktir; piyasa gözetimi denetimlerinde veya gümrükte uygunsuzluk çıkmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-033",
+      "order": 33,
+      "process": "Ürün uygunluk ve teknik mevzuat belgeleri",
+      "question": "İthal tüketici ürünlerinde Türkçe kullanma kılavuzu, etiketleme ve Satış Sonrası Hizmet Yeterlilik Belgesi (SSHYB) nasıl yönetilir?",
+      "description": "Tüketicinin Korunması Hakkında Kanun ve Garanti Belgesi Yönetmeliği kapsamındaki yasal sorumluluklar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "turkce_etiket_kilavuz_ve_garanti_surecleri_standart_kontrol_edilir",
+          "label": "Ürün ambalajı, Türkçe etiket ve SSHYB gereksinimleri ithalat öncesinde onaylanır ve depoda etiketleme denetlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "etiketleme_ve_kilavuz_islemleri_depoda_manuel_eklenir",
+          "label": "Mal millileşip depoya geldiğinde personel manuel olarak kutulara Türkçe etiket ve kılavuz yapıştırır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sirketimiz_sadece_endustriyel_hammadde_ithal_ettiginden_bu_kapsam_yoktur",
+          "label": "İthalatımız son tüketiciye yönelik değildir; sadece üretim hammaddesi veya yarı mamul ithal edilmektedir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-034",
+      "order": 34,
+      "process": "Muayene, eksiklik ve gümrük kontrolü",
+      "question": "Gümrük muayene hatları (Kırmızı, Sarı, Mavi, Yeşil hat) ve gümrük içi fiziki kontroller nasıl takip edilmektedir?",
+      "description": "Kırmızı hat fiziki muayenesi, sarı hat evrak denetimi, laboratuvar tahlilleri ve bekleme süreleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hat_bilgisi_ve_muayene_adimlari_sistemde_anlik_raporlanir",
+          "label": "Beyannamenin düştüğü hat (Kırmızı/Sarı vb.), tahlil ve muayene durumları anlık izlenir ve gecikmeler loglanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muayene_durumu_gumrukcuden_telefon_ve_e_posta_ile_ogrenilir",
+          "label": "Hat bilgisi sisteme girmez; ithalat sorumlusu müşaviri arayarak muayene sonucunu sorar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sik_sik_kirmizi_hatta_dusulmekte_tahlil_gecikmeleri_yasanmaktadir",
+          "label": "Risk kriterleri bilinmemekte; sık sık kırmızı hat ve numune tahliline sevk nedeniyle ciddi zaman kaybedilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-035",
+      "order": 35,
+      "process": "Muayene, eksiklik ve gümrük kontrolü",
+      "question": "İthalat sırasında hasarlı, eksik veya spesifikasyona aykırı çıkan eşyalar için tutanak, sigorta ve tedarikçi tazminat süreci nasıl işletilir?",
+      "description": "Gümrükte hasar tespit tutanağı, eksiklik beyanı, nakliyat sigortası hasar ihbarı ve tedarikçiye debit note kesilmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "resmi_hasar_tutanagi_sigorta_dosyasi_ve_debit_note_otomatik_yurutulur",
+          "label": "Gümrük/liman hasar tutanağı açılır, nakliyat sigortasına ihbar edilir ve tedarikçiden tazminat resmi olarak tahsil edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tedarikci_ile_sozlu_anlasilarak_sonraki_faturadan_iskonto_istenir",
+          "label": "Resmi sigorta hasar süreci işletilmez; tedarikçiye fotoğraf atılarak sonraki siparişte indirim talep edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ithalat_hasar_ve_eksiklikleri_sirket_uzerinde_zarar_olarak_kalmaktadir",
+          "label": "Tutanak ve sigorta takibi yapılmadığı için hasarlı veya eksik gelen malların zararı şirket tarafından üstlenilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-036",
+      "order": 36,
+      "process": "İthalat lojistik takibi ve teslim alma",
+      "question": "Orijinal konşimento (Bill of Lading / AWB / CMR), ordino alımı ve limandan fabrika deposuna sevkiyat nasıl organize edilir?",
+      "description": "Deniz/hava konşimentosu cirosu, teleks salım (telex release), ordino ücreti ödemesi ve yerel nakliye sevki.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "konnsimento_cirosu_ve_ordino_surecleri_dijital_takip_edilir_sevk_planlanir",
+          "label": "Orijinal B/L bankadan veya teleks ile alınır, ordino ödenir ve iç nakliye aracı gümrük tesciline senkron planlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ordino_ve_ic_nakliye_surecleri_gumrukcu_tarafindan_manuel_yurutulur",
+          "label": "Ordino ve kamyon organizasyonu müşavire bırakılır; araç limana gittiğinde bekleme veya ek masraf çıkabilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "orijinal_konsimento_gecikmesi_nedeniyle_mal_limanda_beklemektedir",
+          "label": "B/L evrakının geç gelmesi veya ciro gecikmeleri nedeniyle mallar limanda günlerce bekleyip masraf yaratır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-037",
+      "order": 37,
+      "process": "İthalat lojistik takibi ve teslim alma",
+      "question": "İthal edilen eşyanın fabrika deposuna fiziki kabulünde miktar sayımı ve 'Millileşmiş Stok' statüsüne geçişi nasıl yapılır?",
+      "description": "Gümrükten çıkan eşyanın depoya fiili girişi, irsaliye/çeki listesi sayımı ve serbest stok kaydı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "depoda_barkodlu_kabul_yapilir_ve_stok_aninda_kullanima_acilir",
+          "label": "Gelen araç boşaltılırken barkodlu sayım yapılır; ithalat dosyası 'Teslim Alındı' durumuna geçerek serbest stoka işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "depo_manuel_sayar_irsaliyeyi_imzalar_kayit_sonradan_girilir",
+          "label": "Depo personeli kağıt irsaliyeyi imzalar; sisteme stok kabulü muhasebe tarafından birkaç gün sonra işlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "gumruk_beyannamesi_ile_depo_fiili_sayimi_arasinda_farklar_cikmaktadir",
+          "label": "Beyannamedeki miktar ile depoya giren fiili miktar arasında sayım farkları çıkmakta ve sistemde düzeltilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-038",
+      "order": 38,
+      "process": "İthalat muhasebe ve ERP entegrasyonu",
+      "question": "İthalat dosyasının muhasebesel kapatılması (159 Verilen Sipariş Avansları / İthalat Masrafları hesabının 150/153 Stoka devri) nasıl yapılır?",
+      "description": "159 nolu geçici ithalat hesabında biriken mal bedeli ve masrafların fiili stok maliyetine virmanlanması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_ithalat_kapatma_modulu_ile_159_otomatik_150_153_e_virmanlanir",
+          "label": "Tüm fatura ve gümrük makbuzları sisteme bağlandıktan sonra dosya tek tıkla kapatılır ve muhasebe fişi otomatik oluşur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muhasebeci_159_hesap_ekstresini_alir_manuel_virman_fisi_keser",
+          "label": "Dosya kapama işlemi manueldir; muhasebeci muavini dökerek masrafları toplar ve elle mahsup fişi yazar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ithalat_dosyalari_aylarca_acik_kalmakta_159_bakiye_vermektedir",
+          "label": "Dosya kapama disiplini yoktur; geç gelen faturalar nedeniyle 159 hesapta yıllarca kapatılamayan bakiyeler birikir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-039",
+      "order": 39,
+      "process": "İthalat muhasebe ve ERP entegrasyonu",
+      "question": "İthalatta oluşan kur farkları (Fatura kuru - Gümrük tescil kuru - Fiili ödeme kuru) nasıl muhasebeleştirilir?",
+      "description": "Kambiyo kar/zararı veya stok maliyetine dahil edilen kur farkı kayıtlarının kurallara uygunluğu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "mal_stoga_girene_kadar_kur_farki_maliyete_sonrasi_finansman_giderine_yansitilir",
+          "label": "VUK kurallarına uygun olarak mal girişine kadar oluşan kur farkları stoka, sonrasındakiler 646/656 hesaplara otomatik atılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tum_kur_farklari_dogrudan_kambiyo_kar_zararina_atilir",
+          "label": "Stok maliyeti kur farkıyla düzeltilmez; ödeme anındaki tüm kur farkları doğrudan kambiyo sonucuna kaydedilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kur_farki_hesaplamalari_manuel_yapilir_ve_sik_sik_karisir",
+          "label": "Dövizli borç ve gümrük kuru arasındaki kur farkı takibi manueldir; cari mutabakatlarda kur uyuşmazlıkları çıkar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-040",
+      "order": 40,
+      "process": "İthalat muhasebe ve ERP entegrasyonu",
+      "question": "Gümrük idarelerine verilen teminat mektupları, nakit teminatlar ve teminat çözümü süreçleri nasıl izlenir?",
+      "description": "DİİB, antrepo veya referans kıymet için gümrüğe verilen teminatların takibi ve iadesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "gumruk_teminatlari_ve_vade_tarihleri_sistemde_anlik_izlenir",
+          "label": "Gümrüğe verilen nakit ve mektup teminatları dosya bazında tanımlıdır; beyanname kapanınca teminat iadesi başlatılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "teminatlar_finans_tarafindan_ayri_bir_excel_tablosunda_tutulur",
+          "label": "Teminat mektupları genel finans listesindedir; gümrük dosyasıyla otomatik bir bağ kurulmamıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teminat_cozumu_gecikmekte_banka_komisyon_yukleri_artmaktadir",
+          "label": "Kapanan ithalat dosyalarının teminatları takip edilmediğinden mektuplar yıllarca gümrükte kalıp komisyon yaratır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-041",
+      "order": 41,
+      "process": "İthalat raporlama, riskler ve iyileştirme planı",
+      "question": "Şirketinizde ithalat operasyonel KPI'ları ve yönetim raporlaması nasıl yapılmaktadır?",
+      "description": "Ortalama transit süre, gümrükte bekleme süresi, demuraj maliyeti, birim ithalat masraf yüzdesi gibi göstergeler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ithalat_kpi_paneli_ve_maliyet_analiz_dashboard_u_mevcuttur",
+          "label": "Yönetim dashboard'unda ortalama gümrükleme süresi, navlun maliyeti trendi ve tedarikçi termin performansı anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "aylik_ithalat_tutari_ve_masraflar_excel_raporu_olarak_sunulur",
+          "label": "Ay sonlarında ithalat sorumlusu yapılan ithalatları ve toplam harcamaları Excel'de toplayıp yönetime sunar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ithalat_performans_raporlamasi_yapilmamaktadir",
+          "label": "İthalat KPI takibi yoktur; yalnızca toplam fatura ödemeleri ve banka çıkışları finans tarafından izlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-042",
+      "order": 42,
+      "process": "İthalat raporlama, riskler ve iyileştirme planı",
+      "question": "Yetkilendirilmiş Yükümlü Statüsü (YYS / AEO) veya Onaylı Kişi Statü Belgesi (OKSB) kapsamında kolaylaştırılmış gümrükleme uygulanıyor mu?",
+      "description": "Yerinde gümrükleme, yeşil hat, eksik belgeyle beyan ve götürü teminat imkanları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "sirketimiz_yys_sahibidir_ve_yerinde_gumrukleme_yesil_hat_kullanir",
+          "label": "YYS (AEO) sertifikamız mevcuttur; yeşil hat, emniyet/güvenlik kolaylıkları ve yerinde gümrükleme avantajı kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yys_yoktur_ancak_basvuru_veya_altyapi_hazirligi_planlanmaktadir",
+          "label": "Mevcut durumda YYS yoktur ancak ERP ve iç denetim süreçleri YYS standartlarına uyumlu hale getirilmek istenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "standart_gumrukleme_yapilir_yys_kapsaminda_degildir",
+          "label": "Şirketimiz standart ithalat prosedürlerini kullanır; özel bir statü belgesi veya yeşil hat kolaylığı yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-043",
+      "order": 43,
+      "process": "İthalat raporlama, riskler ve iyileştirme planı",
+      "question": "İthalat dosya ve belgelerinin 5-10 yıllık yasal gümrük arşivleme zorunluluğu nasıl güvenceye alınmaktadır?",
+      "description": "Gümrük Kanunu 13. madde ve VUK uyarınca GÇB, fatura, konşimento ve analiz raporlarının güvenli arşivlenmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ithalat_evrak_seti_dijital_ve_fiziksel_olarak_dosya_bazinda_kilitli_saklanir",
+          "label": "Her ithalatın fatura, konşimento, GÇB, dekont ve analiz raporu dijital kasada indeksli ve fiziksel kutusunda 10 yıl saklanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "evraklar_klasorlenip_arsiv_odasina_kaldirilir_dijital_arsiv_parcalidir",
+          "label": "Fiziksel kağıt evraklar klasörde durur ancak dijital arşiv dağınıktır; denetimlerde eski dosya aramak zaman alır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "arsivleme_duzensizdir_eski_ithalat_evraklarina_ulasmak_zordur",
+          "label": "Arşivleme standardı yoktur; eski yıllara ait beyanname ve faturaların bir kısmı kaybolma riski altındadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-044",
+      "order": 44,
+      "process": "İthalat muhasebe ve ERP entegrasyonu",
+      "question": "Şirketinizde ithalat süreçlerinin yürütüldüğü yazılım altyapısı nasıldır?",
+      "description": "ERP yerleşik ithalat modülü, harici dış ticaret yazılımı veya bağımsız Excel tabloları kullanımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ozel_dis_ticaret_yazilimi_ve_erp_entegrasyonu_var",
+          "label": "Özel bir Dış Ticaret / İthalat yazılımı kullanılır ve ERP sistemine veri entegrasyonu ile bağlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "erp_nin_kendi_yerlesik_ithalat_masraf_dagitim_modulu_kullanilir",
+          "label": "Ayrı bir yazılım yoktur; ERP sisteminin standart ithalat dosyası ve masraf dağıtım fonksiyonları kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "surecler_excel_de_yurutulur_erp_ye_sadece_fatura_girilir",
+          "label": "İthalat tamamen Excel dosyalarında takip edilir; ERP sistemine yalnızca standart yerel fatura gibi işlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer yazılım altyapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-045",
+      "order": 45,
+      "process": "İthalat muhasebe ve ERP entegrasyonu",
+      "question": "Harici dış ticaret yazılımı ile ERP arasında veri senkronizasyonu ve çift yönlü işlem akışı nasıl çalışmaktadır?",
+      "description": "Siparişlerin aktarımı, stok girişlerinin ve muhasebe mahsuplarının otomatik üretimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "IMP-044",
+        "operator": "equals",
+        "value": "ozel_dis_ticaret_yazilimi_ve_erp_entegrasyonu_var"
+      },
+      "options": [
+        {
+          "value": "api_ve_servislerle_tam_otomatik_cift_yonlu_veri_akisi_var",
+          "label": "Siparişler, faturalar ve ithalat kapanışları API üzerinden anlık senkronize edilir, manuel mükerrer giriş yoktur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_veya_xml_ile_dosya_aktarimi_manuel_yapilir",
+          "label": "Otomasyon yoktur; kullanıcılar bir sistemden Excel/XML dışa aktarıp diğer sisteme manuel yükler",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sistemler_arasinda_veri_kopuklugu_ve_mutabakatsizlik_yasanmaktadir",
+          "label": "Dış ticaret sistemi ile ERP birbirini tutmamakta; stok ve maliyet kayıtlarında uyumsuzluklar çıkmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-046",
+      "order": 46,
+      "process": "İthalat raporlama, riskler ve iyileştirme planı",
+      "question": "Dış ticaret kambiyo mevzuatı, döviz transferi bildirimleri (İthalat Kontrol Çizelgesi / İKÇ) ve banka bildirimleri nasıl yürütülür?",
+      "description": "TPKK 32 sayılı karar, İKÇ bildirimleri, ithalat bedeli transfer süreleri ve vergi dairesi kambiyo bildirimleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kambiyo_ve_transfer_sureleri_finans_ve_gumrukce_entegre_takip_edilir",
+          "label": "Transfer dekontları ve beyanname eşleşmeleri sistemde izlenir; İKÇ ve kambiyo bildirimleri süresinde tamamlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "banka_uyardikca_manuel_evrak_gonderilir",
+          "label": "Kambiyo süreleri şirket içinde aktif takip edilmez; banka ihtar gönderdiğinde beyanname nüshası iletilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kambiyo_hesap_kapatma_gecikmeleri_yasanmaktadir",
+          "label": "Gümrük ile banka transfer eşleşmeleri gecikmekte, vergi dairesine intikal eden kambiyo bildirimleri olmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "IMP-047",
+      "order": 47,
+      "process": "İthalat raporlama, riskler ve iyileştirme planı",
+      "question": "Şirketinizin ithalat ve gümrük süreçlerinde geçmişte yaşadığı kritik darboğazlar ve yeni ERP sisteminden öncelikli beklentileri nelerdir?",
+      "description": "Gümrük cezaları, demuraj kayıpları, maliyet dağıtım zorlukları ve ERP dönüşümünün odaklanacağı ana hedefler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tam_entegre_ithalat_dosyasi_ve_otomatik_fiili_maliyet_dagitimi_beklenmektedir",
+          "label": "Tüm ithalat sürecinin tek dosyada toplanması, otomatik masraf dağıtımı ve gümrükçü entegrasyonu öncelikli hedeftir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "transit_sure_ve_demuraj_kayiplarinin_engellenmesi_hedeflenmektedir",
+          "label": "Konteyner ve lojistik takip altyapısının güçlendirilerek liman gecikme ve cezalarının sıfırlanması hedeflenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "gtip_ve_mevzuat_uyum_risklerinin_sistemik_kontrolu_beklenmektedir",
+          "label": "Tarife, izin ve menşe kontrollerinin kurumsallaştırılarak vergi ve ceza risklerinin önlenmesi beklenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer öncelikli beklentiler",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

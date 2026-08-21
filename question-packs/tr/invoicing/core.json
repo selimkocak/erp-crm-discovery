@@ -1,0 +1,818 @@
+{
+  "meta": {
+    "pack_id": "tr.invoicing.core",
+    "name": "Faturalama ve Gider Yönetimi Soru Paketi",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "business_function_code": "INVOICING",
+    "description": "Satış, satınalma ve genel gider faturalarının ticari süreçlerini, sipariş-irsaliye-fatura üçlü eşleştirmesini (Three-Way Match), fiyat/iskonto/vade kontrollerini, tevkifat ve istisna hesaplamalarını, masraf merkezi analitik dağılımını ve muhasebe entegrasyonunu değerlendiren saha keşif soru paketi.",
+    "language": "tr",
+    "author": "Antigravity Discovery Engine",
+    "tags": [
+      "invoicing",
+      "expenses",
+      "satis_faturasi",
+      "alis_faturasi",
+      "gider_yonetimi",
+      "three_way_match",
+      "masraf_merkezi",
+      "tevkifat",
+      "vade_takibi",
+      "kur_farki"
+    ]
+  },
+  "questions": [
+    {
+      "id": "INV-001",
+      "order": 1,
+      "process": "Faturalama Organizasyonu ve Sorumluluklar",
+      "question": "Şirkette satış, satınalma ve masraf faturalarının düzenlenmesi, onaylanması ve kontrolü hangi departmanlar tarafından yürütülmektedir?",
+      "description": "Faturalama operasyonunun satış, satınalma, lojistik ve muhasebe ekipleri arasındaki yetki ve sorumluluk ayrımı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_faturalama_ekibi_ve_yazili_onay_matrisi_var", "label": "Mali İşler bünyesinde uzmanlaşmış merkezi faturalama ekibi ve yazılı onay matrisi mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "her_operasyonel_birim_kendi_faturasini_keser", "label": "Satış kendi faturasını, satınalma kendi faturasını keser; muhasebe sonradan kontrol eder", "allow_note": true, "is_other": false },
+        { "value": "tek_bir_muhasebe_personeli_tum_faturalari_yurutur", "label": "Ayrı bir birim yoktur; tek bir muhasebe personeli tüm faturalama işlemlerini yürütür", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-002",
+      "order": 2,
+      "process": "Faturalama Organizasyonu ve Sorumluluklar",
+      "question": "Faturalama sürecinde şirket içi hizmet seviyesi taahhüdü (SLA) ve fatura kesim/onay termin süreleri takip ediliyor mu?",
+      "description": "Mal sevkiyatı veya hizmet tesliminden sonra faturanın azami kaç gün içinde kesilip müşteriye iletildiğinin takibi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "gunluk_termin_ve_sla_performans_raporu_izlenir", "label": "Aynı gün veya azami 24 saatte faturalama kuralı vardır ve gecikmeler SLA dashboard'unda izlenir", "allow_note": false, "is_other": false },
+        { "value": "yasal_7_gunluk_sure_icerisinde_kesilir", "label": "Yazılı bir iç SLA yoktur ancak yasal 7 günlük süre sınırına manuel dikkat edilir", "allow_note": true, "is_other": false },
+        { "value": "faturalama_sureleri_takip_edilmemektedir", "label": "Faturalama süreleri izlenmemekte; ay sonlarında toplu kesimler nedeniyle yığılmalar olmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-003",
+      "order": 3,
+      "process": "Satış Faturası Oluşturma Süreci",
+      "question": "Müşterilere kesilen satış faturaları (yurtiçi, toptan, perakende, ihraç kayıtlı vb.) hangi ticari kurallarla oluşturulur?",
+      "description": "Satış faturalarının sipariş, irsaliye veya doğrudan manuel giriş üzerinden ticari oluşturulma yöntemi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "onayli_siparis_ve_sevk_irsaliyesinden_otomatik", "label": "Sadece onaylı müşteri siparişi ve fiili sevk irsaliyesi üzerinden sistemik kural denetimiyle üretilir", "allow_note": false, "is_other": false },
+        { "value": "irsaliyesiz_dogrudan_manuel_satis_faturasi_kesilir", "label": "Sipariş veya irsaliye olmadan kullanıcı tarafından doğrudan manuel fatura oluşturulabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "farkli_kanallardan_ayri_ayri_kesilir", "label": "Mağaza, e-ticaret ve toptan satışlar farklı yazılımlarda ayrı ayrı faturalanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-004",
+      "order": 4,
+      "process": "Satış Faturası Oluşturma Süreci",
+      "question": "Satış faturası kaydedilmeden önce müşterinin açık hesap risk limiti, vadesi geçmiş borcu veya bloke durumu denetlenir mi?",
+      "description": "Kredili veya açık hesap çalışan müşterilerde risk aşımında fatura kesiminin otomatik engellenmesi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemik_otomatik_risk_blokesi_ve_onay_akisi_var", "label": "Müşteri risk limiti aşılmışsa veya vadesi geçmiş borç varsa sistem fatura kaydını bloke eder", "allow_note": false, "is_other": false },
+        { "value": "kullaniciya_sadece_uyari_verilir_engel_olmaz", "label": "Sistem uyarı gösterir ancak kullanıcının faturayı kaydetmesine ve kesmesine engel olmaz", "allow_note": true, "is_other": false },
+        { "value": "fatura_asamasinda_risk_kontrolu_yapilmaz", "label": "Fatura kesilirken cari risk kontrolü yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-005",
+      "order": 5,
+      "process": "Alış Faturası Kabul Süreci",
+      "question": "Tedarikçilerden gelen hammadde, ticari mal ve sarf malzeme faturalarının ticari kabul ve kontrol süreci nasıl işletilir?",
+      "description": "Gelen faturaların satınalma siparişi fiyatları ve depo kabul miktarları ile karşılaştırma prosedürü incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "siparis_ve_depo_kabul_onayi_olmadan_fatura_kabul_edilmez", "label": "Satınalma siparişi ve depo mal kabul fişi olmadan hiçbir alış faturası sisteme kabul edilmez", "allow_note": false, "is_other": false },
+        { "value": "fatura_gelince_manuel_kontrol_edilir", "label": "Fatura geldiğinde muhasebeci satınalma sorumlusuna sorar veya kağıt irsaliyeyle gözle karşılaştırır", "allow_note": true, "is_other": false },
+        { "value": "on_kontrol_yapilmadan_dogrudan_muhasebelesir", "label": "Gelen faturalar detaylı sipariş karşılaştırması yapılmadan doğrudan borç kaydedilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-006",
+      "order": 6,
+      "process": "Alış Faturası Kabul Süreci",
+      "question": "Alış faturalarında miktar veya birim fiyat uyuşmazlığı (fiyat aşımı / eksik teslimat) tespit edildiğinde nasıl aksiyon alınır?",
+      "description": "Faturada siparişten yüksek fiyat veya irsaliyeden fazla miktar çıktığında onay mekanizması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_fark_kuyrugu_ve_fiyat_farki_talep_edilir", "label": "Sistem faturayı bekletmeye alır; satınalma onay vermedikçe ödeme planına girmez ve fark faturası istenir", "allow_note": false, "is_other": false },
+        { "value": "tedarikciyle_sozlu_gorusulup_manuel_duzeltilir", "label": "Tedarikçiyle telefonla görüşülür; anlaşılırsa fatura manuel kabul edilir veya iade kesilir", "allow_note": true, "is_other": false },
+        { "value": "farklar_takip_edilmeden_fatura_oldugu_gibi_kaydedilir", "label": "Fiyat ve miktar farkları kontrol edilmez; faturadaki tutar neyse o işlenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-007",
+      "order": 7,
+      "process": "Gider Faturası Yönetimi",
+      "question": "Genel işletme giderleri (kira, elektrik, akaryakıt, iletişim, bakım, temsil-ağırlama vb.) faturaları nasıl onaylanır ve kaydedilir?",
+      "description": "Operasyonel ve idari masraf faturalarının bütçe ve yetki matrisine göre onaylanma süreci incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "departman_butce_sorumlusu_onayli_dijital_is_akisi", "label": "İlgili departman yöneticisi ve bütçe sorumlusu ERP üzerinde dijital onay vermeden işlenemez", "allow_note": false, "is_other": false },
+        { "value": "kagit_evrak_uzerine_islak_imza_ile_onay", "label": "Faturanın kağıt çıktısına yönetici ıslak paraf atar; muhasebe parafı görünce sisteme girer", "allow_note": true, "is_other": false },
+        { "value": "onay_aranmaksizin_dogrudan_muhasebeye_islenir", "label": "Ön onay aranmaz; gelen tüm gider faturaları doğrudan masraf hesaplarına yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-008",
+      "order": 8,
+      "process": "Gider Faturası Yönetimi",
+      "question": "Personel masraf formları (temsil, seyahat, konaklama vb.) ve fiş/fatura ekleri nasıl dijitalleştirilip giderleştirilmektedir?",
+      "description": "Personel avans ve masraf harcamalarının faturalarla eşleşmesi ve gider kaydına dönüşümü incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "mobil_web_masraf_modulu_ile_belge_fotografi_ve_onay", "label": "Personel harcamayı ve fatura fotoğrafını masraf modülünden girer, yönetici onaylar, muhasebeleşir", "allow_note": false, "is_other": false },
+        { "value": "excel_masraf_formu_ve_fiziki_fis_zarfi_ile", "label": "Personel aylık Excel formu doldurur; fiş/faturaları zarfa koyup muhasebeye teslim eder", "allow_note": true, "is_other": false },
+        { "value": "masraf_formu_kullanilmaz_elden_nakit_karsilanir", "label": "Düzenli masraf formu yoktur; küçük harcamalar kasadan fişsiz/belgesiz kapatılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-009",
+      "order": 9,
+      "process": "Hizmet Faturaları",
+      "question": "Alınan veya verilen danışmanlık, taşeronluk, yazılım, nakliye, montaj ve bakım gibi hizmet faturaları nasıl yönetilir?",
+      "description": "Fiziksel stok hareketi olmayan hizmet kalemlerinin hizmet kartları ve hakediş protokolleriyle takibi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "standart_hizmet_kartlari_ve_hakedis_sozlesmesi_ile", "label": "Tanımlı hizmet kartları, sözleşme referansı ve onaylı hakediş tutanağı ile ilişkilendirilerek işlenir", "allow_note": false, "is_other": false },
+        { "value": "serbest_aciklama_satiri_ile_manuel_yazilir", "label": "Hizmet kartı yoktur; kullanıcı faturaya serbest metin açıklama yazarak faturayı keser veya işler", "allow_note": true, "is_other": false },
+        { "value": "hizmet_faturalari_stok_kalemlerine_karistirilir", "label": "Hizmet ve stok ayrımı net değildir; hizmetler zaman zaman genel malzeme gibi açılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-010",
+      "order": 10,
+      "process": "Hizmet Faturaları",
+      "question": "Dönemsel veya yinelenen hizmet faturaları (aylık kira, bakım aidatı, lisans aboneliği) için otomatik şablon veya periyodik faturalama var mı?",
+      "description": "Her ay düzenli kesilen veya gelen sabit tutarlı hizmet faturalarının otomatik üretimi ve hatırlatılması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "otomatik_yinelenen_fatura_sablonu_ve_sozlesme_plani", "label": "Sözleşmeye bağlı yinelenen fatura motoru her dönem faturayı otomatik taslak olarak hazırlar", "allow_note": false, "is_other": false },
+        { "value": "personel_manuel_hatirlatma_ile_her_ay_tekrar_yazar", "label": "Otomasyon yoktur; personel her ay önceki faturayı kopyalayarak manuel yeniden yazar", "allow_note": true, "is_other": false },
+        { "value": "yinelenen_fatura_sureci_takip_edilmez", "label": "Periyodik faturalar takip edilmez; atlamalar veya mükerrer kesimler yaşanabilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-011",
+      "order": 11,
+      "process": "Malzeme ve Ürün Faturaları",
+      "question": "Ticari mal ve hammadde faturalarında stok kartı, birim (Adet, Kg, Metre vb.) ve varyant/seri-lot eşleşmesi nasıl denetlenir?",
+      "description": "Fatura satırlarındaki malzeme kodlarının ana stok verisi ve doğru ölçü birimiyle zorunlu eşleşmesi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "stok_karti_birim_ve_barkod_ile_zorunlu_eslesir", "label": "Faturadaki her satır sistemik stok kartı, ana/ikinci birim çevrimi ve parti/lot ile birebir eşleşir", "allow_note": false, "is_other": false },
+        { "value": "manuel_stok_kodu_secilir_birim_hatalari_olabilir", "label": "Stok seçimi manueldir; birim çevrimlerinde ve miktar girişlerinde ara sıra hatalar yaşanabilir", "allow_note": true, "is_other": false },
+        { "value": "stok_karti_baglantisi_olmadan_fatura_kesilebilir", "label": "Stok kartı eşleştirmesi zorunlu değildir; serbest stoksuz fatura kesilip işlenebilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-012",
+      "order": 12,
+      "process": "Siparişten Faturaya Akış",
+      "question": "Satış ve satınalma siparişlerinin doğrudan faturaya dönüştürülmesi veya sipariş bağlantılı faturalama uygulanıyor mu?",
+      "description": "Sipariş bakiye takibi, kısmi faturalama ve sipariş koşullarının (fiyat, iskonto, vade) faturaya otomatik aktarımı sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "siparis_baglantili_otomatik_faturalama", "label": "Evet, faturalar doğrudan onaylı siparişten otomatik çekilir; sipariş bakiyesi anlık güncellenir", "allow_note": false, "is_other": false },
+        { "value": "siparis_bagimsiz_manuel_fatura_girisi_yapilir", "label": "Hayır, faturalar siparişle ilişkilendirilmez; bağımsız sıfırdan manuel girilir", "allow_note": true, "is_other": false },
+        { "value": "kismi_siparis_baglantisi_kullanilir", "label": "Sadece bazı büyük müşterilerde siparişten fatura çekilir, çoğunlukta manuel girilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-013",
+      "order": 13,
+      "process": "Siparişten Faturaya Akış",
+      "question": "Siparişten faturaya aktarımda fiyat, miktar veya iskonto değişiklikleri yapıldığında sipariş revizyon onayı aranıyor mu?",
+      "description": "Kullanıcının fatura anında siparişte onaylanmış fiyattan farklı bir fiyat uygulamasını engelleyen güvenlik kuralları incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-012",
+        "operator": "equals",
+        "value": "siparis_baglantili_otomatik_faturalama"
+      },
+      "options": [
+        { "value": "siparis_fiyati_kilitlidir_degisiklik_yetkili_onayina_baglidir", "label": "Fatura anında fiyat/iskonto değiştirilemez; değişiklik gerekiyorsa sipariş revize edilip onaylanır", "allow_note": false, "is_other": false },
+        { "value": "kullanici_fatura_ekraninda_fiyati_serbestce_degistirebilir", "label": "Kullanıcı faturada fiyatı değiştirebilir; sipariş fiyatı ile fatura fiyatı uyumsuzlaşabilir", "allow_note": true, "is_other": false },
+        { "value": "fiyat_degisiklik_kontrolu_bulunmamaktadir", "label": "Fiyat değişiklikleri izlenmemekte ve kilit mekanizması uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-014",
+      "order": 14,
+      "process": "İrsaliyeden Faturaya Akış",
+      "question": "Sevk edilen veya teslim alınan sevk irsaliyelerinin faturaya dönüştürülmesi süreci nasıl yürütülmektedir?",
+      "description": "Açık irsaliyelerin faturalanması, 7 günlük yasal süre kontrolü ve faturalaşmamış irsaliye bakiye takibi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "irsaliye_bazli_toplu_veya_tekil_faturalama", "label": "İrsaliyeler seçilerek tekil veya toplu olarak faturaya aktarılır; açık irsaliye havuzu tam kontrol edilir", "allow_note": false, "is_other": false },
+        { "value": "irsaliye_ile_fatura_ayri_ayri_manuel_yazilir", "label": "İrsaliye ayrı yazılır, fatura ayrı yazılır; sistem üzerinde otomatik irsaliye-fatura bağı kurulmaz", "allow_note": true, "is_other": false },
+        { "value": "irsaliye_kullanilmamakta_dogrudan_fatura_kesilmektedir", "label": "İrsaliye düzenlenmemekte; sevk anında doğrudan irsaliyeli fatura veya fatura kesilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-015",
+      "order": 15,
+      "process": "İrsaliyeden Faturaya Akış",
+      "question": "Aynı müşteriye/tedarikçiye ait farklı tarihlerdeki birden fazla irsaliyenin tek bir faturada birleştirilmesi (Konsolide Fatura) destekleniyor mu?",
+      "description": "Haftalık veya aylık periyotlarda kesilen toplu irsaliyelerin tek icmal faturasına bağlanması yeteneği değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-014",
+        "operator": "equals",
+        "value": "irsaliye_bazli_toplu_veya_tekil_faturalama"
+      },
+      "options": [
+        { "value": "tam_konsolide_faturalama_ve_irsaliye_kalem_izlenebilirligi", "label": "Evet, seçilen tüm irsaliyeler tek faturada toplanır ve faturada her irsaliyenin tarihi/nosu listelenir", "allow_note": false, "is_other": false },
+        { "value": "birlestirme_manuel_yapilir_irsaliye_bagi_kopar", "label": "Manuel birleştirme yapılır ancak sistemik irsaliye referans bağı kopabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "her_irsaliye_icin_zorunlu_tek_fatura_kesilir", "label": "İrsaliyeler birleştirilemez; her irsaliye için ayrı fatura kesilmek zorundadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-016",
+      "order": 16,
+      "process": "Fatura Öncesi Teslimat ve Kabul Kontrolü",
+      "question": "Hizmet veya proje teslimatlarında fatura kesilmeden/kabul edilmeden önce teknik onay veya kabul tutanağı şartı var mıdır?",
+      "description": "Danışmanlık, mühendislik veya montaj işlerinde teknik kabul gerçekleşmeden fatura kesiminin/girişinin engellenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kabul_tutanagi_olmadan_fatura_olusturulamaz", "label": "Proje yöneticisi veya teknik kabul heyeti tutanak onaylamadan sistemde fatura oluşturulamaz", "allow_note": false, "is_other": false },
+        { "value": "sozlu_teyit_ile_fatura_kesilir_tutanak_sonradan_alinir", "label": "Sözlü onay ile fatura kesilir; resmi kabul tutanağı genellikle sonradan tamamlanır", "allow_note": true, "is_other": false },
+        { "value": "teslimat_kabul_kontrolu_yapilmamaktadir", "label": "Teknik teslimat kontrolü aranmaz; talep edilen tutar doğrudan faturalanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-017",
+      "order": 17,
+      "process": "Fatura Öncesi Teslimat ve Kabul Kontrolü",
+      "question": "Satış faturalarında müşteriye taahhüt edilen SLA cezaları, gecikme kesintileri veya eksik teslimat kesintileri nasıl yönetilir?",
+      "description": "Müşterinin hakedişten kestiği cezaların fatura tutarından veya fiyat farkı faturasıyla mahsuplaşma yöntemi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "otomatik_ceza_iskontosu_veya_mahsup_dekontu_ile", "label": "Sözleşme şartlarına göre ceza kesintisi faturada açık iskonto/mahsup satırı olarak işlenir", "allow_note": false, "is_other": false },
+        { "value": "musteri_fiyat_farki_faturasi_keserse_mahsuplasma_yapilir", "label": "Fatura tam kesilir; müşteri ceza faturası gönderdiğinde cari hesapta mahsuplaşılır", "allow_note": true, "is_other": false },
+        { "value": "ceza_ve_kesintiler_takip_edilmez", "label": "Ceza kesintileri takip edilmemekte; tahsilat eksik geldiğinde fark edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-018",
+      "order": 18,
+      "process": "Fatura Fiyat ve İskonto Kontrolü",
+      "question": "Satış ve alış faturalarında çok kademeli iskontolar (Cari İskontosu, Kampanya İskontosu, Satır İskontosu, Fatura Altı İskonto) nasıl hesaplanır?",
+      "description": "Fatura satırında ve toplamında uygulanan yüzdesel/tutarsal iskontoların matematiksel ve kurumsal kural denetimi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "otomatik_fiyat_listesi_ve_kademeli_iskonto_matrisi", "label": "Fiyat ve iskontolar sözleşme/kampanya matrisinden otomatik gelir; yetkisiz iskonto girilemez", "allow_note": false, "is_other": false },
+        { "value": "fatura_kesen_personel_manuel_iskonto_yazar", "label": "İskontolar otomatik değildir; kullanıcı fatura altından veya satırdan serbestçe iskonto yazar", "allow_note": true, "is_other": false },
+        { "value": "iskonto_uygulamamiz_bulunmamaktadir", "label": "İskonto uygulanmaz; tüm işlemler net liste fiyatı üzerinden faturalanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-019",
+      "order": 19,
+      "process": "Fatura Fiyat ve İskonto Kontrolü",
+      "question": "Maliyetin altında zararına satış faturası kesilmesini veya belirlenen minimum kar marjı sınırını denetleyen sistemik kural var mıdır?",
+      "description": "Fatura birim fiyatının güncel stok maliyetinden (FIFO/Ağırlıklı Ortalama) düşük olması durumunda uyarı/bloke kontrolü sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "maliyet_alti_satis_blokesi_ve_genel_mudur_onay_sarti", "label": "Birim fiyat son maliyetin altına inerse sistem satışı bloke eder; üst yönetim onayı gerektirir", "allow_note": false, "is_other": false },
+        { "value": "sistem_sadece_uyari_verir_satis_durdurulmaz", "label": "Maliyet altı satışta sistem uyarı verir ancak faturanın kesilmesine izin verir", "allow_note": true, "is_other": false },
+        { "value": "fatura_asamasinda_maliyet_kontrolu_yoktur", "label": "Fatura kesilirken maliyet kontrolü yapılmaz; dönem sonu karlılık raporlarında görülür", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-020",
+      "order": 20,
+      "process": "KDV Oranları ve Vergi Kodları",
+      "question": "Faturalarda uygulanan güncel KDV oranları (%1, %10, %20 vb.), ÖTV, Konaklama Vergisi ve ÖİV hesaplamaları nasıl yönetilir?",
+      "description": "Farklı KDV oranlarına tabi ürünlerin aynı faturada yer alması, matrah ve vergi ayrıştırmasının doğruluğu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "stok_ve_hizmet_kartindan_otomatik_dogru_vergi_hesabi", "label": "KDV oranları ve özel vergiler stok kartından otomatik gelir; çoklu KDV matrahları hatasız ayrışır", "allow_note": false, "is_other": false },
+        { "value": "kullanici_fatura_satirinda_kdv_oranini_manuel_secer", "label": "Vergi oranları kartlarda sabit değildir; faturayı kesen kullanıcı her satırda KDV oranını manuel seçer", "allow_note": true, "is_other": false },
+        { "value": "vergi_hesaplama_hatalari_siklikla_yasanmaktadir", "label": "KDV oranlarının yanlış seçilmesi nedeniyle düzeltme ve beyanname revizyonları yaşanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-021",
+      "order": 21,
+      "process": "KDV Oranları ve Vergi Kodları",
+      "question": "KDV oran değişikliklerinde (mevzuat tebliğleri ile oran güncellemeleri) sistemdeki tüm açık sipariş ve fatura şablonları nasıl güncellenir?",
+      "description": "Resmi vergi oranı değiştiğinde açık siparişlerin yeni KDV ile faturalanması ve parametrik güncelleme hızı sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "merkezi_tarih_bazli_kdv_parametre_yonetimi", "label": "Tarih bazlı merkezi vergi tablosu güncellenir; açık sipariş ve irsaliyeler otomatik yeni orana adapte olur", "allow_note": false, "is_other": false },
+        { "value": "tum_stok_kartlari_manuel_tek_tek_guncellenir", "label": "Merkezi parametre yoktur; personel tüm stok kartlarını ve siparişleri elle tek tek günceller", "allow_note": true, "is_other": false },
+        { "value": "kdv_degisiklik_sureci_yonetilememektedir", "label": "KDV değişikliklerinde faturalama durur; yazılım firmasından müdahale beklenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-022",
+      "order": 22,
+      "process": "Tevkifat Uygulamaları",
+      "question": "Şirketin satış veya alış işlemlerinde KDV Tevkifatı (Kısmi veya Tam Tevkifat: 2/10, 5/10, 7/10, 9/10 vb.) uygulanmakta mıdır?",
+      "description": "Tevkifatlı fatura düzenleme, tevkifata tabi tutulan KDV'nin cari alacaktan düşülmesi ve beyanname uyumu değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tevkifatli_fatura_kesilmektedir", "label": "Evet, tevkifata tabi malzeme/hizmet satış ve alışlarımız mevcuttur ve düzenli tevkifatlı fatura kesilir", "allow_note": false, "is_other": false },
+        { "value": "tevkifat_uygulamamiz_yoktur", "label": "Hayır, şirketimizin faaliyet alanında tevkifatlı satış veya alış faturası bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "tevkifatli_islemler_nadir_olur_manuel_hesaplanir", "label": "Çok nadir olur; sistemde otomatik kural yoktur, Excel'de hesaplanıp manuel yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-023",
+      "order": 23,
+      "process": "Tevkifat Uygulamaları",
+      "question": "Tevkifatlı faturalarda tevkifat matrahı, alıcı payı, satıcı payı ve 2.000 TL işlem alt limiti sistem tarafından otomatik denetlenir mi?",
+      "description": "GİB tevkifat alt limiti kontrolü ve tevkifat tutarlarının cari hesaba net ödenecek tutar olarak yansıması incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-022",
+        "operator": "equals",
+        "value": "tevkifatli_fatura_kesilmektedir"
+      },
+      "options": [
+        { "value": "tam_otomatik_tevkifat_hesabi_alt_limit_ve_cari_netlestirme", "label": "Evet, tevkifat oranı, alt limit kontrolü ve alıcı/satıcı KDV payları sistemce otomatik ve hatasız ayrışır", "allow_note": false, "is_other": false },
+        { "value": "tevkifat_tutarlari_kullanici_tarafindan_manuel_yazilir", "label": "Otomatik hesaplama yoktur; personel tevkifat oranını ve tutarını faturaya elle yazar", "allow_note": true, "is_other": false },
+        { "value": "tevkifat_hesaplama_hatalari_olabilmektedir", "label": "Limit aşımlarında veya oran seçimlerinde manuel hesap hataları yaşanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-024",
+      "order": 24,
+      "process": "İstisna ve Özel Vergi Uygulamaları",
+      "question": "KDV İstisnası (Tam İstisna, Kısmi İstisna, İhraç Kayıtlı Satış, Serbest Bölge, Diplomatik İstisna) faturaları nasıl yönetilir?",
+      "description": "KDV'siz fatura kesiminde yasal istisna gerekçesi, beyanname kodu ve tecil-terkin mekanizması incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "istisna_kodu_ve_tecil_terkin_otomatik_muhasebelesir", "label": "İstisna türüne göre KDV sıfırlanır, yasal istisna kodu basılır ve tecil-terkin kaydı otomatik açılır", "allow_note": false, "is_other": false },
+        { "value": "kdv_orani_manuel_sifir_yazilarak_kesilir", "label": "Özel istisna kodu seçilmez; kullanıcı KDV oranına '%0' yazarak faturayı düzenler", "allow_note": true, "is_other": false },
+        { "value": "istisnali_veya_ihrac_kayitli_satisimiz_yoktur", "label": "İstisnalı veya ihraç kayıtlı satış operasyonumuz bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-025",
+      "order": 25,
+      "process": "Dövizli Fatura ve Kur Kullanımı",
+      "question": "Yabancı para birimli (USD, EUR, GBP vb.) satış ve alış faturaları düzenlenmekte veya kabul edilmekte midir?",
+      "description": "Dövizli faturaların ticari yönetimi, TCMB döviz alış/satış kurları ve fatura tarihindeki TL karşılık hesabı sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "dovizli_fatura_kesilmekte_ve_alinmaktadir", "label": "Evet, düzenli dövizli fatura kesilir/alınır; fatura kuru, döviz tutarı ve TL karşılığı birlikte takip edilir", "allow_note": false, "is_other": false },
+        { "value": "sadece_tl_fatura_kullanilmaktadir", "label": "Hayır, şirketimizde tüm faturalar sadece Türk Lirası (TL) cinsinden düzenlenir ve kabul edilir", "allow_note": true, "is_other": false },
+        { "value": "dovizli_faturalar_manuel_tl_cevrilip_girilir", "label": "Dövizli faturalar sistemde döviz olarak tutulmaz; elle o günkü kurdan TL'ye çevrilip tek para kaydedilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-026",
+      "order": 26,
+      "process": "Dövizli Fatura ve Kur Kullanımı",
+      "question": "Dövizli faturalarda kullanılan kur türü (TCMB Döviz Alış, Efektif Satış, Özel Banka Kuru) ve kur farkı faturalaması nasıl yönetilir?",
+      "description": "Ödeme tarihindeki kur ile fatura tarihindeki kur arasındaki fark için kur farkı faturası oluşturma ve KDV hesaplama yöntemi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-025",
+        "operator": "equals",
+        "value": "dovizli_fatura_kesilmekte_ve_alinmaktadir"
+      },
+      "options": [
+        { "value": "otomatik_tcmb_kur_entegrasyonu_ve_otomatik_kur_farki_faturasi", "label": "Kur TCMB'den otomatik çekilir; tahsilat anında oluşan kur farkı için otomatik kur farkı faturası açılır", "allow_note": false, "is_other": false },
+        { "value": "kur_manuel_girilir_kur_farki_faturasi_manuel_hesaplanir", "label": "Kur elle yazılır; kur farkı faturaları muhasebeci tarafından Excel'de hesaplanarak manuel kesilir", "allow_note": true, "is_other": false },
+        { "value": "kur_farki_faturasi_duzenlenmemektedir", "label": "Kur farkı faturası kesilmez; kur farkları sadece muhasebe değerleme fişiyle kapatılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-027",
+      "order": 27,
+      "process": "İhracat Faturaları",
+      "question": "Yurtdışı mal veya hizmet ihracatlarında İhracat Faturası ve ticari dış ticaret evrakları nasıl düzenlenir?",
+      "description": "İhracat faturalarında dövizli tutar, teslim şekli (FOB, CIF, EXW), ödeme şekli ve banka bilgilerinin doğruluğu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "ihracat_faturasi_duzenlenmektedir", "label": "Evet, yurtdışı mal/hizmet ihracat faturaları Incoterms, GTİP ve döviz kırılımıyla sistemden düzenlenir", "allow_note": false, "is_other": false },
+        { "value": "ihracat_operasyonumuz_yoktur", "label": "Hayır, şirketimizin yurtdışı ihracat satışı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "ihracat_faturalari_harici_programda_kesilir", "label": "İhracat faturaları ERP dışında gümrük müşavirinin programında veya Word/Excel'de kesilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-028",
+      "order": 28,
+      "process": "İhracat Faturaları",
+      "question": "İhracat faturasında navlun, sigorta, komisyon gibi ek giderler ile proforma fatura eşleşmesi nasıl sağlanır?",
+      "description": "Proforma faturadan kesin ihracat faturasına geçiş ve navlun/sigorta maliyetlerinin faturaya eklenmesi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-027",
+        "operator": "equals",
+        "value": "ihracat_faturasi_duzenlenmektedir"
+      },
+      "options": [
+        { "value": "proformadan_kesin_faturaya_ve_navlun_sigorta_kalemleri_tam", "label": "Proforma tek tıkla kesin faturaya döner; navlun ve sigorta giderleri otomatik kalem olarak eklenir", "allow_note": false, "is_other": false },
+        { "value": "proforma_ve_kesin_fatura_ayri_ayri_manuel_hazirlanir", "label": "Proforma Excel'de tutulur; kesin fatura ERP'ye elle yeniden girilir", "allow_note": true, "is_other": false },
+        { "value": "navlun_ve_sigorta_kalemleri_faturada_ayrilmaz", "label": "Navlun ve sigorta faturada ayrıştırılmaz; tek kalem toplam tutar yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-029",
+      "order": 29,
+      "process": "İade Faturaları",
+      "question": "Müşterilerden gelen satış iadesi faturaları veya tedarikçiye kesilen alış iadesi faturaları nasıl yönetilmektedir?",
+      "description": "İade faturasının orijinal satış/alış faturasıyla ilişkilendirilmesi ve stok maliyetine doğru etki etmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "duzenli_satis_ve_alis_iadesi_yapilmaktadir", "label": "Evet, iade faturaları orijinal fatura referansıyla kesilir ve stok/cari hesapla tam entegre çalışır", "allow_note": false, "is_other": false },
+        { "value": "iade_faturalari_orijinal_faturadan_bagimsiz_kesilir", "label": "İadeler orijinal faturayla bağlanmaz; bağımsız genel alış/satış faturası gibi girilir", "allow_note": true, "is_other": false },
+        { "value": "iade_islemleri_nadir_ve_manueldir", "label": "İade çok nadir olur; muhasebe fişleri ile manuel düzeltme sağlanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-030",
+      "order": 30,
+      "process": "İade Faturaları",
+      "question": "İade faturası işlenirken iade edilen ürünün stok maliyet değeri (orijinal satış maliyeti mi, güncel maliyet mi) nasıl hesaplanır?",
+      "description": "Satış iadesinde ürünün stoka geri giriş maliyetinin doğruluğu ve satılan malın maliyeti (SMM) ters kaydı incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-029",
+        "operator": "equals",
+        "value": "duzenli_satis_ve_alis_iadesi_yapilmaktadir"
+      },
+      "options": [
+        { "value": "orijinal_cikis_maliyeti_uzerinden_otomatik_stok_girisi", "label": "Sistem ürünü orijinal çıkış maliyetiyle stoka iade alır ve SMM ters kaydını otomatik düzeltir", "allow_note": false, "is_other": false },
+        { "value": "guncel_ortalama_maliyetten_stoka_alinir", "label": "Orijinal maliyete bakılmaz; ürün güncel ortalama maliyetle stoka geri girer", "allow_note": true, "is_other": false },
+        { "value": "iade_maliyet_etkisi_takip_edilmez", "label": "İade maliyet etkisi izlenmez; dönem sonu sayım farklarıyla dengelenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-031",
+      "order": 31,
+      "process": "Fiyat Farkı ve Ek Faturalar",
+      "question": "Dönem sonu ciro primleri, vade farkları, fiyat farkı faturaları ve reklam/katkı payı faturaları nasıl oluşturulur ve takip edilir?",
+      "description": "Fiziki ürün hareketi olmaksızın ticari mutabakat sonucu kesilen fiyat farkı ve ciro primi faturaları değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sozlesme_ciro_primi_ve_fiyat_farki_modulu_ile", "label": "Sözleşme baremleri üzerinden ciro primi ve fiyat farkı otomatik hesaplanır ve faturalaşır", "allow_note": false, "is_other": false },
+        { "value": "manuel_mutabakat_ile_serbest_fatura_kesilir", "label": "Karşılıklı mutabakat yapıldıktan sonra kullanıcı serbest hizmet faturası olarak keser", "allow_note": true, "is_other": false },
+        { "value": "fiyat_farki_veya_ciro_primi_uygulanmamaktadir", "label": "Fiyat farkı veya ciro primi uygulamamız bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-032",
+      "order": 32,
+      "process": "Fiyat Farkı ve Ek Faturalar",
+      "question": "Kesilen fiyat farkı veya vade farkı faturalarının orijinal ana faturanın kar marjına ve maliyetine etki dağıtımı yapılıyor mu?",
+      "description": "Fiyat farkının projenin veya ürünün net karlılık hesabına analitik olarak yedirilmesi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "orijinal_fatura_ve_siparis_karliligina_otomatik_yansitilir", "label": "Fiyat farkı orijinal sipariş ve proje karlılık raporuna otomatik ek gelir/gider olarak yansır", "allow_note": false, "is_other": false },
+        { "value": "sadece_genel_gelir_gider_hesabinda_tutulur", "label": "Ürün karlılığına dağıtılmaz; sadece genel finansman geliri/gideri olarak muhasebeleşir", "allow_note": true, "is_other": false },
+        { "value": "etki_dagitimi_yapilmamaktadir", "label": "Fiyat farkı etkileri takip edilmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-033",
+      "order": 33,
+      "process": "Fatura İptal, Red ve Düzeltme Süreçleri",
+      "question": "Hatalı düzenlenen satış faturalarının iptali veya reddedilen faturaların ERP sistemindeki düzeltme prosedürü nasıldır?",
+      "description": "Fatura iptalinde stok hareketlerinin, cari borç/alacağın ve muhasebe fişinin otomatik geri alınma güvenliği incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "yetkili_onayli_iptal_stok_ve_muhasebe_otomatik_ters_kayit", "label": "İptal yetkili onayına bağlıdır; onaylanınca irsaliye/sipariş bakiyesi, stok ve muhasebe otomatik düzelir", "allow_note": false, "is_other": false },
+        { "value": "fatura_silinir_veya_manuel_ters_fis_kesilir", "label": "Sistemik otomatik iptal mekanizması yoktur; kullanıcı kaydı siler veya elle ters fiş yazar", "allow_note": true, "is_other": false },
+        { "value": "iptal_surecleri_takip_edilmemektedir", "label": "İptal prosedürü belirsizdir; stok ve cari uyumsuzlukları sıkça yaşanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-034",
+      "order": 34,
+      "process": "Fatura İptal, Red ve Düzeltme Süreçleri",
+      "question": "İptal edilen veya düzeltilen faturaların nedenleri (fiyat hatası, yanlış cari, iade, mükerrer kesim vb.) gerekçe koduyla kaydediliyor mu?",
+      "description": "Fatura iptal gerekçelerinin kök neden analizi ve operasyonel hataları azaltmak için raporlanması incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "zorunlu_iptal_gerekce_kodu_ve_yonetici_aciklamasi", "label": "İptal gerekçe kodu ve açıklama seçilmeden hiçbir fatura iptal edilemez; aylık hata raporu çıkarılır", "allow_note": false, "is_other": false },
+        { "value": "serbest_metin_not_yazilir_zorunlu_degildir", "label": "İptal nedeni açıklama alanına serbest yazılabilir ancak zorunlu tutulmaz", "allow_note": true, "is_other": false },
+        { "value": "iptal_gerekceleri_kaydedilmez", "label": "İptal nedeni kaydedilmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-035",
+      "order": 35,
+      "process": "Gider Onay ve Masraf Merkezi Dağılımı",
+      "question": "Gider ve alış faturaları kaydedilirken Masraf Merkezlerine (Departman, Tesis, Şantiye, Araç, Proje Kodu) analitik dağıtım yapılıyor mu?",
+      "description": "Fatura tutarının birden fazla masraf merkezine veya proje koduna yüzdesel/tutarsal paylaştırılması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "coklu_masraf_merkezi_ve_proje_dagitimi_var", "label": "Evet, her fatura satırı masraf merkezi, kar merkezi ve proje koduna zorunlu olarak dağıtılır", "allow_note": false, "is_other": false },
+        { "value": "tek_bir_sabit_genel_masraf_merkezine_atanir", "label": "Ayrıntılı dağıtım yoktur; tüm faturalar genel şirket merkezine veya tek bir koda yazılır", "allow_note": true, "is_other": false },
+        { "value": "masraf_merkezi_kullanilmamaktadir", "label": "Masraf merkezi veya analitik boyut yapısı kullanılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-036",
+      "order": 36,
+      "process": "Gider Onay ve Masraf Merkezi Dağılımı",
+      "question": "Masraf dağıtımında önceden tanımlanmış sabit dağıtım anahtarları (örn: Genel Gider Dağıtımı: %40 Üretim, %30 Satış, %30 Yönetim) kullanılıyor mu?",
+      "description": "Ortak giderlerin (kira, enerji vb.) otomatik dağıtım şablonlarıyla departmanlara paylaştırılması incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-035",
+        "operator": "equals",
+        "value": "coklu_masraf_merkezi_ve_proje_dagitimi_var"
+      },
+      "options": [
+        { "value": "otomatik_masraf_dagitim_sablonlari_ile_tek_tikla_paylasim", "label": "Evet, tanımlı dağıtım anahtarı seçildiğinde tutar departmanlara oranlarına göre anında dağıtılır", "allow_note": false, "is_other": false },
+        { "value": "kullanici_her_faturada_satirlari_manuel_oranlar", "label": "Şablon yoktur; faturayı giren personel hesap makinesiyle hesaplayıp elle birden fazla satır açar", "allow_note": true, "is_other": false },
+        { "value": "dagitim_anahtari_kullanilmamaktadir", "label": "Dağıtım anahtarları kullanılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-037",
+      "order": 37,
+      "process": "Satınalma Faturası Üçlü Eşleştirme",
+      "question": "Alış faturalarında Satınalma Siparişi - Depo Mal Kabul İrsaliyesi - Tedarikçi Faturası 3'lü eşleştirmesi (Three-Way Matching) uygulanıyor mu?",
+      "description": "Fatura kabulünde sipariş edilen miktar/fiyat ile fiilen depoya giren miktar ve fatura edilen tutarın otomatik eşleşmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_otomatik_uclu_eslestirme_uygulanir", "label": "Evet, sistem Sipariş-İrsaliye-Fatura üçlüsünü miktar ve fiyat toleransları içinde otomatik doğrular", "allow_note": false, "is_other": false },
+        { "value": "ikili_eslestirme_yapilir_irsaliye_fatura_eslesir", "label": "Sipariş kontrol edilmez; sadece depo mal kabul irsaliyesi ile fatura ikili eşleştirilir", "allow_note": true, "is_other": false },
+        { "value": "uclu_eslestirme_yapilmaz_manuel_onaylanir", "label": "Sistemik eşleştirme yoktur; fatura gözle kontrol edilip onaylanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-038",
+      "order": 38,
+      "process": "Satınalma Faturası Üçlü Eşleştirme",
+      "question": "Üçlü eşleştirmede tutar veya miktar tolerans limitleri (örn: %2 veya 100 TL altı yuvarlama toleransı) nasıl yönetilir?",
+      "description": "Kuruş farkları veya küçük miktar toleranslarının otomatik onaylanması, tolerans aşımında yöneticiden ek onay istenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "INV-037",
+        "operator": "equals",
+        "value": "tam_otomatik_uclu_eslestirme_uygulanir"
+      },
+      "options": [
+        { "value": "parametre_bazli_tolerans_limiti_ve_kademeli_onay_akisi", "label": "Tanımlı tolerans içindeki kuruş farkları otomatik kapanır, aşan farklar satınalma onayına düşer", "allow_note": false, "is_other": false },
+        { "value": "tolerans_tanimi_yoktur_en_kucuk_farkta_bile_bloke_olur", "label": "Tolerans yoktur; 1 kuruşluk farkta bile fatura kilitlenir ve manuel müdahale gerekir", "allow_note": true, "is_other": false },
+        { "value": "tolerans_denetimi_yapilmamaktadir", "label": "Toleranslar denetlenmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-039",
+      "order": 39,
+      "process": "Fatura Ödeme Vadesi ve Ödeme Planı",
+      "question": "Fatura bazında ödeme vadesi (Net 30 gün, 60 gün, ay sonu + 15 gün, taksitli vade vb.) ve ödeme planı nasıl oluşturulur?",
+      "description": "Cari sözleşme vade koşullarının faturaya otomatik yansıması ve vadesine göre ödeme/tahsilat takvimi üretimi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "sozlesme_vade_kodundan_otomatik_odeme_plani_uretilir", "label": "Cari kartındaki vade kuralından fatura kesinleştiği an kesin ödeme/tahsilat planı otomatik doğar", "allow_note": false, "is_other": false },
+        { "value": "vade_tarihi_kullanici_tarafindan_manuel_yazilir", "label": "Otomatik vade motoru yoktur; faturayı kesen/işleyen personel vade tarihini elle seçer", "allow_note": true, "is_other": false },
+        { "value": "fatura_vadesi_takip_edilmemektedir", "label": "Fatura vadesi girilmez; cari hesap genel bakiye üzerinden takip edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-040",
+      "order": 40,
+      "process": "Fatura Ödeme Vadesi ve Ödeme Planı",
+      "question": "Erken ödeme iskontosu (Nakit İskonto / Skonto) veya geciken faturalar için otomatik vade farkı faizi hesaplaması var mı?",
+      "description": "Belirlenen süreden önce ödenen faturalarda indirim veya gecikmelerde faiz tahakkuk mekanizması değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_skonto_erken_odeme_ve_vade_farki_hesaplama_var", "label": "Evet, erken ödemede skonto iskontosu, gecikmede sözleşme faizi sistemce otomatik hesaplanır", "allow_note": false, "is_other": false },
+        { "value": "erken_odeme_iskontosu_manuel_mutabakatla_uygulanir", "label": "Sistemik otomatik hesaplama yoktur; mutabık kalınırsa manuel iskonto faturası kesilir", "allow_note": true, "is_other": false },
+        { "value": "erken_odeme_veya_vade_farki_uygulanmamaktadir", "label": "Erken ödeme iskontosu veya vade farkı faizi uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-041",
+      "order": 41,
+      "process": "Cari Hesap ve Muhasebe Entegrasyonu",
+      "question": "Fatura onaylandığı anda Cari Hesap borç/alacak bakiyesi ve Genel Muhasebe Yevmiye Fişi (120/320/600/150/153/770/391/191) anında oluşuyor mu?",
+      "description": "Ticari fatura ile resmi muhasebe defterleri arasındaki anlık veya periyodik entegrasyon yapısı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_anlik_entegrasyon_ile_otomatik_yevmiye_ve_cari_kayit", "label": "Fatura onaylandığı anda cari hesap güncellenir ve kurallara uygun muhasebe yevmiye fişi anında oluşur", "allow_note": false, "is_other": false },
+        { "value": "toplu_aktarim_ile_gun_veya_ay_sonunda_muhasebelesir", "label": "Fatura ticari kaydedilir; muhasebe aktarımı gün/ay sonunda toplu entegrasyon çalıştırmasıyla yapılır", "allow_note": true, "is_other": false },
+        { "value": "muhasebeye_ayri_bir_personel_tarafindan_manuel_yazilir", "label": "Entegrasyon yoktur; faturalar muhasebe programına elle yeniden tek tek fiş olarak yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-042",
+      "order": 42,
+      "process": "Cari Hesap ve Muhasebe Entegrasyonu",
+      "question": "Fatura muhasebeleşirken kullanılan muhasebe hesap kodları (hesap planı bağlantıları) nasıl belirlenir?",
+      "description": "Cari kartı, malzeme grubu, KDV oranı ve masraf merkezi parametrelerine göre muhasebe kodlarının otomatik çözümlenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "parametre_matrisinden_otomatik_hesap_kodu_turetme", "label": "Malzeme, cari grubu, KDV ve masraf merkezinden kurallı 7'li/6'lı hesap kodları otomatik belirlenir", "allow_note": false, "is_other": false },
+        { "value": "kullanici_fatura_satirinda_hesap_kodunu_manuel_yazar", "label": "Otomatik matris yoktur; faturayı giren kullanıcı muhasebe hesap kodunu her satırda elle seçer", "allow_note": true, "is_other": false },
+        { "value": "tek_bir_havuz_hesaba_aktarilip_sonradan_duzeltilir", "label": "Tüm faturalar geçici bir havuz hesaba akar; muhasebeci periyodik olarak doğru hesaplara dağıtır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-043",
+      "order": 43,
+      "process": "Fatura Numaralandırma ve Dönem Kontrolü",
+      "question": "Faturalarda yasal seri/sıra numaralandırma, şube/seri önekleri ve atlama/mükerrerlik engelleme kontrolleri nasıl çalışır?",
+      "description": "Fatura numaralarında ardışıklık kontrolü, yıl bazlı sıfırlama ve atlanan numara kontrolü değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_ardisik_numara_seri_on_ekleri_ve_sifir_atlama", "label": "Sistem şube ve belge tipine göre ardışık numara üretir; numara atlaması ve mükerrerlik imkansızdır", "allow_note": false, "is_other": false },
+        { "value": "numaralar_kullanici_tarafindan_manuel_yazilabilmektedir", "label": "Kullanıcı fatura numarasını manuel yazabilir; atlamalar veya mükerrer kayıtlar yaşanabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "numaralandirma_takibi_yapilmamaktadir", "label": "Numaralandırma disiplini yoktur; sık sık mükerrer fatura numarası uyarısı alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-044",
+      "order": 44,
+      "process": "Fatura Numaralandırma ve Dönem Kontrolü",
+      "question": "Geçmiş tarihe fatura kesilmesi veya geleceğe dönük hatalı tarihli fatura düzenlenmesi nasıl sınırlandırılır?",
+      "description": "Son kesilen fatura tarihinden geriye dönük fatura kesilmesini engelleyen tarih kilidi kuralları incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "siki_tarih_kilidi_ve_gecmise_fatura_engelleme_kurali_var", "label": "Son kesilen fatura tarihinden öncesine veya 7 günden geriye fatura kesilmesi sistemce kilitlenmiştir", "allow_note": false, "is_other": false },
+        { "value": "sistem_sadece_uyari_verir_gecmis_tarihe_fatura_kesilebilir", "label": "Sistem uyarı verir ancak kullanıcının geçmiş veya ileri tarihe fatura kesmesini engellemez", "allow_note": true, "is_other": false },
+        { "value": "tarih_kontrolu_bulunmamaktadir", "label": "Fatura tarih kontrolleri yapılmamaktadır; serbestçe her tarihe fatura düzenlenebilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-045",
+      "order": 45,
+      "process": "Fatura Raporlama, Mutabakat ve KPI",
+      "question": "Aylık Ba/Bs formları, cari hesap fatura mutabakatları ve fatura kontrol listeleri nasıl raporlanmakta ve doğrulanmaktadır?",
+      "description": "5.000 TL üzeri alım/satımların Ba/Bs listelerine otomatik çekilmesi ve cari hesap mutabakat mektupları incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_ba_bs_formu_ve_elektronik_mutabakat_entegrasyonu", "label": "Ba/Bs formları tek tıkla üretilir; carilerle elektronik mutabakat (e-Mutabakat) üzerinden doğrulanır", "allow_note": false, "is_other": false },
+        { "value": "manuel_excel_mizan_karsilastirmasi_ve_faks_eposta", "label": "Sistemik e-mutabakat yoktur; muhasebeci Excel'den manuel liste yapıp e-posta/telefonla teyit alır", "allow_note": true, "is_other": false },
+        { "value": "duzenli_fatura_mutabakati_yapilmamaktadir", "label": "Düzenli mutabakat yapılmaz; sadece yıl sonlarında veya uyuşmazlık çıktığında bakılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-046",
+      "order": 46,
+      "process": "Fatura Raporlama, Mutabakat ve KPI",
+      "question": "Faturalama performans göstergeleri (Faturalanmamış İrsaliye Tutarı, Vadesi Geçmiş Fatura Oranı, Fatura Başına Maliyet vb.) izleniyor mu?",
+      "description": "Üst yönetimin faturalama döngü hızı ve açık irsaliye risklerini dashboard üzerinden izleme olgunluğu sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "yonetim_dashboardu_uzerinde_anlik_kpi_ve_risk_alarmlari", "label": "Evet, açık irsaliyeler, vadesi geçen faturalar ve faturalama gecikmeleri anlık KPI panelinden izlenir", "allow_note": false, "is_other": false },
+        { "value": "ay_sonu_manuel_excel_ozet_tablosu_ile", "label": "Anlık dashboard yoktur; ay sonlarında muhasebe tarafından Excel raporu olarak sunulur", "allow_note": true, "is_other": false },
+        { "value": "faturalama_kpi_ve_performansi_takip_edilmez", "label": "Faturalama KPI'ları takip edilmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "INV-047",
+      "order": 47,
+      "process": "Faturalama Kapanışı, Dönem Kilidi ve Denetim İzi",
+      "question": "KDV beyannamesi verildikten sonra ilgili ayın faturalama dönemine kilit konularak geriye dönük fatura ekleme/silme engelleniyor mu?",
+      "description": "Dönem kapanışı kilidi (Period Lock) ile beyan edilmiş aylara sonradan yetkisiz fatura kesilmesini veya değiştirilmesini engelleyen denetim izi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "katı_donem_kilidi_ve_zaman_damgali_degistirilemez_audit_trail", "label": "Beyanname sonrası dönem kilitlenir; hiçbir kullanıcı geriye dönük fatura kesemez/değiştiremez", "allow_note": false, "is_other": false },
+        { "value": "donem_kilidi_yoktur_yonetici_sifresiyle_her_zaman_degistirilebilir", "label": "Dönem kilidi uygulanmaz veya yönetici şifresiyle geçmiş aylara serbestçe fatura eklenebilir", "allow_note": true, "is_other": false },
+        { "value": "kapanis_disiplini_bulunmamaktadir", "label": "Dönem kapanış disiplini yoktur; eski aylarda sıkça bakiye kaymaları yaşanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

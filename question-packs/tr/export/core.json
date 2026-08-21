@@ -1,0 +1,1745 @@
+{
+  "meta": {
+    "pack_id": "tr.export.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "EXPORT",
+    "name": "İhracat ve Gümrük Yönetimi Soru Paketi",
+    "description": "Kurumsal ihracat operasyonlarını, dış müşteri ve pazar yönetimini, uluslararası sözleşmeler, Incoterms ve ödeme şekillerini, ambalaj/lojistik, gümrükleme, GTİP, menşe ve dolaşım belgeleri (A.TR/EUR.1), ihracat e-Faturası, KDV iadesi, ihracat maliyet dağıtımı ve ERP/CRM entegrasyonunu keşfeden kanonik soru paketi."
+  },
+  "questions": [
+    {
+      "id": "EXP-001",
+      "order": 1,
+      "process": "İhracat organizasyonu ve süreç sahipliği",
+      "question": "Şirketinizde ihracat ve dış ticaret operasyonları nasıl bir organizasyon yapısıyla yönetilmektedir?",
+      "description": "Ayrı ihracat/dış ticaret departmanının varlığı, satış bünyesinde yürütülmesi veya harici aracıya bağımlılık.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_ihracat_ve_dis_ticaret_departmani_var",
+          "label": "Şirket bünyesinde uzman ihracat/dış ticaret departmanı ve atanmış operasyon uzmanları mevcuttur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yerel_satis_veya_pazarlama_ek_gorev_yurutur",
+          "label": "Ayrı ihracat ekibi yoktur; yerel satış veya pazarlama personeli ihracatı ek görev olarak yürütmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tum_ihracat_operasyonu_harici_araci_ve_gumrukcuye_devredilmistir",
+          "label": "İç operasyon ekibi yoktur; sipariş sonrası tüm gümrük ve ihracat takibi harici aracı veya gümrükçüye bırakılmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer ihracat organizasyon yapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-002",
+      "order": 2,
+      "process": "İhracat organizasyonu ve süreç sahipliği",
+      "question": "İhracat dosyası yaşam döngüsü (tekliften gümrük çıkışına, tahsilata ve dosya kapamaya) sistem üzerinde nasıl izlenmektedir?",
+      "description": "Dosya bazlı ihracat takibi, evrak seti yönetimi ve dosya statü kontrolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_veya_dis_ticaret_modulunde_ihracat_dosyasi_acilarak_izlenir",
+          "label": "Her ihracat için sistemde benzersiz bir ihracat dosyası açılır; sipariş, evrak, gümrük ve tahsilat bu dosya üzerinden izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "excel_ve_ortak_klasor_uzerinden_manuel_dosya_takibi_yapilir",
+          "label": "İhracat dosyaları Excel takip listesinde tutulur ve evraklar ağ klasöründe arşivlenir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "dosya_kavrami_yoktur_sadece_fatura_ve_irsaliye_islenir",
+          "label": "İhracat dosyası kavramı yoktur; sadece sevkiyat anında ihracat faturası ve irsaliyesi kesilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-003",
+      "order": 3,
+      "process": "İhracat yapılan ülke ve pazarlar",
+      "question": "Şirketinizin ihracat yaptığı ana coğrafyalar ve hedef pazar çeşitliliği nasıldır?",
+      "description": "Avrupa Birliği, Orta Doğu, Kuzey/Güney Amerika, Asya, Afrika ve Bağımsız Devletler Topluluğu pazarları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "coklu_ulke_ve_farkli_ticaret_bolgeleri",
+          "label": "Farklı kıtalarda ve çok sayıda ülkede geniş bir ihracat pazar ağına satış yapılmaktadır (AB, Orta Doğu, Amerika vb.)",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tek_veya_birbiriyle_benzer_birkaç_komsu_ulke",
+          "label": "Sadece 1-2 komşu ülkeye veya belirli tek bir coğrafi bölgeye ihracat yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_serbest_bolgelere_ihracat_yapilir",
+          "label": "Yurtdışına doğrudan sevkiyat yoktur; sadece Türkiye içi Serbest Bölgelere satış yapılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer pazar yapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-004",
+      "order": 4,
+      "process": "İhracat yapılan ülke ve pazarlar",
+      "question": "Hedef ülkelerin gümrük rejimleri, ticaret ambargoları, yaptırım listeleri (Sanctions Screening) ve ithalat kısıtları sistemde nasıl denetlenir?",
+      "description": "Yaptırımlı kişi/ülke taraması, boykot kuralları ve hedef ülke mevzuat uyumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-003",
+        "operator": "equals",
+        "value": "coklu_ulke_ve_farkli_ticaret_bolgeleri"
+      },
+      "options": [
+        {
+          "value": "sistemik_ambargo_ve_ulke_kullari_taramasi_yapilir",
+          "label": "Hedef ülkeler, STA kuralları ve uluslararası yaptırım listeleri sistemde tanımlıdır; sipariş açılırken otomatik kontrol edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ulke_kullari_ve_kisitlar_musavirden_manuel_sorulur",
+          "label": "Ülke bazlı kısıt ve gümrük vergileri sistemde yoktur; her yeni ülkede gümrük müşaviri veya müşteriden manuel teyit alınır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ulke_kisitlari_ve_ambargolar_kontrol_edilmemektedir",
+          "label": "Ülke bazlı denetim yapılmaz; gümrükte veya banka transferinde sorun çıktığında durum öğrenilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-005",
+      "order": 5,
+      "process": "İhracat ürün ve hizmet kapsamı",
+      "question": "İhraç edilen ürünler (standart mamul, projeli/özel üretim, fason imalat, yedek parça vb.) ERP stok ve GTİP yapısıyla nasıl eşleşmektedir?",
+      "description": "Yabancı dilde ürün tanımları, teknik föyler, GTİP ve üretici parça kodları eşleştirmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "urun_kartlarinda_cok_dilli_isim_ve_gtip_birebir_tanimlidir",
+          "label": "Tüm ihraç ürünlerin stok kartında İngilizce/yabancı dil tanımları, 12 haneli GTİP kodu, teknik spektleri ve birim ağırlıkları eksiksiz tanımlıdır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ihracat_faturasinda_urun_ismi_ve_gtip_manuel_yazilir",
+          "label": "ERP kartlarında sadece Türkçe isim vardır; ihracat faturası kesilirken yabancı isim ve GTİP elle yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "standart_stok_karti_ve_gtip_eslesmesi_yoktur",
+          "label": "İhracat ürünleri için standart kart yapısı yoktur; her siparişte serbest metinle işlem yapılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-006",
+      "order": 6,
+      "process": "İhracat müşteri ve bayi yapısı",
+      "question": "Yurtdışı satış kanalı ve müşteri yapınız nasıl organize edilmiştir?",
+      "description": "Doğrudan son kullanıcı/kurumsal alıcı, münhasır distribütör, bayi ağı, komisyoncu/acente veya OEM ortaklıkları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "distributor_bayi_ve_harici_acente_agi",
+          "label": "Yurtdışında yetkili distribütörler, ülke bayileri veya komisyonlu acenteler üzerinden satış yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dogrudan_son_kullanici_ve_kurumsal_musterilere_satilir",
+          "label": "Aracı yoktur; sadece doğrudan yabancı kurumsal müşterilere ve son kullanıcılara satış yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ana_ortak_veya_grup_sirketi_uzerinden_yurutulur",
+          "label": "Tüm ihracat yabancı ana ortak veya grup dış ticaret şirketi üzerinden tek kanaldan yürütülmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer kanal yapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-007",
+      "order": 7,
+      "process": "İhracat müşteri ve bayi yapısı",
+      "question": "Distribütör sözleşmeleri, bölge münhasırlığı, satış hedefleri ve acente komisyon hakedişleri sistem üzerinde nasıl izlenir?",
+      "description": "Bölge koruması, yıllık ciro kotaları, komisyon hesaplama ve acente gider faturaları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-006",
+        "operator": "equals",
+        "value": "distributor_bayi_ve_harici_acente_agi"
+      },
+      "options": [
+        {
+          "value": "sistemik_sozlesme_bolge_ve_komisyon_takip_modulu_var",
+          "label": "Distribütör bölgeleri, satış hedefleri ve acente komisyon oranları sistemde tanımlıdır; sevkiyata göre otomatik tahakkuk eder",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sozlesme_ve_komisyonlar_excelde_manuel_hesaplanir",
+          "label": "Acente komisyonları ve bayi kotaları Excel listelerinde manuel hesaplanır ve muhasebeye bildirilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "komisyon_ve_bolge_takipsizligi_ihtilaflara_yol_acmaktadir",
+          "label": "Distribütör çakışmaları, yetkisiz satışlar veya komisyon mutabakatlarında sık sık ticari anlaşmazlıklar yaşanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-008",
+      "order": 8,
+      "process": "İhracat fırsat, teklif ve sipariş süreci",
+      "question": "Yurtdışı lead, satış fırsatları ve dövizli teklif hazırlık süreçleri CRM / ERP üzerinde nasıl yönetilmektedir?",
+      "description": "Uluslararası müşteri talepleri, çoklu para birimiyle teklif oluşturma ve onay mekanizmaları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "entegre_crm_erp_uzerinden_dovizli_firsat_ve_teklif_yonetilir",
+          "label": "Tüm yurtdışı fırsatlar CRM'de kayıt altına alınır; dövizli teklifler teslim şekline göre sistemden otomatik türetilir ve onaylanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "teklifler_excel_ve_word_ile_hazirlanip_e_posta_ile_gonderilir",
+          "label": "Fırsat takibi yoktur; teklifler uzmanlarca Excel/Word şablonlarında manuel hazırlanıp e-postayla iletilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teklif_ve_firsat_takip_disiplini_yoktur",
+          "label": "Yurtdışı teklif geçmişi ve revizyonları kayıt altına alınmamakta, müşteri takipleri unutulabilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-009",
+      "order": 9,
+      "process": "İhracat fırsat, teklif ve sipariş süreci",
+      "question": "Uluslararası sektörel fuarlar, B2B ticaret portalları ve gelen müşteri taleplerinin satışa dönüşüm oranları ölçülmekte midir?",
+      "description": "Fuar bütçesi ROI analizi, B2B platform etkinliği ve teklif kazanma/kaybetme (Win/Loss) nedenleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "fuar_ve_b2b_leadleri_crm_de_etiketlenir_ve_roi_olculur",
+          "label": "Tüm fuar ve portal temasları CRM'e yüklenir; teklif dönüşüm oranları ve satış maliyet etkinliği periyodik raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "temaslar_kartvizit_ve_excelde_tutulur_olcum_yapilmaz",
+          "label": "Fuarlarda toplanan kartvizitler ve mailler takip edilir ancak resmi bir dönüşüm ve ROI ölçümü yapılmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fuar_ve_tanitim_sonrasi_takip_yapilamamaktadir",
+          "label": "Fuar sonrası temaslar düzenli takip edilememekte ve potansiyel ihracat müşterileri kaybedilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-010",
+      "order": 10,
+      "process": "Dış ticaret sözleşmeleri",
+      "question": "Yurtdışı alıcılarla yapılan uluslararası satış sözleşmelerinde hukuk, tahkim, teslim gecikmesi, ceza ve mücbir sebep şartları nasıl düzenlenir?",
+      "description": "CISG kuralları, ICC tahkim şartı, gecikme cezaları (liquidated damages) ve ürün garanti kapsamı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "standart_hukuk_onayli_uluslararasi_sozlesme_sablonu_kullanilir",
+          "label": "Hukuk müşavirliğince onaylanmış, yetkili tahkim ve ICC kurallarını içeren standart İngilizce sözleşmeler zorunludur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proforma_fatura_arkasindaki_genel_hukumler_ile_yetinilir",
+          "label": "Ayrı bir sözleşme yapılmaz; sadece proforma fatura altındaki genel satış şartları (Terms & Conditions) kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "musteri_sozlesmeleri_incelenmeden_imzalanabilmektedir",
+          "label": "Sözleşme kontrol mekanizması zayıftır; yabancı alıcının getirdiği ağır cezai şartlar içeren sözleşmeler imzalanabilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-011",
+      "order": 11,
+      "process": "Proforma fatura ve sipariş teyidi",
+      "question": "Tedarikçiye iletilen Proforma Fatura (P/I) nasıl onaylanır ve ERP ihracat satış siparişine (Order Confirmation) nasıl dönüştürülür?",
+      "description": "Proforma numaralandırma, revizyon takibi, müşteri kaşe/imza onayı ve kesin siparişe dönüşüm.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemden_resmi_proforma_uretilir_ve_onayla_siparislesir",
+          "label": "ERP üzerinden tek formatta proforma üretilir; müşteri onayı (PO) sisteme yüklenince otomatik kesin ihracat siparişi açılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "proforma_word_excelde_kesilir_siparis_erpye_manuel_girilir",
+          "label": "Proforma Excel'de hazırlanır; müşteri teyit edince satış personeli ERP'ye siparişi baştan manuel girer",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "proforma_revizyonlari_karisir_uretim_ve_sevk_hatasi_yasanir",
+          "label": "Proforma revizyonları sistemde izlenemez; müşterinin eski proformasına göre üretim veya sevkiyat yapılması riski yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-012",
+      "order": 12,
+      "process": "İhracat ödeme şekilleri ve tahsilat riski",
+      "question": "Şirketinizde ihracat işlemlerinde hangi uluslararası dış ticaret tahsilat ve ödeme yöntemleri kullanılmaktadır?",
+      "description": "Peşin havale (Cash in Advance), Akreditif (L/C), Vesaik Mukabili (CAD/DP), Mal Mukabili (Open Account) veya Kabul Kredili ödeme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "akreditif_veya_vesaik_mukabili_vadeli",
+          "label": "Akreditif (L/C), vesaik mukabili veya kabul kredili vadeli dış ticaret ödeme araçları yoğun olarak kullanılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_pesin_transfer_veya_guvenilir_acik_hesap",
+          "label": "Yalnızca %100 peşin banka havalesi veya uzun süreli güvene dayalı açık hesap / mal mukabili çalışılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kredi_karti_veya_online_tahsilat_platformlari",
+          "label": "Küçük tutarlı siparişlerde uluslararası kredi kartı veya B2B online ödeme ağ geçitleri kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer ödeme yöntemi",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-013",
+      "order": 13,
+      "process": "İhracat ödeme şekilleri ve tahsilat riski",
+      "question": "İhracat akreditiflerinin (L/C) incelenmesi, şartname/vesaik uyumu, teyit talebi ve rezerv (discrepancy) riskleri nasıl yönetilir?",
+      "description": "UCP 600 kurallarına uygun vesaik hazırlığı, akreditif revizyonu ve banka rezerv masraflarının önlenmesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-012",
+        "operator": "equals",
+        "value": "akreditif_veya_vesaik_mukabili_vadeli"
+      },
+      "options": [
+        {
+          "value": "akreditif_sartlari_sistemde_izlenir_ve_vesaik_birebir_eslenir",
+          "label": "Akreditif metni operasyon ve finansça incelenir; ERP'deki fatura/çeki listesi vesaik şartlarıyla harfiyen eşleştirilerek rezervsiz ibraz sağlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "akreditif_inceleme_uzman_tarafindan_manuel_yapilir",
+          "label": "Akreditif takibi dış ticaret sorumlusunun dikkatiyle manuel yürütülür; sistemik bir kural denetimi yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "rezerv_ve_vesaik_hatalari_nedeniyle_tahsilat_gecikmesi_yasanir",
+          "label": "Evrak uyumsuzlukları nedeniyle sık sık rezerv cezası ödenmekte ve banka tahsilatlarında gecikmeler yaşanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-014",
+      "order": 14,
+      "process": "İhracat ödeme şekilleri ve tahsilat riski",
+      "question": "Yurtdışı müşteri kredi limitleri, Türk Eximbank Alacak Sigortası veya faktoring araçları ile tahsilat riski nasıl güvenceye alınır?",
+      "description": "Yurtdışı alıcı istihbaratı, Eximbank kredi limiti tahsisi ve ticari/politik risk sigortası.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_vadeli_ihracat_eximbank_veya_ozel_kredi_sigortasi_ile_korunur",
+          "label": "Vadeli tüm açık hesap ihracat müşterilerine Eximbank/sigorta limiti tanımlanır; limit aşımında sistem sevkiyatı otomatik durdurur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "musteri_guvenine_gore_vadeli_calisilir_resmi_sigorta_yoktur",
+          "label": "Kredi limiti resmi sigortayla korunmaz; genel müdür/yönetim inisiyatifiyle vadeli mal gönderilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yurtdisi_tahsilat_kayiplari_ve_batik_alacak_riski_yasanmistir",
+          "label": "Yurtdışı alacak sigortası veya teminat olmaması nedeniyle tahsil edilemeyen batık ihracat alacakları oluşmuştur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-015",
+      "order": 15,
+      "process": "Incoterms kullanımı",
+      "question": "İhracat siparişlerinde Incoterms 2020 teslim şekilleri (EXW, FOB, CFR, CIF, DAP, DDP vb.) ve masraf/risk intikal noktaları nasıl belirlenir?",
+      "description": "Teslim şeklinin teklif, sipariş ve ihracat faturasında net tanımlanması, navlun ve sigorta yükümlülüğü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "incoterms_ve_net_teslim_limani_yeri_tum_belgelerde_zorunludur",
+          "label": "Siparişten faturaya tüm evraklarda resmi Incoterms kodu ve net teslim noktası (Örn: FOB Ambarlı / CIF Hamburg) standart yazılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "teslim_sekli_konusulur_ancak_belgelerde_serbest_metin_yazilabilir",
+          "label": "Incoterms kodu bilinir ancak sistemde zorunlu standart alan yerine serbest açıklama satırlarına yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teslim_sekli_belirsizligi_navlun_ve_hasar_ihtilafina_yol_acar",
+          "label": "Teslim şekli net uygulanmaz; varış limanında navlun, tahliye veya hasar sorumluluğunda müşteriyle anlaşmazlıklar çıkar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-016",
+      "order": 16,
+      "process": "İhracat fiyatlandırması ve teslim şekli",
+      "question": "Dövizli ihracat fiyat listeleri ve teslim şekline göre (FOB/CIF vb.) navlun/sigorta eklenerek fiyat türetme mantığı nasıl çalışmaktadır?",
+      "description": "Farklı para birimlerinde fiyat listeleri, teslim şekli katsayıları ve minimum sipariş miktarı (MOQ) kuralları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "erp_de_teslim_sekline_gore_dinamik_dovizli_fiyat_matrisi_calisir",
+          "label": "Ürünlerin fabrika çıkış (EXW) baz fiyatına navlun ve sigorta parametreleri eklenerek CIF/FOB fiyatları sistemce dinamik hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "fiyatlar_ihracat_uzmaninca_excel_hesaplamasiyla_manuel_belirlenir",
+          "label": "Her teklifte navlun ve masraflar Excel'de toplanarak müşteriye özel dövizli fiyat manuel oluşturulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "navlun_ve_masraf_artislari_fiyatlara_yansitilamamakta_zarar_edilmektedir",
+          "label": "Navlun ve hammadde fiyat dalgalanmaları siparişe yansıtılamamakta, yetersiz fiyatlandırma nedeniyle operasyon zararla kapanabilmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-017",
+      "order": 17,
+      "process": "Ambalaj, paketleme ve etiketleme",
+      "question": "İhracat ambalajı, paletleme standartları, ISPM 15 ahşap ambalaj ısıl işlem zorunluluğu ve alıcı ülke etiket kuralları nasıl yönetilir?",
+      "description": "Uluslararası taşıma dayanıklılığı, ISPM 15 damgalı paletler, ülke dilinde ürün etiketleri ve uyarı sembolleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ulke_ve_sektor_bazli_ambalaj_etiket_talimatlari_sistemde_tanimlidir",
+          "label": "Her ülkenin etiket mevzuatı ve ISPM 15 ambalaj gereksinimleri üretim ve paketleme iş emirlerine otomatik yansıtılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ambalaj_ve_etiketleme_sevkiyat_ekibince_manuel_kontrol_edilir",
+          "label": "Etiket ve ambalaj kontrolleri depo/sevkiyat personelinin tecrübesine bağlıdır; sistemik bir şablon denetimi yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "hatali_etiket_veya_ispm15_eksikligi_nedeniyle_gumruk_reddi_yasanmistir",
+          "label": "Ambalaj standardı veya etiket eksikliği sebebiyle yabancı gümrüklerde mal reddi veya imha cezasıyla karşılaşılmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-018",
+      "order": 18,
+      "process": "Ambalaj, paketleme ve etiketleme",
+      "question": "İhracat koli ve paletlerinde GS1-128 / SSCC lojistik barkod etiketleri ve dijital çeki listesi eşleştirmesi yapılıyor mu?",
+      "description": "Seri/lot numarası, son kullanma tarihi ve SSCC barkodu ile palet izlenebilirliği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "sscc_palet_etiketi_basilir_ve_dijital_ceki_listesi_otomatik_olusturulur",
+          "label": "Depodan çıkışta paletler el terminaliyle taranır; SSCC barkodu basılır ve koli detaylı çeki listesi ERP'de anında oluşur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_etiket_basilir_koli_sayisi_manuel_sayilarak_yazilir",
+          "label": "Basit stok etiketi yapıştırılır; koli adetleri ve kilolar tartılarak Excel çeki listesine manuel yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "lojistik_barkodlama_yoktur_koli_eslesmeleri_karisabilmektedir",
+          "label": "Barkodlu palet takibi yoktur; konteyner yüklemelerinde eksik/fazla koli veya yanlış parti sevkiyatı riski yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-019",
+      "order": 19,
+      "process": "Navlun, taşıma ve forwarder yönetimi",
+      "question": "İhracat sevkiyatlarında kullanılan uluslararası lojistik ve taşıma modları nelerdir?",
+      "description": "Denizyolu (FCL/LCL), karayolu TIR (FTL/LTL), havayolu kargo, demiryolu veya multimodal kombine taşımacılık.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "coklu_kombine_multimodal_veya_deniz_hava_tasima",
+          "label": "Yoğun denizyolu konteyner (FCL/LCL), havayolu kargo ve karayolu/demiryolu kombine multimodal taşıma kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_karayolu_tir_tasimaciligi_kullanilir",
+          "label": "İhracatımız çoğunlukla komşu veya Avrupa ülkelerine standart karayolu TIR sevkiyatıyla yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_hizli_kurye_ve_hava_kargo_kullanilir",
+          "label": "Hacim küçüktür; sadece DHL/FedEx/UPS gibi hızlı hava kargo veya mikro ihracatla taşıma yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer taşıma modu",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-020",
+      "order": 20,
+      "process": "Navlun, taşıma ve forwarder yönetimi",
+      "question": "Forwarder / armatör seçimi, navlun ihale teklifleri, gemi rezervasyonu (Booking) ve konteyner yükleme takibi nasıl yürütülür?",
+      "description": "Navlun sözleşmeleri, serbest süre (free time) takibi ve liman bekleme masraflarının yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "anlasmali_forwarder_ve_gumrukcu_portali_kullanilir",
+          "label": "Anlaşmalı uluslararası forwarder'larla çalışılır; booking, yükleme ve konteyner takip süreçleri entegre yönetilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "spot_navlun_alinir_ve_booking_e_posta_ile_manuel_yurutulur",
+          "label": "Her sevkiyatta piyasadan spot navlun teklifi toplanır; booking ve konşimento takibi e-posta ile manuel yapılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "booking_ve_arac_temin_gecikmeleri_sevk_aksamasina_yol_acar",
+          "label": "Lojistik planlama yetersizdir; araç/konteyner bulunamaması veya liman kapama (cut-off) kaçırılması sebebiyle sevkiyatlar aksar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-021",
+      "order": 21,
+      "process": "Gümrük müşaviri ve temsil modeli",
+      "question": "Gümrük müşavirliği yazılımı ve lojistik portalı ile şirketiniz ERP sistemi arasında dijital veri ve evrak entegrasyonu bulunmakta mıdır?",
+      "description": "ERP'den çeki listesi/fatura verisinin müşavir sistemine aktarımı ve onaylanan GÇB beyanname tescil/kapanış verisinin ERP'ye otomatik dönüşü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-020",
+        "operator": "equals",
+        "value": "anlasmali_forwarder_ve_gumrukcu_portali_kullanilir"
+      },
+      "options": [
+        {
+          "value": "musavir_sistemi_ile_cift_yonlu_api_web_servis_entegrasyonu_var",
+          "label": "ERP'den fatura/çeki listesi müşavir yazılımına iletilir; tescilli GÇB numarası, kapanma tarihi ve intaç bilgisi ERP'ye otomatik işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_posta_ile_pdf_excel_gonderilir_musavir_tekrar_yazar",
+          "label": "Entegrasyon yoktur; ihracat evrakları e-postayla iletilir, müşavir gümrük programına verileri baştan manuel girer",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "evraklar_kurye_ile_fiziksel_gonderilmektedir",
+          "label": "Orijinal evraklar fiziksel kurye ile gümrükçüye ulaştırılır; süreç tamamen kağıt ortamında yürür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-022",
+      "order": 22,
+      "process": "Gümrük müşaviri ve temsil modeli",
+      "question": "İhracat gümrükleme işlemlerinde temsil modeli (doğrudan temsil veya yetkili gümrük müşavirliği) nasıl yürütülmektedir?",
+      "description": "Şirket içi yetkili gümrük personeli veya vekaletnameli harici gümrük müşavirlik firması kullanımı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "dolayli_temsil_sozlesmeli_harici_gumruk_musavirligi",
+          "label": "Sözleşmeli ve vekaletnameli yetkili harici Gümrük Müşavirliği firması / firmaları ile çalışılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "dogrudan_temsil_sirket_ici_gumruk_ekibi",
+          "label": "Şirket bünyesindeki kendi yetkili gümrük departmanı ve personeli ile doğrudan temsil yoluyla yapılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "lojistik_veya_kargo_firmasinin_gumruk_hizmeti_kullanilir",
+          "label": "İhracat taşımacılığını yapan lojistik veya kurye firmasının entegre gümrükleme hizmeti kullanılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer temsil modeli",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-023",
+      "order": 23,
+      "process": "İhracat beyannamesi ve gümrük çıkış işlemleri",
+      "question": "Gümrük Çıkış Beyannamesi (GÇB / VEDOP) tescili, rejim kodları (1000, 3151 vb.) ve fiili çıkış (kapanma/intaç) teyidi nasıl takip edilir?",
+      "description": "GÇB tescil numarası, VEDOP intaç tarihi, fiili gemi/araç çıkış onayı ve dosya kapanışı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gcb_tescil_ve_intac_tarihi_sistemde_otomatik_eslestirilir",
+          "label": "GÇB tescil ve fiili çıkış (kapanma) tarihi VEDOP / müşavir entegrasyonuyla ERP faturasına otomatik işlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gcb_kapanislari_gumrukcuden_liste_olarak_alinip_excelde_takip_edilir",
+          "label": "GÇB kapanma ve intaç tarihleri müşavirden haftalık liste halinde alınıp Excel'de manuel takip edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fiili_cikis_takibi_duzenli_yapilamamakta_kdv_sorunlari_cikmaktadir",
+          "label": "Beyanname kapanışları düzenli izlenemez; fiili çıkışı geciken veya intaç almayan dosyalar muhasebede sorun yaratır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-024",
+      "order": 24,
+      "process": "İhracat beyannamesi ve gümrük çıkış işlemleri",
+      "question": "İhracatta gümrük muayene hatları (Kırmızı, Sarı, Mavi, Yeşil hat) ve gümrük kapı çıkış kontrolleri nasıl yönetilir?",
+      "description": "Fiziki muayene, belge kontrolü, tartım farkları ve gümrük kapılarındaki bekleme süreleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hat_bilgileri_ve_kapasite_riskleri_anlik_izlenir",
+          "label": "Gümrük muayene hatları ve muayene kaynaklı gecikmeler operasyonel takip panosunda izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "muayene_durumu_ihtiyac_oldukca_gumrukcuye_sorulur",
+          "label": "Gümrük hattı sistemde izlenmez; sadece araç kırmızı hatta düştüğünde gümrükçüden bilgi alınır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fiziki_muayene_ve_tartim_farklari_nedeniyle_ceza_ve_gecikme_yasanir",
+          "label": "Tartım farkı veya evrak uyumsuzluğu nedeniyle sık sık gümrükte inceleme ve ceza riski doğmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-025",
+      "order": 25,
+      "process": "GTİP / HS kodu yönetimi",
+      "question": "İhraç edilecek ürünlerin 12 haneli GTİP tespiti, alıcı ülke gümrük tarife pozisyonu ve tarife havuzu nasıl yönetilmektedir?",
+      "description": "Türkiye 12 haneli GTİP ile alıcı ülke HS kodu uyumu, tarife cetveli güncellemeleri ve teknik ürün föyü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gtip_havuzu_sirket_ve_musavirce_onaylanmis_kartlarda_tanimlidir",
+          "label": "Tüm mamullerin teknik föyüne göre onaylı 12 haneli GTİP havuzu vardır; alıcı ülke 6-8 haneli HS kodlarıyla eşleşir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "gtip_belirleme_tamamen_gumruk_musavirinin_inisiyatifindedir",
+          "label": "Şirket içi tarife kontrolü yoktur; faturada yazan isme göre müşavir ne yazarsa o GTİP kabul edilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "alici_ulke_gtip_uyumsuzlugu_nedeniyle_gumruk_problemi_yasanmistir",
+          "label": "Alıcı ülkedeki tarife pozisyonu farklılığı sebebiyle müşteriye yüksek vergi çıkmış veya teslimatta kriz yaşanmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-026",
+      "order": 26,
+      "process": "Menşe ve tercihli menşe belgeleri",
+      "question": "İhracatta Menşe Şahadetnamesi (Certificate of Origin), tercihli menşe kuralları ve tedarikçi beyanları nasıl yönetilir?",
+      "description": "İhracatta menşe tespiti (yerli girdi/katkı oranı, yetersiz işçilik), Ticaret Odası onayları ve e-Menşe süreçleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tercihli_mense_ve_dolasim_belgeleri_kullanilir",
+          "label": "STA kapsamındaki ülkelere ve AB'ye yönelik ihracatlarda menşe ispat ve dolaşım belgeleri yoğun olarak kullanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_standart_mense_sahadetnamesi_kullanilir",
+          "label": "Tercihli rejim kullanılmaz; sadece alıcının veya ülkenin istediği standart Menşe Şahadetnamesi düzenlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "mense_belgesi_kullanilmaz",
+          "label": "İhracat yapılan pazarlarda veya ürün türümüzde menşe belgesi zorunluluğu bulunmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-027",
+      "order": 27,
+      "process": "ATR, EUR.1 ve diğer dolaşım belgeleri",
+      "question": "A.TR Dolaşım Belgesi, EUR.1 / EUR-MED, Onaylanmış İhracatçı yetkisi ve REX kayıtlı ihracatçı sistemi nasıl yürütülür?",
+      "description": "AB Gümrük Birliği serbest dolaşım belgesi, fatura beyanı yetkisi ve sonradan kontrol riskleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-026",
+        "operator": "equals",
+        "value": "tercihli_mense_ve_dolasim_belgeleri_kullanilir"
+      },
+      "options": [
+        {
+          "value": "e_imzali_dolasim_belgeleri_ve_fatura_beyanlari_sistemde_arsivlenir",
+          "label": "MEDOS üzerinden e-A.TR/EUR.1 onayları alınır; Onaylanmış İhracatçı fatura beyanları ve girdi belgeleri 5 yıl arşivlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "belgeler_musavir_ve_oda_uzerinden_manuel_yurutulur",
+          "label": "Dolaşım belgeleri gümrük müşaviri tarafından çıkartılır; şirket içinde sadece fotokopisi saklanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "mense_sonradan_kontrol_taleplerinde_eksik_evrak_riski_vardir",
+          "label": "Geçmiş ihracatlar için yabancı gümrüklerden gelen sonradan kontrol yazılarında girdi belgelerini bulmakta zorluk yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-028",
+      "order": 28,
+      "process": "İhracat izinleri ve ürün uygunluk belgeleri",
+      "question": "İhraç edilen ürünler için ihracatı kayda bağlı mallar, çifte kullanımlı ürünler (Dual-Use) veya özel izin belgesi gereksinimi var mıdır?",
+      "description": "İhracatçı Birlikleri kayda bağlı ihracat onayları, Ticaret Bakanlığı lisansları ve askeri/stratejik ürün kontrolleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ihracatta_on_izin_lisans_ve_teknik_belge_gerekir",
+          "label": "Ürünlerimizin bir kısmı veya tamamı için İhracat Kayıt Belgesi, Bakanlık izni veya özel uygunluk sertifikası zorunludur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "standart_serbest_ihracattir_on_izin_gerekmez",
+          "label": "İhraç ettiğimiz kalemler serbest ihracat rejimine tabi olup herhangi bir ön izin veya kısıta bağlı değildir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "izin_ve_kayit_sartlari_sevk_aninda_ogrenilmektedir",
+          "label": "İzin şartları önceden taranmaz; gümrük aşamasında izin gerektiği anlaşılıp sevkiyatta bekleme yaşanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer izin durumu",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-029",
+      "order": 29,
+      "process": "İhracat izinleri ve ürün uygunluk belgeleri",
+      "question": "CE Uygunluk Beyanı (DoC), Sağlık/Bitki Sağlık Sertifikası, Analiz Belgesi (CoA), Helal/Koşer ve teknik mevzuat belgeleri nasıl yönetilir?",
+      "description": "Hedef ülke teknik standartlarına uygunluk test raporları, laboratuvar onayları ve Tek Pencere Sistemi (TPS) e-belgeleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-028",
+        "operator": "equals",
+        "value": "ihracatta_on_izin_lisans_ve_teknik_belge_gerekir"
+      },
+      "options": [
+        {
+          "value": "teknik_ve_saglik_sertifikalari_erp_dosyasina_baglanir_ve_gunceldir",
+          "label": "Her ürün partisinin analiz sertifikası ve DoC belgesi ERP ihracat dosyasına eklenir; geçerlilik süreleri sistemde izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sertifikalar_kalite_ve_laboratuvardan_e_posta_ile_manuel_istenir",
+          "label": "Teknik belgeler her yüklemede ilgili birimlerden e-posta ile istenir ve müşteriye manuel gönderilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "teknik_belge_eksikligi_nedeniyle_alici_gumrugunde_mal_beklemektedir",
+          "label": "Analiz veya uygunluk sertifikası eksikliği sebebiyle varış gümrüğünde eşyanın beklemesi ve cezalar yaşanmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-030",
+      "order": 30,
+      "process": "Ticari fatura, çeki listesi ve sevk evrakı",
+      "question": "İhracat e-Faturası (GÇB bilgileri içeren e-İhracat Faturası), Ticari Fatura (Commercial Invoice) ve Çeki Listesi (Packing List) nasıl üretilmektedir?",
+      "description": "GİB portalı/Özel Entegratör üzerinden e-İhracat faturası oluşturma, GÇB tesciliyle eşleşme ve İngilizce ticari fatura.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_uzerinden_tek_seferde_e_ihracat_faturasi_ve_ceki_listesi_basilir",
+          "label": "ERP siparişinden tek tıkla e-İhracat faturası, İngilizce Commercial Invoice ve detaylı Packing List hatasız üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_fatura_erpden_commercial_invoice_excelden_ayri_ayri_yapilir",
+          "label": "Resmi e-İhracat faturası ERP'den kesilirken müşteriye giden İngilizce fatura ve çeki listesi Excel'de ayrıca yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "fatura_ve_ceki_listesi_arasindaki_uyumsuzluklar_gumruk_hatasi_yaratir",
+          "label": "Fatura tutarı, kilo ve koli bilgileri evraklar arasında uyuşmaz; gümrük beyannamesinde düzeltme cezaları çıkar",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-031",
+      "order": 31,
+      "process": "Ticari fatura, çeki listesi ve sevk evrakı",
+      "question": "İhracat çeki listesindeki (Packing List) net/brüt kilo, hacim (m3), koli adetleri ve kap numaralarının fiziki yüklemeyle mutabakatı nasıl sağlanır?",
+      "description": "Konteyner/kamyon çeki listesi doğrulaması, kantar tartım fişleri ve gümrük beyanına aktarım.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kantar_ve_koli_tartimlari_sisteme_girilir_ceki_listesi_otomatik_dogrulanir",
+          "label": "Yükleme anında kantar tartımı ve palet adetleri sisteme işlenir; çeki listesi fiili durumla %100 mutabık üretilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ceki_listesi_tahmini_veya_manuel_hesaplamayla_yazilir",
+          "label": "Kilo ve hacimler ürün kartındaki teorik ağırlıktan veya personelin tahminiyle Excel'e yazılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kilo_ve_kap_adedi_farklari_nedeniyle_gumruk_cezalari_alinmaktadir",
+          "label": "Fiili kilo ile beyan edilen çeki listesi kilosu tutarsızlığı nedeniyle gümrükte ceza veya tutanak düzenlenmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-032",
+      "order": 32,
+      "process": "Konşimento, CMR, AWB ve taşıma belgeleri",
+      "question": "Deniz konşimentosu (Bill of Lading / B/L), Karayolu Sevk Mektubu (CMR) veya Havayolu Taşıma Senedi (AWB) taslak kontrolü ve orijinal evrak takibi nasıl yürütülür?",
+      "description": "Draft B/L onayı, emre yazılı konşimento cirosu, Telex Release / Express B/L ve sevk belgesi arşivleme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "taslak_konşimento_siparis_ve_akreditifle_birebir_eslestirilerek_onaylanir",
+          "label": "Forwarder'dan gelen draft B/L akreditif ve proforma şartlarıyla eşleştirilerek onaylanır; orijinal evraklar sisteme taranır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "konşimento_kontrolu_uzmanin_e_posta_takibiyle_yurutulur",
+          "label": "Konşimento taslakları e-postayla incelenir; sistemik bir eşleştirme ve onay kayıt izi yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "konşimento_hatalari_veya_gec_varis_nedeniyle_alici_limanda_ceza_oder",
+          "label": "Konşimentodaki yazım hataları veya orijinal evrakın geç ulaşması nedeniyle alıcı limanda demuraj ve bekleme öder",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-033",
+      "order": 33,
+      "process": "Konşimento, CMR, AWB ve taşıma belgeleri",
+      "question": "Orijinal ihracat evrak setinin (Orijinal Fatura, B/L, Çeki Listesi, Menşe vb.) bankaya vesaik ibrazı veya alıcıya hızlı kurye ile gönderimi nasıl izlenir?",
+      "description": "Kurye takip numaraları (AWB Tracking), banka teslim teyitleri ve evrak teslim takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "kurye_takip_ve_banka_ibraz_belgeleri_sistemde_dosyaya_islenir",
+          "label": "Hızlı kurye konşimento numarası veya banka ibraz alındısı ERP ihracat dosyasına kaydedilir ve teslim anı takip edilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kurye_takibi_e_posta_ve_kargo_web_sitesinden_manuel_yapilir",
+          "label": "Kurye numarası dış ticaret uzmanının notlarında tutulur; müşteri sordukça kargo sitesinden bakılır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "evrak_kaybi_veya_gecikmesi_nedeniyle_malin_limanda_kalma_riski_vardir",
+          "label": "Orijinal evrakın kaybolması veya geç postalanması sebebiyle müşteri malı limandan çekememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-034",
+      "order": 34,
+      "process": "İhracat KDV istisnası ve mali süreç",
+      "question": "İhracat KDV istisnası (KDV Kanunu 11/1-a), GÇB intaç tarihi ve KDV iadesi / mahsup dosyası hazırlık süreci nasıl yürütülmektedir?",
+      "description": "GÇB listesi, YMM KDV İadesi Raporu, yüklenilen KDV listesi ve GİB İnternet Vergi Dairesi bildirimleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_uzerinden_kdv_istisna_listesi_ve_yuklenilen_kdv_otomatik_cikarilir",
+          "label": "GÇB intaç tarihine göre ihracat KDV listesi ve yüklenilen KDV tablosu ERP'den otomatik oluşturulup YMM/vergi dairesine sunulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "kdv_iade_listeleri_muhasebe_ve_ymm_tarafindan_excelde_hazirlanir",
+          "label": "İhracat KDV iadesi evrakları muhasebe tarafından faturadan faturaya Excel'de manuel ayıklanarak hazırlanır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "kdv_iadesi_surecleri_cok_uzamakta_ve_finansman_yukü_olusturmaktadir",
+          "label": "Kapanmayan beyannameler ve hatalı faturalar nedeniyle KDV iadesi aylarca gecikmekte, nakit akışını olumsuz etkilemektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-035",
+      "order": 35,
+      "process": "İhracat KDV istisnası ve mali süreç",
+      "question": "İhracat Bedeli Kabul Belgesi (İBKB), kambiyo mevzuatı döviz getirme yükümlülüğü (180 gün) ve TCMB döviz bozdurma oranları nasıl izlenmektedir?",
+      "description": "Banka İBKB kayıtları, süresinde döviz transferi kapatma, TCMB zorunlu satış payı ve vergi dairesi kambiyo ihbarları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ibkb_vadeleri_ve_kambiyo_doviz_oranlari_sistemde_anlik_izlenir",
+          "label": "GÇB bazında 180 günlük İBKB süreleri ve TCMB döviz bozdurma tutarları finans modülünde izlenir, ceza riski önlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ibkb_takibi_finans_tarafindan_banka_dekontlariyla_manuel_yapilir",
+          "label": "Döviz getirme takibi finans sorumlusu ile banka arasında manuel yürütülür; sistemik bir vade alarmı yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ibkb_sure_asimi_nedeniyle_vergi_dairesi_kambiyo_sorusturmasi_yasanmistir",
+          "label": "Döviz getirme sürelerinin kaçırılması sebebiyle vergi dairesine ihbar ve kambiyo cezası riskiyle karşılaşılmıştır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-036",
+      "order": 36,
+      "process": "İhracat KDV istisnası ve mali süreç",
+      "question": "Dahilde İşleme İzin Belgesi (DİİB / DİİR) kapsamında hammadde ithalatı ve ihracat taahhüt kapatma döngüsü nasıl yönetilmektedir?",
+      "description": "DİİB şartlı muafiyet, tecil-terkin, hammadde sarfiyatı ve ihracat taahhüt hesabı kapatma.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "diib_ithalat_ve_ihracat_eslesmesi_erp_de_otomatik_sarfiyatla_izlenir",
+          "label": "DİİB kapsamındaki hammadde girişleri ve ihracat GÇB'leri reçete sarfiyatıyla sistemde eşleşir; taahhüt kapatma anlık izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "diib_takibi_excelde_manuel_tutulur_ve_kapatma_danismani_yurutur",
+          "label": "DİİB gerçekleşmeleri Excel tablosunda takip edilir; süre sonu kapatma işlemleri harici danışmanla yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "sirketimizde_diib_kapsaminda_ihracat_yapilmamaktadir",
+          "label": "DİİB veya şartlı muafiyet kullanılmamakta; sadece kesin ihracat işlemleri yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-037",
+      "order": 37,
+      "process": "İhracat maliyetleri, komisyon ve navlun dağıtımı",
+      "question": "İhracat operasyonuna ait fiili maliyetler (uluslararası navlun, ihracat sigortası, gümrükleme, liman/ardiye, acente komisyonu) nasıl izlenmektedir?",
+      "description": "İhracat masraf faturalarının takibi, dosya bazlı maliyet toplama ve bütçe/fiili masraf karşılaştırması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "fiili_ihracat_maliyetleri_siparis_ve_urune_dagitilir",
+          "label": "Tüm navlun, gümrük, sigorta ve komisyon faturaları ilgili ihracat dosyasına ve sipariş kalemlerine fiilen dağıtılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ihracat_masraflari_genel_gider_hesaplarina_atilir_dosyaya_baglanmaz",
+          "label": "Navlun ve gümrük faturaları genel satış/pazarlama giderlerine (760) yazılır; sipariş bazlı maliyet dağıtımı yapılmaz",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ihracat_maliyet_takibi_yapilamamaktadir",
+          "label": "Masraflar net izlenememekte; ihracatın gerçek karlılığı ve gizli lojistik maliyetleri bilinememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-038",
+      "order": 38,
+      "process": "İhracat maliyetleri, komisyon ve navlun dağıtımı",
+      "question": "İhracat masraf dağıtımında hangi anahtarlar (Tutar, Ağırlık/Kg, Hacim/m3, Miktar) kullanılır ve sipariş net karlılığı nasıl raporlanır?",
+      "description": "Landed cost benzeri ihracat net marj hesabı, FOB/CIF katsayı farkı ve döviz kuru etkisi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-037",
+        "operator": "equals",
+        "value": "fiili_ihracat_maliyetleri_siparis_ve_urune_dagitilir"
+      },
+      "options": [
+        {
+          "value": "erp_de_coklu_dagitim_anahtari_ile_kalem_bazli_net_kar_raporlanir",
+          "label": "Navlun ağırlık/hacme göre, gümrük/sigorta tutara göre dağıtılır; her ürün kalemi için net ihracat kar marjı hesaplanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "masraf_dagitimi_excelde_tahmini_yapilir_erpye_girilmez",
+          "label": "Karlılık hesapları ihracat uzmanı tarafından Excel'de tahmini yapılır; ERP sisteminde kalem maliyetine inilmez",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "masraf_dagitim_tutarsizliklari_nedeniyle_yaniltici_karlilik_gorunur",
+          "label": "Masraflar yanlış dağıtıldığı için bazı ürünlerde zararına ihracat yapıldığı sonradan anlaşılmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-039",
+      "order": 39,
+      "process": "ERP/CRM, dış ticaret ve lojistik entegrasyonu",
+      "question": "Şirketinizde ihracat ve dış ticaret süreçlerinin yürütüldüğü yazılım altyapısı ve ERP entegrasyon düzeyi nasıldır?",
+      "description": "ERP yerleşik ihracat modülü, bağımsız dış ticaret yazılımı, CRM veya Excel odaklı manuel yönetim.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_nin_kendi_yerlesik_ihracat_ve_dis_ticaret_modulu_kullanilir",
+          "label": "ERP içerisinde siparişten gümrüğe, faturalamadan maliyet ve tahsilata tüm akış tek entegre sistemde yürütülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ozel_harici_dis_ticaret_programi_kullanilir_ve_erp_ye_aktarilir",
+          "label": "Harici bir dış ticaret/ihracat yazılımı kullanılır ve veriler API/dosya aktarımıyla ERP'ye aktarılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "surecler_tamamen_excel_word_ve_e_posta_ile_yurutulur",
+          "label": "Özel bir ihracat yazılımı yoktur; tüm operasyon Excel tabloları ve e-posta yazışmalarıyla yönetilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer yazılım altyapısı",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-040",
+      "order": 40,
+      "process": "ERP/CRM, dış ticaret ve lojistik entegrasyonu",
+      "question": "Şirketinizde B2B/B2C E-İhracat, Mikro İhracat (ETGB - Elektronik Ticaret Gümrük Beyannamesi) veya uluslararası pazar yeri satışları var mıdır?",
+      "description": "Amazon, eBay, Etsy, AliExpress veya kurumsal e-ihracat sitesi üzerinden mikro ihracat işlemleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "e_ihracat_mikro_ihracat_ve_pazaryeri_satisi_var",
+          "label": "B2C veya B2B mikro ihracat (ETGB) ve uluslararası pazar yerleri üzerinden düzenli yurtdışı satış yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "sadece_geleneksel_konteyner_tir_ihracati_yapilir",
+          "label": "Mikro ihracat veya online pazar yeri satışı yoktur; yalnızca geleneksel konvansiyonel ihracat yapılmaktadır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "e_ihracata_baslama_plani_ve_hazirlik_asamasi_vardir",
+          "label": "Henüz aktif mikro ihracat yoktur ancak altyapı ve pazar yeri entegrasyonu kurulması planlanmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer e-ihracat durumu",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-041",
+      "order": 41,
+      "process": "ERP/CRM, dış ticaret ve lojistik entegrasyonu",
+      "question": "Mikro İhracat (ETGB) beyannameleri, hızlı kargo entegrasyonu, pazar yeri komisyonları ve KDV iade süreçleri nasıl yönetilir?",
+      "description": "Yetkili kargo operatörü ETGB sorgulaması, pazar yeri hak ediş mutabakatı ve mikro ihracat KDV iadesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EXP-040",
+        "operator": "equals",
+        "value": "e_ihracat_mikro_ihracat_ve_pazaryeri_satisi_var"
+      },
+      "options": [
+        {
+          "value": "etgb_ve_pazaryeri_entegrasyonu_erp_ye_otomatik_baglidir",
+          "label": "Kargo firmasından gelen ETGB numaraları ve pazar yeri tahsilatları ERP'ye otomatik işlenir; KDV iade listesi sistemden alınır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "etgb_belgeleri_kargo_firmasindan_manuel_indirilir_ve_takip_edilir",
+          "label": "ETGB dökümleri kargo sitelerinden tek tek indirilir ve Excel'de muhasebeye iletilir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "etgb_takipsizligi_nedeniyle_mikro_ihracat_kdv_iadeleri_alinamamaktadir",
+          "label": "Mikro ihracat beyanname arşivi yetersizdir; hak edilen KDV iadeleri ve teşvikler talep edilememektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-042",
+      "order": 42,
+      "process": "İhracat raporlama, KPI ve risk takibi",
+      "question": "Şirketinizde ihracat operasyonel KPI panelleri ve yönetim raporlaması nasıl yapılmaktadır?",
+      "description": "Zamanında teslimat (OTIF), pazar/ülke bazında satış büyümesi, navlun maliyet oranı ve müşteri karlılık raporları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemik_ihracat_kpi_ve_yonetim_dashboardu_anlik_izlenir",
+          "label": "ERP/BI üzerinde ülke, müşteri, teslim şekli, navlun maliyet oranı ve OTIF metrikleri anlık dashboard'da raporlanır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "ihracat_raporlari_ay_sonlarinda_excelde_manuel_derlenir",
+          "label": "Raporlar ay sonlarında satış ve operasyon sorumluları tarafından Excel'de manuel hazırlanıp yönetime sunulur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "operasyonel_kpi_ve_performans_raporlamasi_yapilmamaktadir",
+          "label": "İhracat operasyonuna dair düzenli bir KPI veya karlılık analizi yapılmamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-043",
+      "order": 43,
+      "process": "İhracat raporlama, KPI ve risk takibi",
+      "question": "Yetkilendirilmiş Yükümlü Statüsü (YYS / AEO) veya İhracatta Yerinde Gümrükleme izinleri kullanılmakta mıdır?",
+      "description": "Gümrükte yeşil hat yetkisi, yerinde gümrükleme, emniyet ve güvenlik sertifikasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yys_aeo_sertifikasi_mevcuttur_ve_yerinde_gumrukleme_yapilir",
+          "label": "Şirketimiz YYS belgesine sahiptir; yeşil hat ve yerinde gümrükleme kolaylıklarından tam olarak yararlanılır",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "yys_basvuru_hazirligi_ve_surec_iyilestirmesi_yapilmaktadir",
+          "label": "YYS belgesi için altyapı, bilgi güvenliği ve süreç dokümantasyonu hazırlıkları sürdürülmektedir",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "yys_kapsaminda_degildir_standart_gumrukleme_yapilir",
+          "label": "YYS veya özel yetki yoktur; tüm ihracatlar standart gümrükleme prosedürleriyle yürütülür",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-044",
+      "order": 44,
+      "process": "İhracat raporlama, KPI ve risk takibi",
+      "question": "Yurtdışı müşteri şikayetleri, hasarlı/reddedilen ürünler ve Mahrece İade (Gümrük Rejimi 6000) süreçleri nasıl yönetilir?",
+      "description": "İhraç edilen malın geri gelmesi, gümrük muafiyeti, tamir/revizyon için geçici ithalat ve müşteri debit note takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "mahrece_iade_ve_kalite_sikayeti_sistemde_gcb_referansiyla_izlenir",
+          "label": "Geri gelen mallar orijinal ihracat GÇB'si ile eşleştirilir; 6000 rejimli gümrük girişi ve kalite incelemesi ERP'de izlenir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "iadeler_ve_sikayetler_vaka_bazinda_manuel_cozulur",
+          "label": "İade geldiğinde gümrük müşaviriyle durum bazında konuşulur; sistemik bir geri gelen eşya takip süreci yoktur",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "mahrece_iade_sureclerinde_gumruk_ve_kdv_problemleri_yasanmaktadir",
+          "label": "İadelerin gümrükten çekilmesi ve muhasebeleştirilmesinde gecikmeler ve KDV/vergi sorunları çıkmaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-045",
+      "order": 45,
+      "process": "İhracat arşivi, kanıt dokümanları ve iyileştirme yol haritası",
+      "question": "İhracat dosya ve evrak setinin (GÇB, Fatura, Konşimento, Menşe, İBKB) 5-10 yıllık yasal gümrük ve vergi arşivleme güvencesi nasıl sağlanmaktadır?",
+      "description": "Gümrük Kanunu ve VUK gereğince ihracat evraklarının fiziksel ve dijital saklanması, sonradan denetim hazırlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_ihracat_evrak_seti_dijital_kasada_ve_fiziki_arsivde_5_10_yil_guvendedir",
+          "label": "Her ihracatın tüm evrakları dijital olarak ERP/kasada saklanır; barkodlu fiziki arşivle gümrük denetimine hazır tutulur",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "evraklar_klasorlerde_ve_personel_bilgisayarlarinda_daginik_durur",
+          "label": "Evraklar klasörlerde ve e-postalarda dağınıktır; geçmiş yıllara ait bir dosya istendiğinde toparlamak zaman alır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "ihracat_arsiv_disiplini_yetersizdir_denetim_riski_bulunmaktadir",
+          "label": "Arşivleme düzenli yapılamamakta; kayıp beyanname veya evraklar nedeniyle olası gümrük/vergi denetiminde risk vardır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-046",
+      "order": 46,
+      "process": "İhracat arşivi, kanıt dokümanları ve iyileştirme yol haritası",
+      "question": "Ticaret Bakanlığı ihracat devlet yardımları ve teşvikleri (fuar desteği, pazar araştırması, küresel tedarik zinciri, yurt dışı birim/kira) nasıl takip edilmektedir?",
+      "description": "Destek Yönetim Sistemi (DYS) başvuruları, harcama belgelerinin toplanması ve teşvik tahsilat takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ihracat_tesvikleri_dys_uzerinden_duzenli_takip_edilir_ve_tahsil_edilir",
+          "label": "Devlet destekleri ve DYS başvuruları ihracat ekibince düzenli yürütülür; hak edilen teşvikler sisteme gelir kaydedilir",
+          "allow_note": false,
+          "is_other": false
+        },
+        {
+          "value": "tesvikler_harici_danismanlik_firmasi_uzerinden_yurutulur",
+          "label": "Teşvik takibi şirket içinde yapılmaz; harici teşvik danışmanı aracılığıyla yürütülür",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "tesvik_surecleri_takip_edilmemekte_desteklerden_yararlanilamamaktadir",
+          "label": "Evrak karmaşası veya sürelerin kaçırılması nedeniyle devlet desteklerinden yararlanılamamaktadır",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    },
+    {
+      "id": "EXP-047",
+      "order": 47,
+      "process": "İhracat arşivi, kanıt dokümanları ve iyileştirme yol haritası",
+      "question": "Şirketinizin ihracat ve gümrük süreçlerinde geçmişte yaşadığı kritik darboğazlar ve yeni ERP sisteminden öncelikli beklentileri nelerdir?",
+      "description": "Saha mülakatında tespit edilen temel ihracat darboğazları, insan bağımlılıkları ve ERP/CRM dönüşüm hedefleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "operasyonel_manuel_islerin_azaltilmasi_ve_hizli_evrak_entegrasyonu",
+          "label": "Tekrarlanan veri girişlerinin kaldırılması, gümrük/e-Fatura entegrasyonu ve evrak hazırlık hızının artırılması",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "anlik_maliyet_karlilik_ve_lojistik_izlenebilirliginin_saglanmasi",
+          "label": "Navlun/gümrük masraflarının siparişe dağıtılması, net karlılık analizi ve konteyner/teslimat takibi",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "mevzuat_ve_kambiyo_uyum_risklerinin_sistemce_guvenceye_alinmasi",
+          "label": "GÇB intaç, İBKB süreleri, KDV iade listeleri ve menşe/tarife risklerinin sistemik kontrol altına alınması",
+          "allow_note": true,
+          "is_other": false
+        },
+        {
+          "value": "diger_oncelikli_ihracat_beklentileri",
+          "label": "Diğer kurumsal ihracat dönüşüm beklentileri",
+          "allow_note": true,
+          "is_other": true
+        }
+      ]
+    }
+  ]
+}

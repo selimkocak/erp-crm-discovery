@@ -1,0 +1,820 @@
+{
+  "meta": {
+    "pack_id": "tr.e_transformation.core",
+    "name": "E-Dönüşüm Yönetimi Soru Paketi",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "business_function_code": "E_TRANSFORMATION",
+    "description": "Gelir İdaresi Başkanlığı (GİB) mevzuatına tabi e-Fatura, e-Arşiv, e-İrsaliye, e-Defter (berat/zaman damgası), e-SMM, e-Müstahsil, UBL-TR standartları, mali mühür, özel entegratör mimarisi, ihracat e-faturası, vergi istisna/tevkifat kodları ve yasal elektronik arşivleme olgunluğunu değerlendiren saha keşif soru paketi.",
+    "language": "tr",
+    "author": "Antigravity Discovery Engine",
+    "tags": [
+      "e_transformation",
+      "e_fatura",
+      "e_arsiv",
+      "e_irsaliye",
+      "e_defter",
+      "gib",
+      "ubl_tr",
+      "mali_muhur",
+      "ozel_entegrator",
+      "tevkifat",
+      "istisna",
+      "yasal_saklama"
+    ]
+  },
+  "questions": [
+    {
+      "id": "EDT-001",
+      "order": 1,
+      "process": "E-Dönüşüm Organizasyonu ve Sorumluluklar",
+      "question": "Şirket bünyesinde e-Dönüşüm süreçlerini (GİB mevzuatı, entegratör ilişkileri, sertifikalar) yöneten resmi bir birim veya sorumlu atanmış mıdır?",
+      "description": "E-Dönüşüm operasyonlarının muhasebe, finans ve BT ekipleri arasındaki görev dağılımı ve yasal sorumluluk netliği incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_ve_yazili_sorumluluk_matrisi_var", "label": "Mali İşler ve BT koordinasyonunda resmi e-Dönüşüm yöneticisi ve yazılı görev dağılımı mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "muhasebe_departmani_ek_gorev_olarak_yurutur", "label": "Özel bir atama yoktur; genel muhasebe personeli günlük işlerinin arasında yürütmektedir", "allow_note": true, "is_other": false },
+        { "value": "tamamen_dis_mali_musavire_devredilmistir", "label": "İç sorumlu yoktur; tüm süreç dış serbest muhasebeci mali müşavir (SMMM) tarafından yönetilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-002",
+      "order": 2,
+      "process": "E-Dönüşüm Organizasyonu ve Sorumluluklar",
+      "question": "GİB tebliğ değişiklikleri ve yeni e-belge zorunlulukları nasıl takip edilmekte ve sisteme uyarlanmaktadır?",
+      "description": "Mevzuat güncellemelerinin (ciro limitleri, zorunlu sektörler, belge formatları) proaktif takip edilme yöntemi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "ozel_entegrator_ve_mali_danisman_bultenleri_ile", "label": "Özel entegratör mevzuat bültenleri ve şirket mali müşavirliği ortaklığıyla proaktif takip edilir", "allow_note": false, "is_other": false },
+        { "value": "gib_duyurulari_manuel_izlenir", "label": "Resmi Gazete ve GİB portal duyuruları manuel olarak takip edilir; geçiş son anda yapılır", "allow_note": true, "is_other": false },
+        { "value": "duzenli_bir_mevzuat_takip_mekanizmasi_yoktur", "label": "Mevzuat takibi yapılmaz; ceza veya uyarı geldiğinde aksiyon alınır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-003",
+      "order": 3,
+      "process": "GİB Mükellefiyet ve Kapsam Değerlendirmesi",
+      "question": "Şirketin GİB kayıtlı kullanıcı mükellefiyet durumu ve zorunlu/gönüllü dahil olduğu e-Belge uygulamaları nelerdir?",
+      "description": "Şirketin e-Fatura, e-Arşiv, e-İrsaliye, e-Defter ve diğer e-belgelerdeki yasal zorunluluk ve tescil statüsü incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tum_temel_e_belgelerde_tam_mukellefiyet", "label": "E-Fatura, e-Arşiv, e-İrsaliye ve e-Defter uygulamalarının tamamında zorunlu/tescilli mükellefiz", "allow_note": false, "is_other": false },
+        { "value": "kismi_e_belgeler_aktif_irsaliye_veya_defter_haric", "label": "E-Fatura ve e-Arşiv aktiftir ancak e-İrsaliye veya e-Defter henüz kapsam dışıdır/kağıt devam eder", "allow_note": true, "is_other": false },
+        { "value": "henuz_hicbir_e_belge_kapsaminda_degiliz", "label": "Henüz e-Dönüşüm kapsamına girilmemiştir; tamamen kağıt fatura ve defter kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-004",
+      "order": 4,
+      "process": "GİB Mükellefiyet ve Kapsam Değerlendirmesi",
+      "question": "Grup şirketleri, şubeler ve farklı vergi kimlik numaralarına (VKN) sahip tüzel kişilikler için mükellefiyet nasıl yönetilmektedir?",
+      "description": "Çoklu şirket yapısında her bir tüzel kişiliğin e-belge hesaplarının ayrı veya merkezi yönetimi araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "coklu_sirket_tek_erp_ve_ayri_vkn_yonetimi", "label": "Tek ERP üzerinde her VKN için ayrı posta kutusu (PK), gönderici birim (GB) ve mühür tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "tek_bir_ana_sirket_vkn_mevcuttur", "label": "Tek tüzel kişilik ve tek VKN vardır; grup şirketi veya şube ayrımı yoktur", "allow_note": true, "is_other": false },
+        { "value": "farkli_sistemlerde_bagimsiz_yonetilir", "label": "Her şirket farklı muhasebe programında veya bağımsız entegratör hesabında tutulmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-005",
+      "order": 5,
+      "process": "Özel Entegratör ve Entegrasyon Modeli",
+      "question": "E-Dönüşüm belgelerinin GİB sistemlerine iletiminde hangi entegrasyon yöntemi tercih edilmektedir?",
+      "description": "GİB Portal, Özel Entegratör (Cloud API) veya Doğrudan Entegrasyon (Direct Server to GİB) mimarisi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "ozel_entegrator_kullanilmaktadir", "label": "GİB onaylı lisanslı Özel Entegratör (Cloud API / Web Servis) altyapısı kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "gib_portal_manuel_kullanilmaktadir", "label": "Entegratör yoktur; GİB Portalı üzerinden manuel giriş/yükleme yapılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "dogrudan_entegrasyon_kendi_sunucumuz_ile", "label": "Şirketin kendi sunucuları üzerinden GİB ile doğrudan entegrasyon (Direct Integration) yapılmıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-006",
+      "order": 6,
+      "process": "Özel Entegratör ve Entegrasyon Modeli",
+      "question": "Çalışılan özel entegratörün hizmet seviyesi taahhüdü (SLA), kontör maliyeti ve felaket kurtarma/yedekleme yapısı nasıldır?",
+      "description": "Entegratörün kesinti anındaki müdahale süresi, belge saklama garantisi ve maliyet modeli incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-005",
+        "operator": "equals",
+        "value": "ozel_entegrator_kullanilmaktadir"
+      },
+      "options": [
+        { "value": "kurumsal_sla_ve_cift_veri_merkezi_yedegi_var", "label": "7/24 SLA, kurumsal kontör anlaşması ve coğrafi yedekli veri merkezi mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "standart_paket_destek_sla_belirsiz", "label": "Standart kontör paketi kullanılır; resmi bir SLA veya acil durum hattı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "entegrator_performansi_duzensizdir", "label": "Sık kesinti ve destek gecikmeleri yaşanmaktadır; yedekleme garantisi net değildir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-007",
+      "order": 7,
+      "process": "Mali Mühür ve Elektronik İmza Yönetimi",
+      "question": "Tüzel kişilik Mali Mührü (TÜBİTAK KamuSM) ve şahıs e-İmzaları nerede ve nasıl konumlandırılmıştır?",
+      "description": "Mali mührün donanımsal akıllı kart (dongle), yerel sunucu HSM veya entegratör bulut HSM sisteminde saklanma yöntemi araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "entegrator_bulut_hsm_veya_sunucu_hsm_ile", "label": "Mali Mühür yetkisi özel entegratör bulut HSM veya şirket sunucusunda donanımsal HSM ile imzalar", "allow_note": false, "is_other": false },
+        { "value": "yerel_pc_usb_dongle_ile_manuel_imzalama", "label": "Mali mühür tek bir personelin bilgisayarına takılı USB dongle'dadır; manuel imza atılır", "allow_note": true, "is_other": false },
+        { "value": "mali_muhur_yonetimi_belirsizdir", "label": "Mali mühür kayıp/belirsiz durumdadır veya yenilenmesi gecikmiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-008",
+      "order": 8,
+      "process": "Mali Mühür ve Elektronik İmza Yönetimi",
+      "question": "Mali mühür / e-İmza arızası, kart bozulması veya PIN kilitlenmesi durumlarında yedekleme ve acil eylem planı var mıdır?",
+      "description": "Fatura kesiminin ve e-defter beratının durmaması için yedek mühür veya acil imzalama protokolü incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "yedek_mali_muhur_ve_tanimli_acil_prosedur_var", "label": "Aktif yedek mali mühür mevcuttur ve acil durum imza prosedürü yazılıdır", "allow_note": false, "is_other": false },
+        { "value": "yedek_muhur_yok_acil_durumda_entegratore_basvurulur", "label": "Yedek mühür yoktur; kart bozulursa yeni kart gelene kadar fatura kesimi durur", "allow_note": true, "is_other": false },
+        { "value": "acil_eylem_plani_bulunmamaktadir", "label": "Mühür kilitlenmesi veya arızası için tanımlı bir plan yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-009",
+      "order": 9,
+      "process": "Sertifika, Yetki ve Süre Takibi",
+      "question": "Mali mühür, e-İmza ve SSL sertifikalarının geçerlilik bitiş tarihleri sistemik olarak takip ediliyor mu?",
+      "description": "Sertifika süresinin dolması nedeniyle yasal belge gönderiminin durmasını engelleyen erken uyarı mekanizması incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_erken_uyari_ve_takvim_hatirlatmasi_var", "label": "Süre dolumuna 60 ve 30 gün kala sistemik e-posta uyarısı ve yenileme takvimi işletilir", "allow_note": false, "is_other": false },
+        { "value": "sorumlu_personel_manuel_takvimle_izler", "label": "Sistemik alarm yoktur; personel kendi ajandasına not alarak manuel izler", "allow_note": true, "is_other": false },
+        { "value": "sure_takibi_yapilmamaktadir", "label": "Sertifika bitiş tarihleri takip edilmez; sistem hata verince fark edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-010",
+      "order": 10,
+      "process": "Sertifika, Yetki ve Süre Takibi",
+      "question": "E-Dönüşüm sisteminde kullanıcı yetkilendirmesi (fatura onaylama, iptal etme, defter beratı yükleme) nasıl denetlenir?",
+      "description": "Hassas mali belgeleri imzalama ve GİB'e iletme yetkilerinin rol bazlı ayrımı incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "rol_bazli_kademeli_yetkilendirme_ve_cift_onay", "label": "Kullanıcı rolleri katıdır; fatura gönderme ve berat oluşturma çift onay yetkisine bağlıdır", "allow_note": false, "is_other": false },
+        { "value": "genel_muhasebe_kullanicisi_tam_yetkilidir", "label": "Muhasebe modülü açık olan tüm kullanıcılar belge gönderme yetkisine sahiptir", "allow_note": true, "is_other": false },
+        { "value": "ortak_tek_kullanici_hesabi_kullanilir", "label": "Entegratör panelinde tek bir ortak yönetici şifresi herkesçe paylaşılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-011",
+      "order": 11,
+      "process": "Test ve Canlı Ortam Ayrımı",
+      "question": "E-Dönüşüm sisteminde ERP ile entegratör arasında Test (Sandbox/GİB Test) ve Canlı (Production) ortamları ayrılmış mıdır?",
+      "description": "Yeni versiyon, ek alan veya format değişikliklerinin canlıya geçmeden önce test ortamında doğrulanması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tam_izole_test_ve_sandbox_ortami_mevcut", "label": "Test ERP ortamı entegratör test servisine bağlıdır; her değişiklik test edildikten sonra canlıya alınır", "allow_note": false, "is_other": false },
+        { "value": "ayri_test_ortami_yok_canlida_deneme_yapilir", "label": "Ayrı test ortamı yoktur; geliştirmeler doğrudan canlı ortamda küçük tutarlı faturalarla denenir", "allow_note": true, "is_other": false },
+        { "value": "test_sureci_hic_isletilmemektedir", "label": "Test veya sandbox kavramı uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-012",
+      "order": 12,
+      "process": "E-Fatura Senaryo ve Belge Akışları",
+      "question": "Şirkette e-Fatura senaryoları (Temel Fatura, Ticari Fatura, Kamu Faturası, İhracat Faturası) aktif olarak kullanılıyor mu?",
+      "description": "Müşteri tipine ve sözleşmeye göre doğru e-fatura senaryosunun otomatik belirlenmesi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "e_fatura_aktif_kullanilmaktadir", "label": "Evet, Temel/Ticari/İhracat/Kamu e-Fatura senaryoları aktif ve düzenli olarak kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "sadece_temel_fatura_kullanilmaktadir", "label": "Sadece Temel Fatura senaryosu kullanılmakta, Ticari veya İhracat senaryosu uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "e_fatura_kullanilmamaktadir", "label": "E-Fatura uygulaması kullanılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-013",
+      "order": 13,
+      "process": "E-Fatura Senaryo ve Belge Akışları",
+      "question": "Müşteri kartında e-Fatura mükellefiyet kontrolü ve senaryo seçimi (Temel/Ticari) ERP'de otomatik yapılıyor mu?",
+      "description": "Fatura kesilirken VKN'den GİB kayıtlı kullanıcı sorgulaması ve cari tipine göre senaryo kilitlenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-012",
+        "operator": "equals",
+        "value": "e_fatura_aktif_kullanilmaktadir"
+      },
+      "options": [
+        { "value": "otomatik_vkn_gib_sorgusu_ve_senaryo_secimi", "label": "ERP sistemi VKN'yi GİB listesinden anlık sorgular ve cari ayarlarına göre senaryoyu otomatik belirler", "allow_note": false, "is_other": false },
+        { "value": "kullanici_manuel_olarak_secim_yapar", "label": "Sistemik otomatik sorgulama yoktur; faturayı kesen kullanıcı Temel/Ticari ayrımını manuel yapar", "allow_note": true, "is_other": false },
+        { "value": "senaryo_ayrimi_yapilamaz_sabit_gider", "label": "Tüm faturalar ayrım yapılmaksızın tek bir sabit senaryo ile gönderilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-014",
+      "order": 14,
+      "process": "E-Fatura Gönderim, Alma ve Yanıt Yönetimi",
+      "question": "Gelen e-Faturalar ERP sistemine nasıl aktarılmakta, onaylanmakta ve muhasebeleşmektedir?",
+      "description": "Tedarikçilerden gelen e-faturaların otomatik içeri alınması, satınalma siparişiyle eşleştirilmesi ve onay döngüsü incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "otomatik_erp_aktarimi_ve_siparis_eslestirme", "label": "Gelen faturalar ERP'ye otomatik düşer, irsaliye/siparişle eşleşir ve onay akışına girer", "allow_note": false, "is_other": false },
+        { "value": "entegrator_panelinden_indirip_manuel_isleme", "label": "Faturalar entegratör portalından XML/PDF indirilerek ERP'ye elle yeniden yazılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "gelen_faturalar_eposta_ile_takip_edilir", "label": "Sistemik entegrasyon yoktur; tedarikçilerin e-postayla attığı PDF'ler işlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-015",
+      "order": 15,
+      "process": "E-Fatura Gönderim, Alma ve Yanıt Yönetimi",
+      "question": "E-Fatura gönderimlerinde GİB 1200 / 1210 / 1215 / 1220 durum kodları ve imza/şema kontrolleri nasıl izlenir?",
+      "description": "Faturanın GİB'e iletildiği, alıcı posta kutusuna ulaştığı veya şema hatası aldığı durumların takibi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "erp_uzerinde_anlik_gib_durum_kodu_takibi", "label": "Durum kodları (1200 Başarılı, 1215 Alıcıya İletildi vb.) ERP ekranında renkli rozetle anlık izlenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_hata_aldiginda_entegrator_panelinden_bakilir", "label": "ERP'de kod görünmez; müşteri 'fatura gelmedi' dediğinde entegratör paneline girilip bakılır", "allow_note": true, "is_other": false },
+        { "value": "durum_kodlari_takip_edilmemektedir", "label": "Durum kodları izlenmemekte; faturanın ulaşıp ulaşmadığı teyit edilmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-016",
+      "order": 16,
+      "process": "Ticari Fatura Kabul ve Red Süreçleri",
+      "question": "Gelen Ticari e-Faturalar için 8 günlük yasal süre içinde Kabul / Red uygulama yanıtı (Application Response) nasıl verilir?",
+      "description": "Ticari faturalara yasal 8 günlük sürede sistem üzerinden KABUL veya RED uygulama yanıtı dönülmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "erp_onay_is_akisi_ile_8_gunde_sistemik_yanit", "label": "ERP içindeki kontrol akışıyla 8 günlük süre aşılmadan tek tıkla sistemik Kabul/Red yanıtı iletilir", "allow_note": false, "is_other": false },
+        { "value": "entegrator_portalinden_manuel_kabul_red", "label": "ERP'de yanıt butonu yoktur; muhasebe personeli entegratör portalına girip manuel red verir", "allow_note": true, "is_other": false },
+        { "value": "uygulama_yaniti_verilmez_otomatik_kabul_olur", "label": "Sistemik yanıt verilmez; 8 gün geçince faturanın kendiliğinden kabul olması beklenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-017",
+      "order": 17,
+      "process": "Ticari Fatura Kabul ve Red Süreçleri",
+      "question": "Kesilen Ticari e-Faturalara müşteriden gelen RED uygulama yanıtları nasıl karşılanmakta ve muhasebeleştirilmektedir?",
+      "description": "Müşterinin reddettiği faturanın ERP'de ters kayıt/iptal statüsüne alınması ve muhasebe uyumu araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "red_yaniti_erpde_faturayi_otomatik_bloke_eder", "label": "Gelen RED yanıtı ERP'deki faturayı anında 'Reddedildi' yapar ve otomatik ters fiş oluşturur", "allow_note": false, "is_other": false },
+        { "value": "manuel_ters_kayit_veya_iptal_fisi_kesilir", "label": "Entegratörden red görüldüğünde muhasebeci manuel ters kayıt açar", "allow_note": true, "is_other": false },
+        { "value": "red_edilen_faturalar_takip_edilmemektedir", "label": "Red yanıtları izlenmez; mutabakat döneminde fark çıkınca düzeltilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-018",
+      "order": 18,
+      "process": "E-Arşiv Fatura Süreçleri",
+      "question": "E-Fatura mükellefi olmayan kurumlara ve nihai tüketicilere kesilen faturalar e-Arşiv Fatura olarak mı düzenleniyor?",
+      "description": "E-Arşiv fatura oluşturma, 5.000 TL / 30.000 TL (ve güncel GİB limitleri) ve raporlama süreçleri değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "e_arsiv_aktif_kullanilmaktadir", "label": "Evet, tüm e-Fatura dışı kurumsal ve bireysel satışlar e-Arşiv fatura olarak sistemden düzenlenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_yasal_limiti_asanlar_e_arsiv_kesilir", "label": "Sadece zorunlu ciro/tutar limitini aşanlar e-Arşiv kesilir; diğerlerine matbu kağıt fatura kesilir", "allow_note": true, "is_other": false },
+        { "value": "e_arsiv_kullanilmamaktadir", "label": "E-Arşiv fatura kullanılmamakta; matbu kağıt fatura koçanı kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-019",
+      "order": 19,
+      "process": "E-Arşiv Fatura Süreçleri",
+      "question": "E-Arşiv faturaların alıcıya e-posta/SMS ile teslimi ve GİB'e ertesi gün gece 24:00'e kadar raporlanması nasıl güvenceye alınır?",
+      "description": "E-Arşiv raporlarının (E-Arşiv Rapor Paketi) GİB sistemine günlük otomatik iletimi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-018",
+        "operator": "equals",
+        "value": "e_arsiv_aktif_kullanilmaktadir"
+      },
+      "options": [
+        { "value": "otomatik_mail_sms_ve_entegrator_gunluk_gib_raporu", "label": "Alıcıya anlık PDF e-posta/SMS gider; entegratör GİB e-Arşiv raporunu her gece otomatik iletir", "allow_note": false, "is_other": false },
+        { "value": "faturalar_manuel_yazdirilip_kargo_edilir", "label": "Alıcıya e-posta gitmez; yazıcıdan kağıt çıktı alınıp gönderilir; raporlama entegratördedir", "allow_note": true, "is_other": false },
+        { "value": "e_arsiv_rapor_takibi_yapilmamaktadir", "label": "GİB rapor iletim durumu izlenmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-020",
+      "order": 20,
+      "process": "İnternet Satış ve E-Ticaret E-Arşiv Akışları",
+      "question": "Web sitesi veya pazar yeri (Trendyol, Hepsiburada, Amazon vb.) internet satışlarında zorunlu e-Arşiv alanları basılıyor mu?",
+      "description": "İnternet satışlarında zorunlu olan 'Web Sitesi Adresi', 'Ödeme Şekli', 'Kargo Firması / VKN' ve 'Gönderi Takip No' alanları incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_internet_satis_alanlari_otomatik_basilir", "label": "Web adresi, ödeme tipi, kargo firması VKN ve kargo takip no faturada otomatik basılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "kismi_alanlar_basilir_kargo_manuel_yazilir", "label": "Ödeme tipi basılır ancak kargo takip numarası ve VKN bilgisi eksik kalabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "internet_satisi_veya_e_ticaret_yapilmamaktadir", "label": "İnternet üzerinden satış veya e-ticaret kanalımız bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-021",
+      "order": 21,
+      "process": "İnternet Satış ve E-Ticaret E-Arşiv Akışları",
+      "question": "Pazar yerlerinden gelen siparişlerin anlık e-Arşiv faturaya dönüşmesi ve pazar yeri API'sine fatura PDF linki aktarımı nasıl yürütülür?",
+      "description": "E-Ticaret siparişinin ERP'de otomatik faturalanıp pazaryerine elektronik link döndürme akışı değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "cift_yonlu_api_ile_otomatik_kesim_ve_link_aktarimi", "label": "Sipariş anında faturalanır ve imzalı e-Arşiv PDF linki pazar yeri API'sine otomatik yüklenir", "allow_note": false, "is_other": false },
+        { "value": "manuel_toplu_faturalama_ve_pdf_yukleme", "label": "Gün sonunda siparişler toplu faturalanır; fatura linkleri panele manuel yüklenir", "allow_note": true, "is_other": false },
+        { "value": "pazaryeri_entegrasyonu_bulunmamaktadir", "label": "Pazar yeri entegrasyonu yoktur; işlemler tamamen manuel yürütülür", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-022",
+      "order": 22,
+      "process": "E-İrsaliye Süreçleri",
+      "question": "Mal sevkiyatlarında ve dahili depo transferlerinde e-İrsaliye uygulaması zorunlu veya aktif olarak kullanılıyor mu?",
+      "description": "Malların sevki öncesinde e-İrsaliye düzenlenmesi, GİB'e iletimi ve yolda denetim için karekod/belge oluşturulması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "e_irsaliye_aktif_kullanilmaktadir", "label": "Evet, tüm mal sevkiyatlarında e-İrsaliye kesilmekte ve şoföre karekodlu belge verilmektedir", "allow_note": false, "is_other": false },
+        { "value": "sadece_e_irsaliye_mukellefi_aliciya_kesilir", "label": "Sadece alıcı e-İrsaliye mükellefiyse kesilir; diğerlerine matbu kağıt sevk irsaliyesi kesilir", "allow_note": true, "is_other": false },
+        { "value": "e_irsaliye_kullanilmamaktadir", "label": "E-İrsaliye kullanılmamakta; matbu kağıt irsaliye koçanları kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-023",
+      "order": 23,
+      "process": "E-İrsaliye Süreçleri",
+      "question": "E-İrsaliyede fiili sevk tarihi/saati, araç plaka no, şoför TCKN ve taşıyıcı firma VKN bilgileri eksiksiz basılıyor mu?",
+      "description": "Yol denetimlerinde ceza yememek için UBL-TR irsaliye şemasındaki zorunlu lojistik ve sevkiyat alanları incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-022",
+        "operator": "equals",
+        "value": "e_irsaliye_aktif_kullanilmaktadir"
+      },
+      "options": [
+        { "value": "tum_sevk_ve_plaka_alanlari_zorunlu_ve_eksiksiz", "label": "Fiili sevk zamanı, şoför TCKN, çekici/dorse plaka ve taşıyıcı bilgisi zorunlu girilmeden kesilmez", "allow_note": false, "is_other": false },
+        { "value": "plaka_ve_sofor_manuel_veya_eksik_kalabilmektedir", "label": "Fiili sevk saati basılır ancak araç plakası veya şoför TCKN zaman zaman boş geçilebilir", "allow_note": true, "is_other": false },
+        { "value": "sevk_bilgileri_takip_edilmemektedir", "label": "Sevk detayları girilmemekte; sadece genel irsaliye belgesi basılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-024",
+      "order": 24,
+      "process": "Sevkiyat, Mal Kabul ve İrsaliye Eşleştirme",
+      "question": "Tedarikçilerden gelen e-İrsaliyeler için mal kabulde sistemik yanıt (Kabul, Kısmi Kabul, Red) dönülüyor mu?",
+      "description": "Depo mal kabulünde fiziki sayım ile e-İrsaliye kalemlerinin eşleştirilip sistem üzerinden yanıt dönülmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "depo_sayimi_ile_kabul_kismi_kabul_yaniti_donulur", "label": "Gelen e-İrsaliye depoda barkodla sayılır; kabul, eksik veya hasarlı miktar için sistemik yanıt iletilir", "allow_note": false, "is_other": false },
+        { "value": "sadece_kagit_irsaliye_nushasi_imzalanir", "label": "Sistemik yanıt dönülmez; şoförün getirdiği kağıt çıktının üzerine ıslak imza atılır", "allow_note": true, "is_other": false },
+        { "value": "gelen_e_irsaliyeler_takip_edilmez", "label": "Gelen e-İrsaliyeler depoda izlenmez; doğrudan fatura beklenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-025",
+      "order": 25,
+      "process": "Sevkiyat, Mal Kabul ve İrsaliye Eşleştirme",
+      "question": "E-İrsaliye ile sonradan kesilen e-Fatura arasında 7 günlük yasal süre ve belge eşleştirme (DespatchReference) bağı kuruluyor mu?",
+      "description": "Faturanın hangi e-İrsaliye ETTN / Belge Numarasına istinaden kesildiğinin UBL-TR referansı ile bağlanması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "ubl_despatchreference_ve_7_gun_kontrolu_tam", "label": "Fatura irsaliyeden otomatik üretilir, ETTN referansı UBL'e gömülür ve 7 gün kuralı denetlenir", "allow_note": false, "is_other": false },
+        { "value": "manuel_irsaliye_numarasi_yazilir", "label": "Sistemik ETTN eşleşmesi yoktur; faturanın açıklama satırına manuel irsaliye no yazılır", "allow_note": true, "is_other": false },
+        { "value": "fatura_irsaliye_bagi_kurulmaz", "label": "Fatura ile irsaliye arasında sistemik bir bağ kurulmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-026",
+      "order": 26,
+      "process": "E-Defter Süreçleri",
+      "question": "Şirket Yevmiye ve Kebir defterlerini GİB e-Defter standartlarına uygun elektronik defter olarak tutmakta mıdır?",
+      "description": "E-Defter mükellefiyeti, aylık/geçici vergi dönemlik defter oluşturma ve yasal saklama durumu değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "e_defter_aktif_kullanilmaktadir", "label": "Evet, Yevmiye ve Büyük Defter (Kebir) yasal süresinde e-Defter olarak üretilmekte ve berat alınmaktadır", "allow_note": false, "is_other": false },
+        { "value": "e_defter_kapsaminda_degiliz_kagit_defter", "label": "E-Defter kapsamında değiliz; noter onaylı fiziki kağıt yevmiye ve kebir defteri tutulmaktadır", "allow_note": true, "is_other": false },
+        { "value": "e_defter_dis_mali_musavirde_tutulur", "label": "Şirket içinde tutulmaz; veriler dış mali müşavire gönderilir ve müşavir defter üretir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-027",
+      "order": 27,
+      "process": "E-Defter Süreçleri",
+      "question": "E-Defter oluşturulmadan önce muhasebe fişlerinde yevmiye madde numaralama, borç/alacak denkliği ve belge tipi kontrolleri yapılıyor mu?",
+      "description": "Defter oluşturma öncesi fiş kontrolleri (Belge Tipi: Fatura, Çek, Senet, Navlun vb. ve Belge Tarihi/No) incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-026",
+        "operator": "equals",
+        "value": "e_defter_aktif_kullanilmaktadir"
+      },
+      "options": [
+        { "value": "otomatik_muhasebe_denetim_araci_ile_kontrol", "label": "Sistemik e-Defter denetim motoru çalıştırılır; eksik belge tipi ve tarih hataları önceden yakalanır", "allow_note": false, "is_other": false },
+        { "value": "manuel_mizan_ve_yevmiye_kontrolu_yapilir", "label": "Sistemik otomatik kural denetimi yoktur; muhasebeci mizanı manuel gözden geçirir", "allow_note": true, "is_other": false },
+        { "value": "on_kontrol_yapilmadan_defter_cikarilir", "label": "Ön denetim yapılmaz; sistem ne üretirse doğrudan berata gönderilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-028",
+      "order": 28,
+      "process": "Berat Oluşturma, Kontrol ve Yükleme",
+      "question": "E-Defter berat dosyaları (Yevmiye Beratı, Kebir Beratı, Defter Raporu) yasal sürelerinde mali mühürle imzalanıp GİB'e yükleniyor mu?",
+      "description": "Aylık veya 3 aylık geçici vergi dönemine göre berat yükleme takvimine tam uyum durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "zamaninda_imzalama_ve_gib_onayli_berat_arsivleme", "label": "Yasal süresi içinde mali mühürle imzalanır, GİB'e yüklenir ve GİB onaylı beratlar arşivlenir", "allow_note": false, "is_other": false },
+        { "value": "zaman_zaman_son_gune_kalir_gecikme_riski_var", "label": "Yükleme yapılır ancak sıklıkla son günlere kalır; sistem yoğunluğunda gecikme yaşanabilir", "allow_note": true, "is_other": false },
+        { "value": "berat_yukleme_surecleri_duzensizdir", "label": "Geçmiş dönemlerde berat yükleme gecikmesi veya düzeltme ihtiyacı yaşanmıştır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-029",
+      "order": 29,
+      "process": "Berat Oluşturma, Kontrol ve Yükleme",
+      "question": "GİB e-Defter Saklama Programı veya Özel Entegratör İkincil Kopya Saklama hizmeti kullanılmakta mıdır?",
+      "description": "E-Defter ve beratların GİB'in kendi saklama sistemine veya onaylı saklamacı entegratöre ikincil kopyasının yüklenmesi zorunluluğu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "gib_veya_entegrator_ikincil_saklama_tam_uyumlu", "label": "Evet, defter ve beratların ikincil kopyaları GİB Saklama sistemine / entegratöre periyodik yüklenmektedir", "allow_note": false, "is_other": false },
+        { "value": "sadece_yerel_sunucuda_saklanir_ikincil_kopya_yok", "label": "Defterler sadece kendi yerel bilgisayarımızda tutulur; ikincil saklama yüklemesi yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "ikincil_saklama_hakkinda_bilgi_yoktur", "label": "İkincil saklama zorunluluğu ve durumu bilinmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-030",
+      "order": 30,
+      "process": "E-SMM (Serbest Meslek Makbuzu) Süreçleri",
+      "question": "Avukat, mali müşavir, doktor ve danışmanlardan alınan veya düzenlenen Serbest Meslek Makbuzları e-SMM olarak mı yönetiliyor?",
+      "description": "Gelen e-SMM belgelerinin stopaj ve KDV tevkifatı hesaplarıyla ERP'ye doğru işlenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "e_smm_sistemik_alinir_ve_stopaj_otomatik_hesaplanir", "label": "Gelen e-SMM'ler sistemde taranır; gelir vergisi stopajı ve KDV tevkifatı otomatik muhasebeleşir", "allow_note": false, "is_other": false },
+        { "value": "e_smm_manuel_hesaplanip_girilir", "label": "Gelen e-SMM PDF'i incelenerek stopaj tutarları muhasebe fişine elle yazılır", "allow_note": true, "is_other": false },
+        { "value": "serbest_meslek_hizmeti_alinmamaktadir", "label": "Serbest meslek faaliyeti veya dış danışmanlık hizmet alımı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-031",
+      "order": 31,
+      "process": "E-Müstahsil Makbuzu Süreçleri",
+      "question": "Tarımsal ve hayvansal ürün alımlarında vergi mükellefi olmayan çiftçilerden alımlar e-Müstahsil Makbuzu (e-MM) ile mi yapılıyor?",
+      "description": "Çiftçiden doğrudan ürün alımında borsa tescil, stopaj ve SGK Bağ-Kur kesintilerinin e-MM ile yönetimi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "e_mustahsil_aktif_ve_kesintiler_otomatik", "label": "E-Müstahsil makbuzu ERP'den düzenlenir; stopaj, borsa ve SGK kesintileri otomatik hesaplanır", "allow_note": false, "is_other": false },
+        { "value": "kagit_mustahsil_makbuzu_kullanilmaktadir", "label": "E-Müstahsil henüz entegre edilmemiştir; kağıt matbu koçan kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "mustahsil_alimimiz_bulunmamaktadir", "label": "Tarımsal veya müstahsil alım faaliyetimiz bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-032",
+      "order": 32,
+      "process": "E-Bilet ve Sektörel E-Belge Kullanımı",
+      "question": "Şirketin faaliyet alanına göre e-Bilet, e-Adisyon, e-Döviz Belgesi veya e-Gider Pusulası gibi sektörel e-belgeler kullanılıyor mu?",
+      "description": "Yolcu taşımacılığı, sinema/etkinlik, restoran veya döviz bürosu faaliyetlerinde zorunlu e-belgeler incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "sektorel_e_belgeler_sistemden_duzenlenir", "label": "Sektörümüze tabi özel e-belgeler (e-Bilet, e-Adisyon vb.) entegre olarak kesilmektedir", "allow_note": false, "is_other": false },
+        { "value": "sektorel_belgeler_manuel_duzenlenir", "label": "Sektörel belgeler harici cihazlardan veya manuel düzenlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "sektorel_ozel_e_belge_kapsaminda_degiliz", "label": "Şirketimiz sektörel özel e-belge uygulamalarına tabi değildir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-033",
+      "order": 33,
+      "process": "İhracat ve E-Belge Bağlantıları",
+      "question": "Mal ve hizmet ihracatı işlemlerinde İhracat e-Faturası (Gümrük Çıkış Beyannamesi - GÇB bağlantılı) düzenleniyor mu?",
+      "description": "Yurtdışı mal ihracatında Gümrük ve Ticaret Bakanlığı (GTB) portalına düşen ihracat e-faturası süreçleri incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "e_fatura_ihracat_yapilmaktadir", "label": "Evet, yurtdışı mal ihracatlarında GTB onayına giden resmi İhracat e-Faturası düzenlenmektedir", "allow_note": false, "is_other": false },
+        { "value": "sadece_hizmet_ihracati_e_arsiv_kesilir", "label": "Mal ihracatımız yoktur; sadece yurtdışına hizmet ihracatı (e-Arşiv) faturası kesilmektedir", "allow_note": true, "is_other": false },
+        { "value": "ihracat_faaliyetimiz_bulunmamaktadir", "label": "Şirketimizin yurtdışı ihracat faaliyeti bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-034",
+      "order": 34,
+      "process": "İhracat ve E-Belge Bağlantıları",
+      "question": "İhracat e-Faturasında GTB 23 haneli referans numarası, GTİP kodları, teslim şekli (Incoterms) ve intaç tarihi eşleşmesi nasıl yapılır?",
+      "description": "Gümrük kapanış (intaç) tarihi ile muhasebe gelir kaydının ve KDV iade listelerinin otomatik eşleşmesi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-033",
+        "operator": "equals",
+        "value": "e_fatura_ihracat_yapilmaktadir"
+      },
+      "options": [
+        { "value": "gtb_referans_ve_intac_tarihi_sistemde_tam_eslesir", "label": "23 haneli GÇB referansı, GTİP ve intaç tarihi sisteme işlenerek KDV iade listelerine otomatik akar", "allow_note": false, "is_other": false },
+        { "value": "gumruk_musaviri_ile_manuel_takip_edilir", "label": "GÇB ve intaç tarihi gümrükçüden gelen evrakla Excel'de manuel takip edilmektedir", "allow_note": true, "is_other": false },
+        { "value": "intac_ve_gtip_eslesmesi_yapilmaz", "label": "İntaç tarihi ve GTİP eşleştirmesi sistemde tutulmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-035",
+      "order": 35,
+      "process": "İade, İptal, İtiraz ve Düzeltme Süreçleri",
+      "question": "Müşterilerden gelen iade faturaları, e-Arşiv iptalleri veya GİB İptal/İtiraz Portalı süreçleri nasıl yürütülmektedir?",
+      "description": "Temel fatura iptal talepleri, e-Arşiv fatura iptal kuralları ve noter/KEP üzerinden yapılan yasal itirazların takibi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "duzenli_iade_ve_itiraz_yasanmaktadir", "label": "Sık iade ve itiraz yaşanır; GİB İptal/İtiraz Portalı ve KEP üzerinden süreçler düzenli yürütülür", "allow_note": false, "is_other": false },
+        { "value": "nadir_iade_olur_iade_faturasi_ile_cozulur", "label": "Çok nadir olur; müşteri doğrudan iade faturası keserek düzeltme sağlar", "allow_note": true, "is_other": false },
+        { "value": "iptal_ve_itiraz_sureci_tanimli_degildir", "label": "Tanımlı bir iptal/itiraz protokolü yoktur; kriz anında manuel çözülmeye çalışılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-036",
+      "order": 36,
+      "process": "İade, İptal, İtiraz ve Düzeltme Süreçleri",
+      "question": "GİB İptal/İtiraz Portalı üzerinden gelen onay talepleri ve 8 günlük yasal itiraz süreleri sistemik izleniyor mu?",
+      "description": "Temel faturalarda alıcının açtığı iptal taleplerinin satıcı tarafından onaylanması süreci incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-035",
+        "operator": "equals",
+        "value": "duzenli_iade_ve_itiraz_yasanmaktadir"
+      },
+      "options": [
+        { "value": "gib_iptal_portali_entegratorle_otomatik_izlenir", "label": "Gelen iptal/itiraz talepleri entegratör üzerinden ERP'ye bildirim olarak düşer ve onaylanır", "allow_note": false, "is_other": false },
+        { "value": "gib_portalina_manuel_girilerek_onaylanir", "label": "Muhasebeci GİB portalına periyodik şifreyle girip manuel onay verir", "allow_note": true, "is_other": false },
+        { "value": "iptal_bildirimleri_takip_edilmemektedir", "label": "İptal portalı takip edilmemekte; süreler kaçabilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-037",
+      "order": 37,
+      "process": "Tevkifat, İstisna, Stopaj ve Vergi Kodları",
+      "question": "Satış ve satın alma faturalarında KDV Tevkifatı (örn: 5/10, 7/10) veya KDV İstisnası (örn: 301, 351) uygulanıyor mu?",
+      "description": "GİB tevkifat ve istisna kodlarının faturaya doğru yansıması ve KDV-1 / KDV-2 beyanname uyumu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tevkifat_ve_istisna_uygulanmaktadir", "label": "Evet, işlemlerimizde düzenli olarak KDV tevkifatı, istisna muafiyet kodları veya ÖTV/ÖİV uygulanır", "allow_note": false, "is_other": false },
+        { "value": "sadece_standart_kdv_uygulanir_istisna_yok", "label": "Sadece standart %1, %10, %20 KDV uygulanır; tevkifat veya özel istisna kodumuz yoktur", "allow_note": true, "is_other": false },
+        { "value": "vergi_kodlari_manuel_belirlenir", "label": "Vergi kodları sistemde otomatik değildir; kullanıcı her faturada elle seçer", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-038",
+      "order": 38,
+      "process": "Tevkifat, İstisna, Stopaj ve Vergi Kodları",
+      "question": "Tevkifat oranları, muafiyet gerekçeleri ve 3 haneli GİB vergi kodları ürün veya cari kartından otomatik mi türetilmektedir?",
+      "description": "Fatura kesilirken kullanıcının vergi kodu hatası yapmasını engelleyen ana veri parametrizasyonu değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "EDT-037",
+        "operator": "equals",
+        "value": "tevkifat_ve_istisna_uygulanmaktadir"
+      },
+      "options": [
+        { "value": "urun_ve_cari_kartindan_otomatik_turetme_tam", "label": "Malzeme veya cari seçildiğinde tevkifat kodu ve istisna gerekçesi faturaya otomatik ve hatasız dolar", "allow_note": false, "is_other": false },
+        { "value": "kullanici_fatura_satirinda_manuel_kod_secer", "label": "Kartlarda tanım yoktur; faturayı kesen kullanıcı yüzlerce kod arasından manuel seçim yapar", "allow_note": true, "is_other": false },
+        { "value": "kod_hatalari_siklikla_yasanmaktadir", "label": "Yanlış vergi kodu seçimi sebebiyle beyanname döneminde sık düzeltme yapılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-039",
+      "order": 39,
+      "process": "UBL-TR ve Belge Alan Eşleşmeleri",
+      "question": "E-Belgelerin UBL-TR 1.2.1 şemasına uygunluğu (Zorunlu Alanlar, Schematron kuralları, XSLT şablonları) nasıl yönetilmektedir?",
+      "description": "Faturanın XML şema doğrulaması ve şirkete özel görsel fatura tasarımının (XSLT) yönetimi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "standart_ubl_tr_ve_ozel_tasarimli_xslt_var", "label": "UBL-TR şematron doğrulaması tamdır; şirketin kurumsal logolu XSLT fatura tasarımı kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "entegratorun_varsayilan_standart_xslt_tasarimi_var", "label": "Özel tasarım yoktur; entegratörün verdiği varsayılan standart beyaz fatura şablonu kullanılır", "allow_note": true, "is_other": false },
+        { "value": "xslt_ve_ubl_sema_yapisi_bilinmemektedir", "label": "Şema ve XSLT yapısı bilinmemekte; teknik kontrol yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-040",
+      "order": 40,
+      "process": "UBL-TR ve Belge Alan Eşleşmeleri",
+      "question": "Fatura ve irsaliyelerde sektörel veya müşteri özel ek alanlar (Sipariş No, Sözleşme No, İban, Proje Kodu vb.) UBL'e basılıyor mu?",
+      "description": "UBL-TR standart ek alanlarının (OrderReference, ContractDocumentReference, Note vb.) parametrik eşleşmesi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_ozel_alanlar_ubl_etiketleriyle_tam_eslesir", "label": "Sipariş no, müşteri malzeme kodu, proje kodu ve IBAN bilgileri doğru UBL alanlarına basılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "ek_alanlar_serbest_not_alanina_yazilir", "label": "Özel UBL etiketi kullanılmaz; tüm bilgiler faturanın genel not alanına metin olarak yazılır", "allow_note": true, "is_other": false },
+        { "value": "ek_alanlar_faturada_yer_almaz", "label": "Özel sipariş veya sözleşme numaraları e-faturaya aktarılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-041",
+      "order": 41,
+      "process": "ERP, Muhasebe ve Özel Entegratör Entegrasyonu",
+      "question": "ERP yazılımı ile e-Dönüşüm altyapısı arasında çift yönlü otomatik API/Web servis köprüsü kurulu mudur?",
+      "description": "Faturanın ERP'de onaylandığı anda otomatik e-faturaya dönüşmesi ve gelen faturaların ERP'ye anlık akışı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_otomatik_cift_yonlu_api_entegrasyonu", "label": "Tam otomatik çift yönlü API entegrasyonu mevcuttur; ara dosya veya manuel yükleme gerekmez", "allow_note": false, "is_other": false },
+        { "value": "manuel_excel_xml_dosya_aktarimi_ile", "label": "API yoktur; ERP'den XML/Excel dışa aktarılır, entegratör portalına elle yüklenir", "allow_note": true, "is_other": false },
+        { "value": "entegrasyon_yoktur_cift_veri_girisi_yapilir", "label": "Sistemler tamamen bağımsızdır; fatura hem ERP'ye hem entegratör paneline ayrı ayrı yazılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-042",
+      "order": 42,
+      "process": "ERP, Muhasebe ve Özel Entegratör Entegrasyonu",
+      "question": "Entegrasyon köprüsünde şifreli veri iletimi (TLS 1.3, Token/OAuth2) ve API anahtarı (API Key) güvenliği nasıl sağlanır?",
+      "description": "Mali verilerin entegratörle haberleşirken siber güvenlik ve veri gizliliği standartlarına uyumu değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "guvenli_token_ip_kisitlamasi_ve_tls_guncel", "label": "Statik IP kısıtlaması, güvenli API token ve güncel TLS şifreleme protokolleri kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "standart_kullanici_adi_ve_sifre_ile", "label": "Özel IP veya token yoktur; temel kullanıcı adı ve şifre ile web servise bağlanılır", "allow_note": true, "is_other": false },
+        { "value": "guvenlik_parametreleri_bilinmemektedir", "label": "Entegrasyon güvenlik altyapısı bilinmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-043",
+      "order": 43,
+      "process": "Hata, Kuyruk, Yeniden Gönderim ve Mutabakat",
+      "question": "Entegratör veya GİB servislerinin kesintisi anında gönderilemeyen faturalar için otomatik kuyruk ve yeniden deneme (Retry) mekanizması var mıdır?",
+      "description": "İnternet veya GİB kesildiğinde sistemin faturayı kaybetmeden kuyrukta bekletip otomatik tekrar deneme yeteneği sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_kuyruk_asenkron_isleme_ve_alarm_var", "label": "Kesinti anında fatura kuyruğa alınır, servis açılınca otomatik iletilir ve kullanıcıya alarm üretilir", "allow_note": false, "is_other": false },
+        { "value": "hata_veren_fatura_manuel_tekrar_gonderilir", "label": "Kuyruk yoktur; hata alan fatura kullanıcı tarafından tespit edilip elle tekrar gönderilir", "allow_note": true, "is_other": false },
+        { "value": "hata_kuyruk_yonetimi_bulunmamaktadir", "label": "Kuyruk yönetimi yoktur; kesintilerde fatura kayıpları veya mükerrer gönderimler yaşanabilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-044",
+      "order": 44,
+      "process": "Hata, Kuyruk, Yeniden Gönderim ve Mutabakat",
+      "question": "Ay sonlarında ERP muhasebe kayıtları ile Özel Entegratör ve GİB portalı arasında e-Belge adet ve tutar mutabakatı yapılıyor mu?",
+      "description": "ERP'de kesilen faturalar ile GİB'e başarılı ulaşan faturaların birebir tutarlılık denetimi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_aylik_mutabakat_raporu_ile_eslestirme", "label": "ERP ile Entegratör kayıtları sistemik mutabakat aracıyla karşılaştırılır; 1 kuruş/1 adet fark dahi raporlanır", "allow_note": false, "is_other": false },
+        { "value": "manuel_excel_mizan_karsilastirmasi_ile", "label": "Sistemik araç yoktur; muhasebeci Excel indirerek manuel fatura listesi kontrolü yapar", "allow_note": true, "is_other": false },
+        { "value": "duzenli_e_belge_mutabakati_yapilmaz", "label": "Düzenli mutabakat yapılmaz; denetim veya vergi incelemesinde fark çıkarsa bakılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-045",
+      "order": 45,
+      "process": "Arşivleme, Yasal Saklama ve Denetim İzi",
+      "question": "GİB mevzuatı gereği e-Fatura, e-Arşiv, e-İrsaliye ve e-Defter dosyaları 10 yıl boyunca orijinal XML ve imzalı formatta nasıl saklanmaktadır?",
+      "description": "Vergi Usul Kanunu ve TTK gereğince belgelerin sadece PDF olarak değil, orijinal mali mühürlü XML formatında saklanma garantisi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "10_yil_garantili_orijinal_xml_ve_cift_yedekleme", "label": "Tüm belgeler orijinal imzalı XML formatında entegratörde 10 yıl yasal saklamada ve yerel yedekte tutulur", "allow_note": false, "is_other": false },
+        { "value": "sadece_pdf_goruntuleri_saklanmaktadir", "label": "Orijinal XML tutulmaz; sadece PDF çıktıları veya taranmış kopyaları bilgisayarda saklanır", "allow_note": true, "is_other": false },
+        { "value": "yasal_saklama_altyapisi_bulunmamaktadir", "label": "10 yıllık yasal elektronik arşiv veya yedekleme güvencesi bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-046",
+      "order": 46,
+      "process": "Arşivleme, Yasal Saklama ve Denetim İzi",
+      "question": "Vergi denetiminde veya bilirkişi incelemesinde e-Defter ve e-Faturaların ibrazı için hızlı arama, doğrulama ve dışa aktarım imkanı var mıdır?",
+      "description": "Vergi müfettişine istenen döneme ait XML defterlerin, beratların ve faturaların dakikalar içinde eksiksiz paketlenebilmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tek_tikla_denetim_paketi_ve_xml_dogrulama_hazir", "label": "İstenen tarih aralığı tek tıkla e-Defter görüntüleyiciye uygun paketlenir ve imza doğrulaması yapılır", "allow_note": false, "is_other": false },
+        { "value": "manuel_klasorlerden_tek_tek_toplanir", "label": "Otomatik paketleme yoktur; personel arşiv klasörlerinden dosyaları manuel ayıklar", "allow_note": true, "is_other": false },
+        { "value": "denetim_ibraz_hazirligi_bulunmamaktadir", "label": "Denetim ibrazı için hazır bir arşivleme veya doğrulama aracı yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "EDT-047",
+      "order": 47,
+      "process": "Arşivleme, Yasal Saklama ve Denetim İzi",
+      "question": "E-Dönüşüm sisteminde gerçekleştirilen her işlem için zaman damgalı değiştirilemez denetim izi (Audit Trail / Log) tutuluyor mu?",
+      "description": "Faturayı kim kesti, ne zaman onaylandı, kim sildi, ne zaman iletildi gibi kritik eylemlerin loglanması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "degistirilemez_zaman_damgali_kullanici_ve_islem_logu", "label": "Kullanıcı, IP, saat ve işlem detayını içeren zaman damgalı denetim izi (audit trail) tutulmaktadır", "allow_note": false, "is_other": false },
+        { "value": "sadece_temel_fatura_tarihcesi_gorunur", "label": "Sadece faturanın gönderilme tarihi görünür; kullanıcı ve detaylı işlem logu tutulmaz", "allow_note": true, "is_other": false },
+        { "value": "denetim_izi_veya_loglama_bulunmamaktadir", "label": "Sistemde e-Dönüşüm işlem logları saklanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

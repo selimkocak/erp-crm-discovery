@@ -3,7 +3,7 @@
  * DO NOT EDIT MANUALLY.
  * Source: data/business-functions.json
  *
- * Generated at: 2026-08-20T15:08:19.935Z
+ * Generated at: 2026-08-21T18:26:42.972Z
  */
 
 export interface BusinessFunctionEntry {
@@ -337,6 +337,16 @@ export const BUSINESS_FUNCTION_REGISTRY: readonly BusinessFunctionEntry[] = [
     category_en: "Accounting & Finance",
     sort_order: 32,
     is_active: true,
+  },
+  {
+    code: "E_TRANSFORMATION",
+    legacy_code: "E_DONUSUM",
+    name_tr: "E-Dönüşüm Yönetimi",
+    name_en: "E-Transformation Management",
+    category_tr: "Muhasebe & Finans",
+    category_en: "Accounting & Finance",
+    sort_order: 33,
+    is_active: true,
   }
 ] as const;
 
@@ -373,6 +383,7 @@ export const CANONICAL_BUSINESS_FUNCTION_CODES: readonly string[] = [
   "LEGAL_COMPLIANCE",
   "REPORTING_ANALYTICS",
   "COSTING",
+  "E_TRANSFORMATION",
 ] as const;
 
 export const CANONICAL_BUSINESS_FUNCTION_CODE_SET = new Set<string>(

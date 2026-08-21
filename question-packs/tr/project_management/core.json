@@ -1,0 +1,815 @@
+{
+  "meta": {
+    "pack_id": "tr.project_management.core",
+    "name": "Proje Yönetimi Soru Paketi",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "business_function_code": "PROJECT_MANAGEMENT",
+    "description": "ERP ve CRM dönüşüm projelerinde şirketlerin proje yönetimi metodolojisi, kapsam tanımı, WBS, takvim, kaynak planlama, bütçe/maliyet kontrolü, zaman takibi, risk, değişiklik yönetimi, alt yüklenici koordinasyonu ve canlıya geçiş/kapanış olgunluğunu değerlendiren saha keşif soru paketi.",
+    "language": "tr",
+    "author": "Antigravity Discovery Engine",
+    "tags": [
+      "project_management",
+      "wbs",
+      "gantt",
+      "milestone",
+      "proje_butcesi",
+      "kaynak_yonetimi",
+      "timesheet",
+      "risk_yonetimi",
+      "degisiklik_yonetimi",
+      "alt_yuklenici",
+      "cut_over",
+      "lessons_learned"
+    ]
+  },
+  "questions": [
+    {
+      "id": "PRJ-001",
+      "order": 1,
+      "process": "Proje Yönetimi Organizasyonu ve Sorumluluklar",
+      "question": "Şirket bünyesinde kurumsal bir Proje Yönetim Ofisi (PMO) veya standart bir proje yönetim metodolojisi bulunuyor mu?",
+      "description": "Projelerin şirket genelinde standart süreçlerle mi (PMI, Agile, Prince2 vb.) yoksa gayriresmi yöntemlerle mi yönetildiği değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_pmo_ve_standart_metodoloji_var", "label": "Merkezi Proje Yönetim Ofisi (PMO) ve yazılı kurumsal standart metodoloji uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "departman_bazli_kismen_standart_var", "label": "Merkezi PMO yoktur; departmanlar kendi iç standartlarıyla proje yürütmektedir", "allow_note": true, "is_other": false },
+        { "value": "standart_yok_kisisel_yontemlerle_yurutulur", "label": "Kurumsal bir standart veya PMO yoktur; tamamen kişisel inisiyatifle yürütülür", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-002",
+      "order": 2,
+      "process": "Proje Yönetimi Organizasyonu ve Sorumluluklar",
+      "question": "Proje yönetimi süreçleri ve proje portföy takibi için hangi yazılım araçları kullanılmaktadır?",
+      "description": "Projelerin kurumsal bir yazılımda (MS Project, Jira, ERP Proje Modülü vb.) mı yoksa elektronik tablolarda mı takip edildiği incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "entegre_erp_veya_ozel_ppm_yazilimi", "label": "Entegre ERP Proje Modülü veya profesyonel proje portföy yazılımı (PPM) kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "bagimsiz_proje_gorev_takip_araclari", "label": "ERP'den bağımsız görev/proje araçları (Jira, Asana, Trello, MS Project vb.) kullanılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "manuel_excel_ve_e_posta_ile", "label": "Özel yazılım yoktur; Excel tabloları ve e-posta üzerinden takip edilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-003",
+      "order": 3,
+      "process": "Proje Türleri ve Proje Sınıflandırması",
+      "question": "İşletmede yürütülen projeler tür ve büyüklüklerine göre standart kriterlerle sınıflandırılıyor mu?",
+      "description": "Projelerin Ar-Ge, Müşteri Siparişi (ETO), Tesis/Yatırım, BT/Dönüşüm veya İç İyileştirme olarak kategorize edilme durumu araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "net_kriterlerle_kategorizasyon_var", "label": "Bütçe, süre, stratejik etki ve proje türüne göre net kurumsal sınıflandırma yapılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "sadece_temel_tur_ayrimi_var", "label": "Sadece iç/dış proje gibi temel bir ayrım yapılmakta, detaylı sınıflandırma bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "siniflandirma_yapilmamaktadir", "label": "Herhangi bir sınıflandırma veya derecelendirme yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-004",
+      "order": 4,
+      "process": "Proje Türleri ve Proje Sınıflandırması",
+      "question": "Şirkette dış müşterilere taahhüt edilen projeler ile şirket içi iç projelerin ağırlık dengesi nasıldır?",
+      "description": "Müşteri odaklı sözleşmeli taahhüt projeleri ile iç dönüşüm/yatırım projelerinin portföydeki dağılımı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "dis_musteri_projeleri_agirliklidir", "label": "Dış müşterilere yapılan sözleşmeli ve taahhütlü projeler ana ağırlıktadır", "allow_note": false, "is_other": false },
+        { "value": "sirket_ici_yatirim_ve_arge_agirliklidir", "label": "Şirket içi yatırım, altyapı ve Ar-Ge projeleri ana ağırlıktadır", "allow_note": true, "is_other": false },
+        { "value": "hem_ic_hem_dis_projeler_esit_yurutulur", "label": "Hem iç dönüşüm hem müşteri projeleri paralel ve dengeli yürütülmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-005",
+      "order": 5,
+      "process": "Proje Açılış ve Onay Süreci",
+      "question": "Yeni bir projenin başlatılması için resmi bir Proje Başlatma Belgesi (Project Charter) ve onay mekanizması işletiliyor mu?",
+      "description": "Proje sponsorluğu, bütçe onayı ve resmi başlatma kararının dokümante edilme standardı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_charter_ve_yonetim_onayi_var", "label": "Standart Proje Başlatma Belgesi (Charter) doldurulur ve üst yönetim onayıyla başlatılır", "allow_note": false, "is_other": false },
+        { "value": "teklif_veya_talep_formu_ile_baslatilir", "label": "Resmi charter yoktur; müşteri teklif onayı veya iç talep formu ile başlatılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "sozlu_talimat_ile_dogrudan_baslatilir", "label": "Resmi bir açılış belgesi veya onay akışı yoktur; sözlü talimatla başlanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-006",
+      "order": 6,
+      "process": "Proje Açılış ve Onay Süreci",
+      "question": "Proje açılışında fizibilite, ROI (Yatırımın Geri Dönüşü) veya iş gerekçesi (Business Case) analizi hazırlanıyor mu?",
+      "description": "Proje yatırımlarının mali ve operasyonel geri dönüşünün başlangıçta hesaplanma disiplini sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tum_projelerde_fizibilite_ve_roi_zorunlu", "label": "Tüm projeler için detaylı fizibilite ve ROI analizi hazırlanması zorunludur", "allow_note": false, "is_other": false },
+        { "value": "sadece_buyuk_butceli_projelerde_hazirlanir", "label": "Sadece belirli bir bütçeyi aşan büyük ölçekli projelerde fizibilite yapılır", "allow_note": true, "is_other": false },
+        { "value": "fizibilite_ve_roi_calismasi_yapilmaz", "label": "Resmi bir fizibilite veya ROI çalışması yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-007",
+      "order": 7,
+      "process": "Proje Yöneticisi ve Ekip Yapısı",
+      "question": "Her proje için resmi olarak atanmış bir Proje Yöneticisi ve tanımlı çekirdek proje ekibi bulunuyor mu?",
+      "description": "Proje liderliği rolünün netliği ve ekip üyelerinin projeye resmi görevlendirilme durumu kontrol edilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "atanmis_proje_yoneticisi_ve_ekip_rolu_net", "label": "Her proje için resmi Proje Yöneticisi atanır, ekip rolleri ve yetkileri yazılı olarak belirlenir", "allow_note": false, "is_other": false },
+        { "value": "gayriresmi_sorumlu_var_roller_esnek", "label": "Sorumlu bir kişi belirlenir ancak ekip rolleri ve yetkiler net tanımlanmamıştır", "allow_note": true, "is_other": false },
+        { "value": "tekil_sorumlu_yok_ortak_yurutulur", "label": "Belirli bir proje yöneticisi atanmaz; ilgili departman yöneticileri ortak yürütmeye çalışır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-008",
+      "order": 8,
+      "process": "Proje Yöneticisi ve Ekip Yapısı",
+      "question": "Proje yöneticilerinin ve proje ekibinin organizasyonel yapısı (Matris, Fonksiyonel, Proje Odaklı) nasıldır?",
+      "description": "Proje yöneticilerinin kaynaklar üzerindeki yönetsel yetkisi ve fonksiyonel departmanlarla ilişkisi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "guclu_matris_veya_proje_odakli_yapi", "label": "Güçlü matris veya tam proje odaklı yapı (Proje yöneticisi tam yetkiye sahiptir)", "allow_note": false, "is_other": false },
+        { "value": "zayif_dengeli_matris_yapi", "label": "Zayıf veya dengeli matris yapı (Departman yöneticilerinin onayı ve ağırlığı fazladır)", "allow_note": true, "is_other": false },
+        { "value": "geleneksel_fonksiyonel_hiyerarsi", "label": "Geleneksel fonksiyonel yapı (Projeler departman işlerinin arasında ikincil yürütülür)", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-009",
+      "order": 9,
+      "process": "Proje Hedefleri ve Başarı Kriterleri",
+      "question": "Proje başında ölçülebilir başarı kriterleri (KPI, süre, bütçe, kalite hedefleri) net olarak tanımlanıyor mu?",
+      "description": "Projenin başarılı sayılıp sayılmayacağını belirleyen somut metriklerin varlığı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "olculebilir_kpi_ve_kriterler_yazili", "label": "Ölçülebilir başarı kriterleri (süre, bütçe, performans, kalite) başlangıçta yazılı belirlenir", "allow_note": false, "is_other": false },
+        { "value": "genel_hedef_belirlenir_somut_kpi_yok", "label": "Genel teslim tarihi ve bütçe konuşulur ancak detaylı ölçülebilir KPI seti oluşturulmaz", "allow_note": true, "is_other": false },
+        { "value": "basari_kriteri_tanimlanmamaktadir", "label": "Başlangıçta somut başarı kriteri tanımlanmaz; süreç içinde değerlendirilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-010",
+      "order": 10,
+      "process": "Proje Hedefleri ve Başarı Kriterleri",
+      "question": "Proje hedeflerinin paydaşlar (müşteri, yönetim, üretim, satış) tarafından imzalanması ve mutabakatı nasıl sağlanır?",
+      "description": "Hedeflerin tüm paydaşlarca aynı şekilde anlaşılması ve resmi taahhüde bağlanma süreci araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "resmi_imza_veya_sistemik_onay_ile", "label": "Tüm ana paydaşların yer aldığı resmi imza/onay protokolü ile sağlanır", "allow_note": false, "is_other": false },
+        { "value": "toplanti_tutanagi_ve_e_posta_ile", "label": "Başlangıç (Kick-off) toplantı tutanağı ve e-posta teyidi ile yürütülür", "allow_note": true, "is_other": false },
+        { "value": "resmi_mutabakat_alinmamaktadir", "label": "Paydaşlar arasında resmi bir hedef mutabakatı yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-011",
+      "order": 11,
+      "process": "Kapsam Tanımı ve Kapsam Dışı Konular",
+      "question": "Proje kapsam bildirimi (Scope Statement) ve kapsam dışı (Out of Scope) bırakılan maddeler açıkça belirleniyor mu?",
+      "description": "Kapsam kaymasını (Scope Creep) önlemek için neyin projenin içinde neyin dışında olduğunun netleştirilmesi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kapsam_ici_ve_disi_ayrintili_dokumante", "label": "Kapsam içi ve kapsam dışı maddeler detaylı olarak yazılı dokümante edilir ve onaylanır", "allow_note": false, "is_other": false },
+        { "value": "sadece_kapsam_ici_maddeler_yazilir", "label": "Kapsam içi işler yazılır ancak kapsam dışı bırakılan unsurlar net belirtilmez", "allow_note": true, "is_other": false },
+        { "value": "kapsam_yazili_degildir_sozlu_yurutulur", "label": "Yazılı kapsam tanımı yapılmaz; süreç içinde gelen taleplerle kapsam şekillenir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-012",
+      "order": 12,
+      "process": "İş Kırılım Yapısı (WBS)",
+      "question": "Projelerde işler İş Kırılım Yapısı (WBS - Work Breakdown Structure) ve hiyerarşik iş paketleri şeklinde modelleniyor mu?",
+      "description": "Büyük teslimatların yönetilebilir alt iş paketlerine, fazlara ve görevlere bölünme seviyesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "detayli_hiyerarsik_wbs_kullanilir", "label": "Detaylı hiyerarşik WBS (faz, iş paketi, aktivite) standart olarak modellenmektedir", "allow_note": false, "is_other": false },
+        { "value": "duz_gorev_listesi_kullanilir", "label": "Hiyerarşik WBS yoktur; düz yapılacaklar (to-do/task) listesi tutulmaktadır", "allow_note": true, "is_other": false },
+        { "value": "is_kirilimi_yapilmamaktadir", "label": "Herhangi bir iş kırılım yapısı veya görev listesi oluşturulmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-013",
+      "order": 13,
+      "process": "İş Kırılım Yapısı (WBS)",
+      "question": "WBS alt iş paketleri için sözlük (WBS Dictionary), sorumlu ataması ve teslimat kabul kriterleri tanımlı mıdır?",
+      "description": "İş paketlerinin her birinin içeriği, girdileri, çıktıları ve sorumlu birimlerinin netliği araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "PRJ-012",
+        "operator": "equals",
+        "value": "detayli_hiyerarsik_wbs_kullanilir"
+      },
+      "options": [
+        { "value": "wbs_sozlugu_ve_sorumluluk_matrisi_tam", "label": "Her iş paketi için teslimat tanımı, kabul kriteri ve sorumlu (RACI) matrisi tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "sadece_sorumlu_atanir_sozluk_yok", "label": "İş paketlerine sorumlu atanır ancak detaylı WBS sözlüğü ve kabul kriteri tutulmaz", "allow_note": true, "is_other": false },
+        { "value": "sorumluluklar_sozlu_paylasilir", "label": "Sorumluluklar yazılı değildir; toplantılarda sözlü olarak paylaşılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-014",
+      "order": 14,
+      "process": "Aşamalar, Kilometre Taşları ve Teslimatlar",
+      "question": "Projeler net aşamalara (Phase/Gate), kilometre taşlarına (Milestone) ve somut ara teslimatlara bölünmüş müdür?",
+      "description": "Projenin kritik dönüm noktalarının ve faz onay kapılarının önceden belirlenme durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "net_fazlar_kilometre_taslari_ve_gate_onaylari_var", "label": "Aşamalar, kilometre taşları ve aşama geçiş onay kapıları (Stage-Gate) tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "sadece_temel_teslim_tarihleri_var", "label": "Sadece nihai teslim tarihi ve 1-2 temel ara tarih belirlenir; gate onayı yoktur", "allow_note": true, "is_other": false },
+        { "value": "asamalar_ve_kilometre_taslari_belirsiz", "label": "Kilometre taşları tanımlı değildir; süreç kesintisiz akışta takip edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-015",
+      "order": 15,
+      "process": "Aşamalar, Kilometre Taşları ve Teslimatlar",
+      "question": "Dış müşteri projelerinde ara teslimat, geçici kabul ve kesin kabul protokolleri nasıl işletilmektedir?",
+      "description": "Müşteriye yapılan teslimatların imzalı tutanak, müşteri testi ve hakediş onayına bağlanma biçimi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRJ-004",
+        "operator": "equals",
+        "value": "dis_musteri_projeleri_agirliklidir"
+      },
+      "options": [
+        { "value": "resmi_kabul_tutanagi_ve_hakedis_sartlidir", "label": "Resmi geçici/kesin kabul tutanağı düzenlenir ve faturalama/hakediş buna bağlanır", "allow_note": false, "is_other": false },
+        { "value": "e_posta_veya_sevk_irsaliyesi_ile_kabul_edilir", "label": "İmzalı irsaliye veya müşteri e-posta teyidi kabul belgesi sayılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "resmi_bir_kabul_protokolu_isletilmez", "label": "Müşteriyle resmi bir kabul protokolü işletilmez; itiraz gelmezse tamamlanmış sayılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-016",
+      "order": 16,
+      "process": "Proje Takvimi ve Bağımlılıklar",
+      "question": "Proje takvimi, aktiviteler arası bağımlılıklar (FS, SS, FF) ve Kritik Yol (Critical Path) analiziyle yönetiliyor mu?",
+      "description": "Görevlerin sıralaması, öncül-ardıl ilişkileri ve projeyi geciktirecek kritik yol aktivitelerinin takibi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "gantt_semasi_ve_kritik_yol_analizi_var", "label": "Gantt şeması, öncül/ardıl bağımlılıkları ve dinamik kritik yol analizi kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "sadece_baslangic_bitis_tarihli_liste_var", "label": "Bağımlılık ilişkisi kurulmadan sadece başlangıç-bitiş tarihli takvim tutulmaktadır", "allow_note": true, "is_other": false },
+        { "value": "dinamik_takvim_kullanilmamaktadir", "label": "Dinamik bir takvim veya Gantt şeması kullanılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-017",
+      "order": 17,
+      "process": "Proje Takvimi ve Bağımlılıklar",
+      "question": "Proje takviminde başlangıç baz hattı (Baseline) kilitleniyor ve takvim sapmaları baz hatta göre raporlanıyor mu?",
+      "description": "İlk onaylanan takvim ile fiili gerçekleşme arasındaki sapmaların ölçülebilmesi için baseline tutulma durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "baseline_kilitlenir_sapmalar_resmen_izlenir", "label": "Proje takvim baz hattı kilitlenir, revizyonlar kayıt altına alınarak sapmalar ölçülür", "allow_note": false, "is_other": false },
+        { "value": "takvim_surekli_guncellenir_baseline_tutulmaz", "label": "Takvim sürekli ileri ötelenerek güncellenir; orijinal baz hat saklanmaz", "allow_note": true, "is_other": false },
+        { "value": "takvim_sapma_takibi_yapilmaz", "label": "Takvim sapması ölçülmemektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-018",
+      "order": 18,
+      "process": "Kaynak Planlama ve Kapasite Yönetimi",
+      "question": "Projelerde ihtiyaç duyulan kaynaklar (insan, teknik uzman, ekipman) proje öncesinde kapasiteye göre planlanıyor mu?",
+      "description": "Aşırı yükleme (over-allocation) ve kaynak darboğazlarını önlemek için kapasite analizinin yapılması araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "merkezi_kaynak_kapasite_planlamasi_var", "label": "Tüm projeleri kapsayan merkezi kaynak havuzu ve kapasite planlama matrisi kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "proje_bazinda_tahmini_kaynak_planlanir", "label": "Şirket geneli kapasite görülmez; her proje kendi içinde tahmini kaynak ataması yapar", "allow_note": true, "is_other": false },
+        { "value": "kaynak_kapasite_plani_yapilmaz", "label": "Kaynak planlaması yapılmaz; iş geldikçe müsait kişilere atanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-019",
+      "order": 19,
+      "process": "Kaynak Planlama ve Kapasite Yönetimi",
+      "question": "Birden fazla projede çalışan personelin kaynak çakışmaları ve iş yükü dengelemesi (Resource Leveling) nasıl yönetilir?",
+      "description": "Aynı personelin farklı projelerde aynı anda görevlendirilmesinden doğan çakışmaların çözümü sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistemik_is_yuku_dengeleme_ve_onceliklendirme", "label": "Sistem üzerinden kaynak yükleri izlenir ve proje önceliklerine göre iş yükü dengelenir", "allow_note": false, "is_other": false },
+        { "value": "yoneticiler_arasi_toplantilarla_cozulur", "label": "Sistemik takip yoktur; yöneticiler haftalık koordinasyon toplantılarında uzlaşır", "allow_note": true, "is_other": false },
+        { "value": "cakismalar_krize_donustugunde_mudahale_edilir", "label": "Önceden dengeleme yapılmaz; çakışma ve gecikme yaşandıkça acil müdahale edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-020",
+      "order": 20,
+      "process": "İnsan Kaynağı Atama ve Görev Dağılımı",
+      "question": "Proje aktivitelerine personel atamaları yetkinlik, rol ve tahmini efor (adam-saat / adam-gün) bazında mı yapılmaktadır?",
+      "description": "Görevlerin belirli rollere ve uzmanlıklara göre efor tahminleriyle atanma standardı incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "rol_yetkinlik_ve_efor_bazli_atama_var", "label": "Atamalar rol/yetkinlik matrisine ve planlanan adam-saat/gün eforuna göre sistemde yapılır", "allow_note": false, "is_other": false },
+        { "value": "kisi_bazli_genel_gorevlendirme_yapilir", "label": "Efor hesabı yapılmadan doğrudan ilgili kişiye genel görev sorumluluğu verilir", "allow_note": true, "is_other": false },
+        { "value": "yazili_gorev_atamasi_bulunmamaktadir", "label": "Aktivite bazında yazılı görev ataması yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-021",
+      "order": 21,
+      "process": "İnsan Kaynağı Atama ve Görev Dağılımı",
+      "question": "Proje ekibi üyelerine atanan görevlerin bildirilmesi ve kabulü hangi kanal üzerinden yürütülür?",
+      "description": "Görevlerin sistemik bildirim, mobil uygulama veya toplantı tutanağı ile iletilme yöntemi araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistem_uzerinden_otomatik_bildirim_ve_kabul", "label": "Proje yönetim yazılımı üzerinden otomatik görev bildirimi ve kullanıcı kabulü ile", "allow_note": false, "is_other": false },
+        { "value": "e_posta_ve_ortak_takvim_ile", "label": "E-posta veya paylaşımlı takvim davetleri üzerinden", "allow_note": true, "is_other": false },
+        { "value": "sozlu_veya_anlik_mesajlasma_ile", "label": "Sözlü veya anlık mesajlaşma (WhatsApp, Teams vb.) kanallarıyla", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-022",
+      "order": 22,
+      "process": "Makine, Ekipman ve Teknik Kaynak Planlaması",
+      "question": "Projede kullanılacak test cihazları, yazılım lisansları, laboratuvar veya montaj ekipmanları takvime bağlı rezerve ediliyor mu?",
+      "description": "Fiziksel ve teknik ekipmanların proje çakışmalarını önlemek için takvimsel rezervasyon yapılma durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "ekipman_ve_lisanslar_takvimle_rezerve_edilir", "label": "Tüm kritik ekipman ve lisanslar proje takvimine bağlanarak önceden rezerve edilir", "allow_note": false, "is_other": false },
+        { "value": "manuel_talep_ile_musaitlik_sorulur", "label": "Sistemik rezervasyon yoktur; ihtiyaç olduğunda ilgili birimden müsaitlik rica edilir", "allow_note": true, "is_other": false },
+        { "value": "teknik_kaynak_rezervasyonu_yapilmaz", "label": "Teknik ekipman veya lisans rezervasyonu yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-023",
+      "order": 23,
+      "process": "Proje Bütçesi ve Maliyet Planı",
+      "question": "Projeler için onaylı ayrıntılı maliyet bütçesi (İşçilik, Malzeme, Alt Yüklenici, Seyahat vb.) hazırlanıyor mu?",
+      "description": "Projenin maliyet kalemlerinin kırılımlı olarak bütçelenmesi ve üst yönetim onayına sunulması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "proje_bazli_ayrintili_butce_var", "label": "Tüm maliyet kalemlerini (işçilik, malzeme, dış hizmet vb.) içeren onaylı detaylı bütçe hazırlanır", "allow_note": false, "is_other": false },
+        { "value": "sadece_toplam_tahmini_butce_belirlenir", "label": "Detaylı kırılım yapılmadan sadece tek satırlık toplam tahmini bütçe belirlenir", "allow_note": true, "is_other": false },
+        { "value": "proje_butcesi_hazirlanmamaktadir", "label": "Proje bazlı bir bütçe oluşturulmamakta; genel giderler içinde harcanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-024",
+      "order": 24,
+      "process": "Proje Bütçesi ve Maliyet Planı",
+      "question": "Proje bütçe revizyonları, maliyet yedekleri (Contingency Reserve) ve bütçe aşım limitleri nasıl yönetilir?",
+      "description": "Öngörülemeyen maliyetler için ayrılan yedek bütçelerin kullanımı ve bütçe revizyon kuralları değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRJ-023",
+        "operator": "equals",
+        "value": "proje_bazli_ayrintili_butce_var"
+      },
+      "options": [
+        { "value": "resmi_risk_yedegi_ve_yetki_limiti_var", "label": "Bütçede risk payı tanımlıdır; bütçe aşımı durumunda yönetim kurulu onayı zorunludur", "allow_note": false, "is_other": false },
+        { "value": "proje_yoneticisi_inisiyatifi_ile_esnetilir", "label": "Belirli bir orana kadar proje yöneticisi inisiyatifiyle esnetilebilir", "allow_note": true, "is_other": false },
+        { "value": "butce_limiti_veya_yedek_kurali_yoktur", "label": "Tanımlı bir bütçe aşım kuralı veya risk yedeği mekanizması yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-025",
+      "order": 25,
+      "process": "Gerçekleşen Maliyet ve Bütçe Sapması",
+      "question": "Projeye yapılan fiili harcamalar (malzeme alımı, taşeron faturası, seyahat gideri) proje koduyla anlık eşleşiyor mu?",
+      "description": "Muhasebe ve satın alma faturalarının ilgili proje koduna doğrudan tahakkuk ettirilmesi değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "erp_uzerinden_anlik_proje_kodlu_tahakkuk", "label": "Tüm faturalar ve giderler ERP'de ilgili proje ve WBS koduna otomatik tahakkuk eder", "allow_note": false, "is_other": false },
+        { "value": "donem_sonlarinda_manuel_projelere_dagitilir", "label": "Faturalar genel kaydedilir; ay sonlarında Excel ile projelere manuel dağıtılır", "allow_note": true, "is_other": false },
+        { "value": "harcamalar_proje_bazinda_ayristirilmaz", "label": "Harcamalar şirket genelinde tutulur; proje bazlı fiili maliyet görünürlüğü yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-026",
+      "order": 26,
+      "process": "Gerçekleşen Maliyet ve Bütçe Sapması",
+      "question": "Proje maliyet performansı Kazanılmış Değer Analizi (EVM - Earned Value Management: PV, EV, AC, CPI) ile ölçülüyor mu?",
+      "description": "Bütçelenen maliyet ile gerçekleşen işin maliyet ve takvim performans endekslerinin hesaplanma durumu sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "evm_gostergeleri_duzenli_raporlanir", "label": "Kazanılmış Değer Analizi (EVM, CPI, SPI) sistemik olarak düzenli raporlanır", "allow_note": false, "is_other": false },
+        { "value": "sadece_butce_fiili_harcama_farki_bakilir", "label": "EVM uygulanmaz; sadece 'Planlanan Bütçe - Gerçekleşen Harcama' farkına bakılır", "allow_note": true, "is_other": false },
+        { "value": "maliyet_performans_analizi_yapilmaz", "label": "Maliyet sapması veya performans analizi yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-027",
+      "order": 27,
+      "process": "Zaman ve Efor Takibi",
+      "question": "Proje ekibi üyeleri yürüttükleri işler için düzenli zaman/efor kaydı (Timesheet) girişi yapıyor mu?",
+      "description": "Personelin hangi projeye ve aktiviteye kaç saat harcadığının şeffaf olarak kaydedilmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "detayli_gunluk_saatlik_timesheet_tutulur", "label": "Personel günlük/haftalık bazda proje ve aktivite kırılımında timesheet girmektedir", "allow_note": false, "is_other": false },
+        { "value": "sadece_toplam_gun_veya_yuzde_girilir", "label": "Aktivite detayı olmadan sadece aylık tahmini gün veya yüzde dağılımı girilmektedir", "allow_note": true, "is_other": false },
+        { "value": "zaman_ve_efor_takibi_yapilmamaktadir", "label": "Personel zaman/efor takibi yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-028",
+      "order": 28,
+      "process": "Zaman ve Efor Takibi",
+      "question": "Girilen timesheet eforları proje yöneticisi onayından geçerek adam-saat maliyetine ve sapma raporlarına dönüşüyor mu?",
+      "description": "Efor onay döngüsü ve personelin saatlik ücretiyle proje işçilik maliyetinin hesaplanması araştırılır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "PRJ-027",
+        "operator": "equals",
+        "value": "detayli_gunluk_saatlik_timesheet_tutulur"
+      },
+      "options": [
+        { "value": "onay_akisi_ile_otomatik_maliyete_donusur", "label": "Proje yöneticisi timesheet'leri onaylar ve sistemik olarak doğrudan proje maliyetine yansır", "allow_note": false, "is_other": false },
+        { "value": "onaylanir_ancak_maliyete_baglanmaz", "label": "Yönetici kontrol eder ancak sadece efor takibi için kullanılır; muhasebe maliyetine girmez", "allow_note": true, "is_other": false },
+        { "value": "onay_ve_maliyetlestirme_yoktur", "label": "Resmi bir onay veya maliyetleştirme adımı işletilmez", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-029",
+      "order": 29,
+      "process": "Müşteri, Tedarikçi ve Alt Yüklenici Koordinasyonu",
+      "question": "Projedeki dış paydaşların (müşteri, ana tedarikçiler, iş ortakları) iletişim ve koordinasyon planı nasıl yürütülür?",
+      "description": "Dış paydaşlarla toplantı sıklığı, iletişim kanalları ve bilgilendirme matrisinin tanımlı olma durumu değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "yazili_iletisim_ve_paydas_yonetim_plani_var", "label": "Yazılı paydaş yönetim planı, periyodik koordinasyon toplantıları ve resmi raporlama mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "ihtiyac_oldukca_toplanti_ve_e_posta_ile", "label": "Yazılı plan yoktur; ihtiyaç oldukça telefon, toplantı ve e-posta ile koordine olunur", "allow_note": true, "is_other": false },
+        { "value": "koordinasyon_yapisi_bulunmamaktadir", "label": "Tanımlı bir koordinasyon mekanizması yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-030",
+      "order": 30,
+      "process": "Müşteri, Tedarikçi ve Alt Yüklenici Koordinasyonu",
+      "question": "Projelerde dış uzmanlık, alt yüklenici (taşeron) veya danışmanlık hizmeti kullanılıyor mu?",
+      "description": "Dış kaynak kullanım sıklığı ve projeye entegrasyon ihtiyacı sorgulanır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "duzenli_alt_yuklenici_ve_dis_kaynak_kullanilir", "label": "Projelerde düzenli olarak alt yüklenici, taşeron veya dış uzman kaynağı kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "nadir_durumlarda_dis_hizmet_alinir", "label": "İşlerin çoğu iç kaynakla yapılır; çok nadir özel uzmanlık için dış hizmet alınır", "allow_note": true, "is_other": false },
+        { "value": "tamamen_sirket_ici_ozkaynakla_yurutulur", "label": "Projelerde dış kaynak veya alt yüklenici kesinlikle kullanılmaz", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-031",
+      "order": 31,
+      "process": "Müşteri, Tedarikçi ve Alt Yüklenici Koordinasyonu",
+      "question": "Alt yüklenicilerin iş teslimatı, SLA performansı ve hakediş onayları projede nasıl denetlenmektedir?",
+      "description": "Taşeron hakedişlerinin proje kilometre taşları ve kalite onaylarıyla ilişkilendirilmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRJ-030",
+        "operator": "equals",
+        "value": "duzenli_alt_yuklenici_ve_dis_kaynak_kullanilir"
+      },
+      "options": [
+        { "value": "kilometre_tasi_ve_teknik_onayli_hakedis", "label": "Hakedişler sadece teknik kontrol ve kilometre taşı teslim onayından sonra imzalanır", "allow_note": false, "is_other": false },
+        { "value": "fatura_ve_zaman_esasli_kontrol_edilir", "label": "Teknik teslimat detayı derin incelenmeden genel fatura ve süre üzerinden onaylanır", "allow_note": true, "is_other": false },
+        { "value": "formal_denetim_yapilmamaktadir", "label": "Alt yüklenici performansı için formal bir denetim veya hakediş prosedürü yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-032",
+      "order": 32,
+      "process": "Satın Alma ve Proje Giderleri",
+      "question": "Proje için gereken özel satın alma talepleri (malzeme, hizmet, ekipman) proje bütçesi kontrolüyle mi onaylanır?",
+      "description": "Satın alma talebi açılırken sistemin proje bütçesinde yeterli bakiye olup olmadığını denetleme yeteneği incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomatik_proje_butce_kontrolu_ile_onaylanir", "label": "Talep açıldığında sistem otomatik olarak proje bütçesini kontrol eder ve bloke koyar", "allow_note": false, "is_other": false },
+        { "value": "proje_yoneticisi_manuel_onaylar", "label": "Sistemik bütçe blokajı yoktur; proje yöneticisi e-posta veya sistemden manuel onaylar", "allow_note": true, "is_other": false },
+        { "value": "genel_satinalma_sureciyle_onaysiz_yurutulur", "label": "Proje bütçesine bakılmadan standart genel satın alma süreciyle alınır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-033",
+      "order": 33,
+      "process": "Satın Alma ve Proje Giderleri",
+      "question": "Projeye özel alınan malzemelerin depoda proje bazlı ayrıştırılması (Project Stock Allocation) sağlanıyor mu?",
+      "description": "Proje için alınan malzemelerin başka siparişlere sehven kullanılmasını önleme mekanizması sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "fiziksel_ve_sistemsel_proje_stok_rezervasyonu", "label": "Malzemeler hem ERP'de proje koduyla rezerve edilir hem depoda özel alanda tutulur", "allow_note": false, "is_other": false },
+        { "value": "sadece_etiketleme_ile_fiziksel_ayrilir", "label": "Sistemde genel stok görünür ancak depo personeli üzerine proje adı yazarak ayırır", "allow_note": true, "is_other": false },
+        { "value": "proje_stok_ayrimi_yapilmaz", "label": "Genel stoka girer ve ilk talep eden işe harcanır; ayrıştırma yapılmaz", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-034",
+      "order": 34,
+      "process": "Proje Risk Yönetimi",
+      "question": "Projelerde riskler başlangıçta ve yürütme aşamasında Risk Kütüğü (Risk Register) üzerinden sistematik takip ediliyor mu?",
+      "description": "Risklerin olasılık, etki, önleyici aksiyon ve risk sahibi ile kayıt altına alınma olgunluğu değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "aktif_risk_kutugu_ve_aksiyon_plani_var", "label": "Risk Kütüğü düzenli güncellenir; risk skoru, sahibi ve azaltma aksiyonları takip edilir", "allow_note": false, "is_other": false },
+        { "value": "proje_basinda_riskler_konusulur_izlenmez", "label": "Başlangıçta bazı riskler listelenir ancak proje boyunca düzenli güncellenmez", "allow_note": true, "is_other": false },
+        { "value": "risk_yonetimi_yapilmamaktadir", "label": "Riskler önceden dokümante edilmez; sorun oluştukça kriz yönetimi yapılır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-035",
+      "order": 35,
+      "process": "Proje Risk Yönetimi",
+      "question": "Yüksek öncelikli proje riskleri için acil durum ve alternatif planlar (Contingency / Fallback Plan) hazırlanıyor mu?",
+      "description": "Kritik tedarikçi gecikmesi, anahtar personel kaybı veya teknik başarısızlık senaryolarına hazırlık derecesi incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "kritik_riskler_icin_b_plani_hazir", "label": "Tüm kritik riskler için önceden B planı ve alternatif tedarik/çözüm senaryoları hazırdır", "allow_note": false, "is_other": false },
+        { "value": "bazi_teknik_konularda_alternatif_dusunulur", "label": "Sadece kritik birkaç teknik konuda alternatif düşünülür ancak yazılı plan yoktur", "allow_note": true, "is_other": false },
+        { "value": "acil_durum_veya_b_plani_hazirlanmaz", "label": "Önceden B planı veya alternatif senaryo çalışması yapılmaz", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-036",
+      "order": 36,
+      "process": "Sorun, Aksiyon ve Karar Yönetimi",
+      "question": "Projede ortaya çıkan sorunlar (Issues), alınan kararlar ve aksiyonlar merkezi bir listede (Action / Decision Log) izleniyor mu?",
+      "description": "Toplantılarda alınan kararların ve operasyonel tıkanıklıkların sorumlusu ve hedef tarihiyle izlenmesi sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "merkezi_aksiyon_ve_karar_kutugu_tutulur", "label": "Merkezi aksiyon ve karar kütüğü tutulur; hedef tarih ve sorumlu takibi eksiksiz yapılır", "allow_note": false, "is_other": false },
+        { "value": "toplanti_notlarinda_daginik_tutulur", "label": "Toplantı notlarında yazılır ancak merkezi konsolide bir aksiyon listesi işletilmez", "allow_note": true, "is_other": false },
+        { "value": "aksiyon_ve_karar_takibi_yapilmaz", "label": "Yazılı karar veya aksiyon takip sistemi bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-037",
+      "order": 37,
+      "process": "Değişiklik Talepleri ve Kapsam Değişikliği",
+      "question": "Kapsam, süre veya bütçe değişikliği gerektiren talepler için resmi Değişiklik Talebi (Change Request - CR) süreci var mıdır?",
+      "description": "Kapsam genişlemesini kontrol altında tutmak için etki analizi ve yazılı onay zorunluluğu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "resmi_cr_sureci_ve_etki_analizi_var", "label": "Resmi Değişiklik Talep formu, bütçe/zaman etki analizi ve müşteri/yönetim onayı işletilir", "allow_note": false, "is_other": false },
+        { "value": "sozlu_veya_e_posta_ile_talep_edilir", "label": "Resmi CR formu yoktur; e-posta veya sözlü taleple etki analizi yapılmadan eklenir", "allow_note": true, "is_other": false },
+        { "value": "degisiklik_yonetim_sureci_yoktur", "label": "Değişiklik yönetimi süreci yoktur; talep geldikçe proje içine doğrudan dahil edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-038",
+      "order": 38,
+      "process": "Değişiklik Talepleri ve Kapsam Değişikliği",
+      "question": "Değişiklik taleplerini değerlendiren bir Değişiklik Kontrol Kurulu (CCB) ve sözleşme/ek bütçe revizyon protokolü işletiliyor mu?",
+      "description": "Değişikliklerin onay yetkisi, ek faturalandırma ve teslim tarihi revizyonunun kuralları sorgulanır.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRJ-037",
+        "operator": "equals",
+        "value": "resmi_cr_sureci_ve_etki_analizi_var"
+      },
+      "options": [
+        { "value": "ccb_kurulu_ve_ek_sozlesme_protokolu_var", "label": "Değişiklik Kontrol Kurulu değerlendirir, ek bütçe ve süre için zeyilname/ek protokol yapılır", "allow_note": false, "is_other": false },
+        { "value": "sadece_proje_yoneticisi_ve_sponsor_onaylar", "label": "Kurul yoktur; proje yöneticisi ve sponsor kendi arasında değerlendirerek onaylar", "allow_note": true, "is_other": false },
+        { "value": "ek_butce_veya_sure_talep_edilmez", "label": "Değişiklik onaylansa bile ek bütçe veya süre revizyonu genellikle uygulanamaz", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-039",
+      "order": 39,
+      "process": "Onay ve Yetki Matrisi",
+      "question": "Proje harcamaları, faz geçişleri, hakedişler ve sözleşme taahhütleri için tanımlı Yetki Matrisi (DOA) uygulanıyor mu?",
+      "description": "Kimin hangi tutara kadar harcama veya taahhüt yetkisi olduğunun sistemde parametrik kilitlenmesi incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "sistemik_kademeli_yetki_matrisi_var", "label": "Tutar ve konu bazında kademeli yetki matrisi (DOA) sistemde tanımlı ve zorunludur", "allow_note": false, "is_other": false },
+        { "value": "genel_yonetim_imza_sirkuleri_ile_yurutulur", "label": "Proje özelinde matris yoktur; şirketin genel imza sirküleri kuralları geçerlidir", "allow_note": true, "is_other": false },
+        { "value": "yetki_matrisi_bulunmamaktadir", "label": "Yazılı bir yetki matrisi veya onay limiti kuralı bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-040",
+      "order": 40,
+      "process": "Onay ve Yetki Matrisi",
+      "question": "Proje yöneticisinin tek başına onaylayabileceği harcama ve satın alma bütçe yetki limiti ne kadardır?",
+      "description": "Proje yöneticilerinin operasyonel esnekliği ile finansal kontrol arasındaki denge değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tanimli_belirli_bir_butce_limiti_vardir", "label": "Yazılı olarak belirlenmiş limit dahilinde tek başına harcama onay yetkisi vardır", "allow_note": false, "is_other": false },
+        { "value": "tum_harcamalarda_ust_yonetim_onayi_sarttir", "label": "Proje yöneticisinin harcama yetkisi yoktur; her harcamada üst yönetim onayı aranır", "allow_note": true, "is_other": false },
+        { "value": "tutar_siniri_olmadan_tam_yetkilidir", "label": "Proje bütçesi dahilinde tutar sınırı olmaksızın tam yetkilidir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-041",
+      "order": 41,
+      "process": "Proje Dokümanları, Versiyonlar ve Kanıt Dosyaları",
+      "question": "Proje şartnameleri, teknik çizimler, sözleşmeler ve teslimat kanıtları versiyon kontrollü merkezi bir alanda mı saklanıyor?",
+      "description": "Dokümanların kişisel bilgisayarlar yerine versiyon kontrollü, yetkilendirilmiş ortak alanda arşivlenme durumu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "merkezi_dms_ve_versiyon_kontrolu_var", "label": "Merkezi Doküman Yönetim Sistemi (DMS) veya bulut arşivde versiyon kontrollü saklanır", "allow_note": false, "is_other": false },
+        { "value": "ortak_ag_klasorunde_manuel_tutulur", "label": "Ortak ağ klasöründe (file server) manuel versiyon adlandırmasıyla tutulur", "allow_note": true, "is_other": false },
+        { "value": "kisisel_bilgisayarlarda_daginik", "label": "Merkezi alan yoktur; çalışanların kendi bilgisayarlarında ve e-postalarda dağınıktır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-042",
+      "order": 42,
+      "process": "Proje Dokümanları, Versiyonlar ve Kanıt Dosyaları",
+      "question": "Müşteri ve paydaş onaylı teknik dokümanlar, çizimler veya test raporları için dijital imza/onay izi tutuluyor mu?",
+      "description": "Onaylanan teknik versiyonların geriye dönük denetlenebilirliği ve uyuşmazlıklardaki yasal kanıt niteliği incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "dijital_imza_ve_denetim_izi_mevcut", "label": "Tüm onaylı teknik dokümanlarda zaman damgalı dijital imza ve denetim izi (audit trail) vardır", "allow_note": false, "is_other": false },
+        { "value": "taratilmis_islak_imzali_pdf_saklanir", "label": "Islak imzalı fiziki dokümanlar taranarak PDF olarak klasörlenir", "allow_note": true, "is_other": false },
+        { "value": "onay_izi_veya_imza_saklanmaz", "label": "Resmi onay izi veya imzalı doküman arşivi tutulmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-043",
+      "order": 43,
+      "process": "Durum Raporları, Toplantılar ve İletişim",
+      "question": "Yönetime ve müşteriye periyodik Proje İlerleme Durum Raporları (Haftalık/Aylık Dashboard) sunuluyor mu?",
+      "description": "Proje sağlığı (Kırmızı/Sarı/Yeşil trafik ışığı), takvim ve bütçe ilerlemesinin düzenli raporlanma standardı araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "otomasyona_bagli_duzenli_dashboard_ve_rapor", "label": "Sistemik verilerle otomatik üretilen periyodik durum dashboard'u ve raporu sunulur", "allow_note": false, "is_other": false },
+        { "value": "manuel_hazirlanan_sunum_ve_raporlar", "label": "Proje yöneticisi tarafından manuel derlenen PowerPoint/Excel raporları sunulur", "allow_note": true, "is_other": false },
+        { "value": "duzenli_durum_raporu_sunulmaz", "label": "Düzenli bir durum raporu sunulmaz; sadece kriz veya talep anında bilgi verilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-044",
+      "order": 44,
+      "process": "Test, Kabul ve Canlıya Geçiş Hazırlığı",
+      "question": "ERP, CRM veya dönüşüm projelerinde Kullanıcı Kabul Testleri (UAT), Pilot ve Canlıya Geçiş (Cut-over) planı uygulanıyor mu?",
+      "description": "Canlı ortama geçiş öncesinde test senaryoları, kullanıcı onayları ve cut-over planlama olgunluğu incelenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kapsamli_cut_over_ve_canliya_gecis_yapilir", "label": "Yazılı UAT test senaryoları, kullanıcı sign-off'ları ve saatlik cut-over planı işletilir", "allow_note": false, "is_other": false },
+        { "value": "temel_testler_yapilir_cut_over_esnektir", "label": "Kullanıcılar temel kontrolleri yapar ancak detaylı saatlik cut-over planı tutulmaz", "allow_note": true, "is_other": false },
+        { "value": "formal_uat_ve_cut_over_plani_yoktur", "label": "Formal bir test ve canlıya geçiş planı olmadan doğrudan kullanıma başlanır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-045",
+      "order": 45,
+      "process": "Test, Kabul ve Canlıya Geçiş Hazırlığı",
+      "question": "Canlıya geçiş öncesinde kullanıcı eğitimleri, sistem provası (Dry-run) ve destek devir protokolü nasıl tamamlanır?",
+      "description": "Canlıya geçiş riskini minimize etmek için prova ve kullanıcı yetkinlik doğrulama süreci incelenir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "PRJ-044",
+        "operator": "equals",
+        "value": "kapsamli_cut_over_ve_canliya_gecis_yapilir"
+      },
+      "options": [
+        { "value": "dry_run_provasi_egitim_ve_destek_protokolu_tam", "label": "Canlı geçiş provası (dry-run), ölçülen kullanıcı eğitimleri ve destek devri eksiksiz yapılır", "allow_note": false, "is_other": false },
+        { "value": "sadece_kullanici_egitimi_verilir_prova_yapilmaz", "label": "Kullanıcılara eğitim verilir ancak canlıya geçiş provası (dry-run) uygulanmaz", "allow_note": true, "is_other": false },
+        { "value": "canliya_gecis_provasi_yapilmamaktadir", "label": "Eğitim ve geçiş provası formal olarak uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-046",
+      "order": 46,
+      "process": "Proje Kapanışı, Devir ve Lessons Learned",
+      "question": "Proje tamamlandığında resmi Kapanış Raporu ve Çıkarılan Dersler (Lessons Learned) toplantısı yapılıyor mu?",
+      "description": "Gelecek projelerde aynı hataların tekrarlanmaması için kurumsal hafıza oluşturma ve kapanış onayı araştırılır.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "resmi_kapanis_raporu_ve_lessons_learned_var", "label": "Resmi kapanış raporu hazırlanır, Lessons Learned toplantısıyla kurumsal hafızaya işlenir", "allow_note": false, "is_other": false },
+        { "value": "sadece_finansal_ve_idari_kapanis_yapilir", "label": "Faturalar kapatılır ancak çıkarılan dersler ve kapanış analizi dokümante edilmez", "allow_note": true, "is_other": false },
+        { "value": "resmi_kapanis_yapilmaz_kendiliginden_biter", "label": "Resmi bir kapanış prosedürü yoktur; işler bittikçe proje sona ermiş kabul edilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "PRJ-047",
+      "order": 47,
+      "process": "Proje Kapanışı, Devir ve Lessons Learned",
+      "question": "Proje çıktılarının operasyonel ekiplere (canlı bakım, müşteri hizmetleri, servis) devri ve garanti/bakım süreci nasıl yönetilir?",
+      "description": "Proje ekibinin devreden çıkıp operasyonel birimlerin sistemi sahiplenme prosedürü değerlendirilir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "resmi_operasyonel_devir_ve_sla_tanimli", "label": "Resmi devir-teslim tutanağı, operasyon el kitabı ve SLA garanti şartları ile devredilir", "allow_note": false, "is_other": false },
+        { "value": "proje_ekibi_gayriresmi_destek_vermeye_devam_eder", "label": "Resmi devir yapılmaz; sorun çıktıkça eski proje ekibi gayriresmi destek verir", "allow_note": true, "is_other": false },
+        { "value": "tanimli_bir_devir_proseduru_yoktur", "label": "Tanımlı bir operasyonel devir veya garanti takip süreci yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

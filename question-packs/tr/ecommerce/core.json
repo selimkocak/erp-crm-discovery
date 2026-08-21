@@ -1,0 +1,805 @@
+{
+  "meta": {
+    "pack_id": "tr.ecommerce.core",
+    "business_function_code": "ECOMMERCE",
+    "name": "E-Ticaret ve Dijital Satış Yönetimi Soru Paketi",
+    "description": "Şirketin e-ticaret ve dijital satış kanallarını; kanal stratejisi, web mağazası, pazaryeri entegrasyonu, mobil ticaret, ürün kataloğu, varyant yönetimi, dijital fiyatlama, sepet/sipariş akışı, sanal POS ve alternatif ödemeler, fraud kontrolü, e-fatura/e-arşiv, depo/toplama, kargo/gönderi takibi, iptal/iade/geri ödeme, müşteri hizmetleri, dijital pazarlama, kupon/sadakat, ERP/CRM entegrasyonu, e-ticaret KPI'ları ve veri güvenliğini saha mülakatlarıyla keşfetmek için hazırlanmış kanonik soru paketi.",
+    "version": "0.1.0",
+    "language": "tr",
+    "schema_version": "1"
+  },
+  "questions": [
+    {
+      "id": "ECOM-001",
+      "order": 1,
+      "process": "E-ticaret organizasyonu ve süreç sahipliği",
+      "question": "Şirketin e-ticaret ve dijital satış operasyonlarını yöneten organizasyon yapısı ve kanal sahipliği nedir?",
+      "description": "Dijital satış kanallarının yönetim sorumluluğu, ayrı bir e-ticaret birimi veya satış/pazarlama bünyesindeki yapılanma düzeyi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_bagimsiz_e_ticaret_direktorlugu_var", "label": "Bağımsız e-ticaret direktörlüğü / yöneticiliği ve operasyon ekibi bulunmaktadır", "is_other": false, "allow_note": true },
+        { "value": "pazarlama_veya_satis_departmani_altinda_uzman_yurutur", "label": "Pazarlama veya Satış departmanı altında e-ticaret uzmanı / sorumlusu yürütmektedir", "is_other": false, "allow_note": true },
+        { "value": "sirket_yonetimi_veya_genel_ekip_ek_gorev_olarak_yurutur", "label": "Şirket yöneticisi veya mevcut idari personel ek görev olarak yürütmektedir", "is_other": false, "allow_note": true },
+        { "value": "diger_organizasyon_modeli", "label": "Diğer organizasyon ve süreç sahipliği modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-002",
+      "order": 2,
+      "process": "E-ticaret organizasyonu ve süreç sahipliği",
+      "question": "E-ticaret operasyonunun günlük iş akışı (sipariş hazırlama, müşteri soruları, içerik girişi) şirket içinde mi yoksa dış kaynak (ajans/operasyon partneri) ile mi yürütülmektedir?",
+      "description": "E-ticaret içerik, operasyon ve müşteri etkileşimlerinin kurum içi (in-house) veya ajans destekli işletilme modeli.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tamamen_kurum_ici_inhouse_ekip_ile", "label": "Tüm operasyon, müşteri hizmetleri ve içerik yönetimi şirket içi kadro ile yürütülür", "is_other": false, "allow_note": true },
+        { "value": "hibrit_model_operasyon_iceride_reklam_ve_tasarim_ajansta", "label": "Hibrit model: Sipariş/operasyon içeride, dijital pazarlama/tasarım dış ajans ile yürütülür", "is_other": false, "allow_note": true },
+        { "value": "tamamen_dis_kaynak_e_ticaret_yonetim_ajansi_ile", "label": "E-ticaret operasyonu ve pazaryeri yönetimi anahtar teslim dış ajans/partner ile yürütülür", "is_other": false, "allow_note": true },
+        { "value": "diger_operasyon_yurutme_sekli", "label": "Diğer operasyon yürütme modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-003",
+      "order": 3,
+      "process": "Dijital satış kanalları ve kanal stratejisi",
+      "question": "Şirketin aktif olarak satış yaptığı dijital kanal karması ve kurumsal web mağazası varlığı nedir?",
+      "description": "Kendi B2C/B2B web sitesi, pazaryerleri veya sadece kurumsal tanıtım kanallarının kullanım durumu. (Trigger 1)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kendi_web_magazamiz_ve_pazaryerleri_birlikte", "label": "Hem kendi kurumsal web mağazamız (B2C/B2B) hem de pazaryerleri aktif olarak kullanılmaktadır", "is_other": false, "allow_note": true },
+        { "value": "sadece_kendi_kurumsal_web_magazamiz", "label": "Sadece kendi kurumsal e-ticaret web sitemiz üzerinden satış yapılmaktadır", "is_other": false, "allow_note": true },
+        { "value": "sadece_pazaryerleri_uzerinden_satis", "label": "Kendi e-ticaret sitemiz yoktur, sadece online pazaryerleri üzerinden satış yapılmaktadır", "is_other": false, "allow_note": true },
+        { "value": "diger_dijital_kanal_karmasi", "label": "Diğer dijital satış kanalı karması", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-004",
+      "order": 4,
+      "process": "Kurumsal web mağazası altyapısı",
+      "question": "Kurumsal e-ticaret web mağazasının yazılım altyapısı ve platform barındırma mimarisi nedir?",
+      "description": "E-ticaret platformunun paket yazılım (SaaS), açık kaynak (Open Source) veya özel geliştirme (Custom) altyapısı. (Target 1)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ECOM-003",
+        "operator": "equals",
+        "value": "kendi_web_magazamiz_ve_pazaryerleri_birlikte"
+      },
+      "options": [
+        { "value": "bulut_tabanli_e_ticaret_saas_platformu", "label": "Bulut tabanlı e-ticaret SaaS altyapısı kullanılmaktadır (Ticimax, İkas, IdeaSoft, Shopify, T-Soft vb.)", "is_other": false, "allow_note": true },
+        { "value": "acik_kaynak_e_ticaret_altyapisi", "label": "Açık kaynak e-ticaret altyapısı sunucularımızda barındırılmaktadır (WooCommerce, Magento, PrestaShop vb.)", "is_other": false, "allow_note": true },
+        { "value": "sirkete_ozel_gelistirilmis_custom_e_ticaret_yazilimi", "label": "Şirketimize özel sıfırdan yazılmış kurumsal B2C/B2B portal yazılımı", "is_other": false, "allow_note": true },
+        { "value": "diger_web_magaza_altyapisi", "label": "Diğer e-ticaret yazılım altyapısı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-005",
+      "order": 5,
+      "process": "Pazaryeri ve platform kullanımı",
+      "question": "Trendyol, Hepsiburada, Amazon, N11 gibi pazaryerlerinde mağaza ve satış faaliyeti yürütülüyor mu?",
+      "description": "Ulusal ve uluslararası pazaryeri mağazalarının aktiflik durumu ve çoklu platform yönetimi. (Trigger 2)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "aktif_coklu_pazaryeri_magazasi_var", "label": "Evet, 2 veya daha fazla pazaryerinde resmi mağazamız üzerinden aktif satış yapılmaktadır", "is_other": false, "allow_note": true },
+        { "value": "tek_bir_pazaryerinde_pilot_satis_var", "label": "Sadece tek bir pazaryerinde mağaza açık olup pilot satış yapılmaktadır", "is_other": false, "allow_note": true },
+        { "value": "pazaryerleri_kullanilmiyor_sadece_kendi_sitemiz", "label": "Pazaryerlerinde satış yapılmamaktadır, doğrudan kendi kanallarımız tercih edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_pazaryeri_kullanim_durumu", "label": "Diğer pazaryeri platform durumu", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-006",
+      "order": 6,
+      "process": "Pazaryeri ve platform kullanımı",
+      "question": "Pazaryeri sipariş, stok ve fiyat senkronizasyonunda entegratör yazılım veya merkezi Omni-channel panel kullanılıyor mu?",
+      "description": "Çoklu pazaryeri operasyonlarının entegratör araçları ile tek merkezden yönetilme düzeyi. (Target 2)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ECOM-005",
+        "operator": "equals",
+        "value": "aktif_coklu_pazaryeri_magazasi_var"
+      },
+      "options": [
+        { "value": "profesyonel_pazaryeri_entegrator_yazilimi_kullanilir", "label": "Merkezi pazaryeri entegratörü yazılımı kullanılmaktadır (Entegra, StockMount, Dopigo, BizimHesap vb.)", "is_other": false, "allow_note": true },
+        { "value": "erp_dogrudan_api_ile_pazaryerlerine_baglidir", "label": "ERP sistemimiz doğrudan kendi API köprüsü ile pazaryerlerine bağlıdır", "is_other": false, "allow_note": true },
+        { "value": "her_pazaryeri_kendi_satici_panelinden_manuel_yonetilir", "label": "Entegratör yoktur; her pazaryerinin kendi satıcı paneline tek tek girilerek manuel yönetilir", "is_other": false, "allow_note": true },
+        { "value": "diger_pazaryeri_entegrasyon_araci", "label": "Diğer pazaryeri yönetim aracı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-007",
+      "order": 7,
+      "process": "Mobil uygulama ve dijital müşteri kanalları",
+      "question": "Müşterilerinize yönelik iOS / Android mobil alışveriş uygulaması veya mobil ticaret kanalı bulunuyor mu?",
+      "description": "Mobil App Store / Google Play uygulaması veya mobil web alışveriş deneyimi varlığı. (Trigger 3)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "ozel_mobil_uygulama_ios_android_var", "label": "Evet, mağazamıza ait iOS ve Android yerel (native/hybrid) mobil alışveriş uygulamamız aktiftir", "is_other": false, "allow_note": true },
+        { "value": "sadece_mobil_uyumlu_responsive_web_var", "label": "Ayrı mobil uygulama yoktur; sadece mobil uyumlu (responsive) web sitemiz üzerinden alışveriş yapılır", "is_other": false, "allow_note": true },
+        { "value": "mobil_uygulama_yok_ve_planlanmiyor", "label": "Mobil uygulama bulunmamaktadır ve kısa vadeli planda yoktur", "is_other": false, "allow_note": true },
+        { "value": "diger_mobil_ticaret_modeli", "label": "Diğer mobil kanal yapısı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-008",
+      "order": 8,
+      "process": "Mobil uygulama ve dijital müşteri kanalları",
+      "question": "Mobil uygulama üzerinden kişiselleştirilmiş push bildirim, mobil özel kupon ve sipariş takibi nasıl yönetilmektedir?",
+      "description": "Mobil kullanıcı bağlılığı ve anlık bildirim altyapısının e-ticaret paneliyle entegrasyonu. (Target 3)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "ECOM-007",
+        "operator": "equals",
+        "value": "ozel_mobil_uygulama_ios_android_var"
+      },
+      "options": [
+        { "value": "e_ticaret_paneline_entegre_otomatik_push_ve_mobil_kampanya", "label": "E-ticaret paneline entegre otomatik kargo/sipariş push bildirimleri ve mobil kuponlar kullanılır", "is_other": false, "allow_note": true },
+        { "value": "harici_mobil_pazarlama_paneli_ile_manuel_gonderim", "label": "Harici bildirim paneli (Firebase, OneSignal vb.) üzerinden dönemsel manuel bildirim atılır", "is_other": false, "allow_note": true },
+        { "value": "mobil_ozel_bildirim_veya_kampanya_yurutulmuyor", "label": "Mobil uygulama üzerinden özel bildirim veya kupon kurgusu işletilmemektedir", "is_other": false, "allow_note": true },
+        { "value": "diger_mobil_etkilesim_yontemi", "label": "Diğer mobil etkileşim yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-009",
+      "order": 9,
+      "process": "Ürün kataloğu ve kategori yönetimi",
+      "question": "E-ticaret ürün kataloğu, kategori hiyerarşisi ve ürün listeleme onay süreci nasıl yönetilmektedir?",
+      "description": "Ürünlerin e-ticarette yayına alınması, kategori ağacı, filtreler ve yeni ürün açma onay mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kategori_agaci_ve_filtreler_standart_ve_kontrollu_yayina_alinir", "label": "Kategori ağacı, arama filtreleri ve SEO etiketleri e-ticaret yöneticisi onayıyla yayına alınır", "is_other": false, "allow_note": true },
+        { "value": "erp_kategorileri_oldugu_gibi_e_ticarete_aktarilir", "label": "ERP içerisindeki ürün kategorileri doğrudan e-ticaret sitesine aktarılmaktadır", "is_other": false, "allow_note": true },
+        { "value": "kategoriler_ve_urun_listeleri_ihtiyaca_gore_anlik_acilir", "label": "Önceden tanımlı standart kategori hiyerarşisi yoktur; anlık ihtiyaçlara göre açılır", "is_other": false, "allow_note": true },
+        { "value": "diger_katalog_yonetim_sekli", "label": "Diğer ürün katalog yönetim yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-010",
+      "order": 10,
+      "process": "Ürün kataloğu ve kategori yönetimi",
+      "question": "ERP stok kartları ile e-ticaret ürün kataloğu arasındaki eşleştirme (SKU, barkod, marka, kategori) nasıl sağlanmaktadır?",
+      "description": "Merkezi stok kodları ve EAN-13 barkodların e-ticaret/pazaryeri listeleriyle tekil (unique) eşleşme disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tekil_sku_ve_barkod_ile_sistemler_arasi_birebir_eslesir", "label": "Tüm ürünler ERP stok kodu (SKU) ve EAN-13 barkodu ile e-ticarette birebir tekil eşleşir", "is_other": false, "allow_note": true },
+        { "value": "bazi_pazaryerlerinde_farkli_kodlar_kullanilir_manuel_eslestirilir", "label": "Pazaryerlerinde farklı ürün kodları açılabilmekte olup manuel eşleştirme tablosu tutulur", "is_other": false, "allow_note": true },
+        { "value": "erp_ile_e_ticaret_kodlari_bagimsizdir_ortak_barkod_yoktur", "label": "ERP kodları ile e-ticaret kodları birbirinden bağımsızdır, ortak barkod disiplini yoktur", "is_other": false, "allow_note": true },
+        { "value": "diger_sku_eslestirme_yontemi", "label": "Diğer SKU ve barkod eşleştirme modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-011",
+      "order": 11,
+      "process": "Ürün açıklaması, görsel ve teknik içerik yönetimi",
+      "question": "Ürün görselleri, teknik özellik tabloları, kullanım kılavuzları ve zengin içeriklerin (PIM / Dijital Varlık) yönetimi nasıl yapılmaktadır?",
+      "description": "Ürün fotoğraflarının boyut/çözünürlük standartları, infografikler, boyut tabloları ve içerik güncelleme süreci.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "merkezi_dijital_varlik_pim_ve_standart_gorsel_klavuzu_var", "label": "Merkezi ürün içerik havuzu (PIM/DAM), standart stüdyo görselleri ve onaylı açıklamalar kullanılır", "is_other": false, "allow_note": true },
+        { "value": "e_ticaret_yazilimi_paneline_manuel_gorsel_ve_aciklama_yuklenir", "label": "Görseller ve açıklamalar e-ticaret ve pazaryeri panellerine ürün bazında manuel yüklenir", "is_other": false, "allow_note": true },
+        { "value": "tedarikciden_gelen_hazir_gorseller_kontrolsuz_kullanilir", "label": "Tedarikçilerden veya internetten alınan görseller doğrudan düzenlenmeden kullanılır", "is_other": false, "allow_note": true },
+        { "value": "diger_icerik_yonetim_yontemi", "label": "Diğer ürün içerik ve görsel yönetim yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-012",
+      "order": 12,
+      "process": "Varyant, özellik ve ürün seçenekleri",
+      "question": "Satılan ürünlerde beden, renk, hacim, materyal veya teknik konfigürasyon gibi çoklu varyant yapısı bulunuyor mu?",
+      "description": "Ana ürün (Parent) altında matris seçeneklerin bulunması ve e-ticaret sepetinde varyant seçimi. (Trigger 4)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "cok_varyantli_ve_matris_ozellikli_urunler_var", "label": "Evet; beden, renk, numara, materyal gibi 2 veya daha fazla boyutlu matris varyantlar vardır", "is_other": false, "allow_note": true },
+        { "value": "tekil_ve_varyantsiz_standart_urunler", "label": "Hayır; satılan ürünler varyantsız standart tekil ürünlerdir", "is_other": false, "allow_note": true },
+        { "value": "sadece_paket_veya_set_urunler", "label": "Varyant yoktur; sadece tekil ürünler ve hazır kombin/set paketleri satılır", "is_other": false, "allow_note": true },
+        { "value": "diger_varyant_yapisi", "label": "Diğer ürün seçenek yapısı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-013",
+      "order": 13,
+      "process": "Varyant, özellik ve ürün seçenekleri",
+      "question": "Varyant bazında bağımsız stok, ayrı barkod ve varyanta özel fiyatlandırma sistemi nasıl işletilmektedir?",
+      "description": "Her beden/renk varyantının kendi SKU/barkodu ile stoktan düşmesi ve fiyat farklarının yönetimi. (Target 4)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ECOM-012",
+        "operator": "equals",
+        "value": "cok_varyantli_ve_matris_ozellikli_urunler_var"
+      },
+      "options": [
+        { "value": "her_varyant_ayri_sku_barkod_ve_bagimsiz_stok_fiyatla_yonetilir", "label": "Her varyantın ayrı SKU/barkodu vardır; stok ve varsa ek fiyat farkı varyant bazında anlık takip edilir", "is_other": false, "allow_note": true },
+        { "value": "varyantlar_tek_ana_stoktan_duser_barkodlar_karisabilmektedir", "label": "Varyantlar ana ürün stok kartına bağlıdır; sipariş anında stok varyant bazında ayrışmayabilir", "is_other": false, "allow_note": true },
+        { "value": "varyant_fiyat_ve_stoklari_excel_ile_manuel_guncellenir", "label": "Varyant stok ve fiyatları panellere Excel ile dönemsel olarak manuel güncellenir", "is_other": false, "allow_note": true },
+        { "value": "diger_varyant_isletme_yontemi", "label": "Diğer varyant işletim yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-014",
+      "order": 14,
+      "process": "Dijital fiyatlandırma ve kampanya fiyatları",
+      "question": "E-ticaret satış fiyatları, liste fiyatından indirimler ve kanala özel (Pazaryeri vs. Web) fiyat stratejisi nasıl belirlenmektedir?",
+      "description": "Kendi sitemiz ile pazaryerlerindeki komisyon farklarını gözeten fiyatlandırma politikası ve kuralları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kanal_bazli_komisyon_ve_kargo_maliyetli_fiyat_matrisi_var", "label": "Kanal bazlı fiyat politikası vardır; pazaryeri komisyon ve kargo giderleri hesaba katılarak belirlenir", "is_other": false, "allow_note": true },
+        { "value": "tum_dijital_kanallarda_tek_fiyat_uygulanir", "label": "Tüm dijital kanallarda ve kendi sitemizde sabit tek satış fiyatı uygulanmaktadır", "is_other": false, "allow_note": true },
+        { "value": "pazaryeri_buybox_ve_rakip_fiyatina_gore_anlik_degisir", "label": "Pazaryerindeki rekabet ve Buybox durumuna göre fiyatlar anlık manuel değiştirilir", "is_other": false, "allow_note": true },
+        { "value": "diger_dijital_fiyatlandirma_politikasi", "label": "Diğer dijital fiyatlandırma stratejisi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-015",
+      "order": 15,
+      "process": "Dijital fiyatlandırma ve kampanya fiyatları",
+      "question": "Süreli indirimler, flaş kampanyalar, sepette ek indirim ve çapraz ürün fırsatları sistemde nasıl tanımlanıp devreye alınmaktadır?",
+      "description": "Zaman ayarlı otomatik başlayan/biten fiyat kampanyaları ve sepette yüzde/tutar indirim kuralları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "zaman_ayarli_otomatik_kampanya_ve_sepet_kurali_motoru_var", "label": "Başlangıç/bitiş saati tanımlı otomatik kampanyalar ve kural bazlı sepet indirimleri kullanılır", "is_other": false, "allow_note": true },
+        { "value": "kampanya_saatinde_fiyatlar_manuel_olarak_degistirilir", "label": "Kampanya zamanı liste fiyatları yönetici tarafından manuel olarak indirilip geri yükseltilir", "is_other": false, "allow_note": true },
+        { "value": "kampanya_kurgusu_uygulanmamaktadir", "label": "Süreli indirim veya sepet kurguları uygulanmamaktadır", "is_other": false, "allow_note": true },
+        { "value": "diger_kampanya_yontemi", "label": "Diğer kampanya tanımlama yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-016",
+      "order": 16,
+      "process": "E-ticaret stok ve bulunabilirlik yönetimi",
+      "question": "E-ticaret için ayrılmış emniyet stoğu (stok tamponu), tükenen ürünün otomatik satışa kapanması ve rezervasyon süreci nasıl çalışmaktadır?",
+      "description": "Stoğu biten ürünün satılmasını (Over-selling) önleyen güvenlik stoku ve sepet/sipariş anında stok bloke etme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "anlik_stok_senkronizasyonu_tampon_stok_ve_otomatik_kapanma_var", "label": "Anlık stok düşümü, belirlenen kritik stok sınırında (örn: 3 adet) otomatik satışa kapatma aktiftir", "is_other": false, "allow_note": true },
+        { "value": "periyodik_guncelleme_yapilir_nadir_over_selling_yasanir", "label": "Stoklar 15-30 dakikada bir güncellenir; yoğun zamanlarda nadiren stoksuz satış olabilmektedir", "is_other": false, "allow_note": true },
+        { "value": "stok_manuel_girilir_olmayan_urun_satilinca_tedarik_edilir", "label": "Stok panellere manuel girilir; stok kalmadığında sipariş iptal edilir veya sonradan temin edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_stok_bulunabilirlik_yontemi", "label": "Diğer stok rezervasyon ve emniyet yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-017",
+      "order": 17,
+      "process": "E-ticaret stok ve bulunabilirlik yönetimi",
+      "question": "Çoklu depo veya fiziksel mağaza stoklarının e-ticarette ortak havuz olarak gösterilmesi ve mağazadan sevkiyat (Omni-channel) uygulanıyor mu?",
+      "description": "Merkez depo dışındaki mağaza stoklarının e-ticarette birleştirilmesi ve Ship-from-Store operasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "omnichannel_magazadan_ve_merkez_depodan_akilli_dagitim_var", "label": "Evet; tüm mağaza ve depolar tek stok havuzundadır, sipariş en yakın lokasyondan sevk edilir", "is_other": false, "allow_note": true },
+        { "value": "sadece_tek_bir_merkezi_e_ticaret_deposundan_stok_verilir", "label": "E-ticaret sadece merkezi e-ticaret deposu stoklarından karşılanır, mağaza stokları kapalıdır", "is_other": false, "allow_note": true },
+        { "value": "magaza_stoklari_fiziksel_olarak_ayridir_sisteme_baglanmaz", "label": "Fiziksel mağaza stokları bağımsızdır, e-ticaret sistemine entegre değildir", "is_other": false, "allow_note": true },
+        { "value": "diger_coklu_depo_modeli", "label": "Diğer çoklu depo ve Omni-channel yapısı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-018",
+      "order": 18,
+      "process": "Sepet ve sipariş oluşturma süreci",
+      "question": "Müşterinin sepet oluşturması, minimum sepet tutarı, sepet terk oranı ve terk edilen sepetleri geri kazanma mekanizması var mıdır?",
+      "description": "Sepet adımındaki dönüşüm oranı, ücretsiz kargo eşiği ve sepetini bırakan kullanıcılara hatırlatma süreci.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "ucretsiz_kargo_baraji_ve_otomatik_terk_edilen_sepet_hatirlatma_var", "label": "Dinamik ücretsiz kargo barı ve e-posta/SMS ile otomatik terk edilen sepet hatırlatması aktiftir", "is_other": false, "allow_note": true },
+        { "value": "standart_sepet_akisi_var_terk_edilen_sepet_takibi_yapilmaz", "label": "Standart sepet adımı vardır ancak terk edilen sepetler için otomatik hatırlatma kurgulanmamıştır", "is_other": false, "allow_note": true },
+        { "value": "sepet_terk_oranlari_veya_donusum_verileri_izlenmemektedir", "label": "Sepet aşaması dönüşüm verileri veya terk oranları ölçülmemektedir", "is_other": false, "allow_note": true },
+        { "value": "diger_sepet_sureci", "label": "Diğer sepet ve sipariş oluşturma mekanizması", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-019",
+      "order": 19,
+      "process": "Sipariş onayı ve sipariş yaşam döngüsü",
+      "question": "E-ticaret siparişinin onaylanması, faturalanması, hazırlanması ve kargoya verilmesi süreçlerinde sipariş statü takibi nasıl yapılmaktadır?",
+      "description": "Yeni Sipariş -> Onaylandı -> Hazırlanıyor -> Kargoya Verildi -> Teslim Edildi durumlarının yönetimi. (Trigger 5)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_entegre_otomatik_statu_akisi_ve_sms_e_posta_bildirimi", "label": "Sipariş statüleri ERP/Depo/Kargo hareketleriyle otomatik değişir ve müşteriye anlık bildirim gider", "is_other": false, "allow_note": true },
+        { "value": "yari_otomatik_panelden_manuel_statu_degistirme", "label": "Sipariş adımları e-ticaret panelinden operasyon sorumlusu tarafından manuel güncellenir", "is_other": false, "allow_note": true },
+        { "value": "manuel_ve_takipsiz_statu_yonetimi", "label": "Sipariş durumları sistemde detaylı takip edilmez, sadece kargo fişi kesilir", "is_other": false, "allow_note": true },
+        { "value": "diger_siparis_statu_akisi", "label": "Diğer sipariş statü ve yaşam döngüsü akışı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-020",
+      "order": 20,
+      "process": "Online ödeme ve ödeme sağlayıcıları",
+      "question": "Web mağazasında kullanılan sanal POS altyapısı, BDDK lisanslı ödeme kuruluşları (iyzico, PayTR vb.) ve komisyon mutabakatı nasıl yürütülmektedir?",
+      "description": "Doğrudan banka sanal POS'ları veya ödeme kuruluşu gateway'i ve işlem başı komisyon kesintilerinin kontrolü. (Target 5)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ECOM-019",
+        "operator": "equals",
+        "value": "tam_entegre_otomatik_statu_akisi_ve_sms_e_posta_bildirimi"
+      },
+      "options": [
+        { "value": "bddk_lisansli_odeme_aracisi_ile_otomatik_tahsilat_ve_mutabakat", "label": "Ödeme kuruluşu (iyzico, PayTR vb.) üzerinden tahsil edilir; hakediş ve komisyon mutabakatı düzenli yapılır", "is_other": false, "allow_note": true },
+        { "value": "birden_fazla_bankanin_dogrudan_sanal_pos_altyapisi_kullanilir", "label": "Bankaların kendi sanal POS'ları kuruludur; işlem oranlarına göre POS yönlendirme yapılır", "is_other": false, "allow_note": true },
+        { "value": "odeme_mutabakati_banka_ekstrelerinden_manuel_yapilir", "label": "Tahsilat gerçekleşir ancak kesilen komisyon ve net geçen tutarlar manuel kontrol edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_online_odeme_altyapisi", "label": "Diğer online ödeme sağlayıcı altyapısı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-021",
+      "order": 21,
+      "process": "Taksit, havale, kapıda ödeme ve alternatif ödeme",
+      "question": "Taksitli kredi kartı satışı, vade farkı maliyetinin yönetimi ve banka kartı kampanyalarının sisteme yansıtılması nasıl sağlanmaktadır?",
+      "description": "Müşteriye taksit sunulması, taksit vade farkının fiyat/sepet adımına yansıtılması ve taksit kısıtlamaları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kategoriye_gore_yasal_taksit_siniri_ve_vade_farki_otomatik_hesaplanir", "label": "Ürün kategorisine göre BDDK taksit sınırları ve vade farkı oranları sepet adımında otomatik uygulanır", "is_other": false, "allow_note": true },
+        { "value": "tum_urunlere_sabit_vade_farksiz_taksit_sunulur_maliyet_ustlenilir", "label": "Belirli taksit sayısına kadar komisyon şirketçe üstlenilir, peşin fiyatına taksit sunulur", "is_other": false, "allow_note": true },
+        { "value": "sadece_tek_cekim_satis_yapilmaktadir_taksit_yoktur", "label": "Taksitli satış açılmamıştır, tüm kartlı işlemler tek çekim olarak tahsil edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_taksit_politikasi", "label": "Diğer taksit ve finansman kurgusu", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-022",
+      "order": 22,
+      "process": "Taksit, havale, kapıda ödeme ve alternatif ödeme",
+      "question": "Havale/EFT ile ödeme, kapıda nakit/kredi kartı ile ödeme veya dijital cüzdan seçenekleri sunuluyor mu; sipariş onay süreci nasıl işletilmektedir?",
+      "description": "Kredi kartı dışındaki alternatif ödeme yöntemlerinin banka/kargo mutabakatı ve onay iş akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "havale_ve_kapida_odeme_var_banka_api_ve_kargo_tahsilat_entegre", "label": "Havale/EFT ve kapıda ödeme vardır; hesap hareketleri veya kargo nakit tahsilatı entegre takip edilir", "is_other": false, "allow_note": true },
+        { "value": "havale_var_dekont_ve_hesap_ekstresi_manuel_kontrol_edilir", "label": "Havale seçeneği vardır; sipariş tutarı hesaba geçince muhasebe personeli siparişi manuel onaylar", "is_other": false, "allow_note": true },
+        { "value": "sadece_online_kredi_karti_kabul_edilir_alternatif_odeme_yoktur", "label": "Havale veya kapıda ödeme kabul edilmez; sadece anlık online kart ödemesi alınır", "is_other": false, "allow_note": true },
+        { "value": "diger_alternatif_odeme_yontemi", "label": "Diğer alternatif ödeme yöntemleri", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-023",
+      "order": 23,
+      "process": "Fraud, risk ve ödeme kontrolü",
+      "question": "Online ödemelerde 3D Secure kullanımı, çalıntı kart / şüpheli sipariş risk kuralları ve fraud kontrolü nasıl uygulanmaktadır?",
+      "description": "SMS doğrulama kodu, yüksek tutarlı veya riskli adres siparişlerinin otomatik süzgeçten geçirilmesi. (Trigger 6)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "3d_secure_zorunlu_ve_otomatik_fraud_filtresi_var", "label": "Tüm işlemlerde 3D Secure zorunludur; IP, ardışık deneme ve limit kurallarıyla otomatik fraud filtresi aktiftir", "is_other": false, "allow_note": true },
+        { "value": "sadece_standart_3d_secure_kullanilir_ek_kural_yok", "label": "Standart 3D Secure şifresi istenir ancak özel ek fraud filtreleme kuralı uygulanmaz", "is_other": false, "allow_note": true },
+        { "value": "fraud_kontrolu_yok_veya_bilinmiyor", "label": "Fraud kontrol mekanizması bilinmemekte veya doğrudan ödeme kuruluşunun insiyatifindedir", "is_other": false, "allow_note": true },
+        { "value": "diger_fraud_onleme_yontemi", "label": "Diğer fraud ve sahtecilik önleme yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-024",
+      "order": 24,
+      "process": "Fraud, risk ve ödeme kontrolü",
+      "question": "Şüpheli bulunan siparişlerin inceleme kuyruğuna (manuel review) alınması, müşteri teyidi ve ters ibraz (Chargeback) itiraz süreci nasıl yürütülmektedir?",
+      "description": "Riskli siparişlerde müşteriden telefon teyidi alma ve banka chargeback itirazlarına teslimat kanıtı sunma süreci. (Target 6)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ECOM-023",
+        "operator": "equals",
+        "value": "3d_secure_zorunlu_ve_otomatik_fraud_filtresi_var"
+      },
+      "options": [
+        { "value": "riskli_siparis_kuyrugu_telefon_teyidi_ve_dijital_chargeback_savunmasi", "label": "Şüpheli siparişler askıya alınır, telefon teyidi yapılır; chargeback durumunda kargo teslim kanıtı sunulur", "is_other": false, "allow_note": true },
+        { "value": "chargeback_gelince_zarar_yazilir_itiraz_sureci_yurutulmez", "label": "Ters ibraz itiraz süreci etkin yürütülmez; bildirim geldiğinde çoğunlukla doğrudan zarar kabul edilir", "is_other": false, "allow_note": true },
+        { "value": "riskli_siparis_takibi_manuel_veya_duzensizdir", "label": "Şüpheli işlem havuzu yoktur, şüphelenilen durumlar rastlantısal fark edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_chargeback_yonetimi", "label": "Diğer şüpheli işlem ve chargeback yönetimi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-025",
+      "order": 25,
+      "process": "E-fatura, e-arşiv ve dijital belge entegrasyonu",
+      "question": "E-ticaret siparişleri için e-Arşiv Fatura / e-Fatura kesilme anı, TCKN/VKN doğrulama ve müşteriye PDF fatura iletme süreci nasıl çalışmaktadır?",
+      "description": "GİB mevzuatına uygun e-Arşiv fatura üretimi, sipariş onayında veya kargo aşamasında otomatik e-posta/SMS gönderimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kargolama_aninda_otomatik_e_arsiv_kesilir_ve_e_posta_ile_iletilir", "label": "Sipariş kargoya verildiğinde e-Arşiv faturası ERP/Özel Entegratörden otomatik kesilir ve linki iletilir", "is_other": false, "allow_note": true },
+        { "value": "faturalar_muhasebe_tarafindan_gun_sonunda_toplu_kesilir", "label": "Günlük sipariş listesi üzerinden muhasebe tarafından gün sonunda toplu e-Arşiv faturası düzenlenir", "is_other": false, "allow_note": true },
+        { "value": "faturalar_manuel_veya_koli_icine_kagit_baski_olarak_konur", "label": "Faturalar tek tek manuel kesilir ve çıktısı koli içerisine fiziksel olarak konulur", "is_other": false, "allow_note": true },
+        { "value": "diger_e_fatura_e_arsiv_akisi", "label": "Diğer e-Arşiv/e-Fatura düzenleme süreci", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-026",
+      "order": 26,
+      "process": "E-fatura, e-arşiv ve dijital belge entegrasyonu",
+      "question": "Pazaryeri siparişlerinde pazaryerinin kestiği komisyon/kargo faturaları ile şirket e-arşiv faturalarının cari hesap mutabakatı nasıl yapılmaktadır?",
+      "description": "Trendyol/Hepsiburada cari hesap ekstresi, kesinti faturaları ve net hakediş ödemelerinin muhasebe mutabakatı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "pazaryeri_kesinti_ve_komisyon_faturalari_erp_cari_mutabakati_ile_eslesir", "label": "Pazaryeri komisyon ve kargo faturaları ERP gider/cari hesaplarına düzenli işlenir ve mutabakat yapılır", "is_other": false, "allow_note": true },
+        { "value": "ay_sonunda_toplu_komisyon_faturasi_gider_yazilir_detay_eslestirilmez", "label": "Ay sonunda pazaryerinden gelen fatura genel gidere atılır; sipariş bazlı komisyon eşleştirilmez", "is_other": false, "allow_note": true },
+        { "value": "pazaryeri_kesintileri_takip_edilmez_net_gelen_para_gelir_yazilir", "label": "Pazaryeri kesinti detayları izlenmez; bankaya yatan net tutar doğrudan gelir/tahsilat kaydedilir", "is_other": false, "allow_note": true },
+        { "value": "diger_pazaryeri_mutabakat_yontemi", "label": "Diğer pazaryeri cari mutabakat modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-027",
+      "order": 27,
+      "process": "Depo, toplama, paketleme ve sevkiyat",
+      "question": "E-ticaret siparişlerinin depodan toplanması (Pick & Pack), el terminali ile barkod okutma ve koli paketleme kalite kontrolü nasıl yapılmaktadır?",
+      "description": "Hızlı sipariş toplama listesi (Picking list), barkodla doğru ürün doğrulama ve koruyucu ambalajlama disiplini.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "el_terminali_ile_barkod_dogrulamali_toplama_ve_paketleme_masasi", "label": "El terminali ile dalga toplama (Wave picking) yapılır; paketleme masasında barkod okutulup sevk edilir", "is_other": false, "allow_note": true },
+        { "value": "kagit_siparis_listesi_ile_toplanir_paketlemede_gozle_kontrol_edilir", "label": "Siparişler yazdırılan kağıt listelerle raftan toplanır, paketlemede ürünler gözle kontrol edilir", "is_other": false, "allow_note": true },
+        { "value": "depoda_ayri_e_ticaret_toplama_duzeni_yoktur_manuel_yurutulur", "label": "E-ticaret için özel toplama/paketleme düzeni yoktur; gelen siparişe göre raftan manuel alınır", "is_other": false, "allow_note": true },
+        { "value": "diger_toplama_paketleme_yontemi", "label": "Diğer depo toplama ve paketleme modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-028",
+      "order": 28,
+      "process": "Depo, toplama, paketleme ve sevkiyat",
+      "question": "Aynı gün kargo taahhüdü, sipariş kesim saati (Cut-off time) ve yoğun kampanya dönemlerinde paketleme kapasite yönetimi nasıl yürütülmektedir?",
+      "description": "Saat 16:00'ya kadar verilen siparişlerin aynı gün çıkarılması, efsane cuma/kampanya pik hacimlerinin yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "kesim_saati_tanimli_vardiya_planlamasi_ve_esnek_paketleme_kapasitesi", "label": "Kesim saati belirlidir; kampanya dönemlerinde ek vardiya/paketleme masası ile SLA korunur", "is_other": false, "allow_note": true },
+        { "value": "normal_donemlerde_yetisir_kampanyalarda_2_3_gun_gecikme_yasanir", "label": "Günlük operasyonda kargo yetişir ancak yoğun kampanya günlerinde sevk süreleri 2-3 gün uzar", "is_other": false, "allow_note": true },
+        { "value": "ayni_gun_kargo_taahhudu_yoktur_hazirlandikca_sevk_edilir", "label": "Belirli bir kargo teslim taahhüdü yoktur; siparişler 1-4 iş günü içinde hazırlandıkça verilir", "is_other": false, "allow_note": true },
+        { "value": "diger_kapasite_yonetim_yontemi", "label": "Diğer paketleme kapasite ve SLA yönetimi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-029",
+      "order": 29,
+      "process": "Kargo, teslimat ve gönderi takibi",
+      "question": "Anlaşmalı kargo firmaları (Yurtiçi, Aras, MNG, Sendeo, Kolay Gelsin vb.) ile API entegrasyonu ve kargo barkodu basımı nasıl yapılmaktadır?",
+      "description": "Kargo entegrasyonu üzerinden gönderi kodu alma, ZPL/termal barkod etiket basımı ve otomatik manifest. (Trigger 7)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "kargo_firmasi_ile_api_entegrasyonu_var_barkod_otomatik_basilir", "label": "Kargo API entegrasyonu aktiftir; sipariş onaylandığında kargo barkodu ve takip no otomatik üretilir", "is_other": false, "allow_note": true },
+        { "value": "kargo_paneline_excel_ile_manuel_yuklenir", "label": "Günlük kargo listesi Excel ile kargo firmasının portalına yüklenir ve etiketler oradan basılır", "is_other": false, "allow_note": true },
+        { "value": "kargo_subesinde_manuel_etiket_yazdirilir", "label": "Entegrasyon yoktur; paketler kargo şubesine götürülerek kargo görevlisine tek tek yazdırılır", "is_other": false, "allow_note": true },
+        { "value": "diger_kargo_entegrasyon_durumu", "label": "Diğer kargo operasyon ve barkodlama modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-030",
+      "order": 30,
+      "process": "Kargo, teslimat ve gönderi takibi",
+      "question": "Kargo takip numarasının anlık olarak müşteriye ve satış kanallarına iletilmesi, teslimat/adreste bulunamama statülerinin takibi nasıl yapılmaktadır?",
+      "description": "Kargo hareketlerinin anlık webhook/cron ile okunması, teslim edildi bilgisi ve teslim edilemeyen kargo alarmları. (Target 7)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "ECOM-029",
+        "operator": "equals",
+        "value": "kargo_firmasi_ile_api_entegrasyonu_var_barkod_otomatik_basilir"
+      },
+      "options": [
+        { "value": "kargo_statuleri_anlik_cekilir_teslimat_smsi_ve_adreste_yok_alarmi_calisir", "label": "Kargo statüleri anlık çekilir; müşteriye SMS gider, adreste bulunamayan paketler için müşteri aranır", "is_other": false, "allow_note": true },
+        { "value": "sadece_kargo_takip_linki_e_posta_ile_gonderilir_statuler_izlenmez", "label": "Takip numarası e-posta ile müşteriye iletilir ancak teslimat süreci sonradan sistemden izlenmez", "is_other": false, "allow_note": true },
+        { "value": "kargo_durumu_sadece_musteri_aradiginda_manuel_sorgulanir", "label": "Teslimat durumu ancak müşteri kargom nerede diye aradığında kargo sitesinden sorgulanır", "is_other": false, "allow_note": true },
+        { "value": "diger_gonderi_takip_yontemi", "label": "Diğer gönderi takip ve bildirim yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-031",
+      "order": 31,
+      "process": "İptal, iade, değişim ve geri ödeme",
+      "question": "Müşteri cayma hakkı kapsamındaki online iade talebi, iade kargo kodu oluşturma ve ürün iade kabul süreci nasıl işletilmektedir?",
+      "description": "Müşterinin web/pazaryeri panelinden iade talebi açması, anlaşmalı iade kargo kodu ve kargo şubesine teslimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "panelden_otomatik_iade_kargo_kodu_ve_sistemli_iade_talebi_akisi", "label": "Müşteri panelden iade talebi açar; sistem otomatik ücretsiz iade kargo kodu üretir ve süreci başlatır", "is_other": false, "allow_note": true },
+        { "value": "musteri_hizmetlerini_arayarak_iade_kodu_alir_manuel_yonetilir", "label": "Müşteri telefon/WhatsApp ile ulaşarak iade talep eder; personel kargo iade kodu verir", "is_other": false, "allow_note": true },
+        { "value": "iade_kodu_yoktur_musteri_kendi_imkaniyla_kargolar_duzensizdir", "label": "Önceden tanımlı iade kodu yoktur; müşteriler paketleri şubeden farklı kargolarla karşı ödemeli yollar", "is_other": false, "allow_note": true },
+        { "value": "diger_iade_talep_sureci", "label": "Diğer iade talep ve kargo kodu süreci", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-032",
+      "order": 32,
+      "process": "İptal, iade, değişim ve geri ödeme",
+      "question": "Depoya dönen iade ürünün fiziki kalite kontrolü, tekrar satışa uygunluk kararı, gider pusulası/iade faturası ve sanal POS üzerinden para iadesi nasıl yönetilmektedir?",
+      "description": "İade ürünün açılması, ambalaj kontrolü, tekrar stoğa alınması, muhasebe iade kaydı ve sanal POS'tan karta iade işlemi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "depo_onayi_stoga_iade_gider_pusulasi_ve_anlik_pos_iadesi_entegre", "label": "Depo ürünü inceler; kabul edilirse stok güncellenir, gider pusulası/fatura kesilir ve POS'tan iade yapılır", "is_other": false, "allow_note": true },
+        { "value": "iade_onayi_manueldir_para_iadesi_haftalik_toplu_yapilir", "label": "İadeler depoda birikir; haftalık olarak muhasebeye iletilir ve sanal POS'tan manuel iade geçilir", "is_other": false, "allow_note": true },
+        { "value": "iade_urunlerin_stok_ve_para_iade_surecinde_sikca_karisiklik_olur", "label": "İade ürünlerin stoğa dönüşü ve para iadeleri Excel üzerinden manuel takip edilir, gecikmeler yaşanır", "is_other": false, "allow_note": true },
+        { "value": "diger_iade_muhasebe_ve_para_iade_yontemi", "label": "Diğer iade kabul ve para iade süreci", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-033",
+      "order": 33,
+      "process": "Müşteri hizmetleri ve satış sonrası destek",
+      "question": "Müşteri çağrıları, canlı yardım/chatbot, WhatsApp ve pazaryeri soru/cevap panellerinin takibi nasıl yapılmaktadır?",
+      "description": "Farklı kanallardan gelen müşteri sorularının (ürün özellikleri, sipariş durumu, kargo gecikmesi) yanıtlanma hızı ve SLA takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "omnichannel_destek_paneli_ve_pazaryeri_entegre_sla_takibi", "label": "Tüm mesajlar (WhatsApp, Canlı Destek, Pazaryeri Soruları) tek panelde toplanır ve SLA ile yanıtlanır", "is_other": false, "allow_note": true },
+        { "value": "her_pazaryeri_ve_kanal_kendi_panellerinden_ayri_ayri_cevaplanir", "label": "Merkezi araç yoktur; pazaryerleri ve e-posta ayrı ayrı kontrol edilerek manuel yanıtlanır", "is_other": false, "allow_note": true },
+        { "value": "sadece_telefon_veya_e_posta_ile_mesai_saatlerinde_destek_verilir", "label": "Sadece şirket santrali veya destek e-postası üzerinden mesai saatleri içinde yanıt verilir", "is_other": false, "allow_note": true },
+        { "value": "diger_musteri_destek_yapisi", "label": "Diğer müşteri hizmetleri ve destek yapısı", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-034",
+      "order": 34,
+      "process": "Müşteri hizmetleri ve satış sonrası destek",
+      "question": "E-ticaret müşteri şikayetleri, kırık/hasarlı/eksik ürün talepleri ve telafi süreçleri sistemde nasıl kayıt altına alınmaktadır?",
+      "description": "Kargo hasar tutanakları, eksik ürün için ücretsiz telafi sevkiyatı ve müşteri memnuniyet kayıtları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "crm_ve_e_ticaret_ticket_sisteminde_hasar_tutanakli_kayit_ve_telafi", "label": "Destek talebi (Ticket) açılır, hasar görseli eklenir, onaylanan durumlarda anında telafi siparişi açılır", "is_other": false, "allow_note": true },
+        { "value": "hasarli_urun_talepleri_whatsapp_uzerinden_yurutulur", "label": "Müşteri WhatsApp'tan fotoğraf atar; müşteri temsilcisi inisiyatifiyle yeni ürün yollanır", "is_other": false, "allow_note": true },
+        { "value": "sikayet_ve_hasar_istatistigi_tutulmamaktadir", "label": "Hasarlı/kırık ürünler için kayıt tutulmaz, maliyet genel fire olarak kabul edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_hasar_ve_sikayet_yonetimi", "label": "Diğer şikayet ve hasarlı ürün telafi süreci", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-035",
+      "order": 35,
+      "process": "Dijital pazarlama ve trafik kaynakları",
+      "question": "Arama motoru reklamları (Google Ads), sosyal medya, pazaryeri sponsorlu ürün reklamları ve SEO çalışmalarının bütçe/dönüşüm takibi nasıl yapılmaktadır?",
+      "description": "Dijital reklam harcamalarının ROAS (Reklam Harcaması Getirisi), tıklama başı maliyet ve dönüşüm takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "roas_ve_donusum_bazli_duzenli_reklam_butcesi_ve_analitik_takip", "label": "Google/Meta/Pazaryeri reklamları ROAS ve kanal bazlı dönüşüm hedefleriyle günlük/haftalık optimize edilir", "is_other": false, "allow_note": true },
+        { "value": "reklamlar_ajans_tarafindan_yonetilir_aylik_rapor_incelenir", "label": "Dijital pazarlama ajansa devredilmiştir; ay sonunda ajansın sunduğu özet rapor değerlendirilir", "is_other": false, "allow_note": true },
+        { "value": "duzenli_reklam_butcesi_yoktur_sadece_organik_veya_pazaryeri_trafigi", "label": "Ücretli dijital reklam bütçesi kullanılmamaktadır; sadece organik arama ve pazaryeri trafiği vardır", "is_other": false, "allow_note": true },
+        { "value": "diger_dijital_pazarlama_stratejisi", "label": "Diğer dijital pazarlama ve reklam yönetim yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-036",
+      "order": 36,
+      "process": "Dijital pazarlama ve trafik kaynakları",
+      "question": "E-posta pazarlaması, SMS bilgilendirmeleri, sepet hatırlatma ve KVKK/İYS (İleti Yönetim Sistemi) izin uyumu nasıl yönetilmektedir?",
+      "description": "Ticari elektronik ileti onayları, İYS entegrasyonu, bülten gönderimleri ve izinli veri tabanı yönetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "iys_ve_kvkk_tam_entegre_otomatik_izinli_pazarlama_ve_segmentasyon", "label": "İYS ile anlık entegre izinli veri tabanı kullanılır; izin durumuna göre segmentli SMS/e-posta gönderilir", "is_other": false, "allow_note": true },
+        { "value": "standart_e_bulten_gonderilir_iys_manuel_guncellenir", "label": "Toplu e-posta/SMS gönderimi yapılır; İYS izin listesi dönemsel Excel ile yüklenir", "is_other": false, "allow_note": true },
+        { "value": "toplu_sms_veya_e_posta_pazarlamasi_yapilmamaktadir", "label": "Pazarlama amaçlı e-posta veya SMS gönderilmemektedir; sadece işlem bildirimleri iletilir", "is_other": false, "allow_note": true },
+        { "value": "diger_izinli_pazarlama_yontemi", "label": "Diğer izinli pazarlama ve İYS yönetim modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-037",
+      "order": 37,
+      "process": "Kupon, promosyon ve sadakat uygulamaları",
+      "question": "Kişiye özel indirim kuponları, hediye çekleri, influencer/affiliate takip kodları ve sadakat puanı uygulamaları var mıdır?",
+      "description": "Müşteri sadakat kurguları, influencer işbirlikleri ve sepette kupon kodu kullanımı. (Trigger 8)",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "kupon_affiliate_ve_sadakat_sistemi_aktif_kullanilir", "label": "Evet; kişiye özel kuponlar, affiliate/influencer yönlendirme kodları ve sadakat puan sistemi aktiftir", "is_other": false, "allow_note": true },
+        { "value": "sadece_genel_indirim_kuponlari_kullanilir", "label": "Sadece genel duyurulan ortak indirim kuponları (örn: HOŞGELDİN10) kullanılır, puan sistemi yoktur", "is_other": false, "allow_note": true },
+        { "value": "kupon_veya_sadakat_uygulamasi_yoktur", "label": "Kupon, hediye çeki veya puan sadakat uygulaması bulunmamaktadır", "is_other": false, "allow_note": true },
+        { "value": "diger_promosyon_modeli", "label": "Diğer promosyon ve kupon kurgusu", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-038",
+      "order": 38,
+      "process": "Kupon, promosyon ve sadakat uygulamaları",
+      "question": "Influencer/affiliate satış komisyonlarının hesaplanması, kupon sahteciliği önleme ve kampanya bazlı marj kontrolü nasıl yapılmaktadır?",
+      "description": "Kuponların kötüye kullanımını engelleme (aynı hesapla tekrar kullanım, minimum sepet tutarı kuralı) ve net karlılık analizi. (Target 8)",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "ECOM-037",
+        "operator": "equals",
+        "value": "kupon_affiliate_ve_sadakat_sistemi_aktif_kullanilir"
+      },
+      "options": [
+        { "value": "otomatik_komisyon_hesaplama_ve_tek_kullanimlik_guvenli_kupon_motoru", "label": "Kuponlar kullanıcı bazında tek kullanımlık sınırlandırılır; affiliate hakedişleri sistemden otomatik raporlanır", "is_other": false, "allow_note": true },
+        { "value": "kupon_kullanimlari_ay_sonu_raporundan_manuel_kontrol_edilir", "label": "Kupon limitleri basittir; influencer satışları ay sonunda panel raporundan manuel toplanır", "is_other": false, "allow_note": true },
+        { "value": "kupon_marj_ve_komisyon_kontrolu_yapilmamaktadir", "label": "Kuponların kar marjına etkisi veya sahtecilik denetimleri detaylı incelenmemektedir", "is_other": false, "allow_note": true },
+        { "value": "diger_affiliate_kontrol_yontemi", "label": "Diğer kupon ve affiliate kontrol mekanizması", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-039",
+      "order": 39,
+      "process": "ERP, CRM, stok ve muhasebe entegrasyonu",
+      "question": "E-ticaret siparişleri, cari kart açılışları, stok düşümleri ve tahsilat kayıtlarının ERP ve muhasebe sistemine aktarım mimarisi nedir?",
+      "description": "Web sitesi ve pazaryerlerinden gelen siparişlerin kurumsal ERP veritabanına otomatik mi yoksa manuel mi aktarıldığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tam_otomatik_gercek_zamanli_api_webhook_entegrasyonu_var", "label": "Sipariş geldiği an API/Webhook ile ERP'ye düşer, cari açılır, stok bloke edilir ve faturalandırılır", "is_other": false, "allow_note": true },
+        { "value": "periyodik_servis_veya_ara_yazilim_ile_toplu_aktarim_yapilir", "label": "Belirli aralıklarla (10-30 dk) ara entegrasyon servisi çalışarak siparişleri ERP'ye toplu aktarır", "is_other": false, "allow_note": true },
+        { "value": "siparisler_excel_ile_manuel_ice_aktarilir_veya_elle_islenir", "label": "Entegrasyon yoktur; siparişler Excel ile ERP'ye aktarılır veya muhasebeci tarafından tek tek girilir", "is_other": false, "allow_note": true },
+        { "value": "diger_erp_aktarim_mimari", "label": "Diğer ERP ve muhasebe entegrasyon mimarisi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-040",
+      "order": 40,
+      "process": "ERP, CRM, stok ve muhasebe entegrasyonu",
+      "question": "E-ticaret entegrasyonunda oluşan aktarım hataları (stok yetersizliği, fiyat uyuşmazlığı, zaman aşımı) için hata kuyruğu ve yeniden deneme (retry) mekanizması var mıdır?",
+      "description": "Entegrasyon kopması veya veri uyumsuzluğu anında düşen hata logları, admin uyarıları ve otomatik tekrar deneme yeteneği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "hata_kuyrugu_dead_letter_queue_ve_otomatik_tekrar_deneme_paneli_var", "label": "Hata logları merkezi panelde toplanır, otomatik tekrar denenir (retry) ve sorumluya alarm düşer", "is_other": false, "allow_note": true },
+        { "value": "hatalar_e_posta_ile_bildirilir_manuel_duzeltilip_tekrar_gonderilir", "label": "Hata oluştuğunda sisteme e-posta gelir; IT/operasyon personeli sebebi düzeltip manuel tetikler", "is_other": false, "allow_note": true },
+        { "value": "hata_mekanizmasi_yoktur_aktarilamayan_siparisler_fark_edilince_aranir", "label": "Hata takip kuyruğu yoktur; aktarılmayan siparişler ancak müşteri şikayet edince fark edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_hata_kuyrugu_yontemi", "label": "Diğer entegrasyon hata yönetim mekanizması", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-041",
+      "order": 41,
+      "process": "E-ticaret raporlama, KPI ve müşteri analitiği",
+      "question": "E-ticaret operasyonel KPI paneli (Brüt Satış Tutarı, Sipariş Adedi, İade Oranı, Kargo Başı Maliyet, Ortalama Sepet Tutarı) nasıl takip edilmektedir?",
+      "description": "Yönetim dashboard'ları, günlük/haftalık satış raporları ve temel e-ticaret performans metriklerinin ölçümü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "canli_yonetim_dashboardu_ve_otomatik_gunluk_kpi_raporlari_var", "label": "Canlı BI / e-ticaret dashboard'u üzerinden ciro, sepet tutarı, iade oranı ve kargo giderleri anlık izlenir", "is_other": false, "allow_note": true },
+        { "value": "haftalik_veya_aylik_excel_raporu_hazirlanarak_yonetime_sunulur", "label": "Veriler panellerden Excel'e çekilerek haftalık/aylık bazda yönetim sunumu haline getirilir", "is_other": false, "allow_note": true },
+        { "value": "sadece_ay_sonu_toplam_ciro_rakami_muhasebeden_ogrenilir", "label": "Detaylı e-ticaret KPI'ları izlenmez; sadece ay sonu toplam banka tahsilatı ve ciro kontrol edilir", "is_other": false, "allow_note": true },
+        { "value": "diger_kpi_takip_yontemi", "label": "Diğer e-ticaret KPI ve raporlama yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-042",
+      "order": 42,
+      "process": "E-ticaret raporlama, KPI ve müşteri analitiği",
+      "question": "Müşteri Edinme Maliyeti (CAC), Müşteri Yaşam Boyu Değeri (CLV) ve pazaryeri komisyon kesintileri sonrası net kanal karlılığı ölçülmekte midir?",
+      "description": "Hangi kanalın (Kendi Web vs. Trendyol vs. Hepsiburada) komisyon, reklam ve kargo masrafları düşüldükten sonra ne kadar net kar bıraktığı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "kanal_bazinda_tum_kesintiler_dusulerek_net_kar_marji_olculur", "label": "Kanal bazında komisyon, reklam (CAC) ve kargo kesintileri sonrası net operasyonel karlılık hesaplanır", "is_other": false, "allow_note": true },
+        { "value": "sadece_pazaryeri_komisyonlari_bilinir_net_urun_karliligi_cikartilamaz", "label": "Pazaryeri komisyon oranları bilinir ancak kargo, iade ve reklam giderleri düşülerek net kar ölçülemez", "is_other": false, "allow_note": true },
+        { "value": "kanal_karliligi_ve_cac_clv_hesaplamasi_yapilmamaktadir", "label": "Müşteri edinme maliyeti veya kanal net karlılık hesaplaması yapılmamaktadır", "is_other": false, "allow_note": true },
+        { "value": "diger_kanal_karlilik_analizi", "label": "Diğer net kanal karlılık ölçüm modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-043",
+      "order": 43,
+      "process": "E-ticaret raporlama, KPI ve müşteri analitiği",
+      "question": "Tekrarlayan müşteri oranı, kohort (cohort) analizi ve RFM müşteri segmentasyonu ile dijital satış verisi analiz ediliyor mu?",
+      "description": "Müşterilerin yeniden satın alma sıklığı (Frequency), son alışveriş tarihi (Recency) ve harcama büyüklüğü (Monetary) analizi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "crm_uzerinde_rfm_segmentasyonu_ve_kohort_analizleri_yapilir", "label": "CRM/CDP sistemi üzerinde RFM segmentasyonu yapılır; sadık, uyuyan ve kayıp müşterilere özel aksiyon alınır", "is_other": false, "allow_note": true },
+        { "value": "sadece_en_cok_alisveris_yapan_vip_musteriler_listelenir", "label": "En yüksek cirolu müşteriler Excel'den filtrelenir ancak kohort veya RFM analitiği uygulanmaz", "is_other": false, "allow_note": true },
+        { "value": "musteri_segmentasyonu_veya_tekrarlayan_alisveris_analizi_yoktur", "label": "Müşteri veritabanı analiz edilmemektedir; tüm müşterilere aynı standart iletişim yapılır", "is_other": false, "allow_note": true },
+        { "value": "diger_musteri_analitik_yontemi", "label": "Diğer müşteri analitiği ve segmentasyon yöntemi", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-044",
+      "order": 44,
+      "process": "Veri güvenliği, arşivleme, riskler ve gelişim yol haritası",
+      "question": "Kredi kartı verilerinin güvenliği (PCI-DSS uyumu), müşteri kişisel verilerinin korunması ve SSL/WAF siber güvenlik önlemleri nasıl sağlanmaktadır?",
+      "description": "Kart bilgilerinin sunucularda saklanmaması (Tokenization), HTTPS/SSL şifreleme ve siber saldırı koruması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "pci_dss_tam_uyumlu_kart_saklanmaz_tokenization_ve_waf_aktiftir", "label": "Kart bilgileri sunucuda tutulmaz, ödeme sağlayıcısı tokenize eder; 256-bit SSL ve WAF koruması aktiftir", "is_other": false, "allow_note": true },
+        { "value": "standart_ssl_ve_saas_platform_guvenligine_guvenilir", "label": "Sitede SSL sertifikası vardır; güvenlik altyapısı kullanılan SaaS e-ticaret platformuna emanettir", "is_other": false, "allow_note": true },
+        { "value": "guvenlik_altyapisi_ve_pci_dss_standartlari_denetlenmemektedir", "label": "Siber güvenlik testleri, sızma testleri veya PCI-DSS standartları düzenli denetlenmemektedir", "is_other": false, "allow_note": true },
+        { "value": "diger_veri_guvenlik_yapisi", "label": "Diğer veri ve ödeme güvenliği modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-045",
+      "order": 45,
+      "process": "Veri güvenliği, arşivleme, riskler ve gelişim yol haritası",
+      "question": "E-ticaret sipariş, fatura, kargo ve müşteri iletişim loglarının yasal saklama ve log arşivleme disiplini nasıldır?",
+      "description": "Elektronik ticaret mevzuatı gereği sipariş işlem kütüklerinin, IP kayıtlarının ve fatura arşivlerinin saklanma düzeni.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_siparis_ve_odeme_loglari_zaman_damgali_ve_yedekli_arsivlenir", "label": "Sipariş, ödeme, kargo ve iletişim logları yasal süre boyunca değiştirilemez biçimde yedeklenir", "is_other": false, "allow_note": true },
+        { "value": "veriler_e_ticaret_veritabaninda_durur_ozel_log_arsivleme_yoktur", "label": "Veriler sadece e-ticaret yazılımının veri tabanında saklanır, harici log arşivleme yapılmaz", "is_other": false, "allow_note": true },
+        { "value": "log_saklama_veya_arsiv_politikasi_bulunmamaktadir", "label": "Eski sipariş ve işlem logları için belirlenmiş bir saklama veya yedekleme politikası yoktur", "is_other": false, "allow_note": true },
+        { "value": "diger_arsiv_politikasi", "label": "Diğer log saklama ve arşivleme modeli", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-046",
+      "order": 46,
+      "process": "Veri güvenliği, arşivleme, riskler ve gelişim yol haritası",
+      "question": "Mevcut e-ticaret süreçlerindeki en kritik darboğazlar, stok/fiyat uyuşmazlığı riskleri ve operasyonel aksaklıklar nelerdir?",
+      "description": "Sahada yaşanan yanlış ürün gönderme, pazaryerinde stoksuz yakalanma cezaları, kargo gecikmeleri ve entegrasyon problemleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "stok_ve_fiyat_senkronizasyonu_gecikmeleri_en_buyuk_risktir", "label": "Pazaryerleri ile ERP arasında stok/fiyat gecikmeleri ve stoksuz satış iptalleri en büyük risktir", "is_other": false, "allow_note": true },
+        { "value": "depo_toplama_ve_kargo_hazirlama_surelerindeki_darbogazlar", "label": "Siparişlerin depoda toplanması, fatura kesimi ve kargo paketleme hızı operasyonu tıkamaktadır", "is_other": false, "allow_note": true },
+        { "value": "iade_yonetimi_ve_musteri_sikayetlerinin_cozulememesi", "label": "İade süreçlerinin karmaşıklığı, hasarlı ürünler ve müşteri hizmetleri yetersizliği darboğazdır", "is_other": false, "allow_note": true },
+        { "value": "diger_e_ticaret_darbogazlari", "label": "Diğer e-ticaret darboğaz ve operasyonel riskleri", "is_other": true, "allow_note": true }
+      ]
+    },
+    {
+      "id": "ECOM-047",
+      "order": 47,
+      "process": "Veri güvenliği, arşivleme, riskler ve gelişim yol haritası",
+      "question": "Şirketin yeni ERP ve entegre dijital ticaret dönüşümünden en öncelikli beklentileri ve yatırım hedefleri nelerdir?",
+      "description": "Kurumsal ERP/CRM geçişinde e-ticaret kanallarının tek merkezden, tam otomatik ve hatasız yönetilmesine dair ana hedef.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "omnichannel_tek_merkezden_stok_fiyat_ve_siparis_otomasyonu", "label": "Tüm web, pazaryeri ve mağaza kanallarının tek merkezden gerçek zamanlı otomatik yönetimi", "is_other": false, "allow_note": true },
+        { "value": "depo_toplama_e_fatura_ve_kargo_sureclerinin_hizlandirilmasi", "label": "El terminali ile hatasız toplama, anında e-arşiv fatura ve otomatik kargo barkoduyla sevkiyat hızı", "is_other": false, "allow_note": true },
+        { "value": "net_kanal_karliligi_ve_gelismis_musteri_analitigi_edinme", "label": "Pazaryeri kesintileri sonrası net kanal karlılığını ve müşteri yaşam boyu değerini anlık ölçebilme", "is_other": false, "allow_note": true },
+        { "value": "diger_donusum_beklentileri", "label": "Diğer dijital dönüşüm ve ERP entegrasyon beklentileri", "is_other": true, "allow_note": true }
+      ]
+    }
+  ]
+}
