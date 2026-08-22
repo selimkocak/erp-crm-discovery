@@ -26,12 +26,13 @@ import {
   PlusCircle,
   Layers,
   Sparkles,
+  Paperclip,
 } from "lucide-react";
 import type { Question, AnswerData } from "../engine/types";
-import type { QuestionFollowup } from "../types";
+import type { QuestionAttachment, QuestionFollowup } from "../types";
 import { isQuestionAnswered } from "../engine/progress";
 
-export type NavigatorFilterType = "all" | "answered" | "revisit" | "critical" | "unanswered";
+export type NavigatorFilterType = "all" | "answered" | "attachments" | "revisit" | "critical" | "unanswered";
 
 interface QuestionNavigatorProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ interface QuestionNavigatorProps {
   questions: Question[];
   answers: Map<string, AnswerData>;
   followups?: Map<string, QuestionFollowup>;
+  attachmentsMap?: Map<string, QuestionAttachment[]>;
   currentQuestionId: string | null;
   onSelectQuestion: (questionId: string) => void;
   onAddCustomQuestion?: () => void;
@@ -51,6 +53,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   questions,
   answers,
   followups = new Map(),
+  attachmentsMap = new Map(),
   currentQuestionId,
   onSelectQuestion,
   onAddCustomQuestion,
@@ -59,14 +62,23 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<NavigatorFilterType>("all");
 
-  // Calculate follow-up and completion counts for tabs
+  // Calculate follow-up, attachment and completion counts for tabs
   let totalAnsweredCount = 0;
   let revisitCount = 0;
   let criticalCount = 0;
   let unansweredCount = 0;
+  let attachmentsTotalQuestionsCount = 0;
+  let totalFilesCount = 0;
 
   for (const q of questions) {
     const fol = followups.get(q.id);
+    const atts = attachmentsMap.get(q.id) || [];
+    const attCount = atts.length;
+    if (attCount > 0) {
+      attachmentsTotalQuestionsCount++;
+      totalFilesCount += attCount;
+    }
+
     if (fol && fol.status === "open") {
       if (fol.flag_type === "critical") criticalCount++;
       else if (fol.flag_type === "revisit") revisitCount++;
@@ -85,9 +97,12 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
     const fol = followups.get(q.id);
     const isOpenFollowup = fol && fol.status === "open";
     const isAnswered = isQuestionAnswered(q, answers.get(q.id), fol);
+    const qAttachments = attachmentsMap.get(q.id) || [];
+    const hasAttachments = qAttachments.length > 0;
 
     // Tab filter
     if (activeFilter === "answered" && !isAnswered) return false;
+    if (activeFilter === "attachments" && !hasAttachments) return false;
     if (activeFilter === "revisit" && (!isOpenFollowup || fol?.flag_type !== "revisit")) return false;
     if (activeFilter === "critical" && (!isOpenFollowup || fol?.flag_type !== "critical")) return false;
     if (activeFilter === "unanswered" && (isAnswered || isOpenFollowup)) return false;
@@ -95,11 +110,17 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
     // Search term filter
     if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
+    const attMatch = qAttachments.some(
+      (a: QuestionAttachment) =>
+        a.original_file_name.toLowerCase().includes(term) ||
+        (a.description && a.description.toLowerCase().includes(term))
+    );
     return (
       q.question.toLowerCase().includes(term) ||
       q.process.toLowerCase().includes(term) ||
       q.id.toLowerCase().includes(term) ||
-      (fol?.note && fol.note.toLowerCase().includes(term))
+      (fol?.note && fol.note.toLowerCase().includes(term)) ||
+      attMatch
     );
   });
 
@@ -151,10 +172,11 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
       >
         <Layers size={15} />
         <span style={{ fontSize: "0.8125rem", fontWeight: 600 }}>Sorular ({questions.length})</span>
-        {(revisitCount > 0 || criticalCount > 0) && (
-          <span style={{ display: "inline-flex", gap: "0.15rem", fontSize: "0.75rem" }}>
-            {revisitCount > 0 && <span>🟡{revisitCount}</span>}
-            {criticalCount > 0 && <span>🔴{criticalCount}</span>}
+        {(revisitCount > 0 || criticalCount > 0 || attachmentsTotalQuestionsCount > 0) && (
+          <span style={{ display: "inline-flex", gap: "0.25rem", fontSize: "0.75rem", alignItems: "center" }}>
+            {attachmentsTotalQuestionsCount > 0 && <span title={`${attachmentsTotalQuestionsCount} ekli soru`}>📎{attachmentsTotalQuestionsCount}</span>}
+            {revisitCount > 0 && <span title={`${revisitCount} sonra dön`}>🟡{revisitCount}</span>}
+            {criticalCount > 0 && <span title={`${criticalCount} kritik takip`}>🔴{criticalCount}</span>}
           </span>
         )}
         <ChevronRight size={14} />
@@ -226,6 +248,8 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveFilter("all")}
+          className="question-navigator__filter-tab"
+          data-filter="all"
           style={{
             fontSize: "0.6875rem",
             fontWeight: 600,
@@ -245,6 +269,8 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveFilter("answered")}
+          className="question-navigator__filter-tab"
+          data-filter="answered"
           style={{
             fontSize: "0.6875rem",
             fontWeight: 600,
@@ -261,10 +287,39 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
           ✓ Cevaplanan ({totalAnsweredCount})
         </button>
 
+        <button
+          type="button"
+          onClick={() => setActiveFilter("attachments")}
+          className="question-navigator__filter-tab"
+          data-filter="attachments"
+          style={{
+            fontSize: "0.6875rem",
+            fontWeight: 600,
+            padding: "0.2rem 0.45rem",
+            borderRadius: "var(--radius-sm)",
+            border: "1px solid",
+            borderColor: activeFilter === "attachments" ? "var(--color-secondary-600)" : "transparent",
+            backgroundColor: activeFilter === "attachments" ? "rgba(15, 118, 110, 0.12)" : "transparent",
+            color: activeFilter === "attachments" ? "var(--color-secondary-600)" : "var(--text-secondary)",
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.25rem",
+          }}
+          title="Ekli sorular — En az bir kanıt dosyası ekli olan soruları göster"
+          aria-label={`Ekli sorular (${attachmentsTotalQuestionsCount})`}
+        >
+          <Paperclip size={11} />
+          <span>Ekli ({attachmentsTotalQuestionsCount})</span>
+        </button>
+
         {revisitCount > 0 && (
           <button
             type="button"
             onClick={() => setActiveFilter("revisit")}
+            className="question-navigator__filter-tab"
+            data-filter="revisit"
             style={{
               fontSize: "0.6875rem",
               fontWeight: 600,
@@ -286,6 +341,8 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
           <button
             type="button"
             onClick={() => setActiveFilter("critical")}
+            className="question-navigator__filter-tab"
+            data-filter="critical"
             style={{
               fontSize: "0.6875rem",
               fontWeight: 600,
@@ -306,6 +363,8 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
         <button
           type="button"
           onClick={() => setActiveFilter("unanswered")}
+          className="question-navigator__filter-tab"
+          data-filter="unanswered"
           style={{
             fontSize: "0.6875rem",
             fontWeight: 600,
@@ -330,7 +389,7 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
           <input
             type="text"
             className="form-control"
-            placeholder="Soru veya süreç ara…"
+            placeholder="Soru, süreç veya ek ara…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -388,6 +447,8 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
                   const isFollowupActive = fol && fol.status === "open";
                   const isAnswered = isQuestionAnswered(q, ans, fol);
                   const isRequiredIncomplete = q.required && !isAnswered && !isFollowupActive;
+                  const attList = attachmentsMap.get(q.id) || [];
+                  const attCount = attList.length;
 
                   return (
                     <button
@@ -432,31 +493,54 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
                         )}
                       </span>
 
-                      {/* Question Order & Snippet */}
+                      {/* Question Order, Snippet & Attachment Badge */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div
                           style={{
                             display: "flex",
                             alignItems: "center",
+                            justifyContent: "space-between",
                             gap: "0.25rem",
-                            fontSize: "0.75rem",
-                            fontWeight: isCurrent ? 700 : 500,
-                            color: isCurrent ? "var(--primary)" : "var(--text-primary)",
                             lineHeight: 1.3,
                           }}
                         >
-                          <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
-                            {String(q.order).padStart(2, "0")}.
-                          </span>
-                          <span
+                          <div
                             style={{
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                              whiteSpace: "nowrap",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "0.25rem",
+                              fontSize: "0.75rem",
+                              fontWeight: isCurrent ? 700 : 500,
+                              color: isCurrent ? "var(--primary)" : "var(--text-primary)",
+                              minWidth: 0,
+                              flex: 1,
                             }}
                           >
-                            {q.question}
-                          </span>
+                            <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+                              {String(q.order).padStart(2, "0")}.
+                            </span>
+                            <span
+                              style={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {q.question}
+                            </span>
+                          </div>
+
+                          {/* Attachment Indicator Badge */}
+                          {attCount > 0 && (
+                            <span
+                              className="question-navigator__attachment-badge"
+                              title={`${attCount} kanıt dosyası ekli`}
+                              aria-label={`Bu soruya ${attCount} kanıt dosyası ekli`}
+                            >
+                              <Paperclip size={11} />
+                              {attCount > 1 && <span>{attCount}</span>}
+                            </span>
+                          )}
                         </div>
 
                         {/* Follow-up Note Snippet */}
@@ -553,6 +637,15 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
             <span style={{ color: "var(--text-muted)" }}>Özel Sorular:</span>
             <strong style={{ color: "var(--info)" }}>
               {customAnswered} / {customRequired.length} ({customQuestions.length} toplam)
+            </strong>
+          </div>
+        )}
+
+        {totalFilesCount > 0 && (
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
+            <span style={{ color: "var(--text-muted)" }}>Ekli Dosyalar:</span>
+            <strong style={{ color: "var(--color-secondary-600)", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+              <Paperclip size={11} /> {totalFilesCount} Dosya ({attachmentsTotalQuestionsCount} Soru)
             </strong>
           </div>
         )}

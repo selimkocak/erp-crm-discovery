@@ -649,6 +649,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         questions={visibleQuestions}
         answers={answers}
         followups={followups}
+        attachmentsMap={attachmentsMap}
         currentQuestionId={currentQuestion?.id ?? null}
         onSelectQuestion={jumpToQuestion}
         onAddCustomQuestion={handleAddCustomQuestion}
