@@ -371,6 +371,30 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
       })
     );
   }
+  if (company.businessSector) {
+    companyRows.push(
+      new TableRow({
+        children: [
+          createTableCell("Sektör / Faaliyet", { bold: true, widthPercent: 30 }),
+          createTableCell(company.businessSector, { widthPercent: 70 }),
+        ],
+      })
+    );
+  }
+  if (company.hasBranches) {
+    const branchText =
+      company.hasBranches === "yes"
+        ? (company.branchCount ? `Evet (${company.branchCount} Şube / Lokasyon)` : "Evet (Çok Lokasyonlu)")
+        : "Hayır (Tek Lokasyon)";
+    companyRows.push(
+      new TableRow({
+        children: [
+          createTableCell("Şubeli / Çok Lokasyonlu Yapı", { bold: true, widthPercent: 30 }),
+          createTableCell(branchText, { widthPercent: 70 }),
+        ],
+      })
+    );
+  }
   if (company.taxNumber) {
     companyRows.push(
       new TableRow({

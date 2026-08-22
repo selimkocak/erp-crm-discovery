@@ -56,6 +56,9 @@ export interface ReportCompany {
   city: string | null;
   country: string;
   employeeCount: string | null;
+  businessSector: string | null;
+  hasBranches: 'yes' | 'no' | null;
+  branchCount: number | null;
   notes: string | null;
 }
 

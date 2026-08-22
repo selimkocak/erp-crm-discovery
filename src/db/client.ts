@@ -15,6 +15,7 @@ import { runMigrations } from "./migrations";
 import { reconcileAndMigrateLegacyAttachments } from "../storage/attachmentMigration";
 import type {
   BusinessFunction,
+  CompanyProfile,
   CreateProjectPayload,
   EnrichedProjectFunction,
   FunctionStatus,
@@ -129,8 +130,8 @@ export async function createProject(payload: CreateProjectPayload): Promise<stri
   // 2. Firma profili
   await db.execute(
     `INSERT INTO company_profiles
-     (id, analysis_project_id, company_name, trade_name, tax_number, city, country, employee_count, notes, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10)`,
+     (id, analysis_project_id, company_name, trade_name, tax_number, city, country, employee_count, business_sector, has_branches, branch_count, notes, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)`,
     [
       companyProfileId,
       projectId,
@@ -140,6 +141,9 @@ export async function createProject(payload: CreateProjectPayload): Promise<stri
       payload.company.city ?? null,
       payload.company.country ?? "Türkiye",
       payload.company.employee_count ?? null,
+      payload.company.business_sector ?? null,
+      payload.company.has_branches ?? null,
+      payload.company.branch_count ?? null,
       payload.company.notes ?? null,
       now,
     ]
@@ -173,7 +177,7 @@ export async function getProjectDetail(projectId: string): Promise<ProjectDetail
   const project = projects[0];
 
   const companies = await db.select<ProjectDetailData["company"][]>(
-    `SELECT id, analysis_project_id, company_name, trade_name, tax_number, city, country, employee_count, notes, created_at, updated_at
+    `SELECT id, analysis_project_id, company_name, trade_name, tax_number, city, country, employee_count, business_sector, has_branches, branch_count, notes, created_at, updated_at
      FROM company_profiles WHERE analysis_project_id = $1`,
     [projectId]
   );
@@ -209,6 +213,47 @@ export async function getProjectDetail(projectId: string): Promise<ProjectDetail
   );
 
   return { project, company, functions };
+}
+
+// ---------------------------------------------------------------
+// 4.1 Firma Profilini Güncelle
+// ---------------------------------------------------------------
+export async function updateCompanyProfile(
+  projectId: string,
+  payload: Partial<CompanyProfile>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE company_profiles
+     SET company_name = COALESCE($1, company_name),
+         trade_name = $2,
+         tax_number = $3,
+         city = $4,
+         country = COALESCE($5, country),
+         employee_count = $6,
+         business_sector = $7,
+         has_branches = $8,
+         branch_count = $9,
+         notes = $10,
+         updated_at = $11
+     WHERE analysis_project_id = $12`,
+    [
+      payload.company_name ?? null,
+      payload.trade_name ?? null,
+      payload.tax_number ?? null,
+      payload.city ?? null,
+      payload.country ?? null,
+      payload.employee_count ?? null,
+      payload.business_sector ?? null,
+      payload.has_branches ?? null,
+      payload.branch_count ?? null,
+      payload.notes ?? null,
+      now,
+      projectId,
+    ]
+  );
 }
 
 // ---------------------------------------------------------------

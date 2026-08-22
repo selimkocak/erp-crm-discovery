@@ -285,5 +285,14 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
     sql: [
       `UPDATE question_attachments SET source_absolute_path = NULL WHERE source_absolute_path IS NOT NULL;`
     ]
+  },
+  {
+    version: 10,
+    description: "Company Profile: Business Sector and Multi-Location Branch Structure",
+    sql: [
+      `ALTER TABLE company_profiles ADD COLUMN business_sector TEXT;`,
+      `ALTER TABLE company_profiles ADD COLUMN has_branches TEXT;`,
+      `ALTER TABLE company_profiles ADD COLUMN branch_count INTEGER;`
+    ]
   }
 ] as const;

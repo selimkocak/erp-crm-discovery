@@ -23,6 +23,9 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
   const [city, setCity] = useState<string>("");
   const [country, setCountry] = useState<string>("Türkiye");
   const [employeeCount, setEmployeeCount] = useState<string>("");
+  const [businessSector, setBusinessSector] = useState<string>("");
+  const [hasBranches, setHasBranches] = useState<"yes" | "no" | "">("");
+  const [branchCount, setBranchCount] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
 
   // Functions Selection
@@ -87,6 +90,9 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
       setIsSubmitting(true);
       setErrorMessage(null);
 
+      const parsedBranchCount =
+        hasBranches === "yes" && branchCount.trim() ? parseInt(branchCount.trim(), 10) : undefined;
+
       const payload: CreateProjectPayload = {
         projectName: projectName.trim(),
         company: {
@@ -96,6 +102,9 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           city: city.trim() || undefined,
           country: country.trim() || "Türkiye",
           employee_count: employeeCount.trim() || undefined,
+          business_sector: businessSector.trim() || undefined,
+          has_branches: hasBranches ? hasBranches : null,
+          branch_count: !isNaN(parsedBranchCount as number) ? parsedBranchCount : undefined,
           notes: notes.trim() || undefined,
         },
         selectedFunctionIds,
@@ -261,36 +270,123 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
             </div>
           </div>
 
+          <div className="form-group">
+            <label htmlFor="businessSector">Sektör / Faaliyet Alanı</label>
+            <input
+              id="businessSector"
+              type="text"
+              className="form-control"
+              placeholder="Örn. Ofis mobilyası üretimi ve toptan satışı"
+              value={businessSector}
+              onChange={(e) => setBusinessSector(e.target.value)}
+            />
+          </div>
+
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="taxNumber">Vergi Numarası / Dairesi</label>
-              <input
-                id="taxNumber"
-                type="text"
-                className="form-control"
-                placeholder="Örn: 1234567890 - Zincirlikuyu VD"
-                value={taxNumber}
-                onChange={(e) => setTaxNumber(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="employeeCount">Çalışan Sayısı Aralığı</label>
+              <label htmlFor="hasBranches">Şubeli veya Çok Lokasyonlu Yapı Var mı?</label>
               <select
-                id="employeeCount"
+                id="hasBranches"
                 className="form-control"
-                value={employeeCount}
-                onChange={(e) => setEmployeeCount(e.target.value)}
+                value={hasBranches}
+                onChange={(e) => setHasBranches(e.target.value as "yes" | "no" | "")}
               >
-                <option value="">Seçiniz</option>
-                <option value="1-20">1 - 20 Çalışan</option>
-                <option value="21-50">21 - 50 Çalışan</option>
-                <option value="51-250">51 - 250 Çalışan</option>
-                <option value="251-1000">251 - 1000 Çalışan</option>
-                <option value="1000+">1000+ Çalışan</option>
+                <option value="">Belirtilmedi</option>
+                <option value="yes">Evet (Çok Lokasyonlu)</option>
+                <option value="no">Hayır (Tek Lokasyon)</option>
               </select>
             </div>
+
+            {hasBranches === "yes" ? (
+              <div className="form-group">
+                <label htmlFor="branchCount">Şube / Lokasyon Sayısı</label>
+                <input
+                  id="branchCount"
+                  type="number"
+                  min="1"
+                  className="form-control"
+                  placeholder="Örn: 5"
+                  value={branchCount}
+                  onChange={(e) => setBranchCount(e.target.value)}
+                />
+              </div>
+            ) : (
+              <div className="form-group">
+                <label htmlFor="employeeCount">Çalışan Sayısı Aralığı</label>
+                <select
+                  id="employeeCount"
+                  className="form-control"
+                  value={employeeCount}
+                  onChange={(e) => setEmployeeCount(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="1-20">1 - 20 Çalışan</option>
+                  <option value="21-50">21 - 50 Çalışan</option>
+                  <option value="51-250">51 - 250 Çalışan</option>
+                  <option value="251-1000">251 - 1000 Çalışan</option>
+                  <option value="1000+">1000+ Çalışan</option>
+                </select>
+              </div>
+            )}
           </div>
+
+          {hasBranches === "yes" && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="employeeCount">Çalışan Sayısı Aralığı</label>
+                <select
+                  id="employeeCount"
+                  className="form-control"
+                  value={employeeCount}
+                  onChange={(e) => setEmployeeCount(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="1-20">1 - 20 Çalışan</option>
+                  <option value="21-50">21 - 50 Çalışan</option>
+                  <option value="51-250">51 - 250 Çalışan</option>
+                  <option value="251-1000">251 - 1000 Çalışan</option>
+                  <option value="1000+">1000+ Çalışan</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="taxNumber">Vergi Numarası / Dairesi</label>
+                <input
+                  id="taxNumber"
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: 1234567890 - Zincirlikuyu VD"
+                  value={taxNumber}
+                  onChange={(e) => setTaxNumber(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {hasBranches !== "yes" && (
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="taxNumber">Vergi Numarası / Dairesi</label>
+                <input
+                  id="taxNumber"
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: 1234567890 - Zincirlikuyu VD"
+                  value={taxNumber}
+                  onChange={(e) => setTaxNumber(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group" style={{ opacity: 0.6 }}>
+                <label>&nbsp;</label>
+                <div style={{ fontSize: "0.8125rem", color: "var(--text-muted)", padding: "0.5rem 0" }}>
+                  {hasBranches === "no"
+                    ? "Tek merkez / fabrika üzerinden yürütülmektedir."
+                    : "Şubeli yapı durumu belirtilmediğinde rapor künyesinde yer almaz."}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="form-row">
             <div className="form-group">

@@ -13,12 +13,15 @@ export interface CompanyProfile {
   id: string;
   analysis_project_id: string;
   company_name: string;
-  trade_name?: string;
-  tax_number?: string;
-  city?: string;
+  trade_name?: string | null;
+  tax_number?: string | null;
+  city?: string | null;
   country: string;
-  employee_count?: string;
-  notes?: string;
+  employee_count?: string | null;
+  business_sector?: string | null;
+  has_branches?: 'yes' | 'no' | null;
+  branch_count?: number | null;
+  notes?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -78,9 +81,25 @@ export interface CreateProjectPayload {
     city?: string;
     country: string;
     employee_count?: string;
+    business_sector?: string;
+    has_branches?: 'yes' | 'no' | null;
+    branch_count?: number | null;
     notes?: string;
   };
   selectedFunctionIds: string[];
+}
+
+export interface UpdateCompanyProfilePayload {
+  company_name?: string;
+  trade_name?: string | null;
+  tax_number?: string | null;
+  city?: string | null;
+  country?: string;
+  employee_count?: string | null;
+  business_sector?: string | null;
+  has_branches?: 'yes' | 'no' | null;
+  branch_count?: number | null;
+  notes?: string | null;
 }
 
 // ─────────────────────────────────────────────────────────────

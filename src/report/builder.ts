@@ -549,6 +549,9 @@ export async function buildReportModel(
     city: company.city || null,
     country: company.country || "Türkiye",
     employeeCount: company.employee_count || null,
+    businessSector: company.business_sector || null,
+    hasBranches: company.has_branches || null,
+    branchCount: company.branch_count ?? null,
     notes: company.notes || null,
   };
 

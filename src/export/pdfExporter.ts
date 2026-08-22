@@ -181,6 +181,14 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   if (company.tradeName) companyBody.push(["Ticari Unvan", company.tradeName]);
   if (company.city) companyBody.push(["Şehir / Ülke", `${company.city}, ${company.country}`]);
   if (company.employeeCount) companyBody.push(["Çalışan Sayısı", company.employeeCount]);
+  if (company.businessSector) companyBody.push(["Sektör / Faaliyet", company.businessSector]);
+  if (company.hasBranches) {
+    const branchText =
+      company.hasBranches === "yes"
+        ? (company.branchCount ? `Evet (${company.branchCount} Şube / Lokasyon)` : "Evet (Çok Lokasyonlu)")
+        : "Hayır (Tek Lokasyon)";
+    companyBody.push(["Şubeli / Çok Lokasyonlu Yapı", branchText]);
+  }
   if (company.taxNumber) companyBody.push(["Vergi Numarası", company.taxNumber]);
   if (company.notes) companyBody.push(["Firma Notları", company.notes]);
 

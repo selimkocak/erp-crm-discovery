@@ -446,6 +446,22 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                       <td className="report-table__value">{company.employeeCount}</td>
                     </tr>
                   )}
+                  {company.businessSector && (
+                    <tr>
+                      <td className="report-table__label">Sektör / Faaliyet:</td>
+                      <td className="report-table__value">{company.businessSector}</td>
+                    </tr>
+                  )}
+                  {company.hasBranches && (
+                    <tr>
+                      <td className="report-table__label">Şubeli / Çok Lokasyonlu Yapı:</td>
+                      <td className="report-table__value">
+                        {company.hasBranches === "yes"
+                          ? (company.branchCount ? `Evet (${company.branchCount} Şube / Lokasyon)` : "Evet (Çok Lokasyonlu)")
+                          : "Hayır (Tek Lokasyon)"}
+                      </td>
+                    </tr>
+                  )}
                   {company.taxNumber && (
                     <tr>
                       <td className="report-table__label">Vergi Numarası:</td>

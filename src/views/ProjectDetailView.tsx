@@ -5,6 +5,8 @@ import {
   Calendar,
   MapPin,
   Users,
+  Briefcase,
+  GitBranch,
   CheckCircle2,
   Clock,
   CircleDot,
@@ -298,6 +300,34 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
               <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
                 <Users size={14} style={{ color: "var(--text-muted)" }} />
                 <span>{company.employee_count}</span>
+              </div>
+            </div>
+          )}
+
+          {company.business_sector && (
+            <div>
+              <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem", fontWeight: 600 }}>
+                SEKTÖR / FAALİYET
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <Briefcase size={14} style={{ color: "var(--text-muted)" }} />
+                <span>{company.business_sector}</span>
+              </div>
+            </div>
+          )}
+
+          {company.has_branches && (
+            <div>
+              <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem", fontWeight: 600 }}>
+                ŞUBELİ YAPI
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+                <GitBranch size={14} style={{ color: "var(--text-muted)" }} />
+                <span>
+                  {company.has_branches === "yes"
+                    ? (company.branch_count ? `Evet (${company.branch_count} Şube / Lokasyon)` : "Evet (Çok Lokasyonlu)")
+                    : "Hayır (Tek Lokasyon)"}
+                </span>
               </div>
             </div>
           )}
