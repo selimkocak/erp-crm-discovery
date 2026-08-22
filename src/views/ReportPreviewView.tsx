@@ -24,12 +24,13 @@ import {
   Paperclip,
   ExternalLink,
   X,
+  FolderOpen,
 } from "lucide-react";
 import { buildReportModel } from "../report/builder";
 import type { ReportModel, ReportAttachmentItem } from "../report/types";
 import { ReportProfileModal } from "../components/ReportProfileModal";
 import { exportReport } from "../export";
-import { openAttachment } from "../storage/attachmentLinks";
+import { openAttachment, showAttachmentInFolder } from "../storage/attachmentLinks";
 import { readAttachmentFile, getFileCategory } from "../storage/attachmentManager";
 
 interface ReportPreviewViewProps {
@@ -79,6 +80,14 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
     }
 
     const res = await openAttachment(att);
+    if (!res.success && res.error) {
+      setAttachmentError(res.error);
+    }
+  };
+
+  const handleShowInFolder = async (att: ReportAttachmentItem) => {
+    setAttachmentError(null);
+    const res = await showAttachmentInFolder(att.relativePath);
     if (!res.success && res.error) {
       setAttachmentError(res.error);
     }
@@ -911,9 +920,31 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                               <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block", marginTop: "0.15rem" }}>
                                 {att.fileExtension.toUpperCase()} • {sizeStr}
                               </span>
-                              <span style={{ color: "var(--text-muted)", fontSize: "0.6875rem", display: "block", opacity: 0.8, fontStyle: "italic" }}>
-                                {att.relativePath}
-                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
+                                <span style={{ color: "var(--text-muted)", fontSize: "0.625rem", fontStyle: "italic", opacity: 0.8 }}>
+                                  Vault: {att.storedFileName}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleShowInFolder(att)}
+                                  title="Dosyanın yerel Vault klasörünü dosya yöneticisinde aç"
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: "0.2rem",
+                                    background: "none",
+                                    border: "1px solid var(--border-color, #cbd5e1)",
+                                    borderRadius: "3px",
+                                    padding: "0.1rem 0.35rem",
+                                    cursor: "pointer",
+                                    fontSize: "0.625rem",
+                                    color: "var(--text-muted)",
+                                  }}
+                                >
+                                  <FolderOpen size={10} />
+                                  Klasörde Göster
+                                </button>
+                              </div>
                             </td>
                             <td style={{ color: att.description ? "var(--text-color)" : "var(--text-muted)", fontStyle: att.description ? "normal" : "italic" }}>
                               {att.description || "Açıklama girilmedi."}

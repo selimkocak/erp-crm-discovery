@@ -220,6 +220,57 @@ export interface OpenAttachmentResult {
  * macOS:    open /Users/.../dosya.pdf
  * Linux:    xdg-open /home/.../dosya.pdf
  */
+// ─────────────────────────────────────────────────────────────
+// 6. Dosya Yöneticisinde Göster ("Klasörde Göster")
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Managed Vault dosyasını seçili olarak işletim sisteminin dosya
+ * yöneticisinde gösterir.
+ *
+ * Windows: explorer.exe /select,"C:\...\dosya.pdf"
+ * macOS:   open -R "/Users/.../dosya.pdf"
+ * Linux:   xdg-open "/parent/dir/"
+ *
+ * Test / web ortamında sessizce { success: true } döner.
+ */
+export async function showAttachmentInFolder(
+  relativePath: string
+): Promise<{ success: boolean; error?: string }> {
+  if (!validateRelativePath(relativePath)) {
+    return {
+      success: false,
+      error: "Geçersiz dosya yolu formatı — klasör gösterilemedi.",
+    };
+  }
+
+  try {
+    const absPath = await resolveAttachmentAbsolutePath(relativePath);
+
+    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        await invoke("show_attachment_in_folder", { path: absPath });
+        return { success: true };
+      } catch (invokeErr: any) {
+        console.warn("show_attachment_in_folder invoke hatası:", invokeErr);
+        return {
+          success: false,
+          error: `Klasör açılamadı: ${invokeErr?.message || invokeErr}`,
+        };
+      }
+    }
+
+    // Web / test ortamı — sessiz başarı
+    return { success: true };
+  } catch (err: any) {
+    return {
+      success: false,
+      error: `Klasör açılırken bir sorun oluştu: ${err?.message || err}`,
+    };
+  }
+}
+
 export async function openAttachment(attachment: {
   relative_path?: string;
   relativePath?: string;
@@ -245,7 +296,7 @@ export async function openAttachment(attachment: {
   if (!exists) {
     return {
       success: false,
-      error: `Kanıt dosyası yerel Attachment Vault içinde bulunamadı: "${originalName}". Dosya silinmiş veya taşınmış olabilir.`,
+      error: `Kanıt dosyası yerel Attachment Vault içinde bulunamadı: "${originalName}" [Vault Yolu: ${relPath}]. Dosyayı yeniden içe aktarınız veya uygulamayı yeniden başlatınız.`,
     };
   }
 

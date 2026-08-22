@@ -494,7 +494,7 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
       attRows.push([
         `${a.businessFunctionNameTr}\n(${a.processName})`,
         `[${a.questionId}]\n${a.questionText}`,
-        `📎 ${a.originalFileName}\n[${a.fileExtension.toUpperCase()} • ${sizeStr}]\n${a.relativePath}`,
+        `📎 ${a.originalFileName}\n[${a.fileExtension.toUpperCase()} • ${sizeStr}]`,
         a.description || "—",
       ]);
     }
