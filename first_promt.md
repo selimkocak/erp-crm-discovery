@@ -1,24 +1,26 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.0 (Release Candidate 1) | Git Durumu: 34 Paket Tamamlandı + Soru Navigatörü Ek Göstergesi + Semantik Buton Sistemi + Managed Vault Windows Native İkiz Kopya + Kalite Denetimi Mühürlü (Temiz Çalışma Ağacı)
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_navigator_attachment_and_quality_audit_2026_08_22
-Doğrulama Durumu: 55 Test Paketinde 1.750+ Test %100 PASS, npm run build (0 Hata, Vite 1921 modül), cargo check (0 Hata)
-Git HEAD: 5e0b9fa (main = origin/main)
+Mevcut Sürüm: v0.1.0 (Release Candidate 1) | Git Durumu: 34 Paket Tamamlandı + Soru Navigatörü Ek Göstergesi + Semantik Buton Sistemi + Managed Vault Windows Native İkiz Kopya + Sektör/Şube Alanları + Mevcut Proje Firma Bilgilerini Düzenleme (Edit Mode) + Kaynak Yolu Gizlilik Mühürü + GitHub Actions CI 3/3 Yeşil (Temiz Çalışma Ağacı)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_company_profile_edit_and_rc1_gate_2026_08_22
+Doğrulama Durumu: 58 Test Paketinde 1.800+ Test %100 PASS, npm run build (0 Hata, Vite 1921 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
+Git HEAD: 83e81e1 (main = origin/main)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
 ======================================================================
 - Temel Konumlandırma: Field-first · Data-first · Analysis-first · Offline-first · Evidence-first · Human-led. Bu proje bir AI uygulaması değildir; AI modeli, tahmin veya otomatik yorum içermez; çekirdek uygulamanın sıfır bulut bağımlılığı vardır.
 - Kabuk: Tauri 2 (Rust) + React 18 + TypeScript + Vite + Vanilla CSS (Design Tokens) + Lucide Icons
-- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 16 Kanonik Tablo, 8 Migrasyon (Tauri plugin-sql)
+- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 16 Kanonik Tablo, 10 Migrasyon (Tauri plugin-sql)
 - Soru Motoru: 33 Kanonik Fonksiyon kataloğu, 34 Kanonik Soru Paketi (1.492 Soru, ~800 Zorunlu, 200+ Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Mevcut Proje Firma Bilgilerini Düzenleme (Project Profile Edit Mode): HomeView ve ProjectDetailView tablolarında `[Düzenle]` (`Pencil` ikonu, `btn btn-secondary btn--sm`); NewProjectView ortak form altyapısında tek adımlı kompakt profil düzenleme modu (11 alan); updateProjectDetails(projectId, payload) fonksiyonu ile analysis_projects ve company_profiles tablolarında atomik UPDATE; cevapların (question_answers), modüllerin (project_business_functions), takip bayraklarının (question_followups), proje notlarının (project_notes), kanıt kasası eklerinin (question_attachments) %100 korunması (test/project_profile_edit_test.ts 40/40 PASS)
+- Firma Profili Sektör ve Şubeli Yapı Alanları: Serbest metin `Sektör / Faaliyet Alanı` (business_sector) ve `Şubeli veya Çok Lokasyonlu Yapı` (has_branches: 'yes' | 'no' | NULL) + `Şube / Lokasyon Sayısı` (branch_count: INTEGER, min 1 pozitif sayı sanitizasyonu); Migration 10 ile DB şeması genişletildi; Rapor Önizleme, DOCX ve PDF çıktılarına koşullu satır entegrasyonu (test/company_profile_sector_and_branch_test.ts 33/33 PASS)
 - Soru Navigatöründe Ek Dosyası Göstergesi & Filtresi: Soru navigatöründe kanıt dosyası ekli soruların yanında `📎` (tekil) veya `📎 N` (çoklu dosya) rozeti; `Ekli (N)` / `data-filter="attachments"` filtre sekmesi; ek dosya adı ve ek açıklamasına göre canlı arama; dinamik ekleme/silme reaktivitesi; bayraklarla (Sarı/Kırmızı) simetrik ve çakışmasız çalışma (`pointer-events: none`, `flex-shrink: 0`)
 - Semantik Kurumsal Buton Renk Sistemi: İşleve göre açıkça ayrışan renk sistemi:
   · Başlat: Mavi (`#2563eb`, `.button--start`)
   · Devam: Turkuaz / Teal (`#0f766e`, `.button--continue`)
   · Rapor Önizleme: Koyu İndigo (`#4f46e5`, `.button--report`)
-  · Kaydet ve Çık: Koyu Zümrüt Yeşili (`#15803d` / `#047857`, 5.48:1 WCAG AA, `.button--save`)
+  · Kaydet ve Çık / Değişiklikleri Kaydet: Koyu Zümrüt Yeşili (`#15803d` / `#047857`, 5.48:1 WCAG AA, `.button--save`)
   · Sonraki: Mavi (`.button--next`)
   · Önceki / Geri: Nötr gri (`.button--back`)
   · Kritik / Sil: Kırmızı (`.button--danger`)
@@ -26,14 +28,15 @@ Git HEAD: 5e0b9fa (main = origin/main)
 - Semantik Katman: Bulgular (Findings), Gereksinimler (Requirements), Riskler (Risks), Proje Notları (Notes)
 - Takip & Navigasyon: 🟡 Sonra Dön (revisit) & 🔴 Kritik Takip (critical) Bayrakları, Proje Özel Soruları (project_custom_questions), Sol Soru Navigatörü, Autosave & Resumable Analiz
 - Soru Ekranı Üst Bar & Geometrik Simetri: .question-screen-toolbar 3-kolonlu CSS Grid (190px / 240px / auto), buton min-width sınırları (.btn-save-exit 142px zümrüt #047857 WCAG AA 5.48:1, .btn-nav-home 150px, .btn-custom-question 126px, .btn-interim-report 118px), .flag-actions 2-kolon simetrik grid, .active-flag-banner ve .followup-modal-container (560px max / 420px min)
-- Managed Attachment Vault (Yönetilen Kanıt Kasası): Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/ERP CRM Discovery/attachment/{projectId}/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration v8), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF file:///... hyperlink garantisi
+- Managed Attachment Vault (Yönetilen Kanıt Kasası): Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/ERP CRM Discovery/attachment/{projectId}/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration 8 & 9), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF file:///... hyperlink garantisi
+- `source_absolute_path` Gizlilik & Taşınabilirlik Mühürü: Kullanıcı dosya sistemi mutlak yollarının (`C:\Users\...`, `/home/...`) SQLite veritabanına kaydedilmesi engellendi; INSERT/UPDATE işlemlerinde mutlak yol NULL yapıldı; Migration 9 ile eski kayıtlar temizlendi; sadece relative_path ve SHA-256 saklandı
 - Attachment Hyperlink Mimarisi: openAttachment() → resolveAttachmentAbsolutePath() (relative→appLocalDataDir→backslash native) → invoke("open_attachment_path") → Rust explorer.exe (Windows) / open (macOS) / xdg-open (Linux). DOCX/PDF: resolveAttachmentFileUrlFromRelative() ile async runtime çözümleme. file:///C:/... (RFC-8089, 3 slash). Path traversal: validateRelativePath() + ".." segment normalizasyonu çift katman.
 - Raporlama Motoru (Tek Doğruluk Kaynağı): ReportModel üzerinden Rapor Önizleme, Word (.docx) ve Gömülü Liberation Sans TrueType Unicode PDF (.pdf) üretimi (Türkçe karakter garantili, sıfır ağ bağımlılığı)
 - Dağıtım Paketleri: Windows (x64 NSIS Setup .exe) ve macOS Apple Silicon (aarch64 DMG + .app)
 - Kurulum Rehberleri: Kök dizinde ve artifact ZIP'lerinde WINDOWS_KURULUM_YARDIMI.txt & MACOS_KURULUM_YARDIMI.txt
 
 ======================================================================
-2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-44 & RC1 STABİLİZASYONU)
+2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-46 & RC1 STABİLİZASYONU)
 ======================================================================
 - FAZ-1 / FAZ-2.2: 31/32 Fonksiyon, soru paketi motoru, SQLite tohumlama ve clean install
 - FAZ-3: Semantik analiz katmanı (Bulgu, Gereksinim, Risk, Not)
@@ -78,11 +81,16 @@ Git HEAD: 5e0b9fa (main = origin/main)
 - FAZ-42: MANAGEMENT — Genel Yönetim ve Kurumsal Yönetişim Soru Paketi (tr.management.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
 - FAZ-43: STRATEGY — Stratejik Planlama Soru Paketi (tr.strategy.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
 - FAZ-44: TRAINING — Eğitim ve Gelişim Soru Paketi (tr.training.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-45 (RC1 Stabilizasyon & Kalite Mühürleme):
+- FAZ-45 (Soru Navigatörü Ek Göstergesi, Semantik Butonlar & Managed Vault Bütünlüğü):
   · Soru Navigatöründe Ek Göstergesi (📎 / 📎 N), Ekli Sorular Filtre Sekmesi ve Arama
   · Kurumsal Semantik Buton Renk Sistemi (Mavi Başlat, Teal Devam, İndigo Rapor, Zümrüt Kaydet)
   · Windows Managed Attachment Vault Native Rust Motoru & Fiziksel Bütünlük Güvencesi
   · 34 Paketlik Külliyat Bağımsız Kalite Denetimi & Süreç/Handle Teşhisi
+- FAZ-46 (Firma Profili Düzenleme Modu, Sektör/Şube Alanları & Gizlilik Mühürü):
+  · Mevcut Proje Firma Bilgilerini Düzenleme (HomeView & ProjectDetailView Düzenle aksiyonu, NewProjectView tek adımlı kompakt edit modu, updateProjectDetails ile atomik UPDATE, cevap/kapsam/bayrak/ek %100 veri izolasyonu)
+  · Firma Profili Sektör ve Şubeli Yapı Alanları (business_sector, has_branches, branch_count, Migration 10, DOCX/PDF koşullu render)
+  · `source_absolute_path` Gizlilik & Taşınabilirlik Mühürü (Migration 9 ile mutlak yolların temizlenmesi, SQLite'a yalnızca relative_path kaydı)
+  · 58 Test Paketi %100 PASS (1.800+ test), GitHub Actions 3 Platform (Linux, macOS ARM64, Windows NSIS) Yeşil Mühürleme
 
 ======================================================================
 3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (34 PAKET / 1.492 SORU — %100 TAMAMLANDI)
@@ -139,7 +147,9 @@ Git HEAD: 5e0b9fa (main = origin/main)
 ======================================================================
 5. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- Tüm Testler (55 Test Suite, 1.750+ Test): npm test
+- Tüm Testler (58 Test Suite, 1.800+ Test): npm test
+- Mevcut Proje Düzenleme Kabul Testi: npm exec -- tsx test/project_profile_edit_test.ts
+- Sektör ve Şube Doğrulama Testi: npm exec -- tsx test/company_profile_sector_and_branch_test.ts
 - Navigatör Ek Göstergesi Testi: npm exec -- tsx test/question_navigator_attachment_indicator_test.ts
 - Windows Managed Vault Bütünlük Testi: npm exec -- tsx test/managed_vault_physical_integrity_test.ts
 - Windows Hyperlink URI Testi: npm exec -- tsx test/windows_attachment_hyperlink_test.ts
