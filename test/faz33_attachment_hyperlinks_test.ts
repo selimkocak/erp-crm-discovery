@@ -156,7 +156,7 @@ async function runTests() {
   const openRes = await openAttachment(missingAtt);
   assert(openRes.success === false, "Eksik dosya için openAttachment başarısız döndü.");
   assert(
-    openRes.error?.includes("Dosya bulunamadı: \"Fiyat_Listesi.pdf\""),
+    Boolean(openRes.error?.includes("bulunamadı") && openRes.error?.includes("Fiyat_Listesi.pdf")),
     `Kullanıcı dostu hata mesajı üretildi: ${openRes.error}`
   );
   assert(

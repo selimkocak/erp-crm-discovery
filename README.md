@@ -41,10 +41,10 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 
 ## Temel Özellikler (Features)
 
-- **33 Kanonik İş Fonksiyonu & 31 Soru Paketi (1.351 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret ve yatay Ana Veri Yönetimi dahil 31 hazır soru paketi.
+- **33 Kanonik İş Fonksiyonu & 32 Soru Paketi (1.398 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim ve yatay Ana Veri Yönetimi dahil 32 hazır soru paketi.
 - **Deklaratif Soru Motoru (Question Engine):** Kod yazmadan, tamamen açık JSON şeması ile genişletilebilir soru paketleri. Tekli seçim, çoklu seçim, açık uçlu metin, seçenek bazlı özel notlar ve genel görüşme notları.
 - **Tek Seçimli Cevabı Kaldırma (Clear Selection):** Yanlışlıkla yapılan seçimleri kolayca geri alma ve klavyeden `Escape` ile temizleme desteği.
-- **Dinamik Koşullu Dallanma (190 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
+- **Dinamik Koşullu Dallanma (197 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
 - **Semantik Analiz Katmanı:** Ham soru-cevapların ötesinde yapılandırılmış **Bulgu (Finding)**, **Gereksinim (Requirement)**, **Risk** ve **Proje Notu** yönetimi.
 - **Soru Takip Bayrakları:** 🟡 *Sonra Dön* ve 🔴 *Kritik Takip* bayrakları — saha görüşmesinde belirsizleri işaretleyip Bölüm 5 Açık Konular tablosuna otomatik taşıma.
 - **Yönetilen Kanıt Kasası (Managed Attachment Vault):** Soru bazlı eklenen dosyaları (PDF, Excel, resim vb.) proje dizininde izole kopyalayarak koruma ve belgelere `file:///` köprüsüyle doğrudan erişim.
@@ -77,7 +77,7 @@ Database:         Lokal SQLite (@tauri-apps/plugin-sql / sqlx) — 16 tablo, 8 m
 Native I/O:       @tauri-apps/plugin-dialog, @tauri-apps/plugin-fs
 Reporting:        docx (npm), jsPDF + jsPDF-AutoTable (Embedded Liberation Sans TrueType)
 Icons:            Lucide React
-Test Runner:      tsx (TypeScript execute) — 50 test suite (1.630+ test)
+Test Runner:      tsx (TypeScript execute) — 52 test suite (1.670+ test)
 ```
 
 ---
@@ -101,10 +101,10 @@ Projeyi yerel Linux veya Windows makinenizde geliştirmek için:
 # 1. Depoyu klonlayın ve bağımlılıkları yükleyin
 npm ci
 
-# 2. Kanonik iş fonksiyonlarını (33 BF) ve 31 soru paketini TypeScript'e derleyin
+# 2. Kanonik iş fonksiyonlarını (33 BF) ve 32 soru paketini TypeScript'e derleyin
 npm run generate
 
-# 3. Tam test suitini çalıştırın (50 test suite, 1.630+ test)
+# 3. Tam test suitini çalıştırın (52 test suite, 1.670+ test)
 npm test
 
 # 4. Windows test paritesini doğrulayın
@@ -124,10 +124,10 @@ npm run tauri dev
 
 ## Kanonik Soru Paketi Kataloğu (Question Pack Catalog)
 
-`v0.1.0` itibarıyla **33 kanonik iş fonksiyonu** tescil edilmiş, **31 soru paketi** mühürlenmiştir.
-Toplam: **1.351 soru**, **717 zorunlu soru**, **634 opsiyonel soru**, **190 koşullu dallanma (branching) noktası**.
+`v0.1.0` itibarıyla **33 kanonik iş fonksiyonu** tescil edilmiş, **32 soru paketi** mühürlenmiştir.
+Toplam: **1.398 soru**, **742 zorunlu soru**, **656 opsiyonel soru**, **197 koşullu dallanma (branching) noktası**.
 
-### Dikey Kanonik Modüller (30 Paket) ve Yatay Yönetişim (1 Paket)
+### Dikey Kanonik Modüller (31 Paket) ve Yatay Yönetişim (1 Paket)
 
 | # | Modül | İş Fonksiyonu Kodu | Soru | Zorunlu | Branching | Durum |
 |---|---|---|:---:|:---:|:---:|:---:|
@@ -162,12 +162,12 @@ Toplam: **1.351 soru**, **717 zorunlu soru**, **634 opsiyonel soru**, **190 koş
 | 29 | İthalat ve Gümrük | `IMPORT` | 47 | 25 | 8 | ✅ Mühürlü |
 | 30 | İhracat ve Gümrük | `EXPORT` | 47 | 25 | 8 | ✅ Mühürlü |
 | 31 | E-Ticaret | `ECOMMERCE` | 47 | 25 | 8 | ✅ Mühürlü |
-| | **TOPLAM (31 Paket)** | | **1.351** | **717** | **190** | |
+| 32 | Genel Yönetim & Kurumsal Yönetişim | `MANAGEMENT` | 47 | 25 | 7 | ✅ Mühürlü |
+| | **TOPLAM (32 Paket)** | | **1.398** | **742** | **197** | |
 
-> **Hazırlanıyor / Yol Haritası (3 Modül):**
-> 1. Genel Yönetim (`MANAGEMENT`)
-> 2. Stratejik Planlama (`STRATEGY`)
-> 3. Eğitim ve Gelişim (`TRAINING`)
+> **Hazırlanıyor / Yol Haritası (2 Modül):**
+> 1. Stratejik Planlama (`STRATEGY`)
+> 2. Eğitim ve Gelişim (`TRAINING`)
 
 ---
 
@@ -225,24 +225,26 @@ erp-crm-discovery/
 │   └── views/                   # Ekranlar (QuestionScreen, ReportPreviewView vb.)
 ├── src-tauri/                   # Tauri 2 Rust backend
 │   └── src/                     # Native dialog, FS komutları
-├── question-packs/tr/           # 31 kanonik JSON soru paketi
+├── question-packs/tr/           # 32 kanonik JSON soru paketi
 │   ├── sales/core.json
 │   ├── invoicing/core.json
 │   ├── document_management/core.json
 │   ├── import/core.json
 │   ├── export/core.json
 │   ├── ecommerce/core.json
-│   └── ... (31 paket)
+│   ├── management/core.json
+│   └── ... (32 paket)
 ├── data/
 │   └── business-functions.json  # 33 BF kanonik registry (tek doğruluk kaynağı)
 ├── scripts/
 │   └── generate_business_functions.mjs  # Kod üretici
-├── test/                        # 50 TypeScript kabul testi (1.630+ test)
+├── test/                        # 52 TypeScript kabul testi (1.670+ test)
 │   ├── vertical_slice_test.ts
 │   ├── faz2_tests.ts
 │   ├── faz41_ecommerce_question_pack_test.ts
+│   ├── faz42_management_question_pack_test.ts
 │   ├── cross_pack_question_identity_test.ts
-│   └── ... (50 dosya)
+│   └── ... (52 dosya)
 └── docs/                        # Faz kapanış raporları & şema kılavuzları
 ```
 
@@ -267,7 +269,7 @@ JSON Soru Paketi
 Proje **"Tek Modül = Tek Faz = Tek Kabul"** disipliniyle geliştirilmiştir. Her kanonik modülün tam kabul testi mevcuttur.
 
 ```bash
-npm test   # 50 test suite (1.630+ test) — tüm FAZ'lar
+npm test   # 52 test suite (1.670+ test) — tüm FAZ'lar
 ```
 
 Her modül testi şu 15 alanı doğrular:
@@ -310,7 +312,7 @@ Her geliştirme fazının kabul raporu [`docs/`](docs/) dizininde saklanmaktadı
 |---|---|
 | [`FAZ_0_ARCHITECTURE_BLUEPRINT.md`](docs/FAZ_0_ARCHITECTURE_BLUEPRINT.md) | Temel mimari kararlar |
 | [`FAZ_1_IMPLEMENTATION_REPORT.md`](docs/FAZ_1_IMPLEMENTATION_REPORT.md) | Core engine & SQLite |
-| [`FAZ_11..FAZ_41_*_QUESTION_PACK.md`](docs/) | Her modülün saha kılavuzu |
+| [`FAZ_11..FAZ_42_*_QUESTION_PACK.md`](docs/) | Her modülün saha kılavuzu |
 
 ---
 
