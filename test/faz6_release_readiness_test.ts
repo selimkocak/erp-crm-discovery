@@ -214,10 +214,10 @@ const {
 } = await import('../src/generated/questionPacks.js');
 
 // 1. Pack ID listesi ve mevcudiyet
-assert(AVAILABLE_PACK_IDS.length === 33, `Tam 33 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
-assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 33, `Tam 33 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
+assert(AVAILABLE_PACK_IDS.length === 34, `Tam 34 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
+assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 34, `Tam 34 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
 
-// 2. Tüm 33 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
+// 2. Tüm 34 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
 for (const bfCode of AVAILABLE_BUSINESS_FUNCTION_CODES) {
   assert(hasQuestionPack(bfCode) === true, `hasQuestionPack("${bfCode}") === true`);
   assert(getPackStatus(bfCode) === 'available', `getPackStatus("${bfCode}") === "available"`);
@@ -251,10 +251,17 @@ if (stratLoad.ok) {
   assert(stratLoad.pack.questions.length === 47, `STRATEGY paketi tam 47 soru içerir (${stratLoad.pack.questions.length})`);
 }
 
-// 3. Henüz geliştirilmemiş 1 fonksiyon için hasQuestionPack === false ve in_development
-const unreadyCodes = [
-  'TRAINING'
-];
+// TRAINING paketi mevcudiyet ve soru sayısı doğrulaması (FAZ-44)
+assert(hasQuestionPack('TRAINING') === true, 'hasQuestionPack("TRAINING") === true');
+assert(getPackStatus('TRAINING') === 'available', 'getPackStatus("TRAINING") === "available"');
+const trnLoad = await loadQuestionPack('tr.training.core');
+assert(trnLoad.ok === true, 'loadQuestionPack("tr.training.core") ok === true');
+if (trnLoad.ok) {
+  assert(trnLoad.pack.questions.length === 47, `TRAINING paketi tam 47 soru içerir (${trnLoad.pack.questions.length})`);
+}
+
+// 3. Artık tüm 33 kanonik iş fonksiyonunun soru paketi mevcuttur (0 unready fonksiyon)
+const unreadyCodes: string[] = [];
 for (const code of unreadyCodes) {
   assert(hasQuestionPack(code) === false, `Unready fonksiyon hasQuestionPack("${code}") === false`);
   assert(getPackStatus(code) === 'in_development', `Unready fonksiyon getPackStatus("${code}") === "in_development"`);

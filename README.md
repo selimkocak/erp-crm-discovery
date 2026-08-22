@@ -101,10 +101,10 @@ Projeyi yerel Linux veya Windows makinenizde geliştirmek için:
 # 1. Depoyu klonlayın ve bağımlılıkları yükleyin
 npm ci
 
-# 2. Kanonik iş fonksiyonlarını (33 BF) ve 32 soru paketini TypeScript'e derleyin
+# 2. Kanonik iş fonksiyonlarını (33 BF) ve 34 soru paketini TypeScript'e derleyin
 npm run generate
 
-# 3. Tam test suitini çalıştırın (52 test suite, 1.670+ test)
+# 3. Tam test suitini çalıştırın (54 test suite, 1.800+ test)
 npm test
 
 # 4. Windows test paritesini doğrulayın
@@ -124,10 +124,10 @@ npm run tauri dev
 
 ## Kanonik Soru Paketi Kataloğu (Question Pack Catalog)
 
-`v0.1.0` itibarıyla **33 soru paketi** (32 dikey modül + 1 yatay yönetişim paketi) mühürlenmiştir. Kalan son kanonik modül olan `TRAINING` (Eğitim ve Gelişim) hazırlanmaktadır.
-Toplam: **1.445 soru**, **767 zorunlu soru**, **678 opsiyonel soru**, **205 koşullu dallanma (branching) noktası**.
+`v0.1.0` itibarıyla **34 soru paketi** (33 dikey kanonik modül + 1 yatay yönetişim paketi) ile **33 kanonik iş fonksiyonunun tamamı (%100)** mühürlenmiştir. Sistemde eksik kanonik modül bulunmamaktadır.
+Toplam: **1.492 soru**, **792 zorunlu soru**, **700 opsiyonel soru**, **213 koşullu dallanma (branching) noktası**.
 
-### Dikey Kanonik Modüller (32 Paket) ve Yatay Yönetişim (1 Paket)
+### Dikey Kanonik Modüller (33 Paket) ve Yatay Yönetişim (1 Paket)
 
 | # | Modül | İş Fonksiyonu Kodu | Soru | Zorunlu | Branching | Durum |
 |---|---|---|:---:|:---:|:---:|:---:|
@@ -164,10 +164,8 @@ Toplam: **1.445 soru**, **767 zorunlu soru**, **678 opsiyonel soru**, **205 koş
 | 31 | E-Ticaret | `ECOMMERCE` | 47 | 25 | 8 | ✅ Mühürlü |
 | 32 | Genel Yönetim & Kurumsal Yönetişim | `MANAGEMENT` | 47 | 25 | 7 | ✅ Mühürlü |
 | 33 | Stratejik Planlama & Performans | `STRATEGY` | 47 | 25 | 8 | ✅ Mühürlü |
-| | **TOPLAM (33 Paket)** | | **1.445** | **767** | **205** | |
-
-> **Hazırlanıyor / Yol Haritası (1 Modül):**
-> 1. Eğitim ve Gelişim (`TRAINING`)
+| 34 | Eğitim ve Gelişim Yönetimi | `TRAINING` | 47 | 25 | 8 | ✅ Mühürlü |
+| | **TOPLAM (34 Paket)** | | **1.492** | **792** | **213** | **%100 Kapsama** |
 
 ---
 

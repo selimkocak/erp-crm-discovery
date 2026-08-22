@@ -1,0 +1,1608 @@
+{
+  "meta": {
+    "pack_id": "tr.training.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "TRAINING",
+    "name": "Eğitim ve Gelişim Yönetimi Ön Analizi",
+    "description": "Kurumsal eğitim politikası, eğitim organizasyonu, yıllık eğitim planlaması, eğitim ihtiyaç analizi (EİA), yetkinlik ve beceri matrisleri, oryantasyon ve işbaşı eğitimleri, teknik ve mesleki uzmanlık eğitimleri, İSG ve yasal zorunlu uyum eğitimleri, kalite ve süreç eğitimleri, ERP/CRM ve dijital sistem eğitimleri, liderlik ve yönetici gelişimi, iç/dış eğitmen ve eğitim kurumu yönetimi, eğitim bütçesi ve kişi-saat maliyet takibi, eğitim takvimi ve katılımcı planlaması, katılım ve devam kayıtları, sınav ve başarı ölçümü, mesleki sertifika ve lisans geçerlilik takibi, kariyer ve performans entegrasyonu, LMS (Öğrenme Yönetim Sistemi) ve dijital içerik altyapısı ile eğitim etkinliği (Kirkpatrick modeli), kurumsal KPI'lar ve dijital dönüşüm yol haritasının AS-IS durumunu ve ERP gereksinimlerini belirleme soru seti."
+  },
+  "questions": [
+    {
+      "id": "TRN-001",
+      "process": "Eğitim organizasyonu ve süreç sahipliği",
+      "order": 1,
+      "question": "Şirketinizde eğitim ve çalışan gelişimi faaliyetleri hangi organizasyonel yapı ve süreç sahipliği ile yönetilmektedir?",
+      "description": "Eğitim biriminin konumu, süreç sorumluları, fabrika ve şubeler arası koordinasyon modeli.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "merkezi_ve_uzmanlasmis_egitim_ve_gelisim_akademisi_veya_birimi",
+          "label": "Merkezi İK bünyesinde ayrı bir Eğitim ve Gelişim / Kurumsal Akademi birimi tarafından yönetilir"
+        },
+        {
+          "value": "ik_ve_ozluk_departmani_bunyesinde_genel_ik_sorumlulari_tarafindan",
+          "label": "Ayrı bir eğitim birimi yoktur; İK ve özlük personeli tarafından genel İK süreçleriyle birlikte yürütülür"
+        },
+        {
+          "value": "her_departman_ve_fabrika_kendi_egitimlerini_bagimsiz_yonetir",
+          "label": "Merkezi bir eğitim yönetimi yoktur; her departman ve fabrika kendi eğitim ihtiyaçlarını bağımsız organize eder"
+        },
+        {
+          "value": "egitim_yonetimi_harici_danismanlik_veya_egitim_firmasi_destegiyle_yurutulur",
+          "label": "Eğitim planlama ve koordinasyonu dış kaynaklı eğitim ve danışmanlık firması desteğiyle yürütülür"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-002",
+      "process": "Eğitim organizasyonu ve süreç sahipliği",
+      "order": 2,
+      "question": "Eğitim organizasyonunda görev alan iç koordinatörler, bölüm eğitim sorumluları ve eğitim komitesi rolleri yazılı olarak tanımlanmış mıdır?",
+      "description": "Bölüm bazlı eğitim elçileri, eğitim komitesi ve yetki paylaşımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tum_roller_egitim_komitesi_ve_elcileri_yazili_olarak_tanimlidir",
+          "label": "Evet; eğitim komitesi, departman eğitim temsilcileri ve sorumluluk matrisi yazılı olarak tanımlıdır"
+        },
+        {
+          "value": "departman_yoneticileri_dogal_sorumludur_ayri_komite_yoktur",
+          "label": "Ayrı bir komite veya elçi yapısı yoktur; departman yöneticileri kendi ekiplerinin eğitiminden doğrudan sorumludur"
+        },
+        {
+          "value": "roller_yazili_degildir_ihtiyaca_gore_gorevlendirme_yapilir",
+          "label": "Roller yazılı değildir; eğitim organizasyonlarında duruma göre geçici görevlendirmeler yapılır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-003",
+      "process": "Eğitim politikası ve yönetmelikler",
+      "order": 3,
+      "question": "Şirket genelinde uygulanan resmî bir Eğitim ve Gelişim Politikası, eğitim yönetmeliği ve onay prosedürü bulunmakta mıdır?",
+      "description": "Yazılı eğitim politikası, yönetmelikler, katılım kuralları ve onay prosedürleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "resmi_ve_guncel_egitim_politikasi_ve_yonetmeligi_yururluktedir",
+          "label": "Evet; onaylı ve güncel eğitim politikası, katılım yönetmeliği ve onay prosedürü mevcuttur"
+        },
+        {
+          "value": "genel_ik_yonetmeligi_icerisinde_maddeler_vardir_ayri_politika_yoktur",
+          "label": "Ayrı bir eğitim yönetmeliği yoktur; genel İK el kitabı içerisinde eğitim maddeleri yer almaktadır"
+        },
+        {
+          "value": "resmi_egitim_politikasi_yok_ihtiyaca_gore_karar_verilir",
+          "label": "Yazılı bir eğitim politikası veya yönetmelik yoktur; talepler yönetim inisiyatifiyle karara bağlanır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-004",
+      "process": "Eğitim politikası ve yönetmelikler",
+      "order": 4,
+      "question": "Eğitim yönetmeliğinde eğitim talebi, bütçe onayı, zorunlu hizmet taahhüdü (eğitim sözleşmesi) ve iptal kuralları hangi detayda düzenlenmiştir?",
+      "description": "Eğitim katılım şartları, sertifika taahhütnameleri ve iptal prosedürleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "TRN-003",
+        "operator": "not_equals",
+        "value": "resmi_egitim_politikasi_yok_ihtiyaca_gore_karar_verilir"
+      },
+      "options": [
+        {
+          "value": "departman_ve_ik_onay_hiyerarsisi",
+          "label": "Departman yöneticisi, İK ve Genel Müdürlük onay hiyerarşisi"
+        },
+        {
+          "value": "maliyetli_dis_egitimlerde_zorunlu_hizmet_taahhutnamesi",
+          "label": "Yüksek bütçeli veya sertifikalı dış eğitimlerde yasal zorunlu hizmet sözleşmesi / taahhütnamesi"
+        },
+        {
+          "value": "egitime_katilmama_ve_gec_iptal_yaptirim_kurallari",
+          "label": "Eğitime mazeretsiz katılmama veya geç iptal durumunda maliyet rücu kuralları"
+        },
+        {
+          "value": "mesai_saatleri_disi_egitim_ve_fazla_mesai_esaslari",
+          "label": "Mesai saatleri dışındaki veya hafta sonu eğitimlerde fazla mesai ve dinlenme esasları"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-005",
+      "process": "Eğitim ihtiyaç analizi",
+      "order": 5,
+      "question": "Şirketinizde kurumsal ve bireysel Eğitim İhtiyaç Analizi (EİA) hangi yöntem ve periyotlarla gerçekleştirilmektedir?",
+      "description": "İhtiyaç analizi metodolojisi, anketler, yönetici talepleri ve periyodik planlama.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yillik_duzenli_performans_yetkinlik_ve_anket_bazli_eia_yapilir",
+          "label": "Yılda en az bir kez performans değerlendirme, yetkinlik açığı ve anket verileriyle kapsamlı EİA yapılır"
+        },
+        {
+          "value": "departman_yoneticilerinin_yillik_talep_listeleri_toplanarak_yapilir",
+          "label": "Departman yöneticilerinden yıllık eğitim talep formları toplanarak konsolide edilir"
+        },
+        {
+          "value": "yalnizca_yasal_zorunluluk_ve_musteri_denetim_ihtiyaclarina_gore_yapilir",
+          "label": "Sistematik analiz yapılmaz; yalnızca İSG/yasal zorunluluklar ve müşteri denetim talepleri toplanır"
+        },
+        {
+          "value": "egitim_ihtiyac_analizi_yapilmiyor_talep_oldukca_degerlendirilir",
+          "label": "Resmî bir ihtiyaç analizi süreci yoktur; eğitim ihtiyacı ortaya çıktıkça anlık değerlendirilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-006",
+      "process": "Eğitim ihtiyaç analizi",
+      "order": 6,
+      "question": "Eğitim İhtiyaç Analizi sürecinde hangi veri kaynakları ve girdi parametreleri analiz edilmektedir?",
+      "description": "Performans çıktıları, hata/hurda oranları, müşteri şikayetleri, denetim bulguları ve çalışan talepleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRN-005",
+        "operator": "not_equals",
+        "value": "egitim_ihtiyac_analizi_yapilmiyor_talep_oldukca_degerlendirilir"
+      },
+      "options": [
+        {
+          "value": "donem_sonu_performans_degerlendirme_gelisim_alanlari",
+          "label": "Dönem sonu performans değerlendirme sonuçları ve gelişim planları"
+        },
+        {
+          "value": "yetkinlik_ve_beceri_matrisi_acik_skorlari",
+          "label": "Yetkinlik ve beceri matrisindeki hedef-mevcut seviye farkları (Skill Gap)"
+        },
+        {
+          "value": "kalite_hata_hurda_ve_musteri_sikayet_kayitlari",
+          "label": "Üretim ve hizmetteki kalite hataları, hurda oranları ve müşteri şikayetleri"
+        },
+        {
+          "value": "isg_ramak_kala_ve_kaza_istatistikleri",
+          "label": "İş kazası, meslek hastalığı ve ramak kala olay analizleri"
+        },
+        {
+          "value": "yeni_makine_teknoloji_ve_yazilim_devreye_alma_gereksinimleri",
+          "label": "Yeni makine, teknoloji, ürün veya kurumsal yazılım devreye alma gereksinimleri"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-007",
+      "process": "Yıllık eğitim planı",
+      "order": 7,
+      "question": "Şirketinizde bütçelenmiş ve takvimlendirilmiş Yıllık Kurumsal Eğitim Planı hazırlanmakta ve üst yönetim onayından geçmekte midir?",
+      "description": "Yıllık eğitim mastır planı, bütçe entegrasyonu ve onay mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yillik_onayli_egitim_plani_butce_ve_takvimle_birlikte_mevcuttur",
+          "label": "Evet; yıl başında üst yönetimce onaylanan bütçeli ve takvimli yıllık eğitim planı yürütülür"
+        },
+        {
+          "value": "genel_bir_taslak_plan_yapilir_ancak_yil_icinde_sik_sik_degisir",
+          "label": "Genel bir plan taslağı hazırlanır ancak bütçe ve takvim yıl içerisinde esnek olarak revize edilir"
+        },
+        {
+          "value": "yalnizca_yasal_isg_egitimleri_icin_yillik_plan_yapilir",
+          "label": "Yalnızca İSG ve yasal zorunlu eğitimler için yıllık plan hazırlanır, mesleki eğitimler plansızdır"
+        },
+        {
+          "value": "yillik_plan_yapilmaz_egitimler_tamamen_anlik_taleplerle_yurutulur",
+          "label": "Yıllık eğitim planı yapılmaz; eğitimler tamamen anlık ihtiyaç ve taleplere göre organize edilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-008",
+      "process": "Yıllık eğitim planı",
+      "order": 8,
+      "question": "Yıllık eğitim planının gerçekleşme oranları, sapma nedenleri ve plan revizyonları hangi periyotlarla takip edilmektedir?",
+      "description": "Plan-gerçekleşen karşılaştırması, gecikme/iptal analizleri ve çeyreklik gözden geçirmeler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "aylik_veya_ceyrek_bazinda_duzenli_plan_gerceklesen_raporlanir",
+          "label": "Aylık veya çeyreklik (Q1..Q4) periyotlarla plan-gerçekleşen sapmaları yönetime raporlanır"
+        },
+        {
+          "value": "yil_sonunda_toplu_olarak_gerceklesme_oranina_bakilir",
+          "label": "Dönem içinde düzenli takip yapılmaz; yalnızca yıl sonunda gerçekleşme oranı hesaplanır"
+        },
+        {
+          "value": "resmi_plan_takibi_ve_sapma_analizi_yapilmaz",
+          "label": "Planın gerçekleşme oranı ve sapma analizleri resmi olarak takip edilmez",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-009",
+      "process": "Yetkinlik ve beceri matrisi",
+      "order": 9,
+      "question": "Şirketinizde pozisyon ve çalışan bazında Yetkinlik ve Beceri Matrisi (Skill Matrix / Polyvalence) tanımlanmış mıdır?",
+      "description": "Çalışan beceri seviyeleri, çoklu beceri (polivalans) matrisi ve kritik iş gücü yedekliliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_roller_icin_sayisal_seviyeli_yetkinlik_ve_polivalans_matrisi_vardir",
+          "label": "Evet; tüm mavi/beyaz yaka pozisyonlar için 1-5 puanlı yetkinlik ve çoklu beceri matrisi aktiftir"
+        },
+        {
+          "value": "yalnizca_uretim_ve_teknik_rollerde_beceri_matrisi_kullanilir",
+          "label": "Yalnızca üretim, bakım ve kalite gibi teknik/mavi yaka operasyonlarda beceri matrisi uygulanır"
+        },
+        {
+          "value": "yetkinlik_tanimlari_vardir_ancak_matris_olarak_duzenli_guncellenmez",
+          "label": "Görev tanımlarında yetkinlikler listelenmiştir ancak puanlı ve yaşayan bir matris işletilmez"
+        },
+        {
+          "value": "yetkinlik_matrisi_kullanilmiyor_pozisyon_tanimlariyla_sinirli",
+          "label": "Yetkinlik ve beceri matrisi kullanılmamaktadır; süreç genel unvan ve tecrübeyle yönetilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-010",
+      "process": "Yetkinlik ve beceri matrisi",
+      "order": 10,
+      "question": "Yetkinlik matrisinde ölçülen beceri seviyeleri eğitim tamamlanma ve sınav/uygulama sonuçlarına göre nasıl güncellenmektedir?",
+      "description": "Eğitim sonrası seviye artışı, bağımsız denetim ve matris güncelleme otomasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRN-009",
+        "operator": "not_equals",
+        "value": "yetkinlik_matrisi_kullanilmiyor_pozisyon_tanimlariyla_sinirli"
+      },
+      "options": [
+        {
+          "value": "egitim_ve_sinav_sonrasi_yonetici_onayiyla_sistemde_otomatik_guncellenir",
+          "label": "Eğitim ve pratik sınav başarıyla tamamlandığında yönetici onayıyla seviye sistemde güncellenir"
+        },
+        {
+          "value": "donemsel_performans_veya_kalite_denetimlerinde_manuel_guncellenir",
+          "label": "Eğitimden bağımsız olarak dönemsel kalite/İK denetimlerinde Excel veya form üzerinden güncellenir"
+        },
+        {
+          "value": "matris_guncellemesi_yapilmaz_statik_referans_olarak_kalir",
+          "label": "Matris ilk tanımlandığı haliyle kalır; eğitimler matris seviyesini doğrudan etkilemez",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-011",
+      "process": "Pozisyon bazlı eğitim gereksinimleri",
+      "order": 11,
+      "question": "Her pozisyon ve unvan için göreve atanmadan önce veya atandıktan sonra tamamlanması zorunlu olan 'Katalog Eğitimleri' tanımlı mıdır?",
+      "description": "Pozisyona zorunlu eğitim profilleri, ön şart eğitimleri ve otomatik atamalar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_pozisyonlar_icin_zorunlu_egitim_katalogu_ve_matrisi_tanimlidir",
+          "label": "Evet; her pozisyonun alması gereken zorunlu ve önerilen eğitim müfredatı standart olarak tanımlıdır"
+        },
+        {
+          "value": "yalnizca_kritik_teknik_ve_isg_rolleri_icin_tanimlidir",
+          "label": "Yalnızca kritik teknik pozisyonlar (operatör, kaynakçı, kimyasal sorumlu) için tanımlıdır"
+        },
+        {
+          "value": "pozisyon_bazli_zorunlu_egitim_katalogu_yoktur",
+          "label": "Pozisyon bazlı zorunlu bir eğitim müfredatı tanımlı değildir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-012",
+      "process": "Pozisyon bazlı eğitim gereksinimleri",
+      "order": 12,
+      "question": "Bir çalışan pozisyon veya departman değiştirdiğinde (terfi / rotasyon), yeni pozisyonun zorunlu eğitimleri nasıl tespit edilmekte ve atanmaktadır?",
+      "description": "Görev değişikliğinde otomatik eğitim açığı tespiti ve yeni müfredat ataması.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "pozisyon_degisikliginde_sistem_fark_egitimlerini_otomatik_atar",
+          "label": "Sistem pozisyon değişikliğini algılayarak çalışanın almadığı fark eğitimlerini otomatik plana ekler"
+        },
+        {
+          "value": "ik_ve_yeni_yonetici_manuel_olarak_fark_egitimlerini_belirler",
+          "label": "İK ve yeni bölüm yöneticisi personelin geçmişini inceleyerek eksik eğitimleri manuel organize eder"
+        },
+        {
+          "value": "rotasyonlarda_ozel_egitim_atanmaz_calisan_is_ustunde_ogrenir",
+          "label": "Özel bir eğitim ataması yapılmaz; çalışan yeni görevini iş üstünde pratikle öğrenir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-013",
+      "process": "İşe giriş ve oryantasyon eğitimi",
+      "order": 13,
+      "question": "Yeni işe başlayan çalışanlar için standartlaştırılmış bir İşe Alım Oryantasyon ve Kurumsal Uyum Programı uygulanmakta mıdır?",
+      "description": "Kurumsal tanıtım, şirket kuralları, İK prosedürleri ve ilk gün/ilk hafta oryantasyon akışı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "standart_takvimli_ve_olculebilir_oryantasyon_programi_uygulanir",
+          "label": "Evet; tüm çalışanlar için kurumsal tanıtım, İSG ve İK prosedürlerini kapsayan standart program uygulanır"
+        },
+        {
+          "value": "beyaz_yaka_ve_mavi_yaka_icin_farkli_kapsamda_oryantasyon_vardir",
+          "label": "Beyaz yaka ve mavi yaka için farklı süre ve içerikte yapılandırılmış oryantasyon uygulanır"
+        },
+        {
+          "value": "gayriresmi_olarak_bolum_ici_tanitim_yapilir_merkezi_program_yoktur",
+          "label": "Merkezi bir program yoktur; bölüm yöneticisi ve çalışma arkadaşları gayriresmi tanıtım yapar"
+        },
+        {
+          "value": "resmi_oryantasyon_programi_uygulanmiyor_dogrudan_ise_baslanir",
+          "label": "Resmî bir oryantasyon programı uygulanmamaktadır; çalışan doğrudan görevine başlar",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-014",
+      "process": "İşe giriş ve oryantasyon eğitimi",
+      "order": 14,
+      "question": "Oryantasyon programı kapsamında hangi kontrol listeleri, formlar ve mentorluk (buddy) mekanizmaları işletilmektedir?",
+      "description": "Oryantasyon kontrol listesi, mentor ataması, deneme süresi değerlendirmesi ve geri bildirim anketleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRN-013",
+        "operator": "not_equals",
+        "value": "resmi_oryantasyon_programi_uygulanmiyor_dogrudan_ise_baslanir"
+      },
+      "options": [
+        {
+          "value": "imzali_veya_dijital_oryantasyon_kontrol_listesi",
+          "label": "İmzalı veya dijital onaylı Oryantasyon Tamamlama Kontrol Listesi (Checklist)"
+        },
+        {
+          "value": "mentor_veya_buddy_rehber_calisan_atamasi",
+          "label": "İlk 1-3 ay için tecrübeli çalışma arkadaşı (Mentor / Buddy) görevlendirmesi"
+        },
+        {
+          "value": "deneme_suresi_1_ve_2_ay_degerlendirme_formlari",
+          "label": "Deneme süresi (1. ve 2. ay) ara değerlendirme ve uyum takip görüşmeleri"
+        },
+        {
+          "value": "yeni_calisan_oryantasyon_memnuniyet_anketi",
+          "label": "Oryantasyon süreci sonunda çalışandan alınan dijital geri bildirim anketi"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-015",
+      "process": "İşbaşı ve görev eğitimi",
+      "order": 15,
+      "question": "Operasyonel ve teknik pozisyonlarda görev başı (OJT - On the Job Training) ve tezgâh/hat başı eğitimleri nasıl verilmekte ve kayıt altına alınmaktadır?",
+      "description": "Usta-çırak eğitimi, iş talimatı eğitimleri, hat başı doğrulama ve işbaşı formu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "isbasi_egitim_formu_ve_usta_ogretici_esliginde_kayitli_yapilir",
+          "label": "İş talimatlarına uygun olarak yetkili usta/eğitmen eşliğinde form veya sistem üzerinden kayıtlı yapılır"
+        },
+        {
+          "value": "tecrubeli_personel_yaninda_calisarak_ogrenir_resmi_form_tutulmaz",
+          "label": "Tecrübeli personelin yanında çalıştırılır ancak eğitim saati ve içeriği resmi olarak formlanmaz"
+        },
+        {
+          "value": "isbasi_egitimi_yalnizca_kalite_denetimlerinde_geriye_donuk_duzenlenir",
+          "label": "Saha eğitimi verilir ancak kayıtlar denetim dönemlerinde geriye dönük tamamlanır"
+        },
+        {
+          "value": "isbasi_egitimi_uygulamasi_yoktur",
+          "label": "Yapılandırılmış bir işbaşı eğitimi uygulaması bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-016",
+      "process": "İşbaşı ve görev eğitimi",
+      "order": 16,
+      "question": "İşbaşı eğitimi sonrasında personelin tek başına çalışma yetkinliğine ulaştığı (bağımsız çalışma yetkisi) nasıl onaylanmaktadır?",
+      "description": "Yeterlilik onayı, gözetimli çalışma süresi ve bağımsız çalışma sertifikasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "bolum_yoneticisi_ve_kalite_sorumlusu_ortak_onayi_ile_yetkilendirilir",
+          "label": "Pratik sınav ve gözetim süresi sonunda bölüm yöneticisi ve kalite sorumlusu ortak onayı ile yetki verilir"
+        },
+        {
+          "value": "usta_veya_hat_liderinin_sozlu_onayi_yeterli_gorulur",
+          "label": "Usta veya hat liderinin sözlü bildirimi ile personel tek başına çalışmaya başlar"
+        },
+        {
+          "value": "resmi_bir_yetkilendirme_onayi_bulunmamaktadir",
+          "label": "Resmî bir yetkilendirme onayı aranmaz; süre dolunca personel doğrudan işe devam eder",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-017",
+      "process": "Teknik eğitimler",
+      "order": 17,
+      "question": "Mühendislik, üretim, bakım, bilişim ve uzmanlık alanlarındaki Teknik Eğitimler hangi sıklıkta ve yöntemlerle organize edilmektedir?",
+      "description": "Teknik uzmanlık programları, dış seminerler, lisanslı eğitimler ve laboratuvar/atölye çalışmaları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yillik_teknik_egitim_katalogu_ve_akredite_kurumlar_uzerinden_yurutulur",
+          "label": "Yıllık teknik eğitim kataloğu kapsamında akredite kurumlar ve üretici eğitimleri ile düzenli yürütülür"
+        },
+        {
+          "value": "yeni_proje_veya_teknoloji_yatirimlarinda_proje_bazli_verilir",
+          "label": "Yıllık düzenli plan yoktur; yeni makine, yazılım veya teknoloji yatırımlarında proje bazlı organize edilir"
+        },
+        {
+          "value": "calisanlarin_bireysel_talebi_ve_yonetim_onayi_ile_sinirlidir",
+          "label": "Çalışanların kendi bulduğu teknik eğitim taleplerinin yönetici tarafından onaylanmasıyla sınırlıdır"
+        },
+        {
+          "value": "sirket_bunyesinde_teknik_egitim_organize_edilmemektedir",
+          "label": "Şirket bünyesinde teknik eğitim organizasyonu yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-018",
+      "process": "Teknik eğitimler",
+      "order": 18,
+      "question": "Teknik eğitimlerin çıktıları, eğitim dokümanları ve edinilen teknik bilginin şirket içine aktarımı (bilgi yayılımı) nasıl sağlanmaktadır?",
+      "description": "Eğitim sunumları arşivi, kurum içi bilgi aktarım seminerleri ve teknik kütüphane.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "egitimi_alan_personelin_ekip_arkadaslarina_ic_egitim_vermesi",
+          "label": "Dış eğitime katılan personelin kendi ekibine bilgi aktarım sunumu / iç eğitim vermesi"
+        },
+        {
+          "value": "egitim_dokuman_ve_sunumlarinin_ortak_arsivde_saklanmasi",
+          "label": "Eğitim notları, sunumlar ve sertifikaların ortak dijital kütüphanede/LMS'te arşivlenmesi"
+        },
+        {
+          "value": "teknik_talimat_veya_prosedur_revizyonu_yapilmasi",
+          "label": "Eğitim sonrasında ilgili teknik talimat, bakım prosedürü veya iş standardının güncellenmesi"
+        },
+        {
+          "value": "bilgi_aktarimi_zorunlulugu_yoktur_bilgi_calisanda_kalir",
+          "label": "Kurum içi bilgi aktarımı zorunluluğu yoktur; bilgi katılan çalışanın kişisel hafızasında kalır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-019",
+      "process": "İş sağlığı ve güvenliği eğitimleri",
+      "order": 19,
+      "question": "6331 sayılı İş Sağlığı ve Güvenliği Kanunu kapsamındaki Temel İSG Eğitimleri şirketinizde nasıl planlanmakta ve yürütülmektedir?",
+      "description": "Tehlike sınıfına göre İSG eğitim saatleri (Az Tehlikeli 8h/3yıl, Tehlikeli 12h/2yıl, Çok Tehlikeli 16h/1yıl), OSGB entegrasyonu ve sınavlar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "isg_uzmani_ve_osgb_ile_tehlike_sinifina_uygun_yillik_planla_yurutulur",
+          "label": "İş Güvenliği Uzmanı/OSGB ile tehlike sınıfına uygun saat ve periyotta yasal plana tam uyumlu yürütülür"
+        },
+        {
+          "value": "isg_egitimleri_verilmektedir_ancak_sure_ve_gecerlilik_takibi_manueldir",
+          "label": "Eğitimler verilmektedir ancak personelin yenileme süreleri ve kişi-saat takibi Excel üzerinden manuel izlenir"
+        },
+        {
+          "value": "isg_egitimleri_yalnizca_ise_giriste_verilir_periyodik_yenileme_aksamaktadir",
+          "label": "Yalnızca işe girişte verilir; periyodik yenileme eğitimleri iş yoğunluğu nedeniyle aksamaktadır"
+        },
+        {
+          "value": "isg_egitimi_sureci_yurutulmemektedir",
+          "label": "Düzenli bir İSG eğitim süreci işletilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-020",
+      "process": "İş sağlığı ve güvenliği eğitimleri",
+      "order": 20,
+      "question": "Temel İSG dışında yüksekte çalışma, kapalı alan, yangın/tahliye, ilkyardım ve kimyasal madde gibi Özel Risk Eğitimleri nasıl yönetilmektedir?",
+      "description": "Özel risk grupları, tatbikatlar, ilkyardımcı sertifikaları ve akredite eğitimler.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yuksekte_calisma_ve_kapali_alan_akredite_egitimleri",
+          "label": "Yüksekte çalışma, iskele kurulumu ve kapalı alanda çalışma akredite teorik ve pratik eğitimleri"
+        },
+        {
+          "value": "yangin_egitimi_ve_yillik_tahliye_tatbikatlari",
+          "label": "Yangın güvenliği eğitimi, acil durum ekipleri eğitimi ve yıllık tahliye tatbikatları"
+        },
+        {
+          "value": "saglik_bakanligi_onayli_ilkyardimci_sertifikasyonu",
+          "label": "Sağlık Bakanlığı onaylı İlkyardımcı sertifikasyon ve 3 yıllık vize yenileme takibi"
+        },
+        {
+          "value": "patlamadan_korunma_ve_kimyasal_madde_guvenligi",
+          "label": "Kimyasal maddelerle çalışma, MSDS okuma ve Patlamadan Korunma Dokümanı (ATEX) eğitimleri"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-021",
+      "process": "Yasal ve zorunlu uyum eğitimleri",
+      "order": 21,
+      "question": "KVKK, Bilgi Güvenliği (ISO 27001), Etik Kurallar, Rüşvetle Mücadele ve Çevre Mevzuatı gibi Yasal ve Zorunlu Uyum Eğitimleri takip edilmekte midir?",
+      "description": "Mevzuat uyum eğitimleri, bilgi güvenliği farkındalık eğitimleri ve zorunlu şirket içi politikalar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "tum_zorunlu_uyum_egitimleri_periyodik_ve_katilim_orani_takip_edilir",
+          "label": "Evet; KVKK, Bilgi Güvenliği, Çevre ve Etik eğitimleri tüm personele periyodik atanır ve katılım %100 hedeflenir"
+        },
+        {
+          "value": "yalnizca_kvkk_ve_bilgi_guvenligi_egitimi_ise_giriste_verilir",
+          "label": "Yalnızca KVKK ve Bilgi Güvenliği eğitimi işe girişte verilir; periyodik yenileme yapılmaz"
+        },
+        {
+          "value": "yasal_ve_zorunlu_uyum_egitim_takibi_yapilmiyor_veya_harici_firma_takip_ediyor",
+          "label": "Kurumsal uyum eğitimleri sistematik olarak verilmemekte veya takip edilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-022",
+      "process": "Yasal ve zorunlu uyum eğitimleri",
+      "order": 22,
+      "question": "Zorunlu uyum eğitimlerini tamamlamayan veya sınavı geçemeyen çalışanlar için hangi eskalasyon ve sistem kısıtlama mekanizmaları işletilmektedir?",
+      "description": "Uyumsuzluk uyarıları, yönetici eskalasyonu ve sistem erişim kısıtlamaları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "TRN-021",
+        "operator": "not_equals",
+        "value": "yasal_ve_zorunlu_uyum_egitim_takibi_yapilmiyor_veya_harici_firma_takip_ediyor"
+      },
+      "options": [
+        {
+          "value": "otomatik_hatirlatma_yonetici_eskalasyonu_ve_erisim_kisitlama",
+          "label": "Süresi içinde tamamlamayanlara otomatik hatırlatma gider, yöneticisine eskalasyon yapılır"
+        },
+        {
+          "value": "yalnizca_ik_tarafindan_manuel_e_posta_hatirlatmasi_yapilir",
+          "label": "Yalnızca İK personeli tarafından geciken çalışanlara telefon veya e-posta ile hatırlatma yapılır"
+        },
+        {
+          "value": "tamamlamayanlar_icin_herhangi_bir_yaptirim_veya_takip_yoktur",
+          "label": "Eğitimi tamamlamayan çalışanlar için bir takip veya yaptırım mekanizması işletilmez",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-023",
+      "process": "Ürün, süreç ve kalite eğitimleri",
+      "order": 23,
+      "question": "Kalite Yönetim Sistemleri (ISO 9001, IATF 16949, GMP vb.), ürün standartları ve şirket içi süreç prosedür eğitimleri nasıl verilmektedir?",
+      "description": "Standart revizyonları, hata analizleri, FMEA, 5S, Kaizen ve süreç eğitimleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kalite_departmani_ile_koordineli_periyodik_ve_prosedur_revizyonlarinda_verilir",
+          "label": "Kalite birimiyle koordineli olarak periyodik ve her prosedür/doküman revizyonunda zorunlu atanır"
+        },
+        {
+          "value": "yalnizca_yillik_kalite_denetimleri_oncesinde_toplu_egitim_yapilir",
+          "label": "Süreç içinde düzenli verilmez; yalnızca yıllık iç/dış kalite denetimleri öncesinde toplu yapılır"
+        },
+        {
+          "value": "yeni_urun_veya_revizyon_oldukca_saha_seviyesinde_bilgilendirme_yapilir",
+          "label": "Yeni ürün veya değişiklik olduğunda hat/bölüm sorumlusu sahada sözlü bilgilendirme yapar"
+        },
+        {
+          "value": "urun_ve_kalite_egitimleri_resmi_olarak_kaydedilmez",
+          "label": "Ürün ve süreç eğitimleri resmi olarak organize edilmez ve kayıt altına alınmaz",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-024",
+      "process": "Ürün, süreç ve kalite eğitimleri",
+      "order": 24,
+      "question": "Üretim veya hizmet süreçlerinde yaşanan uygunsuzluk ve müşteri şikayetleri (DÖF / 8D) sonrasında Düzeltici Eğitim süreci işletilmekte midir?",
+      "description": "DÖF/CAPA çıktısı eğitimler, tekrar eden hataların önlenmesi ve kayıt bağlantısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "dof_kapsaminda_zorunlu_egitim_atanir_ve_dof_kapatma_sarti_olarak_aranir",
+          "label": "Evet; uygunsuzluk kök nedenine göre ilgili personele eğitim atanır ve DÖF kapatma şartıdır"
+        },
+        {
+          "value": "yonetici_personele_hatayi_anlatir_ancak_resmi_egitim_kaydi_acilmaz",
+          "label": "Yönetici personel ile birebir görüşür ancak İK eğitim sisteminde resmî düzeltici eğitim kaydı açılmaz"
+        },
+        {
+          "value": "dof_surecleri_ile_egitim_yonetimi_arasinda_baglanti_yoktur",
+          "label": "DÖF süreçleri ile eğitim yönetimi arasında herhangi bir bağlantı bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-025",
+      "process": "ERP/CRM ve dijital sistem eğitimleri",
+      "order": 25,
+      "question": "Şirkette kullanılan ERP, CRM, MES, WMS ve diğer kurumsal yazılımların kullanıcı eğitimleri nasıl verilmekte ve yetkilendirmeyle ilişkilendirilmektedir?",
+      "description": "Sistem kullanıcı eğitimleri, anahtar kullanıcı (Key User) yetkinliği ve sistem yetkilendirme ön şartı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "modul_egitimi_tamamlanip_sinav_gecilmeden_sistem_kullanici_yetkisi_verilmez",
+          "label": "Modül eğitimini tamamlayıp test ortamında başarılı olmadan canlı sistem yetkisi/şifresi tanımlanmaz"
+        },
+        {
+          "value": "anahtar_kullanicilar_tarafindan_is_ustunde_gosterilir_yetki_hemen_acilir",
+          "label": "Anahtar kullanıcılar iş üstünde sistemi gösterir; kullanıcı hesabı ve yetkileri eğitime bakılmaksızın açılır"
+        },
+        {
+          "value": "yazilim_sirketi_veya_danismanlar_ilk_kurulumda_egitti_yeni_calisanlara_egitim_yoktur",
+          "label": "Yalnızca ilk kurulumda danışman eğitimi alındı; yeni başlayanlar eski çalışanlardan görerek öğrenir"
+        },
+        {
+          "value": "dijital_sistem_egitimi_sureci_bulunmamaktadir",
+          "label": "Yapılandırılmış bir dijital sistem eğitim süreci bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-026",
+      "process": "ERP/CRM ve dijital sistem eğitimleri",
+      "order": 26,
+      "question": "Kurumsal yazılımlara ait kullanıcı kılavuzları, video eğitimler ve süreç akış simülasyonları güncel tutulmakta mıdır?",
+      "description": "Kullanım kılavuzları, ekran kayıtları, adım adım rehberler ve intranet/LMS arşivi.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "adim_adim_ekran_goruntulu_kullanici_kilavuzlari",
+          "label": "Adım adım ekran görüntülü güncel kullanıcı el kitapları ve PDF kılavuzlar"
+        },
+        {
+          "value": "kisa_video_dersler_ve_ekran_kayitlari",
+          "label": "Modül ve süreç bazlı kısa eğitim videoları ve sistem ekran kayıtları"
+        },
+        {
+          "value": "test_ortaminda_pratik_senaryo_calismalari",
+          "label": "Canlıya geçiş ve yeni modüllerde test ortamında örnek veri senaryo çalışmaları"
+        },
+        {
+          "value": "guncel_kilavuz_veya_video_arsivi_bulunmamaktadir",
+          "label": "Güncel kullanıcı kılavuzu veya video arşivi bulunmamaktadır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-027",
+      "process": "Liderlik ve yönetici gelişimi",
+      "order": 27,
+      "question": "İlk kademe yöneticiler, şefler, müdürler ve yönetici adayları için yapılandırılmış Liderlik ve Yönetim Becerileri Gelişim Programı uygulanmakta mıdır?",
+      "description": "Liderlik akademisi, koçluk/mentorluk, yönetim becerileri ve yetenek havuzu eğitimleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yonetici_ve_adaylar_icin_moduler_liderlik_gelisim_programi_mevcuttur",
+          "label": "Evet; tüm yönetim kademeleri ve yönetici adayları için modüler Liderlik Gelişim Programı uygulanır"
+        },
+        {
+          "value": "ihtiyac_ve_talep_oldukca_dis_seminer_veya_egitimlere_gonderilir",
+          "label": "Sürekli bir program yoktur; yöneticiler dış seminer, konferans veya sertifika programlarına gönderilir"
+        },
+        {
+          "value": "yonetim_egitimi_verilmez_yoneticilik_deneyimle_kazanilir",
+          "label": "Liderlik eğitimi verilmez; yöneticilerin yönetsel becerileri sahada tecrübeyle kazanması beklenir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-028",
+      "process": "Liderlik ve yönetici gelişimi",
+      "order": 28,
+      "question": "Yönetici gelişim programı kapsamında 360 derece geri bildirim, bireysel koçluk veya mentorluk destekleri sağlanmakta mıdır?",
+      "description": "360 derece değerlendirme, profesyonel koçluk, tersine mentorluk ve gelişim aksiyon planları.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "360_derece_ve_profesyonel_kocluk_destegi_duzenli_saglanir",
+          "label": "Evet; 360 derece yetkinlik değerlendirmesi ve profesyonel koçluk/mentorluk desteği verilir"
+        },
+        {
+          "value": "yalnizca_ust_duzey_direktor_ve_genel_mudurluk_icin_uygulanir",
+          "label": "Yalnızca üst düzey direktör ve Genel Müdürlük kademesi için özel koçluk uygulanır"
+        },
+        {
+          "value": "kocluk_veya_360_derece_degerlendirme_uygulanmamaktadir",
+          "label": "Koçluk, mentorluk veya 360 derece geri bildirim uygulaması bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-029",
+      "process": "Mesleki sertifika ve lisanslar",
+      "order": 29,
+      "question": "Personelin sahip olduğu Mesleki Yeterlilik (MYK), SRC, ehliyet, kaynakçı, forklift/vinç, kazan operatörlüğü ve kazanılmış lisanslar nasıl takip edilmektedir?",
+      "description": "Yasal ve mesleki sertifikalar, MYK belgeleri, operatörlük lisansları ve geçerlilik takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "sistemde_gecerlilik_tarihli_dijital_sertifika_arsivi_ve_uyari_mekanizmasi_vardir",
+          "label": "Evet; tüm mesleki sertifika ve lisanslar bitiş tarihleriyle sistemde kayıtlıdır ve süresi dolmadan uyarı verir"
+        },
+        {
+          "value": "ozluk_dosyasinda_fotokopi_ve_excelde_tarih_takibi_yapilir",
+          "label": "Özlük dosyasında basılı tutulur; geçerlilik süreleri Excel tablosundan manuel kontrol edilir"
+        },
+        {
+          "value": "yalnizca_ise_giriste_belgeler_alinir_sure_takibi_yapilmaz",
+          "label": "İşe girişte belgeler alınır ancak vizelerin bitiş ve yenilenme takibi düzenli yapılmaz"
+        },
+        {
+          "value": "mesleki_sertifika_ve_lisans_takibi_yapilmiyor",
+          "label": "Mesleki sertifika ve lisans takibi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-030",
+      "process": "Mesleki sertifika ve lisanslar",
+      "order": 30,
+      "question": "Süresi dolan veya yenilenmesi gereken mesleki sertifikaların (MYK, vize, ehliyet) sınav ve yenileme masrafları nasıl karşılanmakta ve planlanmaktadır?",
+      "description": "Sertifika yenileme sınavları, akredite kuruluş randevuları ve şirket/çalışan maliyet paylaşımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "TRN-029",
+        "operator": "not_equals",
+        "value": "mesleki_sertifika_ve_lisans_takibi_yapilmiyor"
+      },
+      "options": [
+        {
+          "value": "sirket_tarafindan_butcelenir_toplu_sinav_ve_vize_yenilemesi_yapilir",
+          "label": "Şirket eğitim bütçesinden karşılanır; akredite kurumla anlaşmalı toplu sınav ve yenileme yapılır"
+        },
+        {
+          "value": "calisan_bireysel_olarak_yeniler_masrafi_sirkete_fatura_eder",
+          "label": "Çalışan bireysel başvurur ve sınavı geçince harcama makbuzunu şirkete masraf olarak girer"
+        },
+        {
+          "value": "belge_yenileme_tamamen_calisanin_kisisel_sorumlulugundadir",
+          "label": "Belge yenileme ve maliyeti tamamen çalışanın kendi sorumluluğundadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-031",
+      "process": "İç eğitmen ve dış eğitmen yönetimi",
+      "order": 31,
+      "question": "Şirket içi tecrübenin aktarılması için İç Eğitmen Yetiştirme (Train the Trainer) programı ve iç eğitmen havuzu bulunmakta mıdır?",
+      "description": "İç eğitmen seçimi, eğitici eğitimi, ders saat ücreti/prim teşvikleri ve iç eğitim havuzu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "resmi_ic_egitmen_programi_ve_egiticinin_egitimi_sertifikasyonu_vardir",
+          "label": "Evet; iç eğitmen kriterleri tanımlıdır, eğiticinin eğitimi verilmiş aktif iç eğitmen havuzu vardır"
+        },
+        {
+          "value": "tecrubeli_personel_egitim_verir_ancak_ozel_bir_tesvik_veya_program_yoktur",
+          "label": "Tecrübeli personel ve şefler eğitim verir ancak özel bir iç eğitmen havuzu veya teşvik sistemi yoktur"
+        },
+        {
+          "value": "tum_egitimler_dis_egitmen_veya_danismanlar_tarafindan_verilir",
+          "label": "İç eğitimci kullanılmaz; tüm eğitimler dış eğitmen veya uzman kuruluşlarca verilir"
+        },
+        {
+          "value": "ic_egitmen_yapisi_bulunmamaktadir",
+          "label": "Yapılandırılmış bir iç eğitmenlik sistemi bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-032",
+      "process": "İç eğitmen ve dış eğitmen yönetimi",
+      "order": 32,
+      "question": "İç eğitmenlerin verdikleri eğitim saatleri, katılımcı memnuniyet puanları ve iç eğitmen motivasyon teşvikleri nasıl izlenmektedir?",
+      "description": "İç eğitmen performans skoru, verilen eğitim saati ve prim/ek ödeme modeli.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "verilen_saat_ve_memnuniyet_puani_izlenir_ek_prim_veya_odul_verilir",
+          "label": "Verilen ders saati ve katılımcı puanı sistemde izlenir; saat başı prim veya yıl sonu ödülü verilir"
+        },
+        {
+          "value": "yalnizca_egitim_saati_kaydedilir_ek_odul_veya_prim_yoktur",
+          "label": "Verilen eğitim saati özlüğe kaydedilir ancak ek bir prim veya finansal teşvik uygulanmaz"
+        },
+        {
+          "value": "ic_egitmen_performans_ve_saat_takibi_yapilmaz",
+          "label": "İç eğitmenlerin eğitim saatleri ve performansları ayrı olarak izlenmez",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-033",
+      "process": "Eğitim kurumu ve tedarikçi yönetimi",
+      "order": 33,
+      "question": "Hizmet alınan dış eğitim kurumları, üniversiteler, danışmanlık firmaları ve eğitmen tedarikçileri nasıl seçilmekte ve değerlendirilmektedir?",
+      "description": "Eğitim tedarikçisi seçimi, akreditasyon kontrolü, teklif toplama ve dönem sonu tedarikçi değerlendirmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "onayli_egitim_tedarikci_listesi_ve_performans_puanlama_sistemi_vardir",
+          "label": "Evet; onaylı eğitim kurumu listesi vardır ve her eğitim sonrasında tedarikçi memnuniyet puanı verilir"
+        },
+        {
+          "value": "satinalma_prosedurune_gore_teklif_toplanir_ancak_ozel_degerlendirme_yapilmaz",
+          "label": "Satın alma kurallarına göre 3 teklif toplanarak seçilir; eğitim sonu özel tedarikçi puanlaması yoktur"
+        },
+        {
+          "value": "yoneticilerin_kisisel_tavsiyesi_ve_tanidik_egitmenlerle_calisilir",
+          "label": "Resmî liste yoktur; bölüm yöneticilerinin tanıdığı veya tavsiye ettiği eğitmenlerle çalışılır"
+        },
+        {
+          "value": "dis_egitim_tedarikcisi_kullanilmamaktadir",
+          "label": "Dış eğitim tedarikçisi veya kurumu kullanılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-034",
+      "process": "Eğitim kurumu ve tedarikçi yönetimi",
+      "order": 34,
+      "question": "Dış eğitim satın alma süreçlerinde sözleşme, fatura, eğitim materyali telif hakları ve SLA şartları nasıl yönetilmektedir?",
+      "description": "Eğitim sözleşmeleri, iptal/iade maddeleri, materyal paylaşım hakları ve gizlilik sözleşmeleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "hukuk_onayli_egitim_hizmet_sozlesmesi_ve_gizlilik_taahhutnamesi",
+          "label": "Hukuk onaylı kurumsal eğitim sözleşmesi ve eğitmen gizlilik taahhütnamesi (NDA)"
+        },
+        {
+          "value": "egitim_dokumanlarinin_kurum_ici_sinirsiz_kullanim_hakki",
+          "label": "Eğitim sunumu ve materyallerinin şirket içi dijital arşivde süresiz kullanım izni"
+        },
+        {
+          "value": "egitmen_degisikligi_ve_tarih_ertelemelerinde_sla_sartlari",
+          "label": "Eğitmen değişikliği veya tarih ertelemelerinde tazminat ve telafi şartları"
+        },
+        {
+          "value": "yalnizca_fatura_ve_teklif_uzerinden_yurutulur_ayri_sozlesme_yoktur",
+          "label": "Yalnızca teklif formu ve fatura üzerinden yürütülür; detaylı hizmet sözleşmesi yapılmaz"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-035",
+      "process": "Eğitim bütçesi ve maliyet takibi",
+      "order": 35,
+      "question": "Şirketinizde yıllık Eğitim Bütçesi departman ve kişi bazında nasıl planlanmakta ve harcama gerçekleşmeleri nasıl izlenmektedir?",
+      "description": "Eğitim bütçesi, masraf merkezi kırılımı, eğitim ücreti, ulaşım/konaklama ve toplam sahip olma maliyeti.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "departman_ve_masraf_merkezi_bazinda_butcelenir_ve_erpye_entegre_izlenir",
+          "label": "Departman/masraf merkezi bazında bütçelenir; eğitim, konaklama ve yol masrafları ERP'de izlenir"
+        },
+        {
+          "value": "sirket_geneli_tek_bir_ik_egitim_butce_kaleminden_manuel_izlenir",
+          "label": "Şirket geneli tek bir İK bütçe havuzu vardır; departman kırılımı yapılmadan Excel'de izlenir"
+        },
+        {
+          "value": "onceden_belirlenmis_bir_egitim_butcesi_yoktur_talep_geldikce_onaylanir",
+          "label": "Yıllık ayrılmış bir eğitim bütçesi yoktur; harcamalar yönetim onayına göre anlık karşılanır"
+        },
+        {
+          "value": "egitim_butcesi_ve_maliyet_takibi_yapilmamaktadir",
+          "label": "Eğitim bütçesi ve maliyet takibi süreci işletilmemektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-036",
+      "process": "Eğitim bütçesi ve maliyet takibi",
+      "order": 36,
+      "question": "Eğitim maliyet analizlerinde kişi başı eğitim maliyeti ve eğitim için harcanan iş gücü maliyeti (kayıp mesai maliyeti) hesaplanmakta mıdır?",
+      "description": "Kişi başı eğitim maliyeti, saat başı doğrudan maliyet ve dolaylı kayıp iş gücü analizi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "hem_dogrudan_egitim_faturasi_hem_de_egitimdeki_mesai_saat_maliyeti_hesaplanir",
+          "label": "Evet; doğrudan fatura tutarının yanı sıra personelin eğitimde geçen saatlerinin iş gücü maliyeti hesaplanır"
+        },
+        {
+          "value": "yalnizca_dis_egitim_faturalari_ve_harcamalar_hesaplanir",
+          "label": "Yalnızca dış eğitim faturaları, yol ve konaklama harcamaları hesaplanır; iç mesai maliyeti eklenmez"
+        },
+        {
+          "value": "kisi_basi_egitim_maliyeti_hesaplanmamaktadir",
+          "label": "Kişi başı veya saat başı eğitim maliyet analizi yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-037",
+      "process": "Eğitim takvimi ve katılımcı planlaması",
+      "order": 37,
+      "question": "Eğitim oturumları, salon/ekipman rezervasyonları ve katılımcı davetleri hangi takvim ve araçlar üzerinden organize edilmektedir?",
+      "description": "Merkezi eğitim takvimi, salon yönetimi, vardiya çakışma kontrolleri ve takvim davetleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "merkezi_dijital_egitim_takvimi_ve_otomatik_katilimci_davet_sistemi_vardir",
+          "label": "Evet; ERP/LMS veya ortak kurumsal takvim üzerinden salon, ekipman ve katılımcı davetleri otomatik yönetilir"
+        },
+        {
+          "value": "outlook_veya_e_posta_takvim_daveti_ile_manuel_duzenlenir",
+          "label": "Outlook / e-posta takvim daveti gönderilir; salon ve yoklama İK tarafından manuel ayarlanır"
+        },
+        {
+          "value": "duyurular_panolara_asilarak_veya_yoneticilere_sozlu_iletilerek_yapilir",
+          "label": "Duyurular panolara asılarak veya şeflere sözlü iletilerek katılımcı toplanır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-038",
+      "process": "Eğitim takvimi ve katılımcı planlaması",
+      "order": 38,
+      "question": "Üretim vardiyaları, saha operasyonları ve kritik kadroların eğitim planlamasında vardiya çakışma kontrolü nasıl sağlanmaktadır?",
+      "description": "Vardiya planı entegrasyonu, yedekleme kuralları ve minimum operasyonel kadro güvencesi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "vardiya_planiyla_entegre_kontrol_edilir_uretimi_aksatmayacak_gruplar_yapilir",
+          "label": "PDKS/Vardiya planıyla entegre kontrol edilir; üretimi durdurmamak için eğitimler rotasyonlu gruplara bölünür"
+        },
+        {
+          "value": "departman_yoneticisi_izin_verdikce_personel_egitime_gonderilir",
+          "label": "Bölüm yöneticisi o günkü iş yoğunluğuna bakarak kimi eğitime göndereceğine anlık karar verir"
+        },
+        {
+          "value": "vardiya_cakismasi_kontrol_edilmez_cogunlukla_egitimler_aksar",
+          "label": "Vardiya kontrolü yapılamadığı için operasyonel yoğunlukta eğitimlere katılım düşmektedir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-039",
+      "process": "Katılım, devam ve eğitim kayıtları",
+      "order": 39,
+      "question": "Eğitim oturumlarına katılım ve devam kayıtları (yoklama listeleri, dijital loglar) nasıl toplanmakta ve özlük dosyasında arşivlenmektedir?",
+      "description": "İmzalı yoklama tutanağı, kartlı/barkodlu okuma, dijital oturum logları ve arşivleme.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "imzali_fiziksel_tutanak_taranir_ve_dijital_sistemde_kisi_ozlugune_islenir",
+          "label": "İmzalı katılım tutanağı taranarak sisteme yüklenir ve eğitim saatleri personelin dijital özlüğüne işlenir"
+        },
+        {
+          "value": "turnike_kart_okuyucu_veya_lms_dijital_oturum_kaydiyla_otomatik_alinir",
+          "label": "Eğitim salonu kart okuyucusu veya LMS online oturum logları ile katılım otomatik doğrulanır"
+        },
+        {
+          "value": "yalnizca_kagit_yoklama_listesi_arsivlenir_sisteme_saat_girisi_yapilmaz",
+          "label": "Yalnızca basılı imza listesi klasörde saklanır; ERP veya İK sistemine eğitim saatleri tek tek girilmez"
+        },
+        {
+          "value": "duzenli_katilim_ve_devam_kaydi_tutulmamaktadir",
+          "label": "Eğitimlerde düzenli katılım ve devam kaydı tutulmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-040",
+      "process": "Katılım, devam ve eğitim kayıtları",
+      "order": 40,
+      "question": "Çalışan başına yıllık toplam eğitim saati (kişi-saat/yıl) ve mavi/beyaz yaka kişi başı eğitim ortalaması sistemden otomatik raporlanabilmekte midir?",
+      "description": "Kişi-saat eğitim KPI'ı, yasal yıllık eğitim saati doğrulaması ve İK göstergeleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kisi_ve_departman_basi_yillik_egitim_saatleri_tek_tikla_raporlanir",
+          "label": "Evet; kişi, unvan, departman ve mavi/beyaz yaka bazında kişi-saat eğitim verisi sistemden anlık raporlanır"
+        },
+        {
+          "value": "yil_sonunda_excel_uzerinde_manuel_toplama_yapilarak_hesaplanir",
+          "label": "Sistemden hazır alınamaz; yıl sonunda farklı listeler Excel'de birleştirilerek manuel hesaplanır"
+        },
+        {
+          "value": "kisi_saat_egitim_suresi_takibi_yapilmamaktadir",
+          "label": "Kişi başı eğitim saati takibi ve raporlaması yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-041",
+      "process": "Sınav, değerlendirme ve başarı ölçümü",
+      "order": 41,
+      "question": "Eğitim sonrasında katılımcıların öğrenme düzeyini ölçmek için sınav, test, vaka çalışması veya pratik uygulama değerlendirmesi yapılmakta mıdır?",
+      "description": "Ön test / son test (Pre-test / Post-test), online sınav, baraj puanı ve başarı belgesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "standart_on_test_son_test_veya_baraj_puanli_sinav_uygulanir",
+          "label": "Evet; eğitim öncesi/sonrası test veya baraj puanı olan (örn. min %70) dijital/yazılı sınav uygulanır"
+        },
+        {
+          "value": "yalnizca_yasal_isg_ve_teknik_sertifika_egitimlerinde_sinav_yapilir",
+          "label": "Yalnızca yasal zorunlu İSG ve teknik operatörlük eğitimlerinde sınav yapılır, genel eğitimlerde yapılmaz"
+        },
+        {
+          "value": "egitmen_veya_yoneticinin_sozlu_kanaat_degerlendirmesi_alinir",
+          "label": "Yazılı sınav yapılmaz; eğitmenin veya yöneticinin sözlü gözlemi ve kanaati yeterli kabul edilir"
+        },
+        {
+          "value": "egitim_sonu_sinav_veya_basari_olcum_yapilmamaktadir",
+          "label": "Eğitim sonrasında herhangi bir sınav veya başarı değerlendirmesi yapılmaz",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-042",
+      "process": "Sertifika, geçerlilik ve yenileme takibi",
+      "order": 42,
+      "question": "Eğitim başarı sertifikaları, katılım belgeleri ve kurum içi yetki kartları nasıl üretilmekte ve geçerlilik süreleri nasıl yönetilmektedir?",
+      "description": "Karekodlu dijital sertifika üretimi, geçerlilik tarihi takibi ve vize yenileme hatırlatıcıları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "karekodlu_dijital_sertifika_sistemden_uretilir_ve_gecerlilik_tarihi_otomatik_takip_edilir",
+          "label": "Karekodlu/doğrulanabilir dijital sertifika üretilir; geçerlilik süresi bitmeden sistem otomatik uyarı verir"
+        },
+        {
+          "value": "basili_sertifika_verilir_taramasi_ozluk_klasorunde_saklanir",
+          "label": "Basılı sertifika düzenlenir ve taranarak özlük klasöründe tutulur; süre takibi manuel yapılır"
+        },
+        {
+          "value": "yalnizca_dis_kurumlarin_verdigi_resmi_sertifikalar_saklanir",
+          "label": "İç eğitimlerde sertifika düzenlenmez; yalnızca dış kurumların verdiği resmî sertifikalar saklanır"
+        },
+        {
+          "value": "sertifika_ve_gecerlilik_takibi_yapilmamaktadir",
+          "label": "Sertifika üretimi ve geçerlilik takip süreci bulunmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-043",
+      "process": "Kariyer, gelişim ve performans bağlantısı",
+      "order": 43,
+      "question": "Eğitim tamamlama skorları, yetkinlik kazanımları ve sertifikalar çalışanın performans notu, terfi kriterleri ve kariyer planı ile entegre midir?",
+      "description": "Eğitim-performans bağı, terfi ön şartları, yedekleme havuzuna giriş ve unvan baremleri.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "egitim_ve_yetkinlik_kriterleri_terfi_ve_performans_notuna_dogrudan_etki_eder",
+          "label": "Evet; zorunlu eğitimleri tamamlamak ve yetkinlik artışı terfi, prim ve performans notunun doğrudan şartıdır"
+        },
+        {
+          "value": "performans_gorusmelerinde_tavsiye_olarak_bakilir_ancak_kat_kural_degildir",
+          "label": "Performans değerlendirmede dikkate alınır ancak terfi veya prim için bağlayıcı bir ön şart değildir"
+        },
+        {
+          "value": "egitim_kayitlari_ile_kariyer_ve_performans_tamamen_bagimsizdir",
+          "label": "Eğitim kayıtları ile terfi, ücret ve performans sistemleri arasında herhangi bir entegrasyon yoktur",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-044",
+      "process": "LMS, içerik ve doküman yönetimi",
+      "order": 44,
+      "question": "Şirketinizde uzaktan/dijital eğitim (E-Learning), video dersler, online sınavlar ve eğitim dokümanları için bir LMS (Learning Management System) kullanılmakta mıdır?",
+      "description": "LMS platformu, SCORM/xAPI içerikleri, mobil erişim, online sınav ve video izleme süre takibi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kurumsal_bulut_veya_onprem_lms_platformu_aktif_olarak_kullanilmaktadir",
+          "label": "Evet; kurumsal LMS platformu üzerinden video dersler, SCORM içerikleri ve online sınavlar yürütülmektedir"
+        },
+        {
+          "value": "intranet_veya_ortak_klasorde_video_ve_pdf_arsivi_vardir_ayri_lms_yoktur",
+          "label": "Ayrı bir LMS yoktur; ortak ağ klasöründe veya şirket intranetinde sunum/video arşivi paylaşılmaktadır"
+        },
+        {
+          "value": "lms_kullanilmiyor_egitimler_manuel_sinif_ortaminda_yurutulur",
+          "label": "LMS kullanılmamaktadır; tüm eğitimler fiziksel sınıf veya atölye ortamında yüz yüze gerçekleştirilir",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-045",
+      "process": "LMS, içerik ve doküman yönetimi",
+      "order": 45,
+      "question": "LMS veya dijital eğitim platformunun ERP/İK sistemiyle çalışan ana verisi, organizasyon şeması ve eğitim tamamlama kayıtları entegrasyonu nasıldır?",
+      "description": "LMS - ERP/İK entegrasyonu, otomatik çalışan senkronizasyonu ve tek oturum açma (SSO).",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRN-044",
+        "operator": "not_equals",
+        "value": "lms_kullanilmiyor_egitimler_manuel_sinif_ortaminda_yurutulur"
+      },
+      "options": [
+        {
+          "value": "ik_calisan_ve_unvan_verisinin_lmsye_otomatik_senkronizasyonu",
+          "label": "İK/ERP sisteminden çalışan, pozisyon ve organizasyon verisinin LMS'e otomatik çift yönlü aktarımı"
+        },
+        {
+          "value": "lms_tamamlama_ve_sinav_sonuclarinin_erpye_otomatik_yazilmasi",
+          "label": "LMS'te tamamlanan eğitimlerin ve sınav puanlarının ERP çalışan özlük geçmişine otomatik işlenmesi"
+        },
+        {
+          "value": "tek_oturum_acma_sso_ve_mobil_uygulama_destegi",
+          "label": "Active Directory / SSO ile tek şifreyle giriş ve çalışan mobil uygulaması üzerinden eğitim izleme"
+        },
+        {
+          "value": "entegrasyon_yoktur_veriler_excel_ile_manuel_aktarilir",
+          "label": "Entegrasyon yoktur; kullanıcı listeleri ve sınav sonuçları Excel ile manuel içeri/dışarı aktarılır"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-046",
+      "process": "Eğitim etkinliği, KPI, arşiv ve yol haritası",
+      "order": 46,
+      "question": "Şirketinizde verilen eğitimlerin etkinliği, çalışan memnuniyeti ve iş sonuçlarına etkisi sistematik olarak ölçülmekte midir?",
+      "description": "Eğitim etkinliği ölçüm modelleri (Kirkpatrick modeli), memnuniyet anketleri ve verimlilik korelasyonu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kirkpatrick_modeli_veya_cok_seviyeli_etkinlik_olcum_sistemi_vardir",
+          "label": "Evet; Seviye 1 (Reaksiyon), Seviye 2 (Öğrenme), Seviye 3 (Davranış) ve Seviye 4 (İş Sonuçları) ölçülür"
+        },
+        {
+          "value": "yalnizca_egitim_sonu_memnuniyet_anketi_yapilir_is_sonucu_olculmez",
+          "label": "Yalnızca eğitim bittiğinde memnuniyet anketi (L1) uygulanır; sahada davranış ve iş sonucu ölçülmez"
+        },
+        {
+          "value": "resmi_etkinlik_olcum_modeli_yok",
+          "label": "Eğitim etkinliği veya memnuniyet ölçümü resmi olarak yapılmamaktadır",
+          "allow_note": true
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "TRN-047",
+      "process": "Eğitim etkinliği, KPI, arşiv ve yol haritası",
+      "order": 47,
+      "question": "Eğitim etkinliği ve yatırım getirisi (ROI) analizlerinde hangi kurumsal KPI ve göstergeler izlenmekte, ERP yol haritasına nasıl dahil edilmektedir?",
+      "description": "Kişi başı eğitim saati, bütçe gerçekleşmesi, hata azalma oranı ve ERP entegre akademi hedefleri.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "TRN-046",
+        "operator": "not_equals",
+        "value": "resmi_etkinlik_olcum_modeli_yok"
+      },
+      "options": [
+        {
+          "value": "egitim_sonrasi_3_6_ay_yonetici_davranis_degisikligi_gozlemi",
+          "label": "Eğitimden 3-6 ay sonra yöneticinin sahada davranış değişikliği ve uygulama gözlem formu (Seviye 3)"
+        },
+        {
+          "value": "hurda_hata_verimlilik_ve_musteri_sikayet_azalma_korelasyonu",
+          "label": "Hata/hurda azalması, müşteri şikayeti düşüşü ve verimlilik artışıyla iş sonuçlarına etki (Seviye 4 / ROI)"
+        },
+        {
+          "value": "kisi_basi_yillik_egitim_saati_ve_butce_gerceklesme_kpi_paneli",
+          "label": "Kişi başı yıllık eğitim saati ve bütçe gerçekleşme oranı yönetici gösterge paneli (KPI Dashboard)"
+        },
+        {
+          "value": "erp_entegre_dijital_akademi_ve_otomatik_yetkinlik_yol_haritasi",
+          "label": "ERP/CRM entegre Kurumsal Akademi, dijital kütüphane ve otomatik yetkinlik atama yol haritası"
+        },
+        {
+          "value": "other",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}

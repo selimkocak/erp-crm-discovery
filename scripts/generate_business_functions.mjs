@@ -8,8 +8,8 @@
  * Validates the canonical JSON registry and deterministically generates TypeScript definitions.
  */
 
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { readFileSync, writeFileSync, mkdirSync, readdirSync } from "node:fs";
+import { resolve, dirname, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -158,9 +158,6 @@ writeFileSync(TS_PATH, tsContent, "utf-8");
 console.log(`[generate] Wrote generated TypeScript to src/generated/businessFunctions.ts`);
 
 // ── Question Packs Manifest Generator ──
-import { readdirSync } from "node:fs";
-import { relative } from "node:path";
-
 const PACKS_DIR = resolve(ROOT_DIR, "question-packs");
 const PACKS_TS_PATH = resolve(ROOT_DIR, "src/generated/questionPacks.ts");
 
@@ -259,6 +256,11 @@ ${packDefinitions.map((p) => `  ${JSON.stringify(p.businessFunctionCode)}: ${JSO
   "STRATEJIK_PLANLAMA": "tr.strategy.core", // Alias
   "KURUMSAL_STRATEJI": "tr.strategy.core", // Alias
   "STRATEGIC_PLANNING": "tr.strategy.core", // Alias
+  "EGITIM": "tr.training.core", // TRAINING için Türkçe ve legacy alias
+  "EGITIM_GELISIM": "tr.training.core", // Alias
+  "EGITIM_VE_GELISIM": "tr.training.core", // Alias
+  "LEARNING_DEVELOPMENT": "tr.training.core", // Alias
+  "L_AND_D": "tr.training.core", // Alias
 } as const;
 
 /**
