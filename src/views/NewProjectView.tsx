@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckSquare, Square, Building, Briefcase } from "lucide-react";
-import { getMasterBusinessFunctions, createProject } from "../db/client";
+import { getMasterBusinessFunctions, createProject, getProjectDetail, updateProjectDetails } from "../db/client";
 import { hasQuestionPack } from "../engine/loader";
 import type { BusinessFunction, CreateProjectPayload } from "../types";
 
 interface NewProjectViewProps {
+  editProjectId?: string | null;
   onCancel: () => void;
   onProjectCreated: (projectId: string) => void;
+  onProjectSaved?: (projectId: string) => void;
 }
 
 export const NewProjectView: React.FC<NewProjectViewProps> = ({
+  editProjectId,
   onCancel,
   onProjectCreated,
+  onProjectSaved,
 }) => {
+  const isEditMode = !!editProjectId;
   const [step, setStep] = useState<1 | 2>(1);
 
   // Form Fields
@@ -37,19 +42,89 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadMasterData = async () => {
+    const loadData = async () => {
       try {
         setIsLoadingFunctions(true);
-        const data = await getMasterBusinessFunctions();
-        setAllFunctions(data);
+        if (editProjectId) {
+          const detail = await getProjectDetail(editProjectId);
+          if (detail) {
+            setProjectName(detail.project.name || "");
+            setCompanyName(detail.company.company_name || "");
+            setTradeName(detail.company.trade_name || "");
+            setTaxNumber(detail.company.tax_number || "");
+            setCity(detail.company.city || "");
+            setCountry(detail.company.country || "Türkiye");
+            setEmployeeCount(detail.company.employee_count || "");
+            setBusinessSector(detail.company.business_sector || "");
+            setHasBranches((detail.company.has_branches as any) || "");
+            setBranchCount(detail.company.branch_count != null ? String(detail.company.branch_count) : "");
+            setNotes(detail.company.notes || "");
+          }
+        } else {
+          const data = await getMasterBusinessFunctions();
+          setAllFunctions(data);
+        }
       } catch (err: any) {
-        console.error("Fonksiyonlar yüklenirken hata:", err);
+        console.error("Veriler yüklenirken hata:", err);
+        setErrorMessage(err?.message || "Veriler yüklenirken bir hata oluştu.");
       } finally {
         setIsLoadingFunctions(false);
       }
     };
-    loadMasterData();
-  }, []);
+    loadData();
+  }, [editProjectId]);
+
+  // Validation & Submit Handlers
+  const handleSaveProjectDetails = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!projectName.trim()) {
+      setErrorMessage("Lütfen analiz / proje adını belirtin.");
+      return;
+    }
+    if (!companyName.trim()) {
+      setErrorMessage("Lütfen firma adını belirtin.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setErrorMessage(null);
+
+      const parsedBranchCount =
+        hasBranches === "yes" && branchCount.trim() ? parseInt(branchCount.trim(), 10) : null;
+      const validBranchCount =
+        hasBranches === "yes" && parsedBranchCount !== null && !isNaN(parsedBranchCount) && parsedBranchCount > 0
+          ? parsedBranchCount
+          : null;
+
+      await updateProjectDetails(editProjectId!, {
+        projectName: projectName.trim(),
+        company: {
+          company_name: companyName.trim(),
+          trade_name: tradeName.trim() || null,
+          tax_number: taxNumber.trim() || null,
+          city: city.trim() || null,
+          country: country.trim() || "Türkiye",
+          employee_count: employeeCount.trim() || null,
+          business_sector: businessSector.trim() || null,
+          has_branches: hasBranches ? hasBranches : null,
+          branch_count: validBranchCount,
+          notes: notes.trim() || null,
+        },
+      });
+
+      if (onProjectSaved) {
+        onProjectSaved(editProjectId!);
+      } else {
+        onCancel();
+      }
+    } catch (err: any) {
+      console.error("Proje güncellenirken hata:", err);
+      setErrorMessage(err?.message || "Proje güncellenirken bir hata oluştu.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Validation
   const handleProceedToStep2 = (e: React.FormEvent) => {
@@ -92,6 +167,10 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
       const parsedBranchCount =
         hasBranches === "yes" && branchCount.trim() ? parseInt(branchCount.trim(), 10) : undefined;
+      const validBranchCount =
+        hasBranches === "yes" && parsedBranchCount !== undefined && !isNaN(parsedBranchCount) && parsedBranchCount > 0
+          ? parsedBranchCount
+          : undefined;
 
       const payload: CreateProjectPayload = {
         projectName: projectName.trim(),
@@ -104,7 +183,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           employee_count: employeeCount.trim() || undefined,
           business_sector: businessSector.trim() || undefined,
           has_branches: hasBranches ? hasBranches : null,
-          branch_count: !isNaN(parsedBranchCount as number) ? parsedBranchCount : undefined,
+          branch_count: validBranchCount,
           notes: notes.trim() || undefined,
         },
         selectedFunctionIds,
@@ -129,78 +208,80 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-      {/* Step Indicator */}
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            padding: "0.75rem 1rem",
-            borderRadius: "var(--radius-md)",
-            backgroundColor: step === 1 ? "var(--primary-subtle)" : "var(--bg-surface)",
-            border: `1px solid ${step === 1 ? "var(--primary-border)" : "var(--border-subtle)"}`,
-            color: step === 1 ? "var(--primary)" : "var(--text-muted)",
-          }}
-        >
+      {/* Step Indicator (Only in Create Mode) */}
+      {!isEditMode && (
+        <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
           <div
             style={{
-              width: "1.75rem",
-              height: "1.75rem",
-              borderRadius: "50%",
-              backgroundColor: step === 1 ? "var(--primary)" : "var(--border-medium)",
-              color: "white",
+              flex: 1,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 700,
-              fontSize: "0.875rem",
+              gap: "0.75rem",
+              padding: "0.75rem 1rem",
+              borderRadius: "var(--radius-md)",
+              backgroundColor: step === 1 ? "var(--primary-subtle)" : "var(--bg-surface)",
+              border: `1px solid ${step === 1 ? "var(--primary-border)" : "var(--border-subtle)"}`,
+              color: step === 1 ? "var(--primary)" : "var(--text-muted)",
             }}
           >
-            1
+            <div
+              style={{
+                width: "1.75rem",
+                height: "1.75rem",
+                borderRadius: "50%",
+                backgroundColor: step === 1 ? "var(--primary)" : "var(--border-medium)",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+                fontSize: "0.875rem",
+              }}
+            >
+              1
+            </div>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>Firma Profili</div>
+              <div style={{ fontSize: "0.75rem" }}>Temel şirket ve proje bilgileri</div>
+            </div>
           </div>
-          <div>
-            <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>Firma Profili</div>
-            <div style={{ fontSize: "0.75rem" }}>Temel şirket ve proje bilgileri</div>
-          </div>
-        </div>
 
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            padding: "0.75rem 1rem",
-            borderRadius: "var(--radius-md)",
-            backgroundColor: step === 2 ? "var(--primary-subtle)" : "var(--bg-surface)",
-            border: `1px solid ${step === 2 ? "var(--primary-border)" : "var(--border-subtle)"}`,
-            color: step === 2 ? "var(--primary)" : "var(--text-muted)",
-          }}
-        >
           <div
             style={{
-              width: "1.75rem",
-              height: "1.75rem",
-              borderRadius: "50%",
-              backgroundColor: step === 2 ? "var(--primary)" : "var(--border-medium)",
-              color: "white",
+              flex: 1,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontWeight: 700,
-              fontSize: "0.875rem",
+              gap: "0.75rem",
+              padding: "0.75rem 1rem",
+              borderRadius: "var(--radius-md)",
+              backgroundColor: step === 2 ? "var(--primary-subtle)" : "var(--bg-surface)",
+              border: `1px solid ${step === 2 ? "var(--primary-border)" : "var(--border-subtle)"}`,
+              color: step === 2 ? "var(--primary)" : "var(--text-muted)",
             }}
           >
-            2
-          </div>
-          <div>
-            <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>İş Fonksiyonu Seçimi</div>
-            <div style={{ fontSize: "0.75rem" }}>Analiz kapsamındaki departmanlar</div>
+            <div
+              style={{
+                width: "1.75rem",
+                height: "1.75rem",
+                borderRadius: "50%",
+                backgroundColor: step === 2 ? "var(--primary)" : "var(--border-medium)",
+                color: "white",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+                fontSize: "0.875rem",
+              }}
+            >
+              2
+            </div>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>İş Fonksiyonu Seçimi</div>
+              <div style={{ fontSize: "0.75rem" }}>Analiz kapsamındaki departmanlar</div>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {errorMessage && (
         <div
@@ -220,11 +301,18 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
       {/* Step 1: Firma Profili */}
       {step === 1 && (
-        <form onSubmit={handleProceedToStep2} className="card">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
+        <form onSubmit={isEditMode ? handleSaveProjectDetails : handleProceedToStep2} className="card">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: isEditMode ? "0.25rem" : "1.25rem" }}>
             <Building size={20} style={{ color: "var(--primary)" }} />
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 700 }}>Firma ve Proje Künyesi</h3>
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 700 }}>
+              {isEditMode ? "Firma ve Proje Bilgilerini Düzenle" : "Firma ve Proje Künyesi"}
+            </h3>
           </div>
+          {isEditMode && (
+            <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)", marginBottom: "1.25rem" }}>
+              Proje ve firma profili bilgilerini güncelleyin.
+            </p>
+          )}
 
           <div className="form-group">
             <label htmlFor="projectName">
@@ -289,7 +377,13 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
                 id="hasBranches"
                 className="form-control"
                 value={hasBranches}
-                onChange={(e) => setHasBranches(e.target.value as "yes" | "no" | "")}
+                onChange={(e) => {
+                  const val = e.target.value as "yes" | "no" | "";
+                  setHasBranches(val);
+                  if (val !== "yes") {
+                    setBranchCount("");
+                  }
+                }}
               >
                 <option value="">Belirtilmedi</option>
                 <option value="yes">Evet (Çok Lokasyonlu)</option>
@@ -428,10 +522,17 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
             <button type="button" className="btn btn-outline btn--back" onClick={onCancel}>
               İptal
             </button>
-            <button type="submit" className="btn btn-primary btn--next">
-              Devam Et
-              <ArrowRight size={16} />
-            </button>
+            {isEditMode ? (
+              <button type="submit" className="btn btn--save" disabled={isSubmitting}>
+                <Check size={16} />
+                {isSubmitting ? "Kaydediliyor..." : "Değişiklikleri Kaydet"}
+              </button>
+            ) : (
+              <button type="submit" className="btn btn-primary btn--next">
+                Devam Et
+                <ArrowRight size={16} />
+              </button>
+            )}
           </div>
         </form>
       )}

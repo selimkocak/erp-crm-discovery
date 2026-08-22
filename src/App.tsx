@@ -4,7 +4,7 @@ import { HomeView } from "./views/HomeView";
 import { NewProjectView } from "./views/NewProjectView";
 import { ProjectDetailView } from "./views/ProjectDetailView";
 
-type AppView = "home" | "new-project" | "project-detail";
+type AppView = "home" | "new-project" | "edit-project" | "project-detail";
 
 export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>("home");
@@ -25,8 +25,18 @@ export const App: React.FC = () => {
     setCurrentView("project-detail");
   };
 
+  const handleEditProject = (projectId: string) => {
+    setActiveProjectId(projectId);
+    setCurrentView("edit-project");
+  };
+
   const handleProjectCreated = (newProjectId: string) => {
     setActiveProjectId(newProjectId);
+    setCurrentView("project-detail");
+  };
+
+  const handleProjectSaved = (savedProjectId: string) => {
+    setActiveProjectId(savedProjectId);
     setCurrentView("project-detail");
   };
 
@@ -43,6 +53,7 @@ export const App: React.FC = () => {
           <HomeView
             onNewProject={handleStartNewProject}
             onOpenProject={handleOpenProject}
+            onEditProject={handleEditProject}
           />
         )}
 
@@ -53,10 +64,22 @@ export const App: React.FC = () => {
           />
         )}
 
+        {currentView === "edit-project" && activeProjectId && (
+          <NewProjectView
+            editProjectId={activeProjectId}
+            onCancel={() => {
+              setCurrentView("project-detail");
+            }}
+            onProjectCreated={handleProjectCreated}
+            onProjectSaved={handleProjectSaved}
+          />
+        )}
+
         {currentView === "project-detail" && activeProjectId && (
           <ProjectDetailView
             projectId={activeProjectId}
             onBack={handleNavigateHome}
+            onEditProject={handleEditProject}
           />
         )}
       </main>

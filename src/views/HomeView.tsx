@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Plus, FolderOpen, Trash2, Calendar, Building2, Layers, AlertCircle } from "lucide-react";
+import { Plus, FolderOpen, Pencil, Trash2, Calendar, Building2, Layers, AlertCircle } from "lucide-react";
 import { getProjects, deleteProject } from "../db/client";
 import type { ProjectListItem } from "../types";
 
 interface HomeViewProps {
   onNewProject: () => void;
   onOpenProject: (projectId: string) => void;
+  onEditProject: (projectId: string) => void;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
   onNewProject,
   onOpenProject,
+  onEditProject,
 }) => {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -153,6 +155,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </td>
                   <td style={{ textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: "0.375rem" }}>
+                      <button
+                        className="btn btn-secondary btn--sm"
+                        title="Firma Bilgilerini Düzenle"
+                        onClick={() => onEditProject(proj.id)}
+                      >
+                        <Pencil size={14} />
+                        Düzenle
+                      </button>
                       <button
                         className="btn btn--continue btn--sm"
                         onClick={() => onOpenProject(proj.id)}

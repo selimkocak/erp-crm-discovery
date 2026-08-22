@@ -257,6 +257,75 @@ export async function updateCompanyProfile(
 }
 
 // ---------------------------------------------------------------
+// 4.2 Proje ve Firma Bilgilerini Güncelle
+// ---------------------------------------------------------------
+export async function updateProjectDetails(
+  projectId: string,
+  payload: {
+    projectName?: string;
+    company: {
+      company_name?: string;
+      trade_name?: string | null;
+      tax_number?: string | null;
+      city?: string | null;
+      country?: string;
+      employee_count?: string | null;
+      business_sector?: string | null;
+      has_branches?: "yes" | "no" | null;
+      branch_count?: number | null;
+      notes?: string | null;
+    };
+  }
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  // 1. Proje adı güncellenmişse analysis_projects tablosunu güncelle
+  if (payload.projectName && payload.projectName.trim()) {
+    await db.execute(
+      `UPDATE analysis_projects SET name = $1, updated_at = $2 WHERE id = $3`,
+      [payload.projectName.trim(), now, projectId]
+    );
+  } else {
+    await db.execute(
+      `UPDATE analysis_projects SET updated_at = $1 WHERE id = $2`,
+      [now, projectId]
+    );
+  }
+
+  // 2. Firma profilini güncelle
+  await db.execute(
+    `UPDATE company_profiles
+     SET company_name = COALESCE($1, company_name),
+         trade_name = $2,
+         tax_number = $3,
+         city = $4,
+         country = COALESCE($5, country),
+         employee_count = $6,
+         business_sector = $7,
+         has_branches = $8,
+         branch_count = $9,
+         notes = $10,
+         updated_at = $11
+     WHERE analysis_project_id = $12`,
+    [
+      payload.company.company_name ?? null,
+      payload.company.trade_name ?? null,
+      payload.company.tax_number ?? null,
+      payload.company.city ?? null,
+      payload.company.country ?? null,
+      payload.company.employee_count ?? null,
+      payload.company.business_sector ?? null,
+      payload.company.has_branches ?? null,
+      payload.company.branch_count ?? null,
+      payload.company.notes ?? null,
+      now,
+      projectId,
+    ]
+  );
+}
+
+// ---------------------------------------------------------------
 // 5. İş fonksiyonu güncelle
 // ---------------------------------------------------------------
 export async function updateProjectBusinessFunction(

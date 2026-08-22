@@ -14,6 +14,7 @@ import {
   Play,
   BookOpen,
   FileText,
+  Pencil,
 } from "lucide-react";
 import { getProjectDetail, updateProjectBusinessFunction } from "../db/client";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
@@ -27,11 +28,13 @@ import type { FunctionStatus, ProjectDetailData } from "../types";
 interface ProjectDetailViewProps {
   projectId: string;
   onBack: () => void;
+  onEditProject?: (projectId: string) => void;
 }
 
 export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   projectId,
   onBack,
+  onEditProject,
 }) => {
   const [data, setData] = useState<ProjectDetailData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -243,9 +246,21 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             <Building2 size={18} style={{ color: "var(--primary)" }} />
             <h3 style={{ fontSize: "1rem", fontWeight: 700 }}>Firma Profili & Künye</h3>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "var(--text-muted)", fontSize: "0.8125rem" }}>
-            <Calendar size={14} />
-            Oluşturulma: {formatDate(project.created_at)}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            {onEditProject && (
+              <button
+                className="btn btn-secondary btn--sm"
+                title="Firma Bilgilerini Düzenle"
+                onClick={() => onEditProject(projectId)}
+              >
+                <Pencil size={13} />
+                Düzenle
+              </button>
+            )}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", color: "var(--text-muted)", fontSize: "0.8125rem" }}>
+              <Calendar size={14} />
+              Oluşturulma: {formatDate(project.created_at)}
+            </div>
           </div>
         </div>
 

@@ -3,7 +3,7 @@ import { Plus, ArrowLeft, Home } from "lucide-react";
 import { AppLogo } from "./AppLogo";
 
 interface HeaderProps {
-  currentView: "home" | "new-project" | "project-detail";
+  currentView: "home" | "new-project" | "edit-project" | "project-detail";
   onNavigateHome: () => void;
   onNewProject?: () => void;
 }

@@ -102,6 +102,11 @@ export interface UpdateCompanyProfilePayload {
   notes?: string | null;
 }
 
+export interface UpdateProjectDetailsPayload {
+  projectName?: string;
+  company: UpdateCompanyProfilePayload;
+}
+
 // ─────────────────────────────────────────────────────────────
 // FAZ-3: Semantic Analysis Types (Findings, Requirements, Risks, Notes)
 // ─────────────────────────────────────────────────────────────
