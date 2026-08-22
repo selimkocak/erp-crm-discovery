@@ -22,11 +22,13 @@ import {
   validateRelativePath,
   readAttachmentFile,
   getManagedAttachmentRoot,
+  isTauriRuntime,
 } from "./attachmentManager";
 
 // ─────────────────────────────────────────────────────────────
 // 1. Path Çözümleme — Relative → Absolute
 // ─────────────────────────────────────────────────────────────
+
 
 /**
  * Göreli yoldan platformun mutlak native işletim sistemi yolunu üretir.
@@ -202,6 +204,15 @@ export async function attachmentExists(relativePath: string): Promise<boolean> {
     return false;
   }
 
+  if (isTauriRuntime()) {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      return await invoke<boolean>("check_attachment_exists_in_vault", { relativePath });
+    } catch {
+      return false;
+    }
+  }
+
   try {
     const buffer = await readAttachmentFile(relativePath);
     return buffer !== null && buffer.byteLength > 0;
@@ -209,6 +220,7 @@ export async function attachmentExists(relativePath: string): Promise<boolean> {
     return false;
   }
 }
+
 
 // ─────────────────────────────────────────────────────────────
 // 5. Native OS Dosya Açıcı

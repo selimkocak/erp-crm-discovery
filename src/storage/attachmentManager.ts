@@ -312,6 +312,7 @@ export function getFileCategory(extension: string): FileCategory {
 }
 
 // ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 // 6. Managed Attachment Vault — Kalıcı Yerel Kasa & I/O
 // ─────────────────────────────────────────────────────────────
 
@@ -326,6 +327,13 @@ export function clearMemoryStorage(): void {
 }
 
 /**
+ * Tauri desktop runtime ortamında olup olmadığımızı tespit eder.
+ */
+export function isTauriRuntime(): boolean {
+  return typeof window !== "undefined" && ("__TAURI_INTERNALS__" in window || "__TAURI__" in window);
+}
+
+/**
  * Returns the canonical root directory of the Managed Attachment Vault.
  *
  * Windows: %LOCALAPPDATA%\ERP CRM Discovery\attachment
@@ -333,6 +341,16 @@ export function clearMemoryStorage(): void {
  * Linux:   ~/.local/share/ERP CRM Discovery/attachment
  */
 export async function getManagedAttachmentRoot(): Promise<string> {
+  if (isTauriRuntime()) {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      const root = await invoke<string>("get_vault_canonical_root");
+      if (root) return root.replace(/\\/g, "/");
+    } catch (err) {
+      console.warn("Tauri get_vault_canonical_root hatasi:", err);
+    }
+  }
+
   try {
     const { localDataDir, appLocalDataDir } = await import("@tauri-apps/api/path");
     if (typeof localDataDir === "function") {
@@ -388,39 +406,50 @@ export async function getManagedVaultBaseDir(): Promise<string> {
  */
 export async function ensureManagedAttachmentVaultRoot(): Promise<string> {
   const root = await getManagedAttachmentRoot();
-  try {
-    const { mkdir } = await import("@tauri-apps/plugin-fs");
-    await mkdir(root, { recursive: true });
-  } catch {
-    // Test / web fallback
+  if (isTauriRuntime()) {
+    return root;
   }
   return root;
 }
 
 export async function saveAttachmentFile(
   relativePath: string,
-  buffer: Uint8Array
-): Promise<void> {
+  buffer: Uint8Array,
+  sourcePath?: string
+): Promise<{ absolutePath?: string; fileSize?: number; sha256?: string }> {
   validateRelativePath(relativePath);
 
-  try {
-    const { writeFile, mkdir } = await import("@tauri-apps/plugin-fs");
-    const vaultRoot = await getManagedAttachmentRoot();
-    const cleanRel = relativePath.startsWith("attachment/")
-      ? relativePath.substring("attachment/".length)
-      : relativePath.startsWith("projects/")
-      ? relativePath.replace(/^projects\/([^/]+)\/attachments\//, "$1/")
-      : relativePath;
+  // 1. Tauri Desktop Runtime: Rust std::fs direct write (No plugin permission limitations)
+  if (isTauriRuntime()) {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      const res = await invoke<{
+        success: boolean;
+        absolute_path: string;
+        file_size: number;
+        sha256: string;
+      }>("save_attachment_to_vault", {
+        relativePath,
+        data: Array.from(buffer),
+        sourcePath: sourcePath || null,
+      });
 
-    const fullPath = `${vaultRoot}/${cleanRel}`.replace(/\/+/g, "/");
-    const dirPath = fullPath.substring(0, fullPath.lastIndexOf("/"));
-
-    await mkdir(dirPath, { recursive: true });
-    await writeFile(fullPath, buffer);
-  } catch {
-    // Memory storage fallback
-    memoryStorage.set(relativePath, buffer);
+      return {
+        absolutePath: res.absolute_path,
+        fileSize: res.file_size,
+        sha256: res.sha256,
+      };
+    } catch (err: any) {
+      // In desktop runtime, NEVER fallback silently to memory! Throw error immediately!
+      throw new Error(`Yönetilen Kasaya Yazma Başarısız Oldu: ${err?.message || err}`);
+    }
   }
+
+  // 2. Non-desktop (Node.js test / in-memory fallback)
+  memoryStorage.set(relativePath, buffer);
+  return {
+    fileSize: buffer.byteLength,
+  };
 }
 
 export async function readAttachmentFile(
@@ -428,20 +457,17 @@ export async function readAttachmentFile(
 ): Promise<Uint8Array | null> {
   validateRelativePath(relativePath);
 
-  try {
-    const { readFile } = await import("@tauri-apps/plugin-fs");
-    const vaultRoot = await getManagedAttachmentRoot();
-    const cleanRel = relativePath.startsWith("attachment/")
-      ? relativePath.substring("attachment/".length)
-      : relativePath.startsWith("projects/")
-      ? relativePath.replace(/^projects\/([^/]+)\/attachments\//, "$1/")
-      : relativePath;
-
-    const fullPath = `${vaultRoot}/${cleanRel}`.replace(/\/+/g, "/");
-    return await readFile(fullPath);
-  } catch {
-    return memoryStorage.get(relativePath) || null;
+  if (isTauriRuntime()) {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      const bytes = await invoke<number[]>("read_attachment_from_vault", { relativePath });
+      return new Uint8Array(bytes);
+    } catch {
+      return null;
+    }
   }
+
+  return memoryStorage.get(relativePath) || null;
 }
 
 export async function deleteAttachmentFile(
@@ -449,20 +475,17 @@ export async function deleteAttachmentFile(
 ): Promise<void> {
   validateRelativePath(relativePath);
 
-  try {
-    const { remove } = await import("@tauri-apps/plugin-fs");
-    const vaultRoot = await getManagedAttachmentRoot();
-    const cleanRel = relativePath.startsWith("attachment/")
-      ? relativePath.substring("attachment/".length)
-      : relativePath.startsWith("projects/")
-      ? relativePath.replace(/^projects\/([^/]+)\/attachments\//, "$1/")
-      : relativePath;
-
-    const fullPath = `${vaultRoot}/${cleanRel}`.replace(/\/+/g, "/");
-    await remove(fullPath);
-  } catch {
-    memoryStorage.delete(relativePath);
+  if (isTauriRuntime()) {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("delete_attachment_from_vault", { relativePath });
+    } catch (err) {
+      console.warn("delete_attachment_from_vault invoke hatası:", err);
+    }
+    return;
   }
+
+  memoryStorage.delete(relativePath);
 }
 
 /**
@@ -473,19 +496,22 @@ export async function deleteProjectAttachmentsDirectory(
 ): Promise<void> {
   const cleanProj = sanitizeFileName(projectId);
 
-  try {
-    const { remove } = await import("@tauri-apps/plugin-fs");
-    const vaultRoot = await getManagedAttachmentRoot();
-    const projectDir = `${vaultRoot}/${cleanProj}`;
-    await remove(projectDir, { recursive: true });
-  } catch {
-    for (const key of Array.from(memoryStorage.keys())) {
-      if (
-        key.startsWith(`attachment/${cleanProj}/`) ||
-        key.startsWith(`projects/${cleanProj}/`)
-      ) {
-        memoryStorage.delete(key);
-      }
+  if (isTauriRuntime()) {
+    try {
+      const { invoke } = await import("@tauri-apps/api/core");
+      await invoke("delete_project_from_vault", { projectId: cleanProj });
+    } catch (err) {
+      console.warn("delete_project_from_vault invoke hatası:", err);
+    }
+    return;
+  }
+
+  for (const key of Array.from(memoryStorage.keys())) {
+    if (
+      key.startsWith(`attachment/${cleanProj}/`) ||
+      key.startsWith(`projects/${cleanProj}/`)
+    ) {
+      memoryStorage.delete(key);
     }
   }
 }
@@ -519,6 +545,14 @@ export interface ImportAttachmentResult {
 /**
  * Kaynak dosya nereden seçilirse seçilsin, dosyayı uygulamanın kalıcı Managed Vault'una
  * ikiz kopya olarak kaydeder, varlığını teyit eder ve SQLite metadata kaydını oluşturur.
+ *
+ * Zorunlu Invariant:
+ * copy(source, managedTarget)
+ * → target exists
+ * → target size equals source size
+ * → target SHA-256 equals source SHA-256
+ * → relative_path DB’ye yazılır
+ * → UI “Managed kopya mevcut” gösterir
  */
 export async function importFileToManagedVault(
   options: ImportAttachmentOptions
@@ -553,38 +587,52 @@ export async function importFileToManagedVault(
   const resolvedMime = file.type || EXTENSION_TO_MIME[ext] || "application/octet-stream";
 
   // 5. Dosyayı fiziksel olarak Managed Vault'a kaydet (kopyala)
-  await saveAttachmentFile(relativePath, file.data);
+  await saveAttachmentFile(relativePath, file.data, file.sourcePath);
 
-  // 6. Fiziksel varlığı doğrula (exists check)
+  // 6. Fiziksel varlığı ve boyut/hash bütünlüğünü doğrula (Mandatory Invariant!)
   const savedData = await readAttachmentFile(relativePath);
   if (!savedData || savedData.byteLength !== file.data.byteLength) {
-    throw new Error("Yönetilen kanıt kasasına yazma işlemi doğrulanamadı.");
+    // Fiziksel dosya bozuk veya yoksa temizle ve hata fırlat
+    await deleteAttachmentFile(relativePath);
+    throw new Error("Yönetilen kanıt kasasına fiziksel yazma işlemi doğrulanamadı (boyut uyuşmazlığı).");
   }
 
-  // 7. SQLite metadata kaydı oluştur
-  const now = new Date().toISOString();
-  const attachment = await addQuestionAttachment({
-    analysis_project_id: projectId,
-    business_function_code: businessFunctionCode,
-    question_id: questionId,
-    original_file_name: file.name,
-    stored_file_name: storedFileName,
-    relative_path: relativePath,
-    mime_type: resolvedMime,
-    file_extension: ext,
-    file_size: file.size,
-    sha256,
-    description: description || null,
-    source_file_name: file.name,
-    source_absolute_path: file.sourcePath || null,
-    imported_at: now,
-  });
+  const savedSha256 = await calculateSha256(savedData);
+  if (savedSha256 !== sha256) {
+    await deleteAttachmentFile(relativePath);
+    throw new Error("Fiziksel kopya bütünlük hatası: SHA-256 sağlama değeri uyuşmuyor.");
+  }
 
-  return {
-    attachment,
-    isDuplicate,
-    duplicateOf: existingDup || undefined,
-  };
+  // 7. SADECE TÜM FİZİKSEL DOĞRULAMALARDAN SONRA SQLite metadata kaydı oluştur
+  try {
+    const now = new Date().toISOString();
+    const attachment = await addQuestionAttachment({
+      analysis_project_id: projectId,
+      business_function_code: businessFunctionCode,
+      question_id: questionId,
+      original_file_name: file.name,
+      stored_file_name: storedFileName,
+      relative_path: relativePath,
+      mime_type: resolvedMime,
+      file_extension: ext,
+      file_size: file.size,
+      sha256,
+      description: description || null,
+      source_file_name: file.name,
+      source_absolute_path: file.sourcePath || null,
+      imported_at: now,
+    });
+
+    return {
+      attachment,
+      isDuplicate,
+      duplicateOf: existingDup || undefined,
+    };
+  } catch (dbErr: any) {
+    // SQLite kaydı başarısız olursa yetim fiziksel dosyayı temizle
+    await deleteAttachmentFile(relativePath);
+    throw new Error(`Veritabanı kaydı oluşturulamadı: ${dbErr?.message || dbErr}`);
+  }
 }
 
 /**
@@ -614,16 +662,23 @@ export async function reimportAttachmentFile(
   const relativePath = buildRelativePath(projectId, businessFunctionCode, questionId, storedFileName);
   const resolvedMime = file.type || EXTENSION_TO_MIME[ext] || "application/octet-stream";
 
-  // Fiziksel kasaya yaz
-  await saveAttachmentFile(relativePath, file.data);
+  // 1. Fiziksel kasaya yaz
+  await saveAttachmentFile(relativePath, file.data, file.sourcePath);
 
-  // Varlık kontrolü
+  // 2. Varlık ve SHA-256 kontrolü
   const savedData = await readAttachmentFile(relativePath);
   if (!savedData || savedData.byteLength !== file.data.byteLength) {
-    throw new Error("Yeniden içe aktarma doğrulanamadı.");
+    await deleteAttachmentFile(relativePath);
+    throw new Error("Yeniden içe aktarma fiziksel doğrulaması başarısız oldu.");
   }
 
-  // DB güncelle
+  const savedSha256 = await calculateSha256(savedData);
+  if (savedSha256 !== sha256) {
+    await deleteAttachmentFile(relativePath);
+    throw new Error("Yeniden içe aktarma SHA-256 doğrulaması başarısız oldu.");
+  }
+
+  // 3. DB güncelle
   await updateQuestionAttachmentReimport(attachmentId, {
     original_file_name: file.name,
     stored_file_name: storedFileName,
