@@ -536,7 +536,7 @@ export const SemanticModal: React.FC<SemanticModalProps> = ({
           <div className="modal-footer">
             <button
               type="button"
-              className="btn btn--secondary"
+              className="btn btn--outline"
               onClick={onClose}
               disabled={isSubmitting}
             >
@@ -544,7 +544,7 @@ export const SemanticModal: React.FC<SemanticModalProps> = ({
             </button>
             <button
               type="submit"
-              className="btn btn--primary"
+              className="btn btn--success"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Kaydediliyor..." : isEditing ? "Güncelle" : "Kaydet"}

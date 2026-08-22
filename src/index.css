@@ -301,27 +301,43 @@ body {
   transform: translateY(0);
 }
 
+.btn-secondary:focus-visible,
+.btn--secondary:focus-visible {
+  outline: 2px solid var(--color-secondary-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.35);
+}
+
 /* ── Success Action: Emerald Green (Tamamlandı, Kaydedildi, Dışa Aktar) ─── */
 .btn-success,
 .btn--success {
-  background-color: var(--color-success-600);
+  background-color: #047857;
   color: #ffffff;
-  border-color: var(--color-success-700);
-  box-shadow: 0 1px 2px rgba(22, 163, 74, 0.2);
+  border-color: #065f46;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(4, 120, 87, 0.2);
 }
 
 .btn-success:hover:not(:disabled),
 .btn--success:hover:not(:disabled) {
-  background-color: var(--color-success-700);
+  background-color: #065f46;
+  border-color: #064e3b;
   color: #ffffff;
-  box-shadow: 0 2px 5px rgba(22, 163, 74, 0.3);
+  box-shadow: 0 2px 5px rgba(4, 120, 87, 0.3);
   transform: translateY(-1px);
 }
 
 .btn-success:active:not(:disabled),
 .btn--success:active:not(:disabled) {
-  background-color: var(--color-success-800);
+  background-color: #064e3b;
   transform: translateY(0);
+}
+
+.btn-success:focus-visible,
+.btn--success:focus-visible {
+  outline: 2px solid #047857;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.35);
 }
 
 /* ── Warning Action: Amber (Sonra Dön, Dikkat, Hazırlanıyor) ────────────── */
@@ -330,12 +346,14 @@ body {
   background-color: var(--color-warning-500);
   color: #ffffff;
   border-color: var(--color-warning-600);
+  font-weight: 600;
   box-shadow: 0 1px 2px rgba(217, 119, 6, 0.2);
 }
 
 .btn-warning:hover:not(:disabled),
 .btn--warning:hover:not(:disabled) {
   background-color: var(--color-warning-600);
+  border-color: var(--color-warning-700);
   color: #ffffff;
   box-shadow: 0 2px 5px rgba(217, 119, 6, 0.3);
   transform: translateY(-1px);
@@ -347,18 +365,27 @@ body {
   transform: translateY(0);
 }
 
+.btn-warning:focus-visible,
+.btn--warning:focus-visible {
+  outline: 2px solid var(--color-warning-500);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.35);
+}
+
 /* ── Danger Action: Crimson (Kritik Takip, Sil, Sıfırla) ───────────────── */
 .btn-danger,
 .btn--danger {
   background-color: var(--color-danger-600);
   color: #ffffff;
   border-color: var(--color-danger-700);
+  font-weight: 600;
   box-shadow: 0 1px 2px rgba(220, 38, 38, 0.2);
 }
 
 .btn-danger:hover:not(:disabled),
 .btn--danger:hover:not(:disabled) {
   background-color: var(--color-danger-700);
+  border-color: var(--color-danger-800);
   color: #ffffff;
   box-shadow: 0 2px 5px rgba(220, 38, 38, 0.3);
   transform: translateY(-1px);
@@ -368,6 +395,13 @@ body {
 .btn--danger:active:not(:disabled) {
   background-color: var(--color-danger-800);
   transform: translateY(0);
+}
+
+.btn-danger:focus-visible,
+.btn--danger:focus-visible {
+  outline: 2px solid var(--color-danger-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
 }
 
 /* ── Outline Action: Neutral Slate (Geri, Filtre, Detay) ────────────────── */
@@ -386,10 +420,24 @@ body {
   color: var(--color-neutral-900);
 }
 
+.btn-outline:active:not(:disabled),
+.btn--outline:active:not(:disabled) {
+  background-color: var(--color-neutral-200);
+  transform: translateY(0);
+}
+
+.btn-outline:focus-visible,
+.btn--outline:focus-visible {
+  outline: 2px solid var(--color-neutral-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.35);
+}
+
 .btn-outline-danger {
   background-color: var(--color-danger-subtle);
   border-color: var(--color-danger-border);
   color: var(--color-danger-700);
+  font-weight: 500;
 }
 
 .btn-outline-danger:hover:not(:disabled) {
@@ -398,16 +446,29 @@ body {
   color: #ffffff;
 }
 
+.btn-outline-danger:focus-visible {
+  outline: 2px solid var(--color-danger-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
+}
+
 .btn-outline-warning {
   background-color: var(--color-warning-subtle);
   border-color: var(--color-warning-border);
   color: var(--color-warning-700);
+  font-weight: 500;
 }
 
 .btn-outline-warning:hover:not(:disabled) {
   background-color: var(--color-warning-500);
   border-color: var(--color-warning-600);
   color: #ffffff;
+}
+
+.btn-outline-warning:focus-visible {
+  outline: 2px solid var(--color-warning-500);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.35);
 }
 
 /* ── Ghost Action: Transparent (İptal, Kapat, İkincil Araçlar) ──────────── */
@@ -424,6 +485,12 @@ body {
   color: var(--color-neutral-900);
 }
 
+.btn-ghost:focus-visible,
+.btn--ghost:focus-visible {
+  outline: 2px solid var(--color-neutral-500);
+  outline-offset: 2px;
+}
+
 .btn-danger-ghost {
   background: transparent;
   color: var(--color-danger-600);
@@ -433,6 +500,11 @@ body {
 .btn-danger-ghost:hover:not(:disabled) {
   background-color: var(--color-danger-subtle);
   color: var(--color-danger-700);
+}
+
+.btn-danger-ghost:focus-visible {
+  outline: 2px solid var(--color-danger-600);
+  outline-offset: 2px;
 }
 
 /* ── Disabled / Loading States ─────────────────────────────────────────── */

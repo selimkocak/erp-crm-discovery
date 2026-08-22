@@ -130,7 +130,7 @@ export const ReportProfileModal: React.FC<ReportProfileModalProps> = ({
           <div className="modal-footer" style={{ margin: "0 -1.5rem -1.25rem", padding: "1rem 1.5rem" }}>
             <button
               type="button"
-              className="btn btn--secondary"
+              className="btn btn--outline"
               onClick={onClose}
               disabled={isSaving}
             >
@@ -138,7 +138,7 @@ export const ReportProfileModal: React.FC<ReportProfileModalProps> = ({
             </button>
             <button
               type="submit"
-              className="btn btn--primary"
+              className="btn btn--success"
               disabled={isSaving}
             >
               <Save size={16} />

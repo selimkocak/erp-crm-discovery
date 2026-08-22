@@ -245,7 +245,7 @@ export const FollowupModal: React.FC<FollowupModalProps> = ({
               </button>
               <button
                 type="submit"
-                className="btn btn-primary btn-sm"
+                className="btn btn-success btn-sm"
                 disabled={isSubmitting}
                 style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}
               >

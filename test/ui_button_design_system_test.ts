@@ -153,8 +153,27 @@ assert((projectDetailCode.includes("btn-report-primary") || projectDetailCode.in
 const questionScreenCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/QuestionScreen.tsx"), "utf-8");
 assert(questionScreenCode.includes("btn--secondary") && questionScreenCode.includes("Özel Soru"), "QuestionScreen: + Özel Soru butonu btn--secondary sınıfına sahip");
 assert(questionScreenCode.includes("btn--secondary") && questionScreenCode.includes("Ara Rapor"), "QuestionScreen: Ara Rapor butonu btn--secondary sınıfına sahip");
-assert(questionScreenCode.includes("btn--primary") && questionScreenCode.includes("Sonraki"), "QuestionScreen: Sonraki butonu btn--primary sınıfına sahip");
-assert(questionScreenCode.includes("btn--outline") && questionScreenCode.includes("Önceki"), "QuestionScreen: Önceki butonu btn--outline sınıfına sahip");
+assert(questionScreenCode.includes("btn--primary") && questionScreenCode.includes("Sonraki"), "QuestionScreen: Sonraki butonu btn--primary (Mavi) sınıfına sahip");
+assert(questionScreenCode.includes("btn--outline") && questionScreenCode.includes("Önceki"), "QuestionScreen: Önceki butonu btn--outline (Nötr) sınıfına sahip");
+assert(questionScreenCode.includes("btn-save-exit") && questionScreenCode.includes("Kaydet ve Çık"), "QuestionScreen: Kaydet ve Çık butonu btn-save-exit (Yeşil) sınıfına sahip");
+assert(questionScreenCode.includes("btn--success") && questionScreenCode.includes("Tamamla"), "QuestionScreen: Tamamla butonu btn--success (Yeşil) sınıfına sahip");
+
+const semanticModalCode = fs.readFileSync(path.join(ROOT_DIR, "src/components/SemanticModal.tsx"), "utf-8");
+assert(semanticModalCode.includes("btn--outline") && semanticModalCode.includes("İptal"), "SemanticModal: İptal butonu btn--outline (Açık Gri) sınıfına sahip");
+assert(semanticModalCode.includes("btn--success") && (semanticModalCode.includes("Kaydet") || semanticModalCode.includes("Güncelle")), "SemanticModal: Kaydet/Güncelle butonu btn--success (Yeşil) sınıfına sahip");
+
+const reportProfileModalCode = fs.readFileSync(path.join(ROOT_DIR, "src/components/ReportProfileModal.tsx"), "utf-8");
+assert(reportProfileModalCode.includes("btn--outline") && reportProfileModalCode.includes("Vazgeç"), "ReportProfileModal: Vazgeç butonu btn--outline (Açık Gri) sınıfına sahip");
+assert(reportProfileModalCode.includes("btn--success") && reportProfileModalCode.includes("Kaydet"), "ReportProfileModal: Kaydet butonu btn--success (Yeşil) sınıfına sahip");
+
+const followupModalCode = fs.readFileSync(path.join(ROOT_DIR, "src/components/FollowupModal.tsx"), "utf-8");
+assert(followupModalCode.includes("btn-outline") && followupModalCode.includes("Vazgeç"), "FollowupModal: Vazgeç butonu btn-outline (Açık Gri) sınıfına sahip");
+assert(followupModalCode.includes("btn-success") && followupModalCode.includes("Bayrağı Kaydet"), "FollowupModal: Bayrağı Kaydet butonu btn-success (Yeşil) sınıfına sahip");
+assert(followupModalCode.includes("btn-outline-danger") && followupModalCode.includes("Bayrağı Kaldır"), "FollowupModal: Bayrağı Kaldır butonu btn-outline-danger (Kırmızı) sınıfına sahip");
+
+const customQuestionModalCode = fs.readFileSync(path.join(ROOT_DIR, "src/components/CustomQuestionModal.tsx"), "utf-8");
+assert(customQuestionModalCode.includes("btn--outline") && customQuestionModalCode.includes("İptal"), "CustomQuestionModal: İptal butonu btn--outline (Açık Gri) sınıfına sahip");
+assert(customQuestionModalCode.includes("btn--success") && (customQuestionModalCode.includes("Soruyu Ekle") || customQuestionModalCode.includes("Güncelle")), "CustomQuestionModal: Soruyu Ekle butonu btn--success (Yeşil) sınıfına sahip");
 
 console.log("\n" + "═".repeat(50));
 console.log(`UI Button Visual Design Test Sonucu: ${passCount} PASS / ${failCount} FAIL`);

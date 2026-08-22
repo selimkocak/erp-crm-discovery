@@ -352,10 +352,10 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
           </div>
 
           <div className="modal-footer" style={{ padding: "0.875rem 1.25rem", display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-            <button type="button" className="btn btn--secondary btn--sm" onClick={onClose} disabled={isSaving}>
+            <button type="button" className="btn btn--outline btn--sm" onClick={onClose} disabled={isSaving}>
               İptal
             </button>
-            <button type="submit" className="btn btn--primary btn--sm" disabled={isSaving}>
+            <button type="submit" className="btn btn--success btn--sm" disabled={isSaving}>
               {isSaving ? "Kaydediliyor..." : existingQuestion ? "Güncelle" : "Soruyu Ekle"}
             </button>
           </div>
