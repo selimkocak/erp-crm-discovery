@@ -340,13 +340,18 @@ console.log("\n=== T10: Cross-Pack Duplication Audit ===");
 const otherPacksDir = path.join(ROOT_DIR, "question-packs/tr");
 let duplicateCount = 0;
 
+// Normalize path separators for cross-platform compatibility (Windows uses backslash)
+function normalizePath(p: string): string {
+  return p.replace(/\\/g, "/");
+}
+
 function findOtherPacks(dir: string): string[] {
   const files: string[] = [];
   for (const entry of readdirSync(dir)) {
     const full = path.join(dir, entry);
     if (statSync(full).isDirectory()) {
       files.push(...findOtherPacks(full));
-    } else if (entry === "core.json" && !full.includes("strategy/core.json")) {
+    } else if (entry === "core.json" && !normalizePath(full).includes("strategy/core.json")) {
       files.push(full);
     }
   }
@@ -365,7 +370,7 @@ for (const otherFile of otherPackFiles) {
     }
   }
 }
-assert(duplicateCount === 0, `32 diğer modülle çapraz karşılaştırmada 0 tam mükerrer soru (${duplicateCount} bulundu)`);
+assert(duplicateCount === 0, `Diğer modüllerle çapraz karşılaştırmada 0 tam mükerrer soru (${duplicateCount} bulundu)`);
 
 // ─── TEST 11: Custom Questions Adapter Compatibility ─────────────────────────
 console.log("\n=== T11: Custom Questions Adapter Compatibility ===");
