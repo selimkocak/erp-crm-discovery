@@ -210,68 +210,131 @@ body {
   box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
-/* ── Primary Action: Deep Blue / Cobalt (Başlat, Devam, Kaydet, Onayla) ─── */
+/* ══════════════════════════════════════════════════════════════════════════════
+   SEMANTIC ACTION BUTTON SUITE (WCAG AA)
+   - Başlat: Mavi (#2563eb) (.btn--start, .btn-start)
+   - Devam: Turkuaz/Teal (#0f766e) (.btn--continue, .btn-continue)
+   - Rapor Önizleme: Mor/Indigo (#4f46e5) (.btn--report, .btn-report, .btn-report-primary)
+   - Kaydet ve Çık / Tamamla: Zümrüt Yeşil (#15803d / #047857) (.btn--save, .btn-save, .btn-save-exit, .btn-success)
+   - Sonraki: Mavi (#2563eb) (.btn--next, .btn-next)
+   - Önceki / Geri: Nötr / Açık Teal (.btn--back, .btn-back, .btn-nav-home)
+   - Tehlike / Sil / Kritik: Kırmızı (#dc2626) (.btn--danger, .btn-danger)
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Başlat / Yeni Analiz: Corporate Blue (#2563eb) ────────────────────── */
 .btn-primary,
-.btn--primary {
+.btn--primary,
+.btn-start,
+.btn--start {
   background-color: var(--color-primary-600);
   color: #ffffff;
   border-color: var(--color-primary-700);
+  font-weight: 600;
   box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
 }
 
 .btn-primary:hover:not(:disabled),
-.btn--primary:hover:not(:disabled) {
+.btn--primary:hover:not(:disabled),
+.btn-start:hover:not(:disabled),
+.btn--start:hover:not(:disabled) {
   background-color: var(--color-primary-700);
+  border-color: var(--color-primary-800);
   color: #ffffff;
   box-shadow: 0 3px 6px rgba(37, 99, 235, 0.35);
   transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled),
-.btn--primary:active:not(:disabled) {
+.btn--primary:active:not(:disabled),
+.btn-start:active:not(:disabled),
+.btn--start:active:not(:disabled) {
   background-color: var(--color-primary-800);
+  border-color: var(--color-primary-800);
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
 }
 
-/* ── Report Primary Action: Deep Indigo / Purple-Blue (Rapor Önizleme / Merkezi Rapor) ─── */
-.btn-report-primary,
-.btn--report-primary,
-.btn-report,
-.btn--report {
-  background-color: var(--color-report-600);
-  color: var(--color-report-text);
-  border-color: var(--color-report-700);
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(79, 70, 229, 0.3), 0 1px 2px -1px rgba(79, 70, 229, 0.2);
+.btn-primary:focus-visible,
+.btn--primary:focus-visible,
+.btn-start:focus-visible,
+.btn--start:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
 }
 
-.btn-report-primary:hover:not(:disabled),
-.btn--report-primary:hover:not(:disabled),
-.btn-report:hover:not(:disabled),
-.btn--report:hover:not(:disabled) {
-  background-color: var(--color-report-700);
-  border-color: var(--color-report-800);
-  color: #ffffff;
-  box-shadow: 0 4px 8px -1px rgba(79, 70, 229, 0.4), 0 2px 4px -2px rgba(79, 70, 229, 0.3);
+/* ── 2. Devam / Analize Devam: Deep Turquoise / Teal (#0f766e) ───────────── */
+.btn-continue,
+.btn--continue {
+  background-color: #0f766e !important;
+  color: #ffffff !important;
+  border-color: #0d655e !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(15, 118, 110, 0.25);
+}
+
+.btn-continue:hover:not(:disabled),
+.btn--continue:hover:not(:disabled) {
+  background-color: #0d655e !important;
+  border-color: #0a524c !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 6px rgba(15, 118, 110, 0.35);
   transform: translateY(-1px);
 }
 
-.btn-report-primary:active:not(:disabled),
-.btn--report-primary:active:not(:disabled),
+.btn-continue:active:not(:disabled),
+.btn--continue:active:not(:disabled) {
+  background-color: #0a524c !important;
+  border-color: #0a524c !important;
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(15, 118, 110, 0.2);
+}
+
+.btn-continue:focus-visible,
+.btn--continue:focus-visible {
+  outline: 2px solid #0f766e !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.35);
+}
+
+/* ── 3. Rapor Önizleme / Merkezi Rapor: Royal Indigo (#4f46e5) ───────────── */
+.btn-report,
+.btn--report,
+.btn-report-primary,
+.btn--report-primary {
+  background-color: var(--color-report-600) !important;
+  color: #ffffff !important;
+  border-color: var(--color-report-700) !important;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3), 0 1px 2px rgba(79, 70, 229, 0.2);
+}
+
+.btn-report:hover:not(:disabled),
+.btn--report:hover:not(:disabled),
+.btn-report-primary:hover:not(:disabled),
+.btn--report-primary:hover:not(:disabled) {
+  background-color: var(--color-report-700) !important;
+  border-color: var(--color-report-800) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 8px rgba(79, 70, 229, 0.4), 0 2px 4px rgba(79, 70, 229, 0.3);
+  transform: translateY(-1px);
+}
+
 .btn-report:active:not(:disabled),
-.btn--report:active:not(:disabled) {
-  background-color: var(--color-report-800);
-  border-color: var(--color-report-800);
+.btn--report:active:not(:disabled),
+.btn-report-primary:active:not(:disabled),
+.btn--report-primary:active:not(:disabled) {
+  background-color: var(--color-report-800) !important;
+  border-color: var(--color-report-800) !important;
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(79, 70, 229, 0.25);
 }
 
-.btn-report-primary:focus-visible,
-.btn--report-primary:focus-visible,
 .btn-report:focus-visible,
-.btn--report:focus-visible {
-  outline: 2px solid var(--color-report-600);
+.btn--report:focus-visible,
+.btn-report-primary:focus-visible,
+.btn--report-primary:focus-visible {
+  outline: 2px solid var(--color-report-600) !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--color-report-focus-ring);
 }
@@ -308,39 +371,122 @@ body {
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.35);
 }
 
-/* ── Success Action: Emerald Green (Tamamlandı, Kaydedildi, Dışa Aktar) ─── */
+/* ── 4. Kaydet ve Çık / Tamamla / Kaydet: Emerald Green (#15803d / #047857) */
+.btn-save,
+.btn--save,
 .btn-success,
-.btn--success {
-  background-color: #047857;
-  color: #ffffff;
-  border-color: #065f46;
+.btn--success,
+.btn-save-exit {
+  background-color: #047857 !important;
+  color: #ffffff !important;
+  border-color: #065f46 !important;
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(4, 120, 87, 0.2);
 }
 
+.btn-save:hover:not(:disabled),
+.btn--save:hover:not(:disabled),
 .btn-success:hover:not(:disabled),
-.btn--success:hover:not(:disabled) {
-  background-color: #065f46;
-  border-color: #064e3b;
-  color: #ffffff;
+.btn--success:hover:not(:disabled),
+.btn-save-exit:hover:not(:disabled) {
+  background-color: #065f46 !important;
+  border-color: #064e3b !important;
+  color: #ffffff !important;
   box-shadow: 0 2px 5px rgba(4, 120, 87, 0.3);
   transform: translateY(-1px);
 }
 
+.btn-save:active:not(:disabled),
+.btn--save:active:not(:disabled),
 .btn-success:active:not(:disabled),
-.btn--success:active:not(:disabled) {
-  background-color: #064e3b;
+.btn--success:active:not(:disabled),
+.btn-save-exit:active:not(:disabled) {
+  background-color: #064e3b !important;
+  border-color: #064e3b !important;
   transform: translateY(0);
 }
 
+.btn-save:focus-visible,
+.btn--save:focus-visible,
 .btn-success:focus-visible,
-.btn--success:focus-visible {
-  outline: 2px solid #047857;
+.btn--success:focus-visible,
+.btn-save-exit:focus-visible {
+  outline: 2px solid #047857 !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.35);
 }
 
-/* ── Warning Action: Amber (Sonra Dön, Dikkat, Hazırlanıyor) ────────────── */
+/* ── 5. Sonraki: Corporate Blue (#2563eb) ───────────────────────────────── */
+.btn-next,
+.btn--next {
+  background-color: var(--color-primary-600) !important;
+  color: #ffffff !important;
+  border-color: var(--color-primary-700) !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
+}
+
+.btn-next:hover:not(:disabled),
+.btn--next:hover:not(:disabled) {
+  background-color: var(--color-primary-700) !important;
+  border-color: var(--color-primary-800) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 6px rgba(37, 99, 235, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-next:active:not(:disabled),
+.btn--next:active:not(:disabled) {
+  background-color: var(--color-primary-800) !important;
+  border-color: var(--color-primary-800) !important;
+  transform: translateY(0);
+}
+
+.btn-next:focus-visible,
+.btn--next:focus-visible {
+  outline: 2px solid var(--color-primary-600) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+}
+
+/* ── 6. Geri / Önceki / Ana Sayfaya Dön: Neutral Slate / Light Teal ────── */
+.btn-back,
+.btn--back,
+.btn-outline,
+.btn--outline {
+  background-color: var(--bg-surface);
+  border-color: var(--color-neutral-300);
+  color: var(--color-neutral-700);
+  font-weight: 500;
+}
+
+.btn-back:hover:not(:disabled),
+.btn--back:hover:not(:disabled),
+.btn-outline:hover:not(:disabled),
+.btn--outline:hover:not(:disabled) {
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-neutral-400);
+  color: var(--color-neutral-900);
+}
+
+.btn-back:active:not(:disabled),
+.btn--back:active:not(:disabled),
+.btn-outline:active:not(:disabled),
+.btn--outline:active:not(:disabled) {
+  background-color: var(--color-neutral-200);
+  transform: translateY(0);
+}
+
+.btn-back:focus-visible,
+.btn--back:focus-visible,
+.btn-outline:focus-visible,
+.btn--outline:focus-visible {
+  outline: 2px solid var(--color-neutral-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.35);
+}
+
+/* ── 7. Warning Action: Amber (Sonra Dön, Dikkat, Hazırlanıyor) ────────── */
 .btn-warning,
 .btn--warning {
   background-color: var(--color-warning-500);
@@ -372,65 +518,37 @@ body {
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.35);
 }
 
-/* ── Danger Action: Crimson (Kritik Takip, Sil, Sıfırla) ───────────────── */
+/* ── 8. Tehlike / Sil / Kritik İşlem: Crimson Red (#dc2626) ─────────────── */
 .btn-danger,
 .btn--danger {
-  background-color: var(--color-danger-600);
-  color: #ffffff;
-  border-color: var(--color-danger-700);
+  background-color: var(--color-danger-600) !important;
+  color: #ffffff !important;
+  border-color: var(--color-danger-700) !important;
   font-weight: 600;
   box-shadow: 0 1px 2px rgba(220, 38, 38, 0.2);
 }
 
 .btn-danger:hover:not(:disabled),
 .btn--danger:hover:not(:disabled) {
-  background-color: var(--color-danger-700);
-  border-color: var(--color-danger-800);
-  color: #ffffff;
+  background-color: var(--color-danger-700) !important;
+  border-color: var(--color-danger-800) !important;
+  color: #ffffff !important;
   box-shadow: 0 2px 5px rgba(220, 38, 38, 0.3);
   transform: translateY(-1px);
 }
 
 .btn-danger:active:not(:disabled),
 .btn--danger:active:not(:disabled) {
-  background-color: var(--color-danger-800);
+  background-color: var(--color-danger-800) !important;
+  border-color: var(--color-danger-800) !important;
   transform: translateY(0);
 }
 
 .btn-danger:focus-visible,
 .btn--danger:focus-visible {
-  outline: 2px solid var(--color-danger-600);
+  outline: 2px solid var(--color-danger-600) !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
-}
-
-/* ── Outline Action: Neutral Slate (Geri, Filtre, Detay) ────────────────── */
-.btn-outline,
-.btn--outline {
-  background-color: var(--bg-surface);
-  border-color: var(--color-neutral-300);
-  color: var(--color-neutral-700);
-  font-weight: 500;
-}
-
-.btn-outline:hover:not(:disabled),
-.btn--outline:hover:not(:disabled) {
-  background-color: var(--color-neutral-100);
-  border-color: var(--color-neutral-400);
-  color: var(--color-neutral-900);
-}
-
-.btn-outline:active:not(:disabled),
-.btn--outline:active:not(:disabled) {
-  background-color: var(--color-neutral-200);
-  transform: translateY(0);
-}
-
-.btn-outline:focus-visible,
-.btn--outline:focus-visible {
-  outline: 2px solid var(--color-neutral-600);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.35);
 }
 
 .btn-outline-danger {

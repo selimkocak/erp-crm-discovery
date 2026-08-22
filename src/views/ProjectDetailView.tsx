@@ -207,7 +207,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
       {/* Top Header */}
       <div className="view-header">
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button className="btn btn-secondary" onClick={onBack}>
+          <button className="btn btn-secondary btn--back" onClick={onBack}>
             <ArrowLeft size={16} />
             Geri
           </button>
@@ -221,7 +221,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
           <button
-            className="btn btn-report-primary btn--sm"
+            className="btn btn-report-primary btn--report btn--sm"
             onClick={() => setIsViewingReport(true)}
             title="Raporu hazırla ve incele"
           >
@@ -428,7 +428,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                   <td>
                     {hasQuestionPack(fn.code) ? (
                       <button
-                        className="btn btn--primary btn--sm"
+                        className={`btn ${fn.status === "not_started" ? "btn--start" : "btn--continue"} btn--sm`}
                         disabled={packLoadingCode === fn.code}
                         onClick={() => handleStartAnalysis(fn.code, fn.name_tr)}
                         title={fn.status === "not_started" ? "Analizi Başlat" : "Analize Devam Et"}

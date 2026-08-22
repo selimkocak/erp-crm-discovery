@@ -87,12 +87,24 @@ const requiredClasses = [
   ".btn",
   ".btn-primary",
   ".btn--primary",
+  ".btn-start",
+  ".btn--start",
+  ".btn-continue",
+  ".btn--continue",
+  ".btn-report",
+  ".btn--report",
   ".btn-report-primary",
   ".btn--report-primary",
   ".btn-secondary",
   ".btn--secondary",
+  ".btn-save",
+  ".btn--save",
   ".btn-success",
   ".btn--success",
+  ".btn-next",
+  ".btn--next",
+  ".btn-back",
+  ".btn--back",
   ".btn-warning",
   ".btn--warning",
   ".btn-danger",
@@ -112,33 +124,37 @@ for (const cls of requiredClasses) {
 // ── Test 3: WCAG AA Color Contrast Verification ──
 console.log("\n=== T03: WCAG AA Color Contrast Verification ===");
 
-// 1. Primary Action (Cobalt #2563eb / #1d4ed8 vs #ffffff)
+// 1. Primary / Start Action (Cobalt #2563eb / #1d4ed8 vs #ffffff)
 const primaryHoverRatio = contrastRatio("#1d4ed8", "#ffffff");
-assert(primaryHoverRatio >= 4.5, `Primary Hover (#1d4ed8 vs #ffffff) Kontrast: ${primaryHoverRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
+assert(primaryHoverRatio >= 4.5, `Primary / Start Hover (#1d4ed8 vs #ffffff) Kontrast: ${primaryHoverRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 2. Report Primary Action (Indigo #4f46e5 / #4338ca vs #ffffff)
+// 2. Continue Action (Teal #0f766e / #0d655e vs #ffffff)
+const continueRatio = contrastRatio("#0f766e", "#ffffff");
+assert(continueRatio >= 4.5, `Continue Action (#0f766e vs #ffffff) Kontrast: ${continueRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
+
+// 3. Report Primary Action (Indigo #4f46e5 / #4338ca vs #ffffff)
 const reportRatio = contrastRatio("#4f46e5", "#ffffff");
 assert(reportRatio >= 4.5, `Report Primary (#4f46e5 vs #ffffff) Kontrast: ${reportRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 const reportHoverRatio = contrastRatio("#4338ca", "#ffffff");
 assert(reportHoverRatio >= 4.5, `Report Hover (#4338ca vs #ffffff) Kontrast: ${reportHoverRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 3. Secondary Action (Teal #0f766e vs #ffffff)
+// 4. Secondary Action (Teal #0f766e vs #ffffff)
 const secondaryRatio = contrastRatio("#0f766e", "#ffffff");
 assert(secondaryRatio >= 4.5, `Secondary (#0f766e vs #ffffff) Kontrast: ${secondaryRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 4. Success Action (Green #15803d vs #ffffff)
+// 5. Success / Save Action (Green #15803d / #047857 vs #ffffff)
 const successRatio = contrastRatio("#15803d", "#ffffff");
-assert(successRatio >= 4.5, `Success (#15803d vs #ffffff) Kontrast: ${successRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
+assert(successRatio >= 4.5, `Success / Save (#15803d vs #ffffff) Kontrast: ${successRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 5. Warning Action (Amber #b45309 vs #ffffff)
+// 6. Warning Action (Amber #b45309 vs #ffffff)
 const warningRatio = contrastRatio("#b45309", "#ffffff");
 assert(warningRatio >= 4.5, `Warning (#b45309 vs #ffffff) Kontrast: ${warningRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 6. Danger Action (Crimson #dc2626 vs #ffffff)
+// 7. Danger Action (Crimson #dc2626 vs #ffffff)
 const dangerRatio = contrastRatio("#dc2626", "#ffffff");
 assert(dangerRatio >= 4.5, `Danger (#dc2626 vs #ffffff) Kontrast: ${dangerRatio.toFixed(2)}:1 (>= 4.5:1 PASS)`);
 
-// 7. Base Text (#0f172a on #f8fafc)
+// 8. Base Text (#0f172a on #f8fafc)
 const bodyTextRatio = contrastRatio("#0f172a", "#f8fafc");
 assert(bodyTextRatio >= 7.0, `Body Text (#0f172a vs #f8fafc) Kontrast: ${bodyTextRatio.toFixed(2)}:1 (>= 7.0:1 AAA PASS)`);
 
@@ -146,17 +162,28 @@ assert(bodyTextRatio >= 7.0, `Body Text (#0f172a vs #f8fafc) Kontrast: ${bodyTex
 console.log("\n=== T04: Core Views Button Semantic Alignment ===");
 
 const projectDetailCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/ProjectDetailView.tsx"), "utf-8");
-assert(projectDetailCode.includes("btn--primary") && projectDetailCode.includes("Başlat"), "ProjectDetailView: Başlat butonu btn--primary sınıfına sahip");
-assert(projectDetailCode.includes("btn--primary") && projectDetailCode.includes("Devam"), "ProjectDetailView: Devam butonu btn--primary sınıfına sahip");
-assert((projectDetailCode.includes("btn-report-primary") || projectDetailCode.includes("btn--report-primary")) && projectDetailCode.includes("Rapor Önizleme"), "ProjectDetailView: Rapor Önizleme butonu btn-report-primary (Indigo) sınıfına sahip");
+assert(projectDetailCode.includes("btn--start") && projectDetailCode.includes("Başlat"), "ProjectDetailView: Başlat butonu btn--start (Mavi #2563eb) sınıfına sahip");
+assert(projectDetailCode.includes("btn--continue") && projectDetailCode.includes("Devam"), "ProjectDetailView: Devam butonu btn--continue (Teal #0f766e) sınıfına sahip");
+assert((projectDetailCode.includes("btn-report-primary") || projectDetailCode.includes("btn--report")) && projectDetailCode.includes("Rapor Önizleme"), "ProjectDetailView: Rapor Önizleme butonu btn-report-primary (Indigo #4f46e5) sınıfına sahip");
+assert(projectDetailCode.includes("btn--back") && projectDetailCode.includes("Geri"), "ProjectDetailView: Geri butonu btn--back sınıfına sahip");
+
+const homeViewCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/HomeView.tsx"), "utf-8");
+assert(homeViewCode.includes("btn--start") && homeViewCode.includes("Yeni Analiz"), "HomeView: Yeni Analiz butonu btn--start sınıfına sahip");
+assert(homeViewCode.includes("btn--continue") && homeViewCode.includes("Aç"), "HomeView: Projeyi Aç butonu btn--continue sınıfına sahip");
+assert(homeViewCode.includes("btn--danger") && homeViewCode.includes("Sil"), "HomeView: Projeyi Sil butonu btn--danger sınıfına sahip");
+
+const newProjectCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/NewProjectView.tsx"), "utf-8");
+assert(newProjectCode.includes("btn--back") && (newProjectCode.includes("İptal") || newProjectCode.includes("Geri")), "NewProjectView: İptal / Geri butonları btn--back sınıfına sahip");
+assert(newProjectCode.includes("btn--next") && newProjectCode.includes("Devam Et"), "NewProjectView: Devam Et butonu btn--next sınıfına sahip");
+assert(newProjectCode.includes("btn--start") && newProjectCode.includes("Analizi Oluştur"), "NewProjectView: Analizi Oluştur butonu btn--start sınıfına sahip");
 
 const questionScreenCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/QuestionScreen.tsx"), "utf-8");
-assert(questionScreenCode.includes("btn--secondary") && questionScreenCode.includes("Özel Soru"), "QuestionScreen: + Özel Soru butonu btn--secondary sınıfına sahip");
-assert(questionScreenCode.includes("btn--secondary") && questionScreenCode.includes("Ara Rapor"), "QuestionScreen: Ara Rapor butonu btn--secondary sınıfına sahip");
-assert(questionScreenCode.includes("btn--primary") && questionScreenCode.includes("Sonraki"), "QuestionScreen: Sonraki butonu btn--primary (Mavi) sınıfına sahip");
-assert(questionScreenCode.includes("btn--outline") && questionScreenCode.includes("Önceki"), "QuestionScreen: Önceki butonu btn--outline (Nötr) sınıfına sahip");
-assert(questionScreenCode.includes("btn-save-exit") && questionScreenCode.includes("Kaydet ve Çık"), "QuestionScreen: Kaydet ve Çık butonu btn-save-exit (Yeşil) sınıfına sahip");
-assert(questionScreenCode.includes("btn--success") && questionScreenCode.includes("Tamamla"), "QuestionScreen: Tamamla butonu btn--success (Yeşil) sınıfına sahip");
+assert(questionScreenCode.includes("btn-custom-question") && questionScreenCode.includes("Özel Soru"), "QuestionScreen: + Özel Soru butonu btn-custom-question sınıfına sahip");
+assert(questionScreenCode.includes("btn-interim-report") && questionScreenCode.includes("Ara Rapor"), "QuestionScreen: Ara Rapor butonu btn-interim-report sınıfına sahip");
+assert(questionScreenCode.includes("btn--next") && questionScreenCode.includes("Sonraki"), "QuestionScreen: Sonraki butonu btn--next (Mavi) sınıfına sahip");
+assert(questionScreenCode.includes("btn--back") && questionScreenCode.includes("Önceki"), "QuestionScreen: Önceki butonu btn--back (Nötr) sınıfına sahip");
+assert(questionScreenCode.includes("btn-save-exit") && questionScreenCode.includes("Kaydet ve Çık"), "QuestionScreen: Kaydet ve Çık butonu btn-save-exit / btn--save (Yeşil) sınıfına sahip");
+assert(questionScreenCode.includes("btn--save") && questionScreenCode.includes("Tamamla"), "QuestionScreen: Tamamla butonu btn--save (Yeşil) sınıfına sahip");
 
 const semanticModalCode = fs.readFileSync(path.join(ROOT_DIR, "src/components/SemanticModal.tsx"), "utf-8");
 assert(semanticModalCode.includes("btn--outline") && semanticModalCode.includes("İptal"), "SemanticModal: İptal butonu btn--outline (Açık Gri) sınıfına sahip");

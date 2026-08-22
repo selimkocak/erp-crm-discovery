@@ -329,10 +329,10 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
-            <button type="button" className="btn btn-outline" onClick={onCancel}>
+            <button type="button" className="btn btn-outline btn--back" onClick={onCancel}>
               İptal
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button type="submit" className="btn btn-primary btn--next">
               Devam Et
               <ArrowRight size={16} />
             </button>
@@ -466,7 +466,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>
             <button
               type="button"
-              className="btn btn-outline"
+              className="btn btn-outline btn--back"
               onClick={() => setStep(1)}
               disabled={isSubmitting}
             >
@@ -476,7 +476,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-primary btn--start"
               onClick={handleSubmit}
               disabled={isSubmitting || selectedFunctionIds.length === 0}
             >

@@ -67,7 +67,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <h2>Mevcut Analiz Projeleri</h2>
           <p>Kayıtlı ERP ve CRM ön analiz çalışmalarını listeleyin ve yönetin.</p>
         </div>
-        <button className="btn btn-primary" onClick={onNewProject}>
+        <button className="btn btn--start" onClick={onNewProject}>
           <Plus size={16} />
           Yeni Analiz
         </button>
@@ -105,7 +105,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <p>
             Yeni bir ERP / CRM ön analiz projesi başlatmak için aşağıdaki butonu kullanarak firma profili ve kapsam fonksiyonlarını belirleyin.
           </p>
-          <button className="btn btn-primary" onClick={onNewProject}>
+          <button className="btn btn--start" onClick={onNewProject}>
             <Plus size={16} />
             Yeni Analiz Başlat
           </button>
@@ -154,14 +154,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <td style={{ textAlign: "right" }}>
                     <div style={{ display: "inline-flex", gap: "0.375rem" }}>
                       <button
-                        className="btn btn--primary btn--sm"
+                        className="btn btn--continue btn--sm"
                         onClick={() => onOpenProject(proj.id)}
                       >
                         <FolderOpen size={14} />
                         Aç
                       </button>
                       <button
-                        className="btn btn-danger-ghost btn--sm"
+                        className="btn btn-danger-ghost btn--danger btn--sm"
                         title="Analizi Sil"
                         onClick={() => handleDelete(proj.id, proj.name)}
                       >

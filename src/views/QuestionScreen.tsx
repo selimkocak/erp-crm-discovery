@@ -721,7 +721,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
             <button
               type="button"
-              className="btn btn-save-exit btn--sm"
+              className="btn btn-save-exit btn--save btn--sm"
               onClick={handleSaveAndExit}
               title="Değişiklikleri doğrula ve proje ekranına dön"
             >
@@ -818,7 +818,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                   </button>
                   <button
                     type="button"
-                    className="btn btn--outline btn--xs"
+                    className="btn btn--outline btn--risk btn--xs"
                     onClick={() => handleOpenSemanticModal("risk")}
                     title="Bu soruya bir risk ekle"
                   >
@@ -826,7 +826,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
                   </button>
                   <button
                     type="button"
-                    className="btn btn--outline btn--xs"
+                    className="btn btn--outline btn--note btn--xs"
                     onClick={() => handleOpenSemanticModal("note")}
                     title="Bu soruya bir proje notu ekle"
                   >
@@ -867,7 +867,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         {/* ── Navigasyon ──────────────────────────────────────────────────── */}
         <div className="question-screen__nav">
           <button
-            className="btn btn--outline question-screen__nav-btn"
+            className="btn btn--outline btn--back question-screen__nav-btn"
             onClick={handlePrev}
             disabled={isFirst}
           >
@@ -898,7 +898,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button
               type="button"
-              className="btn btn-save-exit question-screen__nav-btn"
+              className="btn btn-save-exit btn--save question-screen__nav-btn"
               onClick={handleSaveAndExit}
               title="Analizden ayrıl (Kaldığınız soru saklanır)"
             >
@@ -908,7 +908,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
 
             {isLast ? (
               <button
-                className="btn btn--success question-screen__nav-btn"
+                className="btn btn--success btn--save question-screen__nav-btn"
                 onClick={handleSaveAndExit}
               >
                 Tamamla
@@ -916,7 +916,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               </button>
             ) : (
               <button
-                className="btn btn--primary question-screen__nav-btn"
+                className="btn btn--primary btn--next question-screen__nav-btn"
                 onClick={handleNext}
               >
                 Sonraki
