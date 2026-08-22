@@ -21,7 +21,7 @@
 import {
   validateRelativePath,
   readAttachmentFile,
-  getManagedVaultBaseDir,
+  getManagedAttachmentRoot,
 } from "./attachmentManager";
 
 // ─────────────────────────────────────────────────────────────
@@ -30,8 +30,9 @@ import {
 
 /**
  * Göreli yoldan platformun mutlak native işletim sistemi yolunu üretir.
- * Windows: C:\Users\selim\AppData\Local\com.erpcrm.discovery\projects\...
- * macOS:   /Users/selim/Library/Application Support/com.erpcrm.discovery/projects/...
+ * Windows: C:\Users\selim\AppData\Local\ERP CRM Discovery\attachment\...
+ * macOS:   /Users/selim/Library/Application Support/ERP CRM Discovery/attachment/...
+ * Linux:   /home/selim/.local/share/ERP CRM Discovery/attachment/...
  */
 export async function resolveAttachmentAbsolutePath(
   relativePath: string,
@@ -45,12 +46,24 @@ export async function resolveAttachmentAbsolutePath(
     );
   }
 
-  const baseDir = baseDirOverride || (await getManagedVaultBaseDir());
+  const baseDir = baseDirOverride || (await getManagedAttachmentRoot());
 
   // Normalize path separators to forward-slash for joining
   const cleanBase = baseDir.replace(/\\/g, "/").replace(/\/+$/, "");
   const cleanRel = relativePath.replace(/\\/g, "/").replace(/^\/+/, "");
-  const joined = `${cleanBase}/${cleanRel}`;
+
+  let subPath = cleanRel;
+  if (cleanRel.startsWith("attachment/")) {
+    if (cleanBase.endsWith("/attachment")) {
+      subPath = cleanRel.substring("attachment/".length);
+    }
+  } else if (cleanRel.startsWith("projects/")) {
+    if (cleanBase.endsWith("/attachment")) {
+      subPath = cleanRel.replace(/^projects\/([^/]+)\/attachments\//, "$1/");
+    }
+  }
+
+  const joined = `${cleanBase}/${subPath}`;
 
   // ".." segmentlerini çöz — path traversal'ın startsWith kontrolünü atlatmasını engeller
   const segments = joined.split("/");
@@ -66,7 +79,7 @@ export async function resolveAttachmentAbsolutePath(
 
   // Vault-root kontrolü: çözümlenmiş yol vault kökü altında olmalı
   const normalizedBase = cleanBase.replace(/\/+$/, "");
-  if (!fullPath.startsWith(normalizedBase + "/")) {
+  if (!fullPath.startsWith(normalizedBase + "/") && fullPath !== normalizedBase) {
     throw new Error("Path traversal engellendi: Yol vault kökü dışına çıkıyor.");
   }
 

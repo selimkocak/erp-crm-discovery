@@ -255,6 +255,10 @@ ${packDefinitions.map((p) => `  ${JSON.stringify(p.businessFunctionCode)}: ${JSO
   "ETICARET": "tr.ecommerce.core", // Alias
   "ONLINE_SATIS": "tr.ecommerce.core", // Alias
   "DIGITAL_COMMERCE": "tr.ecommerce.core", // Alias
+  "STRATEJI": "tr.strategy.core", // STRATEGY için Türkçe alias
+  "STRATEJIK_PLANLAMA": "tr.strategy.core", // Alias
+  "KURUMSAL_STRATEJI": "tr.strategy.core", // Alias
+  "STRATEGIC_PLANNING": "tr.strategy.core", // Alias
 } as const;
 
 /**

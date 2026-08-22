@@ -31,7 +31,11 @@ import type { ReportModel, ReportAttachmentItem } from "../report/types";
 import { ReportProfileModal } from "../components/ReportProfileModal";
 import { exportReport } from "../export";
 import { openAttachment, showAttachmentInFolder } from "../storage/attachmentLinks";
-import { readAttachmentFile, getFileCategory } from "../storage/attachmentManager";
+import {
+  readAttachmentFile,
+  getFileCategory,
+  MANAGED_VAULT_APP_NAME,
+} from "../storage/attachmentManager";
 
 interface ReportPreviewViewProps {
   projectId: string;
@@ -896,54 +900,75 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                               <strong>{att.questionText}</strong>
                             </td>
                             <td>
-                              <button
-                                type="button"
-                                onClick={() => handleOpenAttachment(att)}
-                                style={{
-                                  background: "none",
-                                  border: "none",
-                                  padding: 0,
-                                  cursor: "pointer",
-                                  textAlign: "left",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "0.35rem",
-                                }}
-                                title="Dosyayı aç / önizle"
-                              >
-                                <Paperclip size={13} style={{ color: "var(--color-secondary-600)", flexShrink: 0 }} />
-                                <strong style={{ color: "var(--color-primary-700)", textDecoration: "underline" }}>
-                                  {att.originalFileName}
-                                </strong>
-                                <ExternalLink size={11} style={{ opacity: 0.6, flexShrink: 0 }} />
-                              </button>
-                              <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", display: "block", marginTop: "0.15rem" }}>
-                                {att.fileExtension.toUpperCase()} • {sizeStr}
-                              </span>
-                              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", marginTop: "0.2rem", flexWrap: "wrap" }}>
-                                <span style={{ color: "var(--text-muted)", fontSize: "0.625rem", fontStyle: "italic", opacity: 0.8 }}>
-                                  Vault: {att.storedFileName}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleShowInFolder(att)}
-                                  title="Dosyanın yerel Vault klasörünü dosya yöneticisinde aç"
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    gap: "0.2rem",
-                                    background: "none",
-                                    border: "1px solid var(--border-color, #cbd5e1)",
-                                    borderRadius: "3px",
-                                    padding: "0.1rem 0.35rem",
-                                    cursor: "pointer",
-                                    fontSize: "0.625rem",
-                                    color: "var(--text-muted)",
-                                  }}
-                                >
-                                  <FolderOpen size={10} />
-                                  Klasörde Göster
-                                </button>
+                              <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                  <Paperclip size={13} style={{ color: "var(--color-secondary-600)", flexShrink: 0 }} />
+                                  <strong style={{ color: "var(--color-primary-700)" }}>
+                                    {att.originalFileName}
+                                  </strong>
+                                  <span style={{ color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                                    ({att.fileExtension.toUpperCase()} • {sizeStr})
+                                  </span>
+                                </div>
+                                <div style={{ color: "var(--text-muted)", fontSize: "0.6875rem", fontFamily: "monospace", wordBreak: "break-all" }}>
+                                  <span style={{ fontWeight: 600, color: "var(--color-secondary-700)" }}>Vault:</span> {MANAGED_VAULT_APP_NAME}/{att.relativePath}
+                                </div>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.15rem", flexWrap: "wrap" }}>
+                                  <span
+                                    style={{
+                                      fontSize: "0.625rem",
+                                      padding: "0.1rem 0.35rem",
+                                      background: "rgba(16, 185, 129, 0.1)",
+                                      color: "#059669",
+                                      borderRadius: "3px",
+                                      border: "1px solid rgba(16, 185, 129, 0.3)",
+                                      fontWeight: 600,
+                                    }}
+                                  >
+                                    ✓ Managed kopya mevcut
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenAttachment(att)}
+                                    title="Dosyayı varsayılan uygulamada aç"
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "0.2rem",
+                                      background: "var(--color-primary-50, #eff6ff)",
+                                      border: "1px solid var(--color-primary-300, #93c5fd)",
+                                      borderRadius: "3px",
+                                      padding: "0.1rem 0.4rem",
+                                      cursor: "pointer",
+                                      fontSize: "0.6875rem",
+                                      fontWeight: 600,
+                                      color: "var(--color-primary-700, #1d4ed8)",
+                                    }}
+                                  >
+                                    <ExternalLink size={10} />
+                                    Aç
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleShowInFolder(att)}
+                                    title="Dosyanın yerel Vault klasörünü dosya yöneticisinde aç ve seç"
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      gap: "0.2rem",
+                                      background: "none",
+                                      border: "1px solid var(--border-color, #cbd5e1)",
+                                      borderRadius: "3px",
+                                      padding: "0.1rem 0.4rem",
+                                      cursor: "pointer",
+                                      fontSize: "0.6875rem",
+                                      color: "var(--text-muted)",
+                                    }}
+                                  >
+                                    <FolderOpen size={10} />
+                                    Klasörde Göster
+                                  </button>
+                                </div>
                               </div>
                             </td>
                             <td style={{ color: att.description ? "var(--text-color)" : "var(--text-muted)", fontStyle: att.description ? "normal" : "italic" }}>

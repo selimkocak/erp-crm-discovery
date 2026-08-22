@@ -197,8 +197,8 @@ async function runTests() {
 
   const relativePath = buildRelativePath(projectId, bfCode, questionId, storedFileName);
   assert(
-    relativePath.startsWith(`projects/${projectId}/attachments/${bfCode}/${questionId}/`),
-    "Yönetilen kasanın göreli yolu standart düzende (projects/{projId}/attachments/...)"
+    relativePath.startsWith(`attachment/${projectId}/${bfCode}/${questionId}/`),
+    "Yönetilen kasanın göreli yolu standart düzende (attachment/{projId}/{bfCode}/{questionId}/...)"
   );
 
   // Physically copy to managed vault
@@ -242,8 +242,8 @@ async function runTests() {
   console.log("\n=== T06: Report Preview, DOCX & PDF Managed Hyperlinks ===");
 
   const resolvedUrl = await resolveAttachmentFileUrl(relativePath, "/mock/app-data");
-  assert(resolvedUrl.startsWith("file:///mock/app-data/projects/"), "Managed vault fileUrl standarda uygun");
-  assert(resolvedUrl.includes("attachments/"), "URL attachments yolunu içeriyor");
+  assert(resolvedUrl.startsWith("file:///mock/app-data/attachment/"), "Managed vault fileUrl standarda uygun (file:///mock/app-data/attachment/...)");
+  assert(resolvedUrl.includes("IT_INFRASTRUCTURE/ITI-005/"), "URL IT_INFRASTRUCTURE/ITI-005/ yolunu içeriyor");
 
   // Mock ReportModel with attachments
   const mockReport: ReportModel = {
@@ -481,7 +481,7 @@ async function runTests() {
   assert(threwTraversal, "Traversal yolu reddedildi");
 
   assert(!validateRelativePath("projects/p1/../../etc/passwd"), "validateRelativePath traversal içeren yolu reddetti");
-  assert(!validateRelativePath("invalid/path/format"), "validateRelativePath projects/ ile başlamayan yolu reddetti");
+  assert(!validateRelativePath("invalid/path/format"), "validateRelativePath geçersiz formatlı yolu reddetti");
 
   // ─────────────────────────────────────────────────────────────
   // T10: Proje Silindiğinde Managed Vault Temizliği

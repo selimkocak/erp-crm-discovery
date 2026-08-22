@@ -130,34 +130,49 @@ assertEqual(emptyUrl, "file:///", "Boş path → file:/// (güvenli fallback)");
 // ─── T08: Windows Managed Vault Yolu Doğrulama ───────────────────────────────
 console.log("\n=== T08: Windows managed vault yolu formatı ===");
 
-const vaultRoot = "C:\\Users\\selim\\AppData\\Local\\com.erpcrm.discovery";
-const relative = "projects/1/attachments/MANAGEMENT/MGT-001/uuid_dosya.txt";
+const vaultRoot = "C:\\Users\\selim\\AppData\\Local\\ERP CRM Discovery\\attachment";
+const relative = "attachment/proj_1787338783316/ACCOUNTING/ACC-004/7f2c_SHA256SUMS.txt";
 
 const absPath = await resolveAttachmentAbsolutePath(relative, vaultRoot);
-// Windows: backslash döndürür
-assert(
-  absPath === "C:\\Users\\selim\\AppData\\Local\\com.erpcrm.discovery\\projects\\1\\attachments\\MANAGEMENT\\MGT-001\\uuid_dosya.txt" ||
-  absPath === "C:/Users/selim/AppData/Local/com.erpcrm.discovery/projects/1/attachments/MANAGEMENT/MGT-001/uuid_dosya.txt",
-  `Windows vault absolute path doğru çözümlendi: ${absPath}`
+assertEqual(
+  absPath,
+  "C:\\Users\\selim\\AppData\\Local\\ERP CRM Discovery\\attachment\\proj_1787338783316\\ACCOUNTING\\ACC-004\\7f2c_SHA256SUMS.txt",
+  "Kanonik Windows attachment vault absolute path doğru çözümlendi"
 );
 
 const absUrl = attachmentPathToFileUrl(absPath);
+assertEqual(
+  absUrl,
+  "file:///C:/Users/selim/AppData/Local/ERP%20CRM%20Discovery/attachment/proj_1787338783316/ACCOUNTING/ACC-004/7f2c_SHA256SUMS.txt",
+  "Kanonik Windows vault URL'si doğru üretildi (file:///C:/Users/...)"
+);
 assert(absUrl.startsWith("file:///C:"), "Vault URL file:///C: ile başlıyor");
 assert(!absUrl.includes("\\"), "Vault URL içinde backslash yok");
+assert(absUrl.includes("ERP%20CRM%20Discovery/attachment/"), "ERP CRM Discovery/attachment segmentleri korundu");
+
+// Legacy projects/ desteği de korunuyor:
+const legacyRel = "projects/1/attachments/MANAGEMENT/MGT-001/uuid_dosya.txt";
+const legacyAbs = await resolveAttachmentAbsolutePath(legacyRel, "C:\\Users\\selim\\AppData\\Local\\ERP CRM Discovery");
+assert(
+  legacyAbs === "C:\\Users\\selim\\AppData\\Local\\ERP CRM Discovery\\projects\\1\\attachments\\MANAGEMENT\\MGT-001\\uuid_dosya.txt",
+  `Legacy projects/ yolu çözümlendi: ${legacyAbs}`
+);
 
 // ─── T09: macOS Path Davranışının Bozulmaması ────────────────────────────────
 console.log("\n=== T09: macOS path davranışı bozulmadı ===");
 
-const macVaultRoot = "/Users/selim/Library/Application Support/com.erpcrm.discovery";
+const macVaultRoot = "/Users/selim/Library/Application Support/ERP CRM Discovery/attachment";
 const macAbsPath = await resolveAttachmentAbsolutePath(relative, macVaultRoot);
-assert(
-  macAbsPath.startsWith("/Users/selim/Library/Application Support/com.erpcrm.discovery/"),
-  `macOS absolute path doğru: ${macAbsPath}`
+assertEqual(
+  macAbsPath,
+  "/Users/selim/Library/Application Support/ERP CRM Discovery/attachment/proj_1787338783316/ACCOUNTING/ACC-004/7f2c_SHA256SUMS.txt",
+  "macOS kanonik attachment path doğru"
 );
 
 const macAbsUrl = attachmentPathToFileUrl(macAbsPath);
 assert(macAbsUrl.startsWith("file:///"), "macOS URL file:/// ile başlıyor");
-assert(macAbsUrl.includes("Application%20Support"), "macOS boşluk encode edildi");
+assert(macAbsUrl.includes("Application%20Support"), "macOS Application Support boşluk encode edildi");
+assert(macAbsUrl.includes("ERP%20CRM%20Discovery/attachment/"), "macOS ERP CRM Discovery boşluk encode edildi");
 
 // ─── T10: Sürücü Harfi Büyük/Küçük Harf Toleransı ──────────────────────────
 console.log("\n=== T10: Sürücü harfi büyük/küçük harf toleransı ===");

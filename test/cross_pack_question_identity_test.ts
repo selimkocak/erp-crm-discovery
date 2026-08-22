@@ -88,11 +88,11 @@ async function runTests() {
   const invoicingAttachmentPath = buildRelativePath(projId, "INVOICING", "INV-001", "fatura_proseduru.docx");
 
   assert(
-    invAttachmentPath.includes("attachments/INVENTORY/INV-001/"),
+    invAttachmentPath.includes("/INVENTORY/INV-001/"),
     `INVENTORY ek dosya yolu INVENTORY alt klasörünü içerir: ${invAttachmentPath}`
   );
   assert(
-    invoicingAttachmentPath.includes("attachments/INVOICING/INV-001/"),
+    invoicingAttachmentPath.includes("/INVOICING/INV-001/"),
     `INVOICING ek dosya yolu INVOICING alt klasörünü içerir: ${invoicingAttachmentPath}`
   );
   assert(

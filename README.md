@@ -41,10 +41,10 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 
 ## Temel Özellikler (Features)
 
-- **33 Kanonik İş Fonksiyonu & 32 Soru Paketi (1.398 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim ve yatay Ana Veri Yönetimi dahil 32 hazır soru paketi.
+- **33 Kanonik İş Fonksiyonu & 33 Soru Paketi (1.445 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama & Kurumsal Performans ve yatay Ana Veri Yönetimi dahil 33 hazır soru paketi.
 - **Deklaratif Soru Motoru (Question Engine):** Kod yazmadan, tamamen açık JSON şeması ile genişletilebilir soru paketleri. Tekli seçim, çoklu seçim, açık uçlu metin, seçenek bazlı özel notlar ve genel görüşme notları.
 - **Tek Seçimli Cevabı Kaldırma (Clear Selection):** Yanlışlıkla yapılan seçimleri kolayca geri alma ve klavyeden `Escape` ile temizleme desteği.
-- **Dinamik Koşullu Dallanma (197 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
+- **Dinamik Koşullu Dallanma (205 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
 - **Semantik Analiz Katmanı:** Ham soru-cevapların ötesinde yapılandırılmış **Bulgu (Finding)**, **Gereksinim (Requirement)**, **Risk** ve **Proje Notu** yönetimi.
 - **Soru Takip Bayrakları:** 🟡 *Sonra Dön* ve 🔴 *Kritik Takip* bayrakları — saha görüşmesinde belirsizleri işaretleyip Bölüm 5 Açık Konular tablosuna otomatik taşıma.
 - **Yönetilen Kanıt Kasası (Managed Attachment Vault):** Soru bazlı eklenen dosyaları (PDF, Excel, resim vb.) proje dizininde izole kopyalayarak koruma ve belgelere `file:///` köprüsüyle doğrudan erişim.
@@ -124,10 +124,10 @@ npm run tauri dev
 
 ## Kanonik Soru Paketi Kataloğu (Question Pack Catalog)
 
-`v0.1.0` itibarıyla **33 kanonik iş fonksiyonu** tescil edilmiş, **32 soru paketi** mühürlenmiştir.
-Toplam: **1.398 soru**, **742 zorunlu soru**, **656 opsiyonel soru**, **197 koşullu dallanma (branching) noktası**.
+`v0.1.0` itibarıyla **33 soru paketi** (32 dikey modül + 1 yatay yönetişim paketi) mühürlenmiştir. Kalan son kanonik modül olan `TRAINING` (Eğitim ve Gelişim) hazırlanmaktadır.
+Toplam: **1.445 soru**, **767 zorunlu soru**, **678 opsiyonel soru**, **205 koşullu dallanma (branching) noktası**.
 
-### Dikey Kanonik Modüller (31 Paket) ve Yatay Yönetişim (1 Paket)
+### Dikey Kanonik Modüller (32 Paket) ve Yatay Yönetişim (1 Paket)
 
 | # | Modül | İş Fonksiyonu Kodu | Soru | Zorunlu | Branching | Durum |
 |---|---|---|:---:|:---:|:---:|:---:|
@@ -163,11 +163,11 @@ Toplam: **1.398 soru**, **742 zorunlu soru**, **656 opsiyonel soru**, **197 koş
 | 30 | İhracat ve Gümrük | `EXPORT` | 47 | 25 | 8 | ✅ Mühürlü |
 | 31 | E-Ticaret | `ECOMMERCE` | 47 | 25 | 8 | ✅ Mühürlü |
 | 32 | Genel Yönetim & Kurumsal Yönetişim | `MANAGEMENT` | 47 | 25 | 7 | ✅ Mühürlü |
-| | **TOPLAM (32 Paket)** | | **1.398** | **742** | **197** | |
+| 33 | Stratejik Planlama & Performans | `STRATEGY` | 47 | 25 | 8 | ✅ Mühürlü |
+| | **TOPLAM (33 Paket)** | | **1.445** | **767** | **205** | |
 
-> **Hazırlanıyor / Yol Haritası (2 Modül):**
-> 1. Stratejik Planlama (`STRATEGY`)
-> 2. Eğitim ve Gelişim (`TRAINING`)
+> **Hazırlanıyor / Yol Haritası (1 Modül):**
+> 1. Eğitim ve Gelişim (`TRAINING`)
 
 ---
 
@@ -225,7 +225,7 @@ erp-crm-discovery/
 │   └── views/                   # Ekranlar (QuestionScreen, ReportPreviewView vb.)
 ├── src-tauri/                   # Tauri 2 Rust backend
 │   └── src/                     # Native dialog, FS komutları
-├── question-packs/tr/           # 32 kanonik JSON soru paketi
+├── question-packs/tr/           # 33 kanonik JSON soru paketi
 │   ├── sales/core.json
 │   ├── invoicing/core.json
 │   ├── document_management/core.json
@@ -233,18 +233,20 @@ erp-crm-discovery/
 │   ├── export/core.json
 │   ├── ecommerce/core.json
 │   ├── management/core.json
-│   └── ... (32 paket)
+│   ├── strategy/core.json
+│   └── ... (33 paket)
 ├── data/
 │   └── business-functions.json  # 33 BF kanonik registry (tek doğruluk kaynağı)
 ├── scripts/
 │   └── generate_business_functions.mjs  # Kod üretici
-├── test/                        # 52 TypeScript kabul testi (1.670+ test)
+├── test/                        # 53 TypeScript kabul testi (1.750+ test)
 │   ├── vertical_slice_test.ts
 │   ├── faz2_tests.ts
 │   ├── faz41_ecommerce_question_pack_test.ts
 │   ├── faz42_management_question_pack_test.ts
+│   ├── faz43_strategy_question_pack_test.ts
 │   ├── cross_pack_question_identity_test.ts
-│   └── ... (52 dosya)
+│   └── ... (53 dosya)
 └── docs/                        # Faz kapanış raporları & şema kılavuzları
 ```
 
@@ -269,7 +271,7 @@ JSON Soru Paketi
 Proje **"Tek Modül = Tek Faz = Tek Kabul"** disipliniyle geliştirilmiştir. Her kanonik modülün tam kabul testi mevcuttur.
 
 ```bash
-npm test   # 52 test suite (1.670+ test) — tüm FAZ'lar
+npm test   # 53 test suite (1.700+ test) — tüm FAZ'lar
 ```
 
 Her modül testi şu 15 alanı doğrular:
@@ -298,9 +300,17 @@ Her modül testi şu 15 alanı doğrular:
 
 - **Birincil Hedef:** Windows 11 x64 / Windows 10 x64.
 - **Paketleme Formatı:** NSIS Setup Executable (`ERP-CRM-Discovery_0.1.0_x64-setup.exe`).
-- **Mevcut Durum:** `v0.1.0 Release Candidate 1` — soru paketi külliyatı tamamlandı, Windows native acceptance aşamasında.
+- **Mevcut Durum:** `v0.1.0 Release Candidate 1` — 33 soru paketi tamamlandı, Windows native acceptance aşamasında.
 - **Kurulum Rehberi:** [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
 - **Kabul Kontrol Listesi:** [`docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md`](docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md)
+
+### Windows Managed Attachment Vault Manuel Doğrulama Listesi
+Windows'ta installer ile kurulum yapıldıktan sonra `%LOCALAPPDATA%\ERP CRM Discovery\attachment` kökünde şu 5 adım doğrulanmalıdır:
+1. **Otomatik Kök Oluşumu:** Uygulama açıldığında `%LOCALAPPDATA%\ERP CRM Discovery\attachment` klasörü otomatik olarak oluşuyor mu?
+2. **Fiziksel Dijital İkiz:** Soru ekranında veya raporda dosya eklendiğinde dosyanın fiziksel ikizi `attachment/{projectId}/{bfCode}/{questionId}/{storedName}` altına kopyalanıyor mu?
+3. **Kaynak Silinme Dayanıklılığı:** Kullanıcının orijinal kaynak dosyası silinse dahi rapordan veya soru ekranından managed kopya açılabiliyor mu?
+4. **Klasörde Göster Entegrasyonu:** "Klasörde Göster" tıklandığında Windows Explorer doğrudan ilgili dosyayı seçili olarak açıyor mu?
+5. **Dışa Aktarım Eşliği:** DOCX ve PDF raporlarındaki hyperlink'ler doğrudan managed kopyayı açıyor mu?
 
 ---
 

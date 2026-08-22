@@ -1,0 +1,848 @@
+{
+  "meta": {
+    "pack_id": "tr.strategy.core",
+    "name": "Stratejik Planlama ve Kurumsal Performans Soru Paketi",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "business_function_code": "STRATEGY",
+    "description": "ERP ve CRM dönüşüm projelerinde şirketlerin vizyon, misyon ve kurumsal değerlerini, stratejik hedeflerini, SWOT ve dış çevre (PESTLE) analizlerini, kurumsal ve departman bazlı hedef yayılımını, ölçülebilir KPI ve Balanced Scorecard metodolojisini, bütçe-strateji bağlantısını, yatırım ve stratejik inisiyatif portföyünü, ERP/CRM dönüşüm hedeflerini, senaryo ve risk planlamasını, üst yönetim stratejik gözden geçirme döngüsünü ve strateji arşiv disiplinini keşfeden saha soru paketi.",
+    "language": "tr",
+    "author": "Antigravity Discovery Engine",
+    "tags": [
+      "strategy",
+      "strategic_planning",
+      "corporate_performance",
+      "vision_mission",
+      "swot",
+      "pestle",
+      "kpi",
+      "balanced_scorecard",
+      "budget_alignment",
+      "initiative_portfolio",
+      "erp_crm_alignment",
+      "scenario_planning",
+      "strategic_review"
+    ]
+  },
+  "questions": [
+    {
+      "id": "STR-001",
+      "order": 1,
+      "process": "Strateji organizasyonu ve sahipliği",
+      "question": "Şirketin stratejik planlama ve kurumsal performans yönetimi fonksiyonu organizasyonel olarak nasıl yapılandırılmıştır ve kimin liderliğinde yürütülmektedir?",
+      "description": "Strateji sahipliğinin kurumsal düzeyi, ERP/CRM hedeflerinin üst yönetimle doğrudan hizalanması için temel göstergedir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "ozel_strateji_ve_is_gelistirme_departmani", "label": "Ayrı bir Strateji / İş Geliştirme / Kurumsal Dönüşüm departmanı tarafından yürütülmektedir", "allow_note": false, "is_other": false },
+        { "value": "genel_mudur_ve_icra_komitesi_dogrudan", "label": "Genel Müdür / CEO ve İcra Komitesi tarafından doğrudan yönetilmektedir", "allow_note": true, "is_other": false },
+        { "value": "mali_isler_finans_bunyesinde", "label": "Mali İşler / Finans Direktörlüğü bünyesinde bütçe ve planlama ile birlikte koordine edilmektedir", "allow_note": false, "is_other": false },
+        { "value": "formal_yapi_yok_ortaklar_duzeyinde", "label": "Resmi bir birim yoktur; stratejik kararlar kurucu ortaklar veya yönetim kurulu tarafından durumsal olarak alınmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-002",
+      "order": 2,
+      "process": "Strateji organizasyonu ve sahipliği",
+      "question": "Strateji geliştirme, hedef belirleme ve performans izleme süreçlerine hangi iç paydaşlar ve yönetim kademeleri dahil edilmektedir?",
+      "description": "Geniş tabanlı katılım, kurumsal stratejinin departmanlarca benimsenmesini ve ERP/CRM dönüşümünün sahiplenilmesini sağlar.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "yonetim_kurulu_ve_ortaklar", "label": "Yönetim Kurulu ve Hissedarlar / Ortaklar", "allow_note": false, "is_other": false },
+        { "value": "ust_yonetim_c_level_direktorler", "label": "Üst Yönetim (C-Level ve Direktörler)", "allow_note": false, "is_other": false },
+        { "value": "departman_mudurleri_ve_fonksiyon_liderleri", "label": "Departman Müdürleri ve Fonksiyonel Birim Liderleri", "allow_note": false, "is_other": false },
+        { "value": "saha_ve_operasyon_ekip_liderleri", "label": "Saha, Fabrika ve Operasyon Ekip Liderleri", "allow_note": true, "is_other": false },
+        { "value": "dis_danisman_ve_akademik_paydaslar", "label": "Dış Strateji Danışmanları ve Sektörel Uzmanlar", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-003",
+      "order": 3,
+      "process": "Vizyon ve misyon",
+      "question": "Şirketin resmi olarak tanımlanmış, belgelenmiş ve güncelliğini koruyan bir vizyon ve misyon bildirimi bulunuyor mu?",
+      "description": "Vizyon ve misyon, kurumsal yatırımların ve ERP/CRM sistem mimarisinin uzun vadeli yön birliğini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "guncel_yazili_ve_tum_kuruma_ilan_edilmis", "label": "Evet, yazılı olarak tanımlanmış, düzenli gözden geçirilen ve tüm çalışanlara duyurulan resmi vizyon/misyon mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "yazili_var_fakat_guncelligini_yitirmis", "label": "Yazılı bir metin bulunmaktadır ancak uzun süredir güncellenmemiş veya faaliyeti tam yansıtmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "zihinsel_olarak_var_yazili_dokuman_yok", "label": "Yönetimin zihninde bir vizyon vardır ancak resmi olarak belgelenip yayımlanmamıştır", "allow_note": true, "is_other": false },
+        { "value": "tanimli_vizyon_misyon_yok", "label": "Resmi veya gayriresmi tanımlanmış bir vizyon/misyon bildirimi bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-004",
+      "order": 4,
+      "process": "Kurumsal değerler ve yönetim ilkeleri",
+      "question": "Şirketin iş yapış kültürünü ve etik standartlarını yönlendiren kurumsal değerler ve yönetim ilkeleri belgelenmiş midir?",
+      "description": "Kurumsal değerler, süreç disiplini ve veri şeffaflığı kültürünün altyapısını oluşturur.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "belgelenmis_ve_oryantasyon_parcasi", "label": "Kurumsal değerler belgelenmiş, etik kurallar yazılmış ve işe alım/oryantasyon sürecine entegre edilmiştir", "allow_note": false, "is_other": false },
+        { "value": "temel_ilkeler_belirlenmis_takip_sinirli", "label": "Temel değerler belirlenmiştir ancak günlük operasyonlarda ve performans süreçlerinde sistematik takibi sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "geleneksel_sozlu_kultur_mevcut", "label": "Yazılı ilkeler yoktur; kurucu/yönetici ilkeleri sözlü şirket kültürüyle aktarılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "degerler_ve_ilkeler_tanimli_degil", "label": "Tanımlanmış kurumsal değer veya yönetim ilkeleri seti bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-005",
+      "order": 5,
+      "process": "Stratejik planın varlığı ve kapsamı",
+      "question": "Şirkette Yönetim Kurulu veya Üst Yönetim tarafından resmi olarak onaylanmış çok yıllık (3-5 yıllık vb.) bir stratejik plan bulunuyor mu?",
+      "description": "Stratejik planın varlığı ve onay durumu, ERP/CRM bütçelemesi ve kapsamının referans zeminini oluşturur.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "resmi_onayli_cok_yillik_plan_var", "label": "Evet, resmi olarak onaylanmış 3-5 yıllık yazılı bir stratejik plan mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "yillik_hedef_plani_var_cok_yillik_yok", "label": "Yalnızca 1 yıllık dönemler için hedef planı hazırlanmakta; çok yıllık plan bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "planlama_taslak_hazirlik_asamasinda", "label": "Stratejik plan hazırlık/taslak aşamasındadır; henüz resmi olarak yürürlüğe girmemiştir", "allow_note": true, "is_other": false },
+        { "value": "resmi_plan_yok_zihinsel_hedef", "label": "Resmi bir stratejik plan yoktur; hedefler yıllık bütçe veya yönetim inisiyatifleriyle şekillenmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-006",
+      "order": 6,
+      "process": "Stratejik planın varlığı ve kapsamı",
+      "question": "Mevcut stratejik planın kapsadığı planlama ufku, ayrıntı düzeyi ve resmi belgelendirme formatı nasıldır?",
+      "description": "Stratejik planın derinliği ve yapısı, hedeflerin ERP/CRM süreçleriyle ilişkilendirilme kapasitesini belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "STR-005",
+        "operator": "not_equals",
+        "value": "resmi_plan_yok_zihinsel_hedef"
+      },
+      "options": [
+        { "value": "3_5_yillik_detayli_hedef_ve_inisiyatif_seti", "label": "3-5 yıllık dönemi kapsar; finansal hedefler, pazar stratejileri ve inisiyatif yol haritaları detaylıdır", "allow_note": false, "is_other": false },
+        { "value": "genel_yonelim_belgesi_detay_sinirli", "label": "3 yıllık genel hedefleri içerir ancak inisiyatif kırılımları ve detaylı bütçe bağlantısı sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "sunum_formatinda_ozet_strateji", "label": "Üst yönetim sunumu formatında hazırlanmış ana hatlardan oluşmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-007",
+      "order": 7,
+      "process": "SWOT analizi",
+      "question": "Şirkette kurumsal güçlü yönler, zayıf yönler, fırsatlar ve tehditleri belirlemek üzere periyodik SWOT analizi çalışması yapılıyor mu?",
+      "description": "SWOT analizi, ERP/CRM önceliklendirmesinde zayıf süreçlerin ve fırsat alanlarının belirlenmesinde kritik girdidir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "yillik_duzenli_swot_yapilmaktadir", "label": "Evet, her yıl stratejik planlama veya bütçe öncesinde kurumsal SWOT analizi sistematik olarak yapılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "proje_veya_donem_bazli_aralikli", "label": "Yalnızca büyük dönüşüm projeleri veya kriz dönemlerinde durumsal olarak SWOT çalışması yapılmaktadır", "allow_note": true, "is_other": false },
+        { "value": "swot_analizi_yapilmiyor", "label": "Şirket genelinde formel bir SWOT analizi çalışması yürütülmemektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-008",
+      "order": 8,
+      "process": "SWOT analizi",
+      "question": "Yapılan SWOT analizlerinin bulguları (özellikle iç zayıflıklar ve dış tehditler) somut stratejik hedeflere ve aksiyon planlarına nasıl dönüştürülmektedir?",
+      "description": "SWOT bulgularının operasyonel aksiyonlara ve ERP gereksinimlerine bağlanma derecesini ölçer.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "STR-007",
+        "operator": "not_equals",
+        "value": "swot_analizi_yapilmiyor"
+      },
+      "options": [
+        { "value": "tows_matrisi_ve_aksiyon_planiyla", "label": "TOWS matrisi veya stratejik aksiyon planlarına dönüştürülerek departman hedeflerine atanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "raporlanmakta_fakat_aksiyon_takibi_zayif", "label": "Üst yönetime raporlanmaktadır ancak aksiyonların atanması ve izlenmesi gayriresmidir", "allow_note": true, "is_other": false },
+        { "value": "yalnizca_bilgi_ve_farkindalik_icin", "label": "Yalnızca stratejik vizyon toplantılarında bilgilendirme amacıyla kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-009",
+      "order": 9,
+      "process": "PESTLE ve dış çevre analizi",
+      "question": "Politik, ekonomik, sosyokültürel, teknolojik, yasal ve çevresel (PESTLE) makro faktörler strateji oluşturma sürecinde sistematik olarak analiz ediliyor mu?",
+      "description": "Dış çevre riskleri ve mevzuat değişimleri, ERP/CRM uyumluluk ve ölçeklenebilirlik mimarisini doğrudan etkiler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "sistematik_pestle_ve_mevzuat_izleme", "label": "Evet, makroekonomik göstergeler, sektörel regülasyonlar ve teknoloji trendleri düzenli izlenip raporlanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_ekonomik_ve_yasal_takip", "label": "Yalnızca döviz/enflasyon gibi ekonomik parametreler ve zorunlu yasal mevzuat değişiklikleri takip edilmektedir", "allow_note": true, "is_other": false },
+        { "value": "resmi_analiz_yok_sezgisel_takip", "label": "Resmi bir PESTLE analizi yoktur; yöneticilerin sektörel tecrübesi ve pazar gözlemleriyle ilerlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-010",
+      "order": 10,
+      "process": "Pazar ve sektör hedefleri",
+      "question": "Şirketin pazar payı büyümesi, coğrafi genişleme (yurt içi / yurt dışı) ve hedef müşteri segmentleri nasıl tanımlanmıştır?",
+      "description": "Pazar hedefleri; çoklu şirket, çoklu para birimi ve CRM kanal yönetim ihtiyaçlarını belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "olculebilir_pazar_payi_ve_segment_hedefi_var", "label": "Hedef pazar payı, odak segmentler ve coğrafi büyüme hedefleri sayısal ve ölçülebilir olarak belirlenmiştir", "allow_note": false, "is_other": false },
+        { "value": "ciro_odakli_genel_buyume_hedefi", "label": "Pazar payı yerine toplam ciro ve satış hacmi odaklı genel büyüme hedefleri bulunmaktadır", "allow_note": false, "is_other": false },
+        { "value": "bolgesel_veya_urun_bazli_kismen_tanimli", "label": "Belirli ürün gruplarında veya bölgelerde hedefler vardır ancak şirket genelinde bütünleşik değildir", "allow_note": true, "is_other": false },
+        { "value": "pazar_hedefi_tanimlanmamis", "label": "Resmi tanımlanmış bir pazar genişleme veya pazar payı hedefi bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-011",
+      "order": 11,
+      "process": "Pazar ve sektör hedefleri",
+      "question": "Yeni pazarlara, yeni sektörlere veya yeni ürün/hizmet kategorilerine giriş stratejileri nasıl değerlendirilmekte ve karara bağlanmaktadır?",
+      "description": "Ürün yaşam döngüsü ve pazar penetrasyon modelleri ERP ürün ağacı ve CRM satış döngüsü yapılandırmasını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "pazar_arastirmasi_ve_fizibilite_raporuyla", "label": "Pazar araştırması, iş planı ve resmi fizibilite onayı sonrasında Yönetim Kurulu kararıyla", "allow_note": false, "is_other": false },
+        { "value": "yonetim_inisiyatifi_ve_musteri_talebiyle", "label": "Üst yönetimin inisiyatifi veya büyük bir müşteri talebi üzerine hızlı adaptasyonla", "allow_note": true, "is_other": false },
+        { "value": "firsat_odakli_deneme_yanilma", "label": "Fırsat bazlı ve pilot uygulamalarla deneme-yanılma yaklaşımıyla", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-012",
+      "order": 12,
+      "process": "Rekabet analizi",
+      "question": "Şirketin ana rakipleri, rekabet avantajı stratejisi (maliyet liderliği, ürün farklılaşması, niş odak vb.) ve pazar konumlandırması nasıl yönetilmektedir?",
+      "description": "Rekabet stratejisi, ERP/CRM ile maliyet optimizasyonu mu yoksa müşteri deneyimi odaklılık mı gerektiğini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "urun_hizmet_farklilastirma_ve_deger_odakli", "label": "Ürün/hizmet kalitesi, marka ve müşteri deneyiminde farklılaşma stratejisi uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "maliyet_liderligi_ve_fiyat_rekabeti", "label": "Operasyonel verimlilik, ölçek ekonomisi ve maliyet liderliği stratejisi uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "nis_pazar_ve_ozel_uzmanlik_odakli", "label": "Belirli bir dikey sektör veya niş müşteri grubuna odaklanma stratejisi izlenmektedir", "allow_note": true, "is_other": false },
+        { "value": "belirgin_bir_rekabet_stratejisi_yok", "label": "Resmi olarak netleştirilmiş bir rekabet konumlandırma stratejisi bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-013",
+      "order": 13,
+      "process": "Müşteri ve paydaş beklentileri",
+      "question": "Müşteri segmentlerinin, bayilerin, tedarikçilerin ve diğer kurumsal paydaşların beklentileri stratejiye nasıl yansıtılmaktadır?",
+      "description": "Paydaş beklentileri analizi, B2B/B2C portal, CRM ve tedarikçi portalı stratejilerini doğrudan şekillendirir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "duzenli_memnuniyet_anketi_ve_nps_analizi", "label": "Düzenli NPS/memnuniyet anketleri, bayi toplantıları ve müşteri geri bildirimleri stratejiye doğrudan girdi sağlar", "allow_note": false, "is_other": false },
+        { "value": "satis_ekibi_saha_geribildirimleriyle", "label": "Satış ve müşteri hizmetleri ekiplerinin saha raporları üzerinden değerlendirilmektedir", "allow_note": true, "is_other": false },
+        { "value": "sikayet_ve_iade_verileriyle_reaktif", "label": "Yalnızca şikayetler, iadeler veya kayıp müşteri durumlarında reaktif olarak ele alınmaktadır", "allow_note": false, "is_other": false },
+        { "value": "paydas_beklenti_analizi_yapilmiyor", "label": "Stratejik planlamada sistematik paydaş beklenti analizi yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-014",
+      "order": 14,
+      "process": "Stratejik öncelikler",
+      "question": "Şirketin önümüzdeki 1-3 yıllık dönem için belirlediği ana stratejik öncelikler ve odak alanları nelerdir?",
+      "description": "Ana odak alanları ERP/CRM projesinin modüler önceliklendirme ve kaynak dağılım planını doğrular.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "ciro_ve_pazar_payi_buyumesi", "label": "Ciro, Satış Hacmi ve Pazar Payı Büyümesi", "allow_note": false, "is_other": false },
+        { "value": "karlilik_ve_maliyet_optimizasyonu", "label": "Kârlılık Artışı, Maliyet Kontrolü ve Verimlilik", "allow_note": false, "is_other": false },
+        { "value": "dijitallesme_ve_sistem_donusumu", "label": "Dijitalleşme, ERP/CRM ve Süreç Otomasyonu Dönüşümü", "allow_note": false, "is_other": false },
+        { "value": "yurt_disi_ihracat_ve_kuresellesme", "label": "İhracat, Yurt Dışı Genişleme ve Küreselleşme", "allow_note": false, "is_other": false },
+        { "value": "musteri_deneyimi_ve_hizmet_kalitesi", "label": "Müşteri Deneyimi, Sadakat ve Hizmet Kalitesi", "allow_note": false, "is_other": false },
+        { "value": "yeni_urun_ar_ge_ve_inovasyon", "label": "Yeni Ürün Geliştirme, Ar-Ge ve İnovasyon", "allow_note": false, "is_other": false },
+        { "value": "surdurulebilirlik_ve_kurumsal_yonetisim", "label": "Sürdürülebilirlik, ESG ve Kurumsal Yönetişim Olgunluğu", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-015",
+      "order": 15,
+      "process": "Stratejik öncelikler",
+      "question": "Farklı departmanların veya stratejik hedeflerin birbiriyle çelişmesi durumunda (örn: kârlılık vs. hızlı pazar büyümesi) önceliklendirme kararı nasıl verilmektedir?",
+      "description": "Stratejik çelişkilerin çözüm kuralı, proje kapsam tartışmalarında karar hızını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "yonetim_kurulu_ve_icra_karariyla", "label": "Yönetim Kurulu veya İcra Kurulu tarafından kurumsal öncelik matrisine göre karara bağlanır", "allow_note": false, "is_other": false },
+        { "value": "genel_mudur_tekil_karariyla", "label": "Genel Müdürün tekil takdiri ve anlık yönlendirmesiyle çözülür", "allow_note": true, "is_other": false },
+        { "value": "departmanlar_arasi_muzakere_ile", "label": "Departman yöneticileri arasında müzakere ve uzlaşma yoluyla ilerlenir", "allow_note": true, "is_other": false },
+        { "value": "net_onceliklendirme_kurali_yok", "label": "Tanımlı bir önceliklendirme kuralı yoktur; duruma göre değişkenlik gösterir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-016",
+      "order": 16,
+      "process": "Kurumsal hedefler",
+      "question": "Şirket düzeyinde tanımlanan finansal ve operasyonel uzun vadeli hedefler (ciro, EBITDA, pazar payı, müşteri sayısı vb.) ne derecede sayısallaştırılmıştır?",
+      "description": "Ölçülebilir kurumsal hedefler, ERP/CRM sonrası yatırım geri dönüş (ROI) takibinin temelidir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "tum_hedefler_sayisal_ve_zaman_bagli", "label": "Tüm kurumsal hedefler sayısal metrikler, zaman kısıtları ve hedef değerlerle eksiksiz tanımlanmıştır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_finansal_hedefler_sayisal", "label": "Yalnızca ciro ve kârlılık gibi finansal hedefler sayısallaştırılmış; operasyonel hedefler niteldir", "allow_note": true, "is_other": false },
+        { "value": "genel_yonelimler_var_hedef_rakam_yok", "label": "Büyüme niyetleri vardır ancak net sayısal hedef parametreleri belirlenmemiştir", "allow_note": true, "is_other": false },
+        { "value": "tanimli_kurumsal_hedef_seti_yok", "label": "Kurumsal düzeyde tanımlanmış uzun vadeli hedef seti bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-017",
+      "order": 17,
+      "process": "Kurumsal hedefler",
+      "question": "Kurumsal hedeflerin gerçekleşme düzeyleri hangi sıklıkta ölçülmekte ve kabul edilebilir sapma tolerans limitleri nasıl belirlenmektedir?",
+      "description": "Hedef takip periyodu ve tolerans disiplini, yönetim raporlama ritmini şekillendirir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "aylik_ve_ceyreklik_tolerans_aralikli", "label": "Aylık ve çeyreklik periyotlarda ölçülür; sarı/kırmızı tolerans limitleri resmi olarak tanımlıdır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_yil_sonu_degerlendirmesi", "label": "Hedef gerçekleşmeleri yalnızca yıl sonunda genel olarak değerlendirilmektedir", "allow_note": false, "is_other": false },
+        { "value": "duzenli_periyot_yok_ihtiyaca_gore", "label": "Sabit bir ölçüm periyodu veya tanımlı tolerans eşiği bulunmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-018",
+      "order": 18,
+      "process": "Departman hedefleri",
+      "question": "Kurumsal stratejik hedefler; satış, üretim, satın alma, finans, İK gibi departman ve fonksiyon bazında alt hedeflere kırılıyor mu?",
+      "description": "Hedef kırılımı, departmanlar arası ERP veri akışının kurumsal hedeflere hizmet etmesini sağlar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "tum_departmanlara_resmi_kirilim_yapilmaktadir", "label": "Evet, kurumsal hedefler her departman için resmi hedef kartlarına ve metriklerine dönüştürülmektedir", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_satis_ve_uretim_gibi_ana_birimlere", "label": "Yalnızca satış ve üretim gibi temel operasyonel birimlere hedef verilmekte; destek birimlere verilmemektedir", "allow_note": true, "is_other": false },
+        { "value": "gayriresmi_olarak_konusuluyor", "label": "Yazılı bir hedef kartı yoktur; hedefler sözlü olarak müdürler düzeyinde konuşulmaktadır", "allow_note": true, "is_other": false },
+        { "value": "departman_hedefi_kirilimi_yok", "label": "Departman düzeyinde resmi bir hedef kırılımı uygulanmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-019",
+      "order": 19,
+      "process": "Departman hedefleri",
+      "question": "Departman hedefleri ekip ve bireysel performans hedeflerine (prim, KPI, performans değerlendirme) nasıl yayılmakta ve ilişkilendirilmektedir?",
+      "description": "Bireysel hedef bağlantısı, kullanıcıların ERP/CRM sisteminde doğru ve zamanında veri girmesini teşvik eder.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "STR-018",
+        "operator": "not_equals",
+        "value": "departman_hedefi_kirilimi_yok"
+      },
+      "options": [
+        { "value": "bireysel_kpi_ve_prim_sistemine_entegre", "label": "Bireysel performans kartlarına ve prim/ödüllendirme sistemine resmi olarak bağlanmıştır", "allow_note": false, "is_other": false },
+        { "value": "ekip_bazli_genel_performans_olarak", "label": "Bireysel değil, departman/ekip başarısı olarak değerlendirilmektedir", "allow_note": true, "is_other": false },
+        { "value": "hedef_yayilimi_var_odul_baglantisi_yok", "label": "Hedefler verilmektedir ancak prim veya kariyer sistemine resmi bağlantısı bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-020",
+      "order": 20,
+      "process": "Ölçülebilir KPI ve hedef metrikleri",
+      "question": "Şirketin stratejik hedeflerinin gerçekleşmesini izlemek amacıyla kurumsal ve operasyonel Temel Performans Göstergeleri (KPI) tanımlı mıdır?",
+      "description": "KPI altyapısı, ERP ve BI raporlama katmanının hangi metrikleri hesaplaması gerektiğini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "resmi_kpi_sozlugu_ve_metrik_seti_var", "label": "Evet, tanımları, formülleri ve veri kaynakları belirlenmiş resmi bir kurumsal KPI sözlüğü mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "temel_metrikler_izleniyor_katalog_yok", "label": "Temel finans ve satış metrikleri izlenmektedir ancak kurumsal standart bir KPI kataloğu yoktur", "allow_note": true, "is_other": false },
+        { "value": "departmanlar_kendi_metriklerini_tutuyor", "label": "Merkezi bir KPI yapısı yoktur; her departman kendi bildiği göstergeleri takip etmektedir", "allow_note": true, "is_other": false },
+        { "value": "resmi_kpi_seti_tanimli_degil", "label": "Şirket genelinde tanımlanmış resmi bir KPI seti bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-021",
+      "order": 21,
+      "process": "Ölçülebilir KPI ve hedef metrikleri",
+      "question": "KPI metriklerinin hesaplanmasında kullanılan veri kaynakları, hesaplama formülleri ve verilerin güvenilirliği nasıl denetlenmektedir?",
+      "description": "Veri güvenilirliği denetimi, ERP öncesinde 'tek doğru veri' kaynağının tespit edilmesini sağlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "STR-020",
+        "operator": "not_equals",
+        "value": "resmi_kpi_seti_tanimli_degil"
+      },
+      "options": [
+        { "value": "otomatik_sistem_raporlariyla_tekil_kaynaktan", "label": "Veriler doğrudan ERP/veritabanı sorgularıyla otomatik hesaplanmakta ve formül tutarlılığı denetlenmektedir", "allow_note": false, "is_other": false },
+        { "value": "manuel_excel_konsolidasyonuyla", "label": "Farklı sistemlerden çekilen veriler Excel'de manuel birleştirilerek hesaplanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "departman_beyanina_dayali_hesaplama", "label": "Departmanların hazırladığı kendi rapor ve beyanlarına dayalı olarak takip edilmektedir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-022",
+      "order": 22,
+      "process": "Ölçülebilir KPI ve hedef metrikleri",
+      "question": "Hedef gerçekleşmelerinde sapma (kırmızı/sarı KPI) tespit edildiğinde kök neden analizi ve düzeltici aksiyon başlatma süreci nasıl işletilmektedir?",
+      "description": "Performans sapmalarında aksiyon disiplini, operasyonel iyileştirme hızını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "formal_kok_neden_ve_aksiyon_takip_sureci", "label": "Resmi kök neden analizi (8D, 5 Neden vb.) yapılır; aksiyon planı atanır ve takip edilir", "allow_note": false, "is_other": false },
+        { "value": "yonetim_toplantisinda_sozlu_takip", "label": "Aylık yönetim toplantısında sapma konuşulur; ilgili müdüre sözlü aksiyon verilir", "allow_note": true, "is_other": false },
+        { "value": "formal_surec_yok_durumsal_mudahale", "label": "Resmi bir süreç yoktur; kriz oluşturan sapmalara durumsal olarak müdahale edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-023",
+      "order": 23,
+      "process": "Balanced Scorecard / performans perspektifleri",
+      "question": "Kurumsal performans yönetiminde Balanced Scorecard (Finansal, Müşteri, İç Süreçler, Öğrenme/Gelişim) veya çok boyutlu bir performans modeli kullanılıyor mu?",
+      "description": "Balanced Scorecard olgunluğu, ERP/CRM'in sadece maliyet değil süreç ve müşteri boyutlarında da izlenmesini sağlar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "dort_perspektifli_bsc_aktif_kullaniliyor", "label": "Evet, 4 perspektifli Balanced Scorecard modeli kurumsal düzeyde aktif olarak uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "finans_ve_musteri_odakli_cok_boyutlu", "label": "Finansal ve müşteri odaklı çok boyutlu bir yapı vardır ancak tam BSC metodolojisi uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "bsc_kullanilmiyor_klasik_finansal_takip", "label": "Balanced Scorecard kullanılmamaktadır; ağırlıklı olarak klasik finansal ve bütçe hedefleri izlenmektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-024",
+      "order": 24,
+      "process": "Balanced Scorecard / performans perspektifleri",
+      "question": "Balanced Scorecard perspektiflerinin ağırlıklandırması ve hedefler arasındaki neden-sonuç ilişkilerini gösteren bir Stratejik Harita (Strategy Map) mevcut mudur?",
+      "description": "Stratejik harita varlığı, süreç iyileştirmelerinin finansal hedeflere katkısını modeller.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "STR-023",
+        "operator": "not_equals",
+        "value": "bsc_kullanilmiyor_klasik_finansal_takip"
+      },
+      "options": [
+        { "value": "resmi_strateji_haritasi_ve_agirliklar_tanimli", "label": "Evet, resmi Strateji Haritası çizilmiştir; perspektif ve hedef ağırlıkları net olarak belirlenmiştir", "allow_note": false, "is_other": false },
+        { "value": "agirliklar_var_harita_cizilmemis", "label": "Hedef ağırlıkları mevcuttur ancak resmi bir strateji haritası dokümanı hazırlanmamıştır", "allow_note": true, "is_other": false },
+        { "value": "agirlik_ve_harita_yok", "label": "Perspektifler eşit kabul edilmektedir; stratejik neden-sonuç haritası bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-025",
+      "order": 25,
+      "process": "Bütçe ve strateji bağlantısı",
+      "question": "Yıllık operasyonel bütçe (OPEX) ve yatırım bütçesi (CAPEX) hazırlık süreçleri stratejik plan ve önceliklerle nasıl ilişkilendirilmektedir?",
+      "description": "Bütçe-strateji uyumu, ERP/CRM yatırımlarının kurumsal bütçede güvenceye alınmasını sağlar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "butce_dogrudan_stratejik_hedeflerden_turetiliyor", "label": "Bütçe kalemleri doğrudan stratejik plan ve inisiyatif hedeflerinden türetilerek onaylanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "gecmis_yil_gerceklesmesine_gore_artan_oranli", "label": "Bütçe ağırlıklı olarak geçmiş yıl gerçekleşmeleri ve enflasyon artışına göre hazırlanmakta; strateji bağı zayıftır", "allow_note": true, "is_other": false },
+        { "value": "butce_ve_strateji_ayri_surecler", "label": "Stratejik hedefler ile yıllık bütçe birbirinden bağımsız iki ayrı süreç olarak yürütülmektedir", "allow_note": false, "is_other": false },
+        { "value": "formal_butce_sureci_yok", "label": "Şirkette resmi bir bütçe hazırlık süreci uygulanmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-026",
+      "order": 26,
+      "process": "Bütçe ve strateji bağlantısı",
+      "question": "Yıl içi bütçe revizyonlarının veya beklenmeyen finansal sapmaların stratejik hedeflere geri bildirimi ve stratejiye etkisi nasıl yönetilmektedir?",
+      "description": "Bütçe revizyon mekanizması, stratejik projelerin finansal sürdürülebilirliğini korur.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "resmi_revizyon_dongusu_ile_hedefler_guncellenir", "label": "Bütçe revizyonları Üst Yönetim onayıyla stratejik hedeflere ve KPI değerlerine resmi olarak yansıtılır", "allow_note": false, "is_other": false },
+        { "value": "butce_degisir_stratejik_hedef_sabit_kalir", "label": "Bütçe güncellenir ancak uzun vadeli stratejik hedefler resmi olarak revize edilmez", "allow_note": true, "is_other": false },
+        { "value": "durumsal_kararlarla_yonetilir", "label": "Mali sapmalar durumsal tasarruf veya erteleme kararlarıyla yönetilir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-027",
+      "order": 27,
+      "process": "Yatırım ve kaynak önceliklendirme",
+      "question": "Sermaye yatırımları (CAPEX), yeni tesis/makine alımı, dijital dönüşüm ve insan kaynağı tahsisinde stratejik önceliklendirme modeli nasıl işletilmektedir?",
+      "description": "Kaynak tahsis modeli, ERP/CRM bütçe onaylarının kurumsal öncelik sırasını belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "stratejik_oncelik_matrisi_ve_puanlama_ile", "label": "Stratejik hedeflere katkı puanı, kârlılık etkisi ve risk kriterlerine göre puanlanarak önceliklendirilir", "allow_note": false, "is_other": false },
+        { "value": "yonetim_kurulu_takdiri_ve_onayi_ile", "label": "Yönetim Kurulu veya Genel Müdürün doğrudan inisiyatifi ve takdiriyle belirlenir", "allow_note": true, "is_other": false },
+        { "value": "acil_operasyonel_ihtiyac_baskisina_gore", "label": "En acil darboğaz oluşturan departman taleplerine göre kaynak tahsis edilir", "allow_note": false, "is_other": false },
+        { "value": "formal_onceliklendirme_modeli_yok", "label": "Tanımlanmış bir kaynak önceliklendirme modeli bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-028",
+      "order": 28,
+      "process": "Yatırım ve kaynak önceliklendirme",
+      "question": "Büyük ölçekli yatırım kararlarında fizibilite, Yatırımın Geri Dönüşü (ROI) ve Geri Ödeme Süresi (Payback Period) hesaplamaları yapılıyor mu?",
+      "description": "Fizibilite kültürü, ERP/CRM iş gerekçesinin (business case) finansal doğrulanmasını sağlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "her_buyuk_yatirimda_detayli_roi_hesaplanir", "label": "Evet, belirlenen tutar üzerindeki tüm yatırımlarda NPV, IRR ve ROI hesaplamalı resmi fizibilite hazırlanır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_uretim_ve_fiziksel_tesis_icin", "label": "Yalnızca makine/tesis yatırımlarında hesaplanır; yazılım ve süreç yatırımlarında hesaplanmaz", "allow_note": true, "is_other": false },
+        { "value": "tahmini_ve_kabataslak_hesaplama_yapilir", "label": "Ayrıntılı finansal modelleme yapılmaz; tahmini geri dönüş süresi üzerinden karar verilir", "allow_note": true, "is_other": false },
+        { "value": "formal_roi_hesaplanmiyor", "label": "Yatırım kararlarında resmi ROI veya fizibilite çalışması yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-029",
+      "order": 29,
+      "process": "Stratejik proje ve inisiyatif portföyü",
+      "question": "Şirketin stratejik hedeflerine ulaşmak amacıyla yürütülen kurumsal projeler ve dönüşüm inisiyatifleri tek bir portföy altında izleniyor mu?",
+      "description": "Stratejik portföy gözetimi, ERP/CRM projesinin diğer dönüşüm inisiyatifleriyle çakışmasını engeller.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_stratejik_proje_portfoyu_var", "label": "Evet, tüm kurumsal ve stratejik projeler merkezi bir portföy altında izlenmekte ve önceliklendirilmektedir", "allow_note": false, "is_other": false },
+        { "value": "departman_bazli_ayri_proje_takibi", "label": "Her departman kendi projelerini bağımsız yürütmekte; merkezi portföy görünürlüğü sınırlıdır", "allow_note": true, "is_other": false },
+        { "value": "portfoy_takibi_yapilmiyor_bireysel_projeler", "label": "Merkezi bir proje portföyü yönetimi yoktur; projeler münferit olarak takip edilmektedir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-030",
+      "order": 30,
+      "process": "Stratejik proje ve inisiyatif portföyü",
+      "question": "Stratejik inisiyatiflerin ve dönüşüm projelerinin beklenen iş faydaları (Benefits Realization) proje tamamlandıktan sonra takip ediliyor mu?",
+      "description": "Fayda realizasyon takibi, ERP/CRM canlıya geçişi sonrası hedeflenen verimlilik kazanımlarının ölçülmesini sağlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "STR-029",
+        "operator": "not_equals",
+        "value": "portfoy_takibi_yapilmiyor_bireysel_projeler"
+      },
+      "options": [
+        { "value": "duzenli_fayda_ve_kazanim_takip_raporu", "label": "Evet, projeler tamamlandıktan sonra 6-12 ay boyunca hedeflenen kazanımların gerçekleşmesi ölçülür", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_teslimat_asamasi_kapanisi_var", "label": "Proje teslim edildiğinde kapanış yapılır; sonrasında fayda gerçekleşmesi ayrıca izlenmez", "allow_note": true, "is_other": false },
+        { "value": "fayda_takibi_yapilmiyor", "label": "Proje sonrası fayda veya kazanım takibi yapılmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-031",
+      "order": 31,
+      "process": "ERP/CRM dönüşüm hedefleri",
+      "question": "ERP ve CRM dönüşüm yatırımlarının şirketin stratejik hedeflerine (büyüme, verimlilik, müşteri deneyimi, kurumsallaşma vb.) katkısı ve stratejik gerekçesi nasıl tanımlanmıştır?",
+      "description": "ERP/CRM stratejik gerekçesi, projenin kapsam sınırlarını ve üst yönetim sponsorluğunu belirleyen en kritik girdidir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "stratejik_is_gerekcesi_ve_kazanim_hedefleri_yazili", "label": "Net olarak tanımlanmış, belgelenmiş ve ölçülebilir iş kazanımlarına (verimlilik, hız, şeffaflık) bağlanmıştır", "allow_note": false, "is_other": false },
+        { "value": "operasyonel_ihtiyac_ve_eski_sistem_yetersizligi", "label": "Mevcut sistemlerin yetersizliği ve operasyonel aksaklıkları çözme odaklı genel bir gerekçe vardır", "allow_note": true, "is_other": false },
+        { "value": "sadece_mevzuat_ve_e_donusum_zorunlulugu", "label": "Ağırlıklı olarak yasal zorunluluklar, e-Dönüşüm ve fatura entegrasyonu ihtiyacıyla tetiklenmiştir", "allow_note": false, "is_other": false },
+        { "value": "stratejik_hedef_baglantisi_kurulmamis", "label": "Projenin uzun vadeli stratejik hedeflerle bağlantısı henüz netleştirilmemiştir", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-032",
+      "order": 32,
+      "process": "ERP/CRM dönüşüm hedefleri",
+      "question": "ERP ve CRM dönüşümünün stratejik başarı kriterleri (proje tamamlandığında nelerin değişmiş olacağı) yönetimce nasıl belirlenmiştir?",
+      "description": "Başarı kriterlerinin netliği, kabul testleri ve canlıya geçiş kararında ortak ölçüt sağlar.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "STR-031",
+        "operator": "not_equals",
+        "value": "stratejik_hedef_baglantisi_kurulmamis"
+      },
+      "options": [
+        { "value": "tekil_ve_guvenilir_veri_kaynagi_olusturulmasi", "label": "Tüm şirkette tekil, tutarlı ve güvenilir ana veri kaynağının sağlanması", "allow_note": false, "is_other": false },
+        { "value": "finansal_kapanis_ve_raporlama_suresinin_kisalmasi", "label": "Ay sonu finansal kapanış ve yönetim raporlama süresinin önemli ölçüde kısalması", "allow_note": false, "is_other": false },
+        { "value": "stok_ve_envanter_maliyetlerinin_azaltilmasi", "label": "Stok doğruluğunun artırılması ve gereksiz envanter maliyetlerinin düşürülmesi", "allow_note": false, "is_other": false },
+        { "value": "siparis_teslimat_dongu_suresinin_kisalmasi", "label": "Siparişten teslimata ve tahsilata kadar olan süreç sürelerinin kısalması", "allow_note": false, "is_other": false },
+        { "value": "musteri_360_derece_gorunurlugu_ve_sadakati", "label": "Müşteri temaslarının 360 derece izlenebilirliği ve satış kapatma oranlarının artması", "allow_note": false, "is_other": false },
+        { "value": "manuel_is_yuku_ve_mukerrerligin_ortadan_kalkmasi", "label": "Excel bağımlılığı, manuel veri girişi ve mükerrer işlerin ortadan kalkması", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-033",
+      "order": 33,
+      "process": "Dijitalleşme ve süreç olgunluğu",
+      "question": "Şirketin dijital dönüşüm stratejisi ve iş süreçlerinin dijitalleşme olgunluk düzeyi hedefi nasıl yapılandırılmıştır?",
+      "description": "Dijitalleşme stratejisi, ERP/CRM dışındaki tamamlayıcı sistemlerin (WMS, MES, e-Fatura vb.) entegrasyon vizyonunu belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "yazili_dijital_donusum_yol_haritasi_var", "label": "3-5 yıllık resmi dijital dönüşüm yol haritası mevcuttur; aşamalı olarak uygulanmaktadır", "allow_note": false, "is_other": false },
+        { "value": "departman_bazli_dijitallesme_projeleri", "label": "Departmanlar kendi yazılım ve dijitalleşme projelerini yürütmektedir; bütünleşik yol haritası zayıftır", "allow_note": true, "is_other": false },
+        { "value": "reaktif_ve_ihtiyac_odakli_yazilim_alimi", "label": "İhtiyaç çıktıkça yazılım veya modül alımı yapılmakta; uzun vadeli dijital strateji yoktur", "allow_note": false, "is_other": false },
+        { "value": "tanimli_dijitallesme_stratejisi_yok", "label": "Resmi bir dijital dönüşüm stratejisi bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-034",
+      "order": 34,
+      "process": "Dijitalleşme ve süreç olgunluğu",
+      "question": "İş süreçlerinin standardizasyonu, dokümantasyonu ve süreç sahipliği mekanizması ne derecede olgundur?",
+      "description": "Süreç standardizasyon olgunluğu, ERP uyarlamasında özel yazılım (customization) ihtiyacını minimize eder.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "tum_surecler_haritalanmis_ve_sahibi_belli", "label": "Tüm ana süreçler haritalanmış, iş akışları belgelenmiş ve süreç sahipleri resmi olarak atanmıştır", "allow_note": false, "is_other": false },
+        { "value": "temel_prosedurler_var_guncelleme_zayif", "label": "Temel prosedürler yazılmıştır ancak fiili uygulamalarla farklılaşmalar ve güncelleme eksikleri vardır", "allow_note": true, "is_other": false },
+        { "value": "surecler_kisilere_bagli_yazili_degil", "label": "Süreçler kilit kişilerin hafızasına ve alışkanlıklarına bağlıdır; yazılı dokümantasyon yoktur", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-035",
+      "order": 35,
+      "process": "Ana veri ve raporlama stratejisi",
+      "question": "Stratejik ve operasyonel kararların alınmasında kullanılan verilerin doğruluğu ve tekil veri kaynağı (Single Source of Truth) stratejisi nasıl güvenceye alınmaktadır?",
+      "description": "Tekil veri kaynağı stratejisi, farklı departmanların çelişen rapor üretmesini engeller.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        { "value": "merkezi_veri_yonetimi_ve_tekil_kaynak_var", "label": "Merkezi veri modeli mevcuttur; tüm yönetim raporları tek bir doğrulanmış veri ambarından/ERP'den üretilir", "allow_note": false, "is_other": false },
+        { "value": "farkli_sistemler_var_excelde_birlestiriliyor", "label": "Farklı departmanlar farklı yazılımlar kullanmakta; üst yönetim için veriler Excel'de manuel konsolide edilmektedir", "allow_note": true, "is_other": false },
+        { "value": "departman_raporlari_birbiriyle_celisiyor", "label": "Aynı metrik için farklı departmanlar farklı rakamlar üretmekte; veri tutarsızlığı yaşanmaktadır", "allow_note": true, "is_other": false },
+        { "value": "tanimli_veri_stratejisi_yok", "label": "Resmi bir kurumsal veri ve raporlama stratejisi bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-036",
+      "order": 36,
+      "process": "Ana veri ve raporlama stratejisi",
+      "question": "Üst yönetimin stratejik karar alma sürecinde kullandığı Yönetici Panoları (Executive Dashboard) ve İş Zekası (BI) araçlarının kullanım düzeyi nasıldır?",
+      "description": "Üst yönetim raporlama aracı olgunluğu, ERP/CRM BI entegrasyon ihtiyacını belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "canli_interaktif_bi_dashboardlari_kullaniliyor", "label": "Power BI / Tableau / Qlik vb. canlı interaktif BI panoları üst yönetimce düzenli kullanılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "periyodik_statik_pdf_ve_excel_raporlari", "label": "Aylık/haftalık statik PDF veya Excel formatında özet yönetim raporları sunulmaktadır", "allow_note": false, "is_other": false },
+        { "value": "talep_edildikce_manuel_rapor_hazirlaniyor", "label": "Yönetim istedikçe ilgili birimler manuel analiz hazırlamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-037",
+      "order": 37,
+      "process": "Risk ve senaryo planlaması",
+      "question": "Stratejik hedeflere ulaşmayı engelleyebilecek kurumsal riskler ve alternatif senaryo planları (iyimser, baz, kötümser senaryolar / B planı) hazırlanıyor mu?",
+      "description": "Senaryo planlaması, ERP/CRM sisteminin esneklik ve beklenmeyen hacim değişimlerine uyum kabiliyetini sınar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "cok_senaryolu_planlama_ve_risk_matrisi_var", "label": "Evet, kurumsal risk matrisi hazırlanır ve 3 farklı senaryoya (baz, iyimser, kötümser) göre planlama yapılır", "allow_note": false, "is_other": false },
+        { "value": "riskler_biliniyor_formal_senaryo_yok", "label": "Temel kurumsal ve finansal riskler bilinmektedir ancak resmi senaryo modellemeleri yapılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "kriz_aninda_reaktif_mudahale", "label": "Önceden senaryo hazırlanmaz; olumsuz durumlar oluştukça kriz yönetimiyle reaktif müdahale edilir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-038",
+      "order": 38,
+      "process": "Risk ve senaryo planlaması",
+      "question": "Makroekonomik dalgalanmalar (kur, faiz, enflasyon), tedarik zinciri krizleri veya regülasyon değişikliklerine karşı tetikleyici erken uyarı mekanizmaları mevcut mudur?",
+      "description": "Erken uyarı mekanizmaları, operasyonel süreçlerin stratejik risklere hızla yanıt vermesini sağlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "erken_uyari_gostergeleri_ve_esik_degerler_tanimli", "label": "Evet, tanımlı eşik değerler ve erken uyarı göstergeleri aşıldığında üst yönetime otomatik alarm/rapor üretilir", "allow_note": false, "is_other": false },
+        { "value": "yoneticilerin_sezgisel_ve_saha_takibi", "label": "Yöneticilerin piyasa takibi ve sektörel duyumlarıyla durumsal olarak değerlendirilir", "allow_note": true, "is_other": false },
+        { "value": "erken_uyari_mekanizmasi_yok", "label": "Tanımlanmış bir erken uyarı veya alarm mekanizması bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-039",
+      "order": 39,
+      "process": "Strateji uygulama takibi",
+      "question": "Stratejik plan ve hedeflerin fiili gerçekleşmeleri hangi periyotlarda ve hangi kurumsal mekanizmayla izlenmektedir?",
+      "description": "Strateji uygulama izleme ritmi, ERP verilerinin ne sıklıkla analiz edildiğini belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "aylik_ve_ceyreklik_duzenli_strateji_toplantisi", "label": "Her ay operasyonel, her çeyrekte ise stratejik performans resmi izleme toplantılarıyla değerlendirilir", "allow_note": false, "is_other": false },
+        { "value": "alti_aylik_veya_yillik_donemlerde", "label": "Yılda 1 veya 2 kez genel değerlendirme toplantılarında gözden geçirilir", "allow_note": false, "is_other": false },
+        { "value": "duzenli_izleme_ritmi_yok", "label": "Sabit bir strateji izleme takvimi yoktur; duruma göre konuşulmaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-040",
+      "order": 40,
+      "process": "Strateji uygulama takibi",
+      "question": "Strateji izleme toplantılarında alınan aksiyon kararlarının sorumlusu, hedef tarihi ve tamamlanma durumu nasıl takip edilmektedir?",
+      "description": "Aksiyon takip disiplini, stratejik kararların hayata geçme oranını doğrudan belirler.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "merkezi_aksiyon_takip_yazilimi_veya_tablosuyla", "label": "Resmi aksiyon takip sistemi üzerinden sorumlu, termin tarihi ve durum düzenli izlenir", "allow_note": false, "is_other": false },
+        { "value": "toplanti_notlarinda_sozlu_takip", "label": "Toplantı notlarına yazılır; bir sonraki toplantıda sözlü olarak sorulur", "allow_note": true, "is_other": false },
+        { "value": "aksiyon_takip_disiplini_yok", "label": "Alınan kararların sistematik takibi yapılmamakta; kişilerin inisiyatifine kalmaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-041",
+      "order": 41,
+      "process": "Yönetim kurulu ve icra kurulu gözden geçirmesi",
+      "question": "Yönetim Kurulu veya Üst Yönetim, kurumsal performansı ve stratejik hedefleri resmi bir Yönetim Gözden Geçirme (Management Review) oturumunda değerlendiriyor mu?",
+      "description": "Üst yönetim resmi gözden geçirmesi, stratejik düzeltmeler ve bütçe yeniden tahsisi için kurumsal onay zeminidir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "yillik_ve_yari_yillik_resmi_gozden_gecirme", "label": "Evet, yılda en az iki kez tüm kurumsal verilerin ve hedeflerin resmi gözden geçirme oturumu yapılır", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_yil_sonu_butce_kapanisinda", "label": "Yalnızca yıl sonunda bütçe kapanışı ve genel kurul öncesinde genel değerlendirme yapılır", "allow_note": false, "is_other": false },
+        { "value": "resmi_stratejik_gozden_gecirme_yapilmiyor", "label": "Resmi bir yönetim gözden geçirme mekanizması uygulanmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-042",
+      "order": 42,
+      "process": "Yönetim kurulu ve icra kurulu gözden geçirmesi",
+      "question": "Yönetim gözden geçirme toplantılarında alınan stratejik kararların resmi tutanak altına alınması ve organizasyona geri bildirimi nasıl sağlanmaktadır?",
+      "description": "Karar tutanakları ve geribildirim mekanizması, kurumsal hafızayı ve yönetsel şeffaflığı korur.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "STR-041",
+        "operator": "not_equals",
+        "value": "resmi_stratejik_gozden_gecirme_yapilmiyor"
+      },
+      "options": [
+        { "value": "resmi_karar_tutonagi_ve_aksiyon_genelgesi", "label": "Resmi karar tutanağı düzenlenir; ilgili birimlere aksiyon genelgesi olarak tebliğ edilir", "allow_note": false, "is_other": false },
+        { "value": "sunum_ozeti_paylasilmakta", "label": "Toplantı sunum özeti müdürlerle paylaşılmakta ancak resmi genelge çıkarılmamaktadır", "allow_note": true, "is_other": false },
+        { "value": "kararlar_ust_yonetimde_kalir_duyurulmaz", "label": "Kararlar üst yönetim düzeyinde kalır; alt kademelere resmi duyuru yapılmaz", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-043",
+      "order": 43,
+      "process": "Kurum içi iletişim ve hedef yayılımı",
+      "question": "Şirketin vizyonu, stratejik öncelikleri ve yıllık hedefleri çalışanlara nasıl aktarılmakta ve kurum genelinde nasıl benimsetilmektedir?",
+      "description": "İç iletişim ve benimseme düzeyi, ERP/CRM değişim yönetimi ve kullanıcı direncinin kırılmasında belirleyicidir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        { "value": "genel_bilgilendirme_toplantilari_ve_intranet", "label": "Tüm çalışanların katıldığı Townhall toplantıları, intranet duyuruları ve hedef bültenleriyle", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_yonetici_kademesine_aktarilmakta", "label": "Yalnızca müdür ve şef kademesine aktarılmakta; alt kademelere yayılım sınırlı kalmaktadır", "allow_note": true, "is_other": false },
+        { "value": "formal_iletisim_yok_kulaktan_kulaga", "label": "Resmi bir strateji iletişimi kanalı yoktur; hedefler gayriresmi aktarılmaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-044",
+      "order": 44,
+      "process": "Kurum içi iletişim ve hedef yayılımı",
+      "question": "Çalışanların stratejik hedefleri anlama ve benimseme düzeyini ölçmek üzere kurum içi anket veya geri bildirim mekanizması işletiliyor mu?",
+      "description": "Çalışan hedef farkındalığı, organizasyonel hizalanma kalitesini gösterir.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "low",
+      "options": [
+        { "value": "yillik_calisan_bagliligi_ve_farkindalik_anketi", "label": "Evet, yıllık çalışan bağlılığı ve hedef farkındalığı anketleriyle düzenli ölçülmektedir", "allow_note": false, "is_other": false },
+        { "value": "performans_gorusmelerinde_sozlu_geribildirim", "label": "Yıllık performans görüşmelerinde yöneticiler tarafından sözlü olarak değerlendirilmektedir", "allow_note": true, "is_other": false },
+        { "value": "olcum_veya_anket_yapilmiyor", "label": "Hedef farkındalığı veya strateji benimsemesini ölçen bir mekanizma yoktur", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-045",
+      "order": 45,
+      "process": "Stratejik plan revizyonu, arşiv ve yol haritası",
+      "question": "Değişen pazar koşullarında, krizlerde veya şirket içi dönüşümlerde stratejik planın resmi revizyon döngüsü nasıl işletilmektedir?",
+      "description": "Strateji revizyon kuralı, ERP/CRM kapsam esnekliği ve değişiklik yönetimi için çerçeve sunar.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        { "value": "yillik_rolling_planlama_ve_resmi_revizyon_proseduru", "label": "Her yıl 'Rolling Forecast' mantığıyla bir yıl ileriye ötelenerek resmi revizyon prosedürü işletilir", "allow_note": false, "is_other": false },
+        { "value": "yalnizca_buyuk_kriz_veya_satin_alma_durumunda", "label": "Yalnızca olağanüstü pazar krizleri, birleşme veya büyük yatırım kararlarında revize edilir", "allow_note": true, "is_other": false },
+        { "value": "resmi_revizyon_proseduru_yok", "label": "Plan revizyonu için tanımlanmış resmi bir süreç yoktur; durumsal ilerlenir", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-046",
+      "order": 46,
+      "process": "Stratejik plan revizyonu, arşiv ve yol haritası",
+      "question": "Geçmiş dönem stratejik planları, hedef gerçekleşme raporları ve kurumsal strateji arşivi kurumsal hafıza olarak nasıl saklanmaktadır?",
+      "description": "Strateji arşivi, geçmiş dönem başarı ve hatalarından ders çıkarılarak yeni sistem tasarımının yapılmasını sağlar.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        { "value": "merkezi_dokuman_yonetimi_ve_arsiv_sisteminde", "label": "Merkezi doküman yönetim sisteminde veya kurumsal portalda versiyonlu ve yetkilendirilmiş olarak saklanır", "allow_note": false, "is_other": false },
+        { "value": "yonetici_bilgisayarlarinda_daginik", "label": "İlgili yöneticilerin kişisel bilgisayarlarında veya e-posta arşivlerinde dağınık olarak bulunmaktadır", "allow_note": true, "is_other": false },
+        { "value": "formal_arsivleme_yapilmiyor", "label": "Geçmiş dönem planları için kurumsal bir arşivleme düzeni bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    },
+    {
+      "id": "STR-047",
+      "order": 47,
+      "process": "Stratejik plan revizyonu, arşiv ve yol haritası",
+      "question": "Şirketin önümüzdeki 3-5 yıllık ERP/CRM dönüşümü, kurumsal gelişim ve sistem modernizasyonu stratejik yol haritası belgelenmiş midir?",
+      "description": "Nihai stratejik yol haritası, ERP/CRM keşif raporunun yönetici özeti ve fazlandırma planının temelini oluşturur.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        { "value": "asamalandirilmis_ve_onaylanmis_yol_haritasi_var", "label": "Evet, fazları, bütçesi, beklenen kazanımları ve kritik kilometre taşları belirlenmiş resmi yol haritası mevcuttur", "allow_note": false, "is_other": false },
+        { "value": "taslak_yol_haritasi_var_onay_bekliyor", "label": "Taslak bir yol haritası ve fazlandırma çalışması yapılmıştır; yönetim onayı aşamasındadır", "allow_note": true, "is_other": false },
+        { "value": "sadece_ilk_faz_planlanmis", "label": "Yalnızca ilk fazın hedefleri düşünülmüş; 3-5 yıllık uzun vadeli yol haritası henüz çıkarılmamıştır", "allow_note": true, "is_other": false },
+        { "value": "yol_haritasi_belgesi_yok", "label": "Resmi olarak belgelenmiş bir stratejik yol haritası bulunmamaktadır", "allow_note": false, "is_other": false },
+        { "value": "other", "label": "Diğer", "allow_note": true, "is_other": true }
+      ]
+    }
+  ]
+}

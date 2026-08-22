@@ -2,8 +2,8 @@
  * Production Runtime Smoke Test & UI Flow Simulator
  *
  * Doğrulamalar:
- * 1. CANONICAL_QUESTION_PACKS manifest doğruluğu (32 paket)
- * 2. 32 paketin tamamının loadQuestionPack() ile hatasız yüklenmesi
+ * 1. CANONICAL_QUESTION_PACKS manifest doğruluğu (33 paket)
+ * 2. 33 paketin tamamının loadQuestionPack() ile hatasız yüklenmesi
  * 3. 5 kritik paket için UI Soru Ekranı yaşam döngüsü:
  *    - Başlat / Devam tetikleme
  *    - Soru ekranı başlatma
@@ -51,11 +51,11 @@ console.log("══════════════════════�
 console.log("PRODUCTION RUNTIME QUESTION PACK SMOKE TEST");
 console.log("══════════════════════════════════════════════════════\n");
 
-// ── BÖLÜM 1: Manifest Envanteri ve Tüm 32 Paketin Yüklenmesi ──
-console.log("=== BÖLÜM 1: 32 Soru Paketi Manifest & Yükleme Denetimi ===");
+// ── BÖLÜM 1: Manifest Envanteri ve Tüm 33 Paketin Yüklenmesi ──
+console.log("=== BÖLÜM 1: 33 Soru Paketi Manifest & Yükleme Denetimi ===");
 const manifestKeys = Object.keys(CANONICAL_QUESTION_PACKS);
 console.log(`Toplam Kayıtlı Paket Sayısı: ${manifestKeys.length}`);
-assert(manifestKeys.length === 32, `Object.keys(CANONICAL_QUESTION_PACKS) tam 32 adet (Bulunan: ${manifestKeys.length})`);
+assert(manifestKeys.length === 33, `Object.keys(CANONICAL_QUESTION_PACKS) tam 33 adet (Bulunan: ${manifestKeys.length})`);
 
 const packSummaryTable: Array<{ packId: string; bfCode: string; name: string; qCount: number; loadOk: boolean }> = [];
 

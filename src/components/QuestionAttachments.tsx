@@ -29,6 +29,7 @@ import {
   Table,
   RefreshCw,
   AlertTriangle,
+  FolderOpen,
 } from "lucide-react";
 import type { QuestionAttachment } from "../types";
 import {
@@ -38,7 +39,11 @@ import {
   readAttachmentFile,
   EXTENSION_TO_MIME,
 } from "../storage/attachmentManager";
-import { openAttachment, attachmentExists } from "../storage/attachmentLinks";
+import {
+  openAttachment,
+  attachmentExists,
+  showAttachmentInFolder,
+} from "../storage/attachmentLinks";
 
 interface QuestionAttachmentsProps {
   projectId: string;
@@ -271,6 +276,18 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
     } catch (err: any) {
       console.error("Dosya açma hatası:", err);
       setErrorMessage(`Dosya açılamadı: ${err?.message || err}`);
+    }
+  };
+
+  const handleShowInFolder = async (att: QuestionAttachment) => {
+    try {
+      const result = await showAttachmentInFolder(att.relative_path);
+      if (!result.success) {
+        setErrorMessage(result.error || "Klasör açılamadı.");
+      }
+    } catch (err: any) {
+      console.error("Klasörde gösterme hatası:", err);
+      setErrorMessage(`Klasör açılamadı: ${err?.message || err}`);
     }
   };
 
@@ -553,15 +570,26 @@ export const QuestionAttachments: React.FC<QuestionAttachmentsProps> = ({
                       </button>
                     )
                   ) : (
-                    <button
-                      type="button"
-                      className="btn btn--ghost btn--xs"
-                      onClick={() => handleOpenFile(att)}
-                      title="Dosyayı Görüntüle / Aç"
-                      style={{ padding: "0.2rem 0.35rem" }}
-                    >
-                      <ExternalLink size={13} />
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--xs"
+                        onClick={() => handleOpenFile(att)}
+                        title="Dosyayı Görüntüle / Aç"
+                        style={{ padding: "0.2rem 0.35rem" }}
+                      >
+                        <ExternalLink size={13} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn--ghost btn--xs"
+                        onClick={() => handleShowInFolder(att)}
+                        title="Dosyayı Klasörde Göster"
+                        style={{ padding: "0.2rem 0.35rem" }}
+                      >
+                        <FolderOpen size={13} />
+                      </button>
+                    </>
                   )}
 
                   {!readOnly && (

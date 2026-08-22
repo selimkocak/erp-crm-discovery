@@ -89,12 +89,25 @@ fn show_attachment_in_folder(path: String) -> Result<(), String> {
     }
 }
 
+use tauri::Manager;
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_sql::Builder::default().build())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .setup(|app| {
+            // Managed Attachment Vault kök klasörünü açılışta otomatik oluştur:
+            // Windows: %LOCALAPPDATA%\ERP CRM Discovery\attachment
+            // macOS:   ~/Library/Application Support/ERP CRM Discovery/attachment
+            // Linux:   ~/.local/share/ERP CRM Discovery/attachment
+            if let Ok(local_data) = app.path().local_data_dir() {
+                let vault_root = local_data.join("ERP CRM Discovery").join("attachment");
+                let _ = std::fs::create_dir_all(&vault_root);
+            }
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![open_attachment_path, show_attachment_in_folder])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

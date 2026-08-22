@@ -310,7 +310,7 @@ assert(storedName1 !== storedName2, "Aynı isimli iki dosya için farklı benzer
 console.log("\n=== T13: Storage Security - buildRelativePath ===");
 const builtPath = buildRelativePath("proj_abc", "SALES", "SALES-010", storedName1);
 assert(
-  builtPath === `projects/proj_abc/attachments/SALES/SALES-010/${storedName1}`,
+  builtPath === `attachment/proj_abc/SALES/SALES-010/${storedName1}`,
   `Göreli yol kanonik düzende oluşturuldu: "${builtPath}"`
 );
 assert(!builtPath.includes("\\"), "Yol ayırıcıları kesinlikle ileri slash (/)");

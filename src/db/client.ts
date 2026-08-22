@@ -12,6 +12,7 @@
 
 import Database from "@tauri-apps/plugin-sql";
 import { runMigrations } from "./migrations";
+import { reconcileAndMigrateLegacyAttachments } from "../storage/attachmentMigration";
 import type {
   BusinessFunction,
   CreateProjectPayload,
@@ -51,6 +52,11 @@ export async function getDb(): Promise<Database> {
   try {
     const db = await Database.load("sqlite:erp_discovery.db");
     await runMigrations(db);
+    try {
+      await reconcileAndMigrateLegacyAttachments(db);
+    } catch (migErr) {
+      console.warn("[ERP Discovery] Attachment reconciliation warning:", migErr);
+    }
     dbInstance = db;
     return dbInstance;
   } catch (err) {

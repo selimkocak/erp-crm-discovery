@@ -148,16 +148,28 @@ export function rejectAbsolutePath(pathStr: string): void {
   }
 }
 
+export const MANAGED_VAULT_APP_NAME = "ERP CRM Discovery";
+export const MANAGED_VAULT_DIR_NAME = "attachment";
+
 /**
  * Göreli yolun beklenen kanonik desende olduğunu doğrular.
+ * Standart: attachment/{projectId}/{bfCode}/{questionId}/{storedFileName}
+ * Legacy uyumluluk: projects/{projectId}/attachments/{bfCode}/{questionId}/{storedFileName}
  */
 export function validateRelativePath(relativePath: string): boolean {
   try {
     rejectAbsolutePath(relativePath);
-    if (!relativePath.startsWith("projects/")) return false;
+    if (!relativePath || typeof relativePath !== "string") return false;
     if (relativePath.includes("\\")) return false; // Her zaman standart forward-slash
-    const parts = relativePath.split("/");
-    return parts.length >= 6 && parts[2] === "attachments";
+    if (relativePath.startsWith("attachment/")) {
+      const parts = relativePath.split("/");
+      return parts.length >= 5 && Boolean(parts[1] && parts[2] && parts[3] && parts[4]);
+    }
+    if (relativePath.startsWith("projects/")) {
+      const parts = relativePath.split("/");
+      return parts.length >= 6 && parts[2] === "attachments";
+    }
+    return false;
   } catch {
     return false;
   }
@@ -179,7 +191,7 @@ export function generateStoredFileName(originalFileName: string): string {
 
 /**
  * Standart göreli yolu oluşturur:
- * projects/{projectId}/attachments/{bfCode}/{questionId}/{storedFileName}
+ * attachment/{projectId}/{businessFunctionCode}/{questionId}/{storedFileName}
  */
 export function buildRelativePath(
   projectId: string,
@@ -192,7 +204,7 @@ export function buildRelativePath(
   const cleanQ = sanitizeFileName(questionId);
   const cleanStored = sanitizeFileName(storedFileName);
 
-  return `projects/${cleanProj}/attachments/${cleanBf}/${cleanQ}/${cleanStored}`;
+  return `attachment/${cleanProj}/${cleanBf}/${cleanQ}/${cleanStored}`;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -314,24 +326,75 @@ export function clearMemoryStorage(): void {
 }
 
 /**
- * Tauri'nin kalıcı yerel veri dizinini döner.
- * macOS: ~/Library/Application Support/erp-crm-discovery
- * Windows: C:\Users\<user>\AppData\Local\erp-crm-discovery
- * Linux: ~/.local/share/erp-crm-discovery
+ * Returns the canonical root directory of the Managed Attachment Vault.
+ *
+ * Windows: %LOCALAPPDATA%\ERP CRM Discovery\attachment
+ * macOS:   ~/Library/Application Support/ERP CRM Discovery/attachment
+ * Linux:   ~/.local/share/ERP CRM Discovery/attachment
  */
-export async function getManagedVaultBaseDir(): Promise<string> {
+export async function getManagedAttachmentRoot(): Promise<string> {
   try {
-    const { appLocalDataDir, appDataDir } = await import("@tauri-apps/api/path");
-    if (typeof appLocalDataDir === "function") {
-      return await appLocalDataDir();
+    const { localDataDir, appLocalDataDir } = await import("@tauri-apps/api/path");
+    if (typeof localDataDir === "function") {
+      const base = await localDataDir();
+      if (base) {
+        const cleanBase = base.replace(/[/\\]+$/, "").replace(/\\/g, "/");
+        return `${cleanBase}/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+      }
     }
-    if (typeof appDataDir === "function") {
-      return await appDataDir();
+    if (typeof appLocalDataDir === "function") {
+      const appLocal = await appLocalDataDir();
+      if (appLocal) {
+        const clean = appLocal.replace(/[/\\]+$/, "").replace(/\\/g, "/");
+        if (clean.includes("com.erpcrm.discovery")) {
+          const parent = clean.substring(0, clean.lastIndexOf("/"));
+          return `${parent}/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+        }
+        if (!clean.endsWith(`/${MANAGED_VAULT_APP_NAME}`)) {
+          return `${clean}/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+        }
+        return `${clean}/${MANAGED_VAULT_DIR_NAME}`;
+      }
     }
   } catch {
-    // Tauri mevcut değilse fallback
+    // Non-Tauri / test fallback
   }
-  return "/app-data";
+
+  // Node.js / process.env fallback for tests and CLI runners
+  if (typeof process !== "undefined" && process.env) {
+    if (process.env.LOCALAPPDATA) {
+      const local = process.env.LOCALAPPDATA.replace(/[/\\]+$/, "").replace(/\\/g, "/");
+      return `${local}/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+    }
+    if (process.env.XDG_DATA_HOME) {
+      const xdg = process.env.XDG_DATA_HOME.replace(/[/\\]+$/, "").replace(/\\/g, "/");
+      return `${xdg}/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+    }
+    if (process.env.HOME) {
+      const home = process.env.HOME.replace(/[/\\]+$/, "").replace(/\\/g, "/");
+      return `${home}/.local/share/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+    }
+  }
+
+  return `/app-data/${MANAGED_VAULT_APP_NAME}/${MANAGED_VAULT_DIR_NAME}`;
+}
+
+export async function getManagedVaultBaseDir(): Promise<string> {
+  return await getManagedAttachmentRoot();
+}
+
+/**
+ * Uygulama açılışında Managed Attachment Vault kök klasörünün varlığını garantiye alır.
+ */
+export async function ensureManagedAttachmentVaultRoot(): Promise<string> {
+  const root = await getManagedAttachmentRoot();
+  try {
+    const { mkdir } = await import("@tauri-apps/plugin-fs");
+    await mkdir(root, { recursive: true });
+  } catch {
+    // Test / web fallback
+  }
+  return root;
 }
 
 export async function saveAttachmentFile(
@@ -342,8 +405,14 @@ export async function saveAttachmentFile(
 
   try {
     const { writeFile, mkdir } = await import("@tauri-apps/plugin-fs");
-    const baseDir = await getManagedVaultBaseDir();
-    const fullPath = `${baseDir}/${relativePath}`.replace(/\/+/g, "/");
+    const vaultRoot = await getManagedAttachmentRoot();
+    const cleanRel = relativePath.startsWith("attachment/")
+      ? relativePath.substring("attachment/".length)
+      : relativePath.startsWith("projects/")
+      ? relativePath.replace(/^projects\/([^/]+)\/attachments\//, "$1/")
+      : relativePath;
+
+    const fullPath = `${vaultRoot}/${cleanRel}`.replace(/\/+/g, "/");
     const dirPath = fullPath.substring(0, fullPath.lastIndexOf("/"));
 
     await mkdir(dirPath, { recursive: true });
@@ -361,8 +430,14 @@ export async function readAttachmentFile(
 
   try {
     const { readFile } = await import("@tauri-apps/plugin-fs");
-    const baseDir = await getManagedVaultBaseDir();
-    const fullPath = `${baseDir}/${relativePath}`.replace(/\/+/g, "/");
+    const vaultRoot = await getManagedAttachmentRoot();
+    const cleanRel = relativePath.startsWith("attachment/")
+      ? relativePath.substring("attachment/".length)
+      : relativePath.startsWith("projects/")
+      ? relativePath.replace(/^projects\/([^/]+)\/attachments\//, "$1/")
+      : relativePath;
+
+    const fullPath = `${vaultRoot}/${cleanRel}`.replace(/\/+/g, "/");
     return await readFile(fullPath);
   } catch {
     return memoryStorage.get(relativePath) || null;
@@ -376,8 +451,14 @@ export async function deleteAttachmentFile(
 
   try {
     const { remove } = await import("@tauri-apps/plugin-fs");
-    const baseDir = await getManagedVaultBaseDir();
-    const fullPath = `${baseDir}/${relativePath}`.replace(/\/+/g, "/");
+    const vaultRoot = await getManagedAttachmentRoot();
+    const cleanRel = relativePath.startsWith("attachment/")
+      ? relativePath.substring("attachment/".length)
+      : relativePath.startsWith("projects/")
+      ? relativePath.replace(/^projects\/([^/]+)\/attachments\//, "$1/")
+      : relativePath;
+
+    const fullPath = `${vaultRoot}/${cleanRel}`.replace(/\/+/g, "/");
     await remove(fullPath);
   } catch {
     memoryStorage.delete(relativePath);
@@ -385,22 +466,24 @@ export async function deleteAttachmentFile(
 }
 
 /**
- * Proje silindiğinde projeye ait tüm fiziksel kanıt dosyalarını ve klasörünü disktan temizler.
+ * Proje silindiğinde projeye ait tüm fiziksel kanıt dosyalarını ve klasörünü diskten temizler.
  */
 export async function deleteProjectAttachmentsDirectory(
   projectId: string
 ): Promise<void> {
   const cleanProj = sanitizeFileName(projectId);
-  const relProjectDir = `projects/${cleanProj}`;
 
   try {
     const { remove } = await import("@tauri-apps/plugin-fs");
-    const baseDir = await getManagedVaultBaseDir();
-    const fullPath = `${baseDir}/${relProjectDir}`.replace(/\/+/g, "/");
-    await remove(fullPath, { recursive: true });
+    const vaultRoot = await getManagedAttachmentRoot();
+    const projectDir = `${vaultRoot}/${cleanProj}`;
+    await remove(projectDir, { recursive: true });
   } catch {
     for (const key of Array.from(memoryStorage.keys())) {
-      if (key.startsWith(`projects/${cleanProj}/`)) {
+      if (
+        key.startsWith(`attachment/${cleanProj}/`) ||
+        key.startsWith(`projects/${cleanProj}/`)
+      ) {
         memoryStorage.delete(key);
       }
     }

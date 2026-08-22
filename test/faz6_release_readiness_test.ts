@@ -214,10 +214,10 @@ const {
 } = await import('../src/generated/questionPacks.js');
 
 // 1. Pack ID listesi ve mevcudiyet
-assert(AVAILABLE_PACK_IDS.length === 32, `Tam 32 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
-assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 32, `Tam 32 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
+assert(AVAILABLE_PACK_IDS.length === 33, `Tam 33 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
+assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 33, `Tam 33 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
 
-// 2. Tüm 32 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
+// 2. Tüm 33 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
 for (const bfCode of AVAILABLE_BUSINESS_FUNCTION_CODES) {
   assert(hasQuestionPack(bfCode) === true, `hasQuestionPack("${bfCode}") === true`);
   assert(getPackStatus(bfCode) === 'available', `getPackStatus("${bfCode}") === "available"`);
@@ -242,9 +242,18 @@ if (mgtLoad.ok) {
   assert(mgtLoad.pack.questions.length === 47, `MANAGEMENT paketi tam 47 soru içerir (${mgtLoad.pack.questions.length})`);
 }
 
-// 3. Henüz geliştirilmemiş 2 fonksiyon için hasQuestionPack === false ve in_development
+// STRATEGY paketi mevcudiyet ve soru sayısı doğrulaması (FAZ-43)
+assert(hasQuestionPack('STRATEGY') === true, 'hasQuestionPack("STRATEGY") === true');
+assert(getPackStatus('STRATEGY') === 'available', 'getPackStatus("STRATEGY") === "available"');
+const stratLoad = await loadQuestionPack('tr.strategy.core');
+assert(stratLoad.ok === true, 'loadQuestionPack("tr.strategy.core") ok === true');
+if (stratLoad.ok) {
+  assert(stratLoad.pack.questions.length === 47, `STRATEGY paketi tam 47 soru içerir (${stratLoad.pack.questions.length})`);
+}
+
+// 3. Henüz geliştirilmemiş 1 fonksiyon için hasQuestionPack === false ve in_development
 const unreadyCodes = [
-  'STRATEGY', 'TRAINING'
+  'TRAINING'
 ];
 for (const code of unreadyCodes) {
   assert(hasQuestionPack(code) === false, `Unready fonksiyon hasQuestionPack("${code}") === false`);
