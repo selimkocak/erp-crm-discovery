@@ -278,5 +278,12 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `ALTER TABLE question_attachments ADD COLUMN source_absolute_path TEXT;`,
       `ALTER TABLE question_attachments ADD COLUMN imported_at TEXT;`
     ]
+  },
+  {
+    version: 9,
+    description: "Managed Attachment Vault Privacy & Portability: Purge source_absolute_path",
+    sql: [
+      `UPDATE question_attachments SET source_absolute_path = NULL WHERE source_absolute_path IS NOT NULL;`
+    ]
   }
 ] as const;

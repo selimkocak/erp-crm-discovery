@@ -1,10 +1,10 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.0 | Git Durumu: FAZ-42 Mühürlü + Windows Attachment Hotfix (Temiz Çalışma Ağacı)
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz42_management_and_windows_hotfix_2026_08_21
-Doğrulama Durumu: 52 Test Paketinde 1.673+ Test %100 PASS, npm run build (0 Hata), cargo check (0 Hata)
-Git HEAD: 5a1ced6 (main = origin/main)
+Mevcut Sürüm: v0.1.0 (Release Candidate 1) | Git Durumu: 34 Paket Tamamlandı + Soru Navigatörü Ek Göstergesi + Semantik Buton Sistemi + Managed Vault Windows Native İkiz Kopya + Kalite Denetimi Mühürlü (Temiz Çalışma Ağacı)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_navigator_attachment_and_quality_audit_2026_08_22
+Doğrulama Durumu: 55 Test Paketinde 1.750+ Test %100 PASS, npm run build (0 Hata, Vite 1921 modül), cargo check (0 Hata)
+Git HEAD: 5e0b9fa (main = origin/main)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
@@ -12,20 +12,28 @@ Git HEAD: 5a1ced6 (main = origin/main)
 - Temel Konumlandırma: Field-first · Data-first · Analysis-first · Offline-first · Evidence-first · Human-led. Bu proje bir AI uygulaması değildir; AI modeli, tahmin veya otomatik yorum içermez; çekirdek uygulamanın sıfır bulut bağımlılığı vardır.
 - Kabuk: Tauri 2 (Rust) + React 18 + TypeScript + Vite + Vanilla CSS (Design Tokens) + Lucide Icons
 - Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 16 Kanonik Tablo, 8 Migrasyon (Tauri plugin-sql)
-- Soru Motoru: 33 Kanonik Fonksiyon kataloğu, 32 Kanonik Soru Paketi (1.398 Soru, ~689 Zorunlu, 176+ Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Soru Motoru: 33 Kanonik Fonksiyon kataloğu, 34 Kanonik Soru Paketi (1.492 Soru, ~800 Zorunlu, 200+ Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Soru Navigatöründe Ek Dosyası Göstergesi & Filtresi: Soru navigatöründe kanıt dosyası ekli soruların yanında `📎` (tekil) veya `📎 N` (çoklu dosya) rozeti; `Ekli (N)` / `data-filter="attachments"` filtre sekmesi; ek dosya adı ve ek açıklamasına göre canlı arama; dinamik ekleme/silme reaktivitesi; bayraklarla (Sarı/Kırmızı) simetrik ve çakışmasız çalışma (`pointer-events: none`, `flex-shrink: 0`)
+- Semantik Kurumsal Buton Renk Sistemi: İşleve göre açıkça ayrışan renk sistemi:
+  · Başlat: Mavi (`#2563eb`, `.button--start`)
+  · Devam: Turkuaz / Teal (`#0f766e`, `.button--continue`)
+  · Rapor Önizleme: Koyu İndigo (`#4f46e5`, `.button--report`)
+  · Kaydet ve Çık: Koyu Zümrüt Yeşili (`#15803d` / `#047857`, 5.48:1 WCAG AA, `.button--save`)
+  · Sonraki: Mavi (`.button--next`)
+  · Önceki / Geri: Nötr gri (`.button--back`)
+  · Kritik / Sil: Kırmızı (`.button--danger`)
 - Tek Seçimli Sorularda Seçimi Kaldırma (Clear Selection): Platform bağımsız React mimarisinde (QuestionCard, ChoiceOption) görünür ikincil "Seçimi kaldır" butonu ve Escape klavye dinleyicisi; seçimi selected: [] yaparak soruyu cevapsız duruma döndürme, SQLite kalıcılığı ve ilerleme sayacını anında düşürme; bayraklı zorunlu cevapsız soruda Sonraki ile geçebilme, bayraksızken ilerlemeyi açıklayıcı uyarıyla engelleme; checkbox çoklu seçim bağımsızlığını koruma
 - Semantik Katman: Bulgular (Findings), Gereksinimler (Requirements), Riskler (Risks), Proje Notları (Notes)
 - Takip & Navigasyon: 🟡 Sonra Dön (revisit) & 🔴 Kritik Takip (critical) Bayrakları, Proje Özel Soruları (project_custom_questions), Sol Soru Navigatörü, Autosave & Resumable Analiz
 - Soru Ekranı Üst Bar & Geometrik Simetri: .question-screen-toolbar 3-kolonlu CSS Grid (190px / 240px / auto), buton min-width sınırları (.btn-save-exit 142px zümrüt #047857 WCAG AA 5.48:1, .btn-nav-home 150px, .btn-custom-question 126px, .btn-interim-report 118px), .flag-actions 2-kolon simetrik grid, .active-flag-banner ve .followup-modal-container (560px max / 420px min)
-- Rapor Önizleme Özel Aksiyonu: Koyu indigo (#4f46e5, hover #4338ca) dolgu ve FileText ikonu ile ara rapordan ayrıştırılmış ana çıktı tasarımı
-- Managed Attachment Vault (Yönetilen Kanıt Kasası): Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/projects/{projectId}/attachments/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration v8), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF file:///... hyperlink garantisi
-- Attachment Hyperlink Mimarisi (HOTFIX sonrası): openAttachment() → resolveAttachmentAbsolutePath() (relative→appLocalDataDir→backslash native) → invoke("open_attachment_path") → Rust explorer.exe (Windows) / open (macOS) / xdg-open (Linux). DOCX/PDF: resolveAttachmentFileUrlFromRelative() ile async runtime çözümleme. file:///C:/... (RFC-8089, 3 slash). Path traversal: validateRelativePath() + ".." segment normalizasyonu çift katman.
+- Managed Attachment Vault (Yönetilen Kanıt Kasası): Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/ERP CRM Discovery/attachment/{projectId}/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration v8), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF file:///... hyperlink garantisi
+- Attachment Hyperlink Mimarisi: openAttachment() → resolveAttachmentAbsolutePath() (relative→appLocalDataDir→backslash native) → invoke("open_attachment_path") → Rust explorer.exe (Windows) / open (macOS) / xdg-open (Linux). DOCX/PDF: resolveAttachmentFileUrlFromRelative() ile async runtime çözümleme. file:///C:/... (RFC-8089, 3 slash). Path traversal: validateRelativePath() + ".." segment normalizasyonu çift katman.
 - Raporlama Motoru (Tek Doğruluk Kaynağı): ReportModel üzerinden Rapor Önizleme, Word (.docx) ve Gömülü Liberation Sans TrueType Unicode PDF (.pdf) üretimi (Türkçe karakter garantili, sıfır ağ bağımlılığı)
 - Dağıtım Paketleri: Windows (x64 NSIS Setup .exe) ve macOS Apple Silicon (aarch64 DMG + .app)
 - Kurulum Rehberleri: Kök dizinde ve artifact ZIP'lerinde WINDOWS_KURULUM_YARDIMI.txt & MACOS_KURULUM_YARDIMI.txt
 
 ======================================================================
-2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-42)
+2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-44 & RC1 STABİLİZASYONU)
 ======================================================================
 - FAZ-1 / FAZ-2.2: 31/32 Fonksiyon, soru paketi motoru, SQLite tohumlama ve clean install
 - FAZ-3: Semantik analiz katmanı (Bulgu, Gereksinim, Risk, Not)
@@ -67,97 +75,75 @@ Git HEAD: 5a1ced6 (main = origin/main)
 - FAZ-39: IMPORT — İthalat ve Gümrük Yönetimi Soru Paketi (tr.import.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching, Landed Cost maliyet dağıtımı & GÇB/GTİP takibi)
 - FAZ-40: EXPORT — İhracat ve Dış Ticaret Soru Paketi (tr.export.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
 - FAZ-41: ECOMMERCE — E-Ticaret ve Dijital Satış Soru Paketi (tr.ecommerce.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-42: MANAGEMENT — Genel Yönetim ve Kurumsal Yönetişim Soru Paketi (tr.management.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching) [BU OTURUMDA TAMAMLANDI]
-- HOTFIX: Windows Attachment Hyperlink — file:/// RFC-8089 üçlü-slash fix, resolveAttachmentFileUrlFromRelative async çözümleme, explorer.exe opener, ".." path traversal guard [BU OTURUMDA TAMAMLANDI]
+- FAZ-42: MANAGEMENT — Genel Yönetim ve Kurumsal Yönetişim Soru Paketi (tr.management.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
+- FAZ-43: STRATEGY — Stratejik Planlama Soru Paketi (tr.strategy.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
+- FAZ-44: TRAINING — Eğitim ve Gelişim Soru Paketi (tr.training.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
+- FAZ-45 (RC1 Stabilizasyon & Kalite Mühürleme):
+  · Soru Navigatöründe Ek Göstergesi (📎 / 📎 N), Ekli Sorular Filtre Sekmesi ve Arama
+  · Kurumsal Semantik Buton Renk Sistemi (Mavi Başlat, Teal Devam, İndigo Rapor, Zümrüt Kaydet)
+  · Windows Managed Attachment Vault Native Rust Motoru & Fiziksel Bütünlük Güvencesi
+  · 34 Paketlik Külliyat Bağımsız Kalite Denetimi & Süreç/Handle Teşhisi
 
 ======================================================================
-3. AKTİF KÜLLİYAT VE MODÜL SIRASI
+3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (34 PAKET / 1.492 SORU — %100 TAMAMLANDI)
 ======================================================================
-- Mevcut Tamamlanan Külliyat (32 Modül / 1.398 Soru):
-  1.  SALES (38 Soru) [Kabul Edildi]
-  2.  PROCUREMENT (40 Soru) [Kabul Edildi]
-  3.  WAREHOUSE (38 Soru) [Kabul Edildi]
-  4.  INVENTORY (37 Soru) [Kabul Edildi]
-  5.  LOGISTICS (37 Soru) [Kabul Edildi]
-  6.  ACCOUNTING (42 Soru) [Kabul Edildi]
-  7.  TREASURY (42 Soru) [Kabul Edildi]
-  8.  BUDGET_REPORTING (42 Soru) [Kabul Edildi]
-  9.  REPORTING_ANALYTICS (42 Soru) [Kabul Edildi]
-  10. CRM (42 Soru) [Kabul Edildi]
-  11. PROPOSALS (42 Soru) [Kabul Edildi]
-  12. MARKETING (42 Soru) [Kabul Edildi]
-  13. SUPPLIER_MANAGEMENT (42 Soru) [Kabul Edildi]
-  14. QUALITY (42 Soru) [Kabul Edildi]
-  15. MAINTENANCE (42 Soru) [Kabul Edildi]
-  16. PRODUCTION_PLANNING (44 Soru) [Kabul Edildi]
-  17. WORK_ORDERS (45 Soru) [Kabul Edildi]
-  18. COSTING (45 Soru) [Kabul Edildi]
-  19. ASSET_MANAGEMENT (45 Soru) [Kabul Edildi]
-  20. HUMAN_RESOURCES (46 Soru) [Kabul Edildi]
-  21. PAYROLL (47 Soru) [Kabul Edildi]
-  22. LEGAL_COMPLIANCE (46 Soru) [Kabul Edildi]
-  23. IT_INFRASTRUCTURE (47 Soru) [Kabul Edildi]
-  24. MASTER_DATA_MANAGEMENT (47 Soru, Yatay) [Kabul Edildi]
-  25. PROJECT_MANAGEMENT (47 Soru) [Kabul Edildi]
-  26. E_TRANSFORMATION (47 Soru) [Kabul Edildi]
-  27. INVOICING (47 Soru) [Kabul Edildi]
-  28. DOCUMENT_MANAGEMENT (47 Soru) [Kabul Edildi]
-  29. IMPORT (47 Soru) [Kabul Edildi]
-  30. EXPORT (47 Soru) [Kabul Edildi]
-  31. ECOMMERCE (47 Soru) [Kabul Edildi]
-  32. MANAGEMENT (47 Soru, 25 req, 22 opt, 25 süreç, 8 branching) [Kabul Edildi — FAZ-42]
+1.  SALES (38 Soru) [Kabul Edildi]
+2.  PROCUREMENT (40 Soru) [Kabul Edildi]
+3.  WAREHOUSE (38 Soru) [Kabul Edildi]
+4.  INVENTORY (37 Soru) [Kabul Edildi]
+5.  LOGISTICS (37 Soru) [Kabul Edildi]
+6.  ACCOUNTING (42 Soru) [Kabul Edildi]
+7.  TREASURY (42 Soru) [Kabul Edildi]
+8.  BUDGET_REPORTING (42 Soru) [Kabul Edildi]
+9.  REPORTING_ANALYTICS (42 Soru) [Kabul Edildi]
+10. CRM (42 Soru) [Kabul Edildi]
+11. PROPOSALS (42 Soru) [Kabul Edildi]
+12. MARKETING (42 Soru) [Kabul Edildi]
+13. SUPPLIER_MANAGEMENT (42 Soru) [Kabul Edildi]
+14. QUALITY (42 Soru) [Kabul Edildi]
+15. MAINTENANCE (42 Soru) [Kabul Edildi]
+16. PRODUCTION_PLANNING (44 Soru) [Kabul Edildi]
+17. WORK_ORDERS (45 Soru) [Kabul Edildi]
+18. COSTING (45 Soru) [Kabul Edildi]
+19. ASSET_MANAGEMENT (45 Soru) [Kabul Edildi]
+20. HUMAN_RESOURCES (46 Soru) [Kabul Edildi]
+21. PAYROLL (47 Soru) [Kabul Edildi]
+22. LEGAL_COMPLIANCE (46 Soru) [Kabul Edildi]
+23. IT_INFRASTRUCTURE (47 Soru) [Kabul Edildi]
+24. MASTER_DATA_MANAGEMENT (47 Soru, Yatay) [Kabul Edildi]
+25. PROJECT_MANAGEMENT (47 Soru) [Kabul Edildi]
+26. E_TRANSFORMATION (47 Soru) [Kabul Edildi]
+27. INVOICING (47 Soru) [Kabul Edildi]
+28. DOCUMENT_MANAGEMENT (47 Soru) [Kabul Edildi]
+29. IMPORT (47 Soru) [Kabul Edildi]
+30. EXPORT (47 Soru) [Kabul Edildi]
+31. ECOMMERCE (47 Soru) [Kabul Edildi]
+32. MANAGEMENT (47 Soru) [Kabul Edildi]
+33. STRATEGY (47 Soru) [Kabul Edildi]
+34. TRAINING (47 Soru) [Kabul Edildi]
 
-- Henüz Paketi Olmayan Kanonik Fonksiyonlar (2 Modül):
-  1. STRATEGY (Stratejik Planlama)
-  2. TRAINING (Eğitim ve Gelişim)
-
-- Kural: Tek Modül = Tek Faz = Tek Kabul
-- Sıradaki Modül / Faz Adayı: FAZ-43 STRATEGY (Stratejik Planlama) veya FAZ-43 TRAINING (Eğitim ve Gelişim)
-- Çapraz Denetim Kuralı: Cross-Pack Duplication Audit (Kelimeleri değiştirip aynı soruyu tekrar sorma YASAK, net sınır ayrımı zorunlu)
-- MANAGEMENT–STRATEGY sınır notu: "vizyon" keyword MANAGEMENT T16 testinde .includes() ile kontrol ediliyor; "revizyon" gibi kelimeler false positive üretir — STRATEGY paketinde dikkatli kullanılmalı
+- Henüz Paketi Olmayan Kanonik Fonksiyon: 0 (Külliyat %100 tamamlandı)
+- v0.2.0 Teknik Borç Notu: `inventory` ve `invoicing` arasındaki `INV-` öneki çakışması (runtime SQLite composite key ile güvende; v0.2.0'da INVC- önekine migration ile taşınacak)
 
 ======================================================================
-4. KRİTİK API VE TEST NOTLARI (Sonraki Fazlar İçin)
+4. KRİTİK APİ, TEST VE ÇALIŞTIRMA NOTLARI
 ======================================================================
+- Test Çalıştırma Standardı: Testler doğrudan `npm exec -- tsx <test_path>` veya `npm test` ile çalıştırılmalıdır (Global paket veya PATH bağımlılığı yoktur).
+- Open Handle / SQLite WAL Notu: `better-sqlite3` kullanılan testlerde açık kalan veritabanı bağlantıları (`db.close()`) Node event loop'unu askıda tutabilir; testlerde db lifecycle yönetimine dikkat edilmelidir.
 - formatAnswer() dönüş tipi: { isAnswered, selectedOptions, textValue, generalNote, summaryText }
-  → displayText ve noteText YOKTUR
 - ReportModel şeması: { metadata, company, profile, scope[], businessFunctions[], followups[], globalFindings[], globalRequirements[], globalRisks[], projectNotes[], summaryStats }
-  → projectName/companyName/interviewDate gibi flat alanlar YOKTUR, metadata object içindedir
-- businessFunctions[].processes[].questions[] alanları: { id, order, process, questionText, answerType, criticality, formattedAnswer, findings[], requirements[], risks[], notes[] }
-  → question: string değil, questionText: string; required: boolean değil, criticality kullanılır
 - buildDocxBuffer(report: ReportModel) / buildPdfBuffer(report: ReportModel) — tek argüman, async
-- PDFParse kullanımı: new PDFParse({ data: pdfBuf }).getText() — await PDFParse(buf) şeklinde ÇAĞRILAMAZ
-- Branching engine: Map<string, AnswerData> — Record<string, AnswerData> KULLANILMAZ
-- Progress engine: Map<string, AnswerData> — Record<string, AnswerData> KULLANILMAZ
-- adaptCustomQuestionToQuestion: (dbRow: ProjectCustomQuestion, orderIndex: number) — alanlar: analysis_project_id, process_name, question_type, options: string[] (JSON parse edilmiş), vb.
-- loadQuestionPack result: { ok: boolean, pack?: QuestionPack } — if (result.ok) { result.pack.questions } guard zorunlu
+- PDFParse kullanımı: new PDFParse({ data: pdfBuf }).getText()
+- Branching & Progress engine: Map<string, AnswerData> kullanılır
 
 ======================================================================
-5. ATTACHMENT HYPERLINK MİMARİSİ (HOTFIX SONRASI)
+5. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- src/storage/attachmentLinks.ts:
-  · attachmentPathToFileUrl(absPath): RFC-8089 file:///C:/... (3 slash) — absolute path alır
-  · resolveAttachmentAbsolutePath(relativePath, base?): relative→vault→native absolute (Windows: backslash)
-  · resolveAttachmentFileUrlFromRelative(relativePath): DOCX/PDF için — async, runtime appLocalDataDir çözümlemesi
-  · openAttachment(att): invoke("open_attachment_path") → Rust explorer.exe / open / xdg-open
-  · Path traversal: validateRelativePath() false → throw + ".." segment normalizasyonu
-- src-tauri/src/lib.rs: open_attachment_path → explorer.exe (Windows), open (macOS), xdg-open (Linux)
-- src/export/docxExporter.ts: resolveAttachmentFileUrlFromRelative (await, her iki attachment bölümü)
-- src/export/pdfExporter.ts: for...of döngüsü + resolveAttachmentFileUrlFromRelative (await)
-- test/windows_attachment_hyperlink_test.ts: 30/30 PASS (T01–T13)
-
-======================================================================
-6. TEMEL DOĞRULAMA KOMUTLARI
-======================================================================
-- Tüm Testler (52 Suite, 1.673+ Test): npm test
-- FAZ-42 Tekil Test: npx tsx test/faz42_management_question_pack_test.ts
-- Windows Attachment Hotfix Testi: npx tsx test/windows_attachment_hyperlink_test.ts
-- Tekil Test (İthalat & Gümrük): npx tsx test/faz39_import_question_pack_test.ts
-- Tekil Test (Doküman Yönetimi): npx tsx test/faz38_document_management_question_pack_test.ts
-- Tekil Test (Faturalama): npx tsx test/faz37_invoicing_question_pack_test.ts
-- Tekil Test (E-Dönüşüm): npx tsx test/faz36_e_transformation_question_pack_test.ts
-- Tekil Test (Proje Yönetimi): npx tsx test/faz35_project_management_question_pack_test.ts
-- Tekil Test (Ana Veri Yönetimi): npx tsx test/faz34_master_data_management_question_pack_test.ts
+- Tüm Testler (55 Test Suite, 1.750+ Test): npm test
+- Navigatör Ek Göstergesi Testi: npm exec -- tsx test/question_navigator_attachment_indicator_test.ts
+- Windows Managed Vault Bütünlük Testi: npm exec -- tsx test/managed_vault_physical_integrity_test.ts
+- Windows Hyperlink URI Testi: npm exec -- tsx test/windows_attachment_hyperlink_test.ts
+- Semantik Buton Renk Testi: npm exec -- tsx test/ui_button_design_system_test.ts
 - Registry Yenileme: npm run generate
 - Frontend Üretim Derlemesi: npm run build
 - Backend Rust Derlemesi: cargo check --manifest-path src-tauri/Cargo.toml

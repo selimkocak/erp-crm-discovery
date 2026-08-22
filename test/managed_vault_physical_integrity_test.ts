@@ -194,7 +194,7 @@ if (Database) {
     targetSha,
     "Onaylı Tedarikçi Teklifi",
     originalFileName,
-    "C:\\Users\\selim\\Downloads\\Satın Alma Teklif Formu.pdf",
+    null, // Mutlak kaynak dosya yolu asla kaydedilmez
     now,
     0,
     now,
@@ -204,6 +204,7 @@ if (Database) {
   const row = db.prepare("SELECT * FROM question_attachments WHERE id = ?").get(attId);
   assert(row !== undefined, "Fiziksel kopya doğrulandıktan sonra SQLite kaydı oluşturuldu");
   assertEqual(row.relative_path, relativePath, "SQLite yalnız relative_path saklıyor");
+  assertEqual(row.source_absolute_path, null, "SQLite source_absolute_path saklamaz (daima NULL)");
   assertEqual(row.sha256, targetSha, "SQLite SHA-256 kaydedildi");
 }
 

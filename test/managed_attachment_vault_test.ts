@@ -81,9 +81,9 @@ async function runTests() {
   clearMemoryStorage();
 
   // ─────────────────────────────────────────────────────────────
-  // T01: Migration 7 & 8 Managed Vault Schema Extensions
+  // T01: Migration 7, 8 & 9 Managed Vault Schema Extensions & Privacy
   // ─────────────────────────────────────────────────────────────
-  console.log("\n=== T01: Migration 7 & 8 Managed Vault Schema Extensions ===");
+  console.log("\n=== T01: Migration 7, 8 & 9 Managed Vault Schema & Privacy ===");
   const migration7 = MIGRATION_DEFINITIONS.find((m) => m.version === 7);
   assert(migration7 !== undefined, "Migration 7 tanımlı");
   const hasAttachmentsTable = migration7?.sql.some((s) =>
@@ -98,12 +98,15 @@ async function runTests() {
     "source_file_name kolonu migration v8'de mevcut"
   );
   assert(
-    migration8?.sql.some((s) => s.includes("source_absolute_path")) === true,
-    "source_absolute_path kolonu migration v8'de mevcut"
-  );
-  assert(
     migration8?.sql.some((s) => s.includes("imported_at")) === true,
     "imported_at kolonu migration v8'de mevcut"
+  );
+
+  const migration9 = MIGRATION_DEFINITIONS.find((m) => m.version === 9);
+  assert(migration9 !== undefined, "Migration 9 (Privacy & Portability: Purge source_absolute_path) tanımlı");
+  assert(
+    migration9?.sql.some((s) => s.includes("SET source_absolute_path = NULL")) === true,
+    "Migration 9 source_absolute_path kolonunu temizliyor"
   );
 
   // ─────────────────────────────────────────────────────────────
@@ -138,7 +141,7 @@ async function runTests() {
       now
     );
 
-    // Insert an attachment with managed metadata
+    // Insert an attachment with managed metadata (source_absolute_path is null)
     const attId = "att_vault_001";
     const relPath = `projects/${PROJ_ID}/attachments/PROCUREMENT/PR-001/uuid123_Teklif_Analizi.pdf`;
     db.prepare(`
@@ -162,7 +165,7 @@ async function runTests() {
       "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "Onaylı Satın Alma Teklifi",
       "Teklif Analizi.pdf",
-      "/Users/selim/Downloads/Teklif Analizi.pdf",
+      null, // Mutlak yol asla kaydedilmez
       now,
       0,
       now,
@@ -173,7 +176,7 @@ async function runTests() {
     assert(inserted !== undefined, "SQLite kaydı başarıyla oluşturuldu");
     assert(inserted.relative_path === relPath, "SQLite'ta göreli yol eksiksiz saklandı");
     assert(inserted.source_file_name === "Teklif Analizi.pdf", "source_file_name saklandı");
-    assert(inserted.source_absolute_path === "/Users/selim/Downloads/Teklif Analizi.pdf", "source_absolute_path saklandı");
+    assert(inserted.source_absolute_path === null, "source_absolute_path gizlilik gereği NULL saklandı (mutlak yol yok)");
 
     // Test Cascade Delete
     db.prepare("DELETE FROM analysis_projects WHERE id = ?").run(PROJ_ID);

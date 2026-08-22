@@ -619,7 +619,7 @@ export async function importFileToManagedVault(
       sha256,
       description: description || null,
       source_file_name: file.name,
-      source_absolute_path: file.sourcePath || null,
+      source_absolute_path: null,
       imported_at: now,
     });
 
@@ -662,7 +662,7 @@ export async function reimportAttachmentFile(
   const relativePath = buildRelativePath(projectId, businessFunctionCode, questionId, storedFileName);
   const resolvedMime = file.type || EXTENSION_TO_MIME[ext] || "application/octet-stream";
 
-  // 1. Fiziksel kasaya yaz
+  // 1. Fiziksel kasaya yaz (kaynak dosya yolu yalnızca bu kopyalama işleminde kullanılır)
   await saveAttachmentFile(relativePath, file.data, file.sourcePath);
 
   // 2. Varlık ve SHA-256 kontrolü
@@ -678,7 +678,7 @@ export async function reimportAttachmentFile(
     throw new Error("Yeniden içe aktarma SHA-256 doğrulaması başarısız oldu.");
   }
 
-  // 3. DB güncelle
+  // 3. DB güncelle (source_absolute_path asla DB'ye yazılmaz, daima null)
   await updateQuestionAttachmentReimport(attachmentId, {
     original_file_name: file.name,
     stored_file_name: storedFileName,
@@ -688,7 +688,7 @@ export async function reimportAttachmentFile(
     file_size: file.size,
     sha256,
     source_file_name: file.name,
-    source_absolute_path: file.sourcePath || null,
+    source_absolute_path: null,
   });
 
   return {
@@ -704,7 +704,7 @@ export async function reimportAttachmentFile(
     file_size: file.size,
     sha256,
     source_file_name: file.name,
-    source_absolute_path: file.sourcePath || null,
+    source_absolute_path: null,
     imported_at: new Date().toISOString(),
     status: "valid",
     sort_order: 0,

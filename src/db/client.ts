@@ -1235,7 +1235,7 @@ export async function addQuestionAttachment(
       payload.sha256,
       payload.description ?? null,
       payload.source_file_name ?? payload.original_file_name,
-      payload.source_absolute_path ?? null,
+      null, // source_absolute_path daima NULL (gizlilik ve taşınabilirlik garantisi)
       importedAt,
       payload.sort_order ?? 0,
       now,
@@ -1257,7 +1257,7 @@ export async function addQuestionAttachment(
     sha256: payload.sha256,
     description: payload.description ?? null,
     source_file_name: payload.source_file_name ?? payload.original_file_name,
-    source_absolute_path: payload.source_absolute_path ?? null,
+    source_absolute_path: null,
     imported_at: importedAt,
     status: "valid",
     sort_order: payload.sort_order ?? 0,
@@ -1297,7 +1297,7 @@ export async function updateQuestionAttachmentReimport(
       updates.file_size,
       updates.sha256,
       updates.source_file_name ?? updates.original_file_name,
-      updates.source_absolute_path ?? null,
+      null, // source_absolute_path daima NULL
       now,
       attachmentId,
     ]
