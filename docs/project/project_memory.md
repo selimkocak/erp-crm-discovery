@@ -91,6 +91,10 @@ Git HEAD: 213d7bc (main = origin/main)
   · Firma Profili Sektör ve Şubeli Yapı Alanları (business_sector, has_branches, branch_count, Migration 10, DOCX/PDF koşullu render)
   · `source_absolute_path` Gizlilik & Taşınabilirlik Mühürü (Migration 9 ile mutlak yolların temizlenmesi, SQLite'a yalnızca relative_path kaydı)
   · 58 Test Paketi %100 PASS (1.800+ test), GitHub Actions 3 Platform (Linux, macOS ARM64, Windows NSIS) Yeşil Mühürleme
+- FAZ-47 (Geliştirici Atfı, Hakkında Modalı & Kök Dizin Kütüphaneci Arşiv Düzenlemesi):
+  · Geliştirici Atfı ve Hakkında Modalı (AboutModal.tsx, Header entegrasyonu, docx/pdf kapanış dipnotları, test/attribution_and_about_test.ts 53/53 PASS, sıfır reklam & sıfır watermark)
+  · Kök Dizin Arşiv Standardı (Kurulum kılavuzları docs/guides/installation/ ve hafıza docs/project/ altına taşındı, CI/CD yolları senkronize edildi, kökte yalnızca 12 standart dosya bırakıldı)
+  · 59 Test Paketi (1.800+ test) %100 PASS, npm run build (1922 modül) 0 hata, cargo check 0 hata, GitHub Actions CI 3/3 Yeşil (Temiz Çalışma Ağacı)
 
 ======================================================================
 3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (34 PAKET / 1.492 SORU — %100 TAMAMLANDI)
@@ -147,7 +151,9 @@ Git HEAD: 213d7bc (main = origin/main)
 ======================================================================
 5. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- Tüm Testler (58 Test Suite, 1.800+ Test): npm test
+- Tüm Testler (59 Test Suite, 1.800+ Test): npm test
+- Windows Test Paritesi (59 Test Suite): npm run test:windows
+- Geliştirici Atfı & Hakkında Kabul Testi: npm exec -- tsx test/attribution_and_about_test.ts
 - Mevcut Proje Düzenleme Kabul Testi: npm exec -- tsx test/project_profile_edit_test.ts
 - Sektör ve Şube Doğrulama Testi: npm exec -- tsx test/company_profile_sector_and_branch_test.ts
 - Navigatör Ek Göstergesi Testi: npm exec -- tsx test/question_navigator_attachment_indicator_test.ts
