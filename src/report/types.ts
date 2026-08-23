@@ -246,6 +246,35 @@ export interface ReportSummaryStats {
   totalAttachmentSizeBytes?: number;
 }
 
+import type {
+  GovernanceObject,
+  GovernanceResponsibility,
+  GovernanceAuthorization,
+  GovernanceLimit,
+  GovernanceSodRisk,
+  GovernanceAttachment,
+} from "../types/governance";
+
+export interface ReportGovernanceModel {
+  summary: {
+    totalObjects: number;
+    unassignedOwnerCount: number;
+    unassignedStewardCount: number;
+    criticalSodRiskCount: number;
+    totalSodRisks: number;
+    discrepancyCount: number;
+    totalAuthorizations: number;
+    totalLimits: number;
+    totalAttachments: number;
+  };
+  objects: GovernanceObject[];
+  responsibilities: GovernanceResponsibility[];
+  authorizations: GovernanceAuthorization[];
+  limits: GovernanceLimit[];
+  sodRisks: GovernanceSodRisk[];
+  attachments: GovernanceAttachment[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -254,10 +283,12 @@ export interface ReportModel {
   businessFunctions: ReportBusinessFunction[];
   followups?: ReportFollowupItem[];
   attachments?: ReportAttachmentItem[];
+  governance?: ReportGovernanceModel;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];
   projectNotes: ReportProjectNote[];
   summaryStats: ReportSummaryStats;
 }
+
 

@@ -328,3 +328,5 @@ export interface AttachmentSummaryStats {
   totalAttachmentSizeBytes: number;
 }
 
+export * from './governance';
+

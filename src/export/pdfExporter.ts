@@ -412,12 +412,105 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY += 4;
   }
 
-  // ── Section 5: Proje Notları & Açık Konular ───────────────────────────────
+  // ── Section 5: Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi (FAZ-46) ──
+  if (report.governance) {
+    checkPageBreak(30);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("5. Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi", marginX, currentY);
+    currentY += 6;
+
+    // 5.1 Sorumluluk Matrisi
+    if (report.governance.responsibilities.length > 0) {
+      checkPageBreak(25);
+      const respRows = report.governance.responsibilities.map((r) => [
+        `${r.object_name_tr}\n(${r.object_code})`,
+        r.responsibility_type,
+        `${r.subject_name}\n(${r.subject_type})`,
+        r.scope_name || "Tüm Organizasyon",
+        r.state_type === "to_be" ? "Hedef (To-Be)" : "Mevcut (As-Is)",
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Yönetişim Nesnesi", "Sorumluluk Türü", "Atanan Rol / Kişi", "Kapsam", "Model"]],
+        body: respRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 4;
+    }
+
+    // 5.2 Yetki Matrisi
+    if (report.governance.authorizations.length > 0) {
+      checkPageBreak(25);
+      const authRows = report.governance.authorizations.map((a) => {
+        const perms = [
+          a.can_view ? "G" : "-",
+          a.can_create ? "E" : "-",
+          a.can_edit ? "D" : "-",
+          a.can_delete ? "S" : "-",
+          a.can_approve ? "O" : "-",
+          a.can_cancel ? "İ" : "-",
+          a.can_export ? "X" : "-",
+          a.can_view_cost ? "M" : "-",
+        ].join("");
+        return [
+          `${a.subject_name}\n(${a.subject_type})`,
+          a.object_name_tr || a.governance_object_id,
+          a.permission_level,
+          a.has_discrepancy === 1 && a.effective_level ? `Sapma: ${a.effective_level}` : "Yok",
+          perms,
+        ];
+      });
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Özne (Rol/Kişi)", "Yönetişim Nesnesi", "Yetki Seviyesi", "Efektif Sapma", "İzinler"]],
+        body: authRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 4;
+    }
+
+    // 5.3 Görevler Ayrılığı (SoD) Riskleri
+    if (report.governance.sodRisks.length > 0) {
+      checkPageBreak(25);
+      const sodRows = report.governance.sodRisks.map((s) => [
+        s.risk_title,
+        s.risk_severity.toUpperCase(),
+        `A: ${s.conflicting_duty_a}\nB: ${s.conflicting_duty_b}`,
+        s.mitigation_action || s.current_control || "—",
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["SoD Risk Başlığı", "Ciddiyet", "Çatışan Görevler", "Hedef Çözüm / Kontrol"]],
+        body: sodRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [254, 226, 226], textColor: [185, 28, 28], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 4;
+    }
+  }
+
+  // ── Section 6/5: Proje Notları & Açık Konular ───────────────────────────────
   checkPageBreak(30);
   doc.setFont(PDF_FONT_FAMILY, "bold");
   doc.setFontSize(13);
   doc.setTextColor(2, 132, 199);
-  doc.text("5. Proje Notları & Açık Konular", marginX, currentY);
+  doc.text(report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular", marginX, currentY);
   currentY += 6;
 
   // Açık Sorular ve Teyit Bekleyen Saha Başlıkları Tablosu (FAZ-9)

@@ -15,12 +15,14 @@ import {
   BookOpen,
   FileText,
   Pencil,
+  Shield,
 } from "lucide-react";
 import { getProjectDetail, updateProjectBusinessFunction } from "../db/client";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
+import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
 import { loadQuestionPack, getPackIdForFunction, hasQuestionPack } from "../engine/loader";
 import type { QuestionPack } from "../engine/types";
 import type { FunctionStatus, ProjectDetailData } from "../types";
@@ -41,6 +43,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error" | "idle">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [viewMode, setViewMode] = useState<"process" | "governance">("process");
 
   // Question Engine state
   const [activeBfCode, setActiveBfCode] = useState<string | null>(null);
@@ -360,162 +363,213 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         )}
       </div>
 
-      {/* Scope & Selected Business Functions */}
-      <div className="card">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-          <div>
-            <h3 style={{ fontSize: "1.125rem", fontWeight: 700 }}>Analiz Kapsamındaki İş Fonksiyonları</h3>
-            <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
-              Toplam {functions.length} iş fonksiyonu seçilmiştir. Departman eşleştirmelerini ve sorumlu kişileri güncelleyebilirsiniz.
-            </p>
-          </div>
-
-          {/* Quick Stats Badges */}
-          <div style={{ display: "flex", gap: "0.5rem" }}>
-            <span className="badge badge-not-started">
-              <CircleDot size={12} /> {notStartedCount} Başlanmadı
-            </span>
-            <span className="badge badge-in-progress">
-              <Clock size={12} /> {inProgressCount} Devam Ediyor
-            </span>
-            <span className="badge badge-completed">
-              <CheckCircle2 size={12} /> {completedCount} Tamamlandı
-            </span>
-          </div>
-        </div>
-
-        <div className="table-container">
-          {packError && (
-            <div className="pack-error-banner">
-              <AlertCircle size={16} />
-              {packError}
-            </div>
-          )}
-          <table className="custom-table">
-            <thead>
-              <tr>
-                <th style={{ width: "22%" }}>Standart İş Fonksiyonu</th>
-                <th style={{ width: "18%" }}>Kategori</th>
-                <th style={{ width: "22%" }}>Firma İçi Departman Adı</th>
-                <th style={{ width: "18%" }}>Sorumlu / Görüşülen Kişi</th>
-                <th style={{ width: "8%" }}>Durum</th>
-                <th style={{ width: "12%" }}>Analiz</th>
-              </tr>
-            </thead>
-            <tbody>
-              {functions.map((fn) => (
-                <tr key={fn.id}>
-                  <td>
-                    <div>
-                      <strong style={{ color: "var(--text-primary)", display: "block" }}>
-                        {fn.name_tr}
-                      </strong>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                        {fn.code} • {fn.name_en}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span style={{ fontSize: "0.8125rem", color: "var(--text-secondary)" }}>
-                      {fn.category}
-                    </span>
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      style={{ padding: "0.375rem 0.625rem", fontSize: "0.8125rem" }}
-                      placeholder="Örn: Fabrika Müdürlüğü"
-                      defaultValue={fn.company_department_name || ""}
-                      onBlur={(e) =>
-                        handleFunctionFieldChange(
-                          fn.id,
-                          "company_department_name",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      style={{ padding: "0.375rem 0.625rem", fontSize: "0.8125rem" }}
-                      placeholder="Örn: Ahmet Yılmaz (Müdür)"
-                      defaultValue={fn.responsible_person || ""}
-                      onBlur={(e) =>
-                        handleFunctionFieldChange(
-                          fn.id,
-                          "responsible_person",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                  <td>
-                    <select
-                      className="form-control"
-                      style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem", width: "auto" }}
-                      value={fn.status}
-                      onChange={(e) =>
-                        handleFunctionFieldChange(
-                          fn.id,
-                          "status",
-                          e.target.value as FunctionStatus
-                        )
-                      }
-                    >
-                      <option value="not_started">Başlanmadı</option>
-                      <option value="in_progress">Devam Ediyor</option>
-                      <option value="completed">Tamamlandı</option>
-                    </select>
-                  </td>
-                  <td>
-                    {hasQuestionPack(fn.code) ? (
-                      <button
-                        className={`btn ${fn.status === "not_started" ? "btn--start" : "btn--continue"} btn--sm`}
-                        disabled={packLoadingCode === fn.code}
-                        onClick={() => handleStartAnalysis(fn.code, fn.name_tr)}
-                        title={fn.status === "not_started" ? "Analizi Başlat" : "Analize Devam Et"}
-                      >
-                        {packLoadingCode === fn.code ? (
-                          <span className="btn__spinner" />
-                        ) : fn.status === "not_started" ? (
-                          <><Play size={13} /> Başlat</>
-                        ) : (
-                          <><BookOpen size={13} /> Devam</>
-                        )}
-                      </button>
-                    ) : (
-                      <span
-                        className="badge badge--neutral"
-                        title="Bu iş fonksiyonunun soru paketi hazırlanma aşamasındadır"
-                        style={{
-                          fontSize: "0.75rem",
-                          padding: "0.25rem 0.5rem",
-                          borderRadius: "4px",
-                          background: "var(--color-neutral-100)",
-                          color: "var(--color-neutral-500)",
-                          border: "1px solid var(--color-neutral-200)",
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                          cursor: "default",
-                        }}
-                      >
-                        Hazırlanıyor
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* FAZ-3: Semantic Analysis Layer (Findings, Requirements, Risks, Notes) */}
-        <SemanticSummarySection projectId={projectId} />
+      {/* View Mode Tabs (Süreç Analizi & Veri/Yetki Yönetişimi) */}
+      <div className="project-view-mode-tabs" style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem" }}>
+        <button
+          type="button"
+          className={`btn ${viewMode === "process" ? "btn-primary" : "btn-secondary"}`}
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1.25rem", fontWeight: 600 }}
+          onClick={() => setViewMode("process")}
+        >
+          <FileText size={16} />
+          <span>Süreç Analizi ({functions.length} Fonksiyon)</span>
+        </button>
+        <button
+          type="button"
+          className={`btn ${viewMode === "governance" ? "btn-primary" : "btn-secondary"}`}
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1.25rem", fontWeight: 600 }}
+          onClick={() => setViewMode("governance")}
+        >
+          <Shield size={16} />
+          <span>Veri ve Yetki Yönetişimi</span>
+        </button>
       </div>
+
+      {viewMode === "process" ? (
+        /* Scope & Selected Business Functions */
+        <div className="card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+            <div>
+              <h3 style={{ fontSize: "1.125rem", fontWeight: 700 }}>Analiz Kapsamındaki İş Fonksiyonları</h3>
+              <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+                Toplam {functions.length} iş fonksiyonu seçilmiştir. Departman eşleştirmelerini ve sorumlu kişileri güncelleyebilirsiniz.
+              </p>
+            </div>
+
+            {/* Quick Stats Badges */}
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              <span className="badge badge-not-started">
+                <CircleDot size={12} /> {notStartedCount} Başlanmadı
+              </span>
+              <span className="badge badge-in-progress">
+                <Clock size={12} /> {inProgressCount} Devam Ediyor
+              </span>
+              <span className="badge badge-completed">
+                <CheckCircle2 size={12} /> {completedCount} Tamamlandı
+              </span>
+            </div>
+          </div>
+
+          <div className="table-container">
+            {packError && (
+              <div className="pack-error-banner">
+                <AlertCircle size={16} />
+                {packError}
+              </div>
+            )}
+            <table className="custom-table">
+              <thead>
+                <tr>
+                  <th style={{ width: "22%" }}>Standart İş Fonksiyonu</th>
+                  <th style={{ width: "18%" }}>Kategori</th>
+                  <th style={{ width: "22%" }}>Firma İçi Departman Adı</th>
+                  <th style={{ width: "18%" }}>Sorumlu / Görüşülen Kişi</th>
+                  <th style={{ width: "8%" }}>Durum</th>
+                  <th style={{ width: "12%" }}>Analiz</th>
+                </tr>
+              </thead>
+              <tbody>
+                {functions.map((fn) => (
+                  <tr key={fn.id}>
+                    <td>
+                      <div>
+                        <strong style={{ color: "var(--text-primary)", display: "block" }}>
+                          {fn.name_tr}
+                        </strong>
+                        <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                          {fn.code} • {fn.name_en}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span style={{ fontSize: "0.8125rem", color: "var(--text-secondary)" }}>
+                        {fn.category}
+                      </span>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control"
+                        style={{ padding: "0.375rem 0.625rem", fontSize: "0.8125rem" }}
+                        placeholder="Örn: Fabrika Müdürlüğü"
+                        defaultValue={fn.company_department_name || ""}
+                        onBlur={(e) =>
+                          handleFunctionFieldChange(
+                            fn.id,
+                            "company_department_name",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        className="form-control"
+                        style={{ padding: "0.375rem 0.625rem", fontSize: "0.8125rem" }}
+                        placeholder="Örn: Ahmet Yılmaz (Müdür)"
+                        defaultValue={fn.responsible_person || ""}
+                        onBlur={(e) =>
+                          handleFunctionFieldChange(
+                            fn.id,
+                            "responsible_person",
+                            e.target.value
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <select
+                        className="form-control"
+                        style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem" }}
+                        value={fn.status}
+                        onChange={(e) =>
+                          handleFunctionFieldChange(
+                            fn.id,
+                            "status",
+                            e.target.value as FunctionStatus
+                          )
+                        }
+                      >
+                        <option value="not_started">Başlanmadı</option>
+                        <option value="in_progress">Devam Ediyor</option>
+                        <option value="completed">Tamamlandı</option>
+                      </select>
+                    </td>
+                    <td>
+                      {hasQuestionPack(fn.code) ? (
+                        <button
+                          className={`btn ${
+                            fn.status === "completed"
+                              ? "btn--secondary"
+                              : fn.status === "in_progress"
+                              ? "btn--continue"
+                              : "btn--start"
+                          } btn--sm`}
+                          onClick={() => handleStartAnalysis(fn.code, fn.name_tr)}
+
+                          disabled={packLoadingCode === fn.code}
+                          style={{
+                            minWidth: "90px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "0.25rem",
+                          }}
+                        >
+                          {packLoadingCode === fn.code ? (
+                            "Yükleniyor..."
+                          ) : fn.status === "completed" ? (
+                            <>
+                              <BookOpen size={13} /> İncele
+                            </>
+                          ) : fn.status === "in_progress" ? (
+                            <>
+                              <Play size={13} /> Devam Et
+                            </>
+                          ) : (
+                            <>
+                              <Play size={13} /> Başlat
+                            </>
+                          )}
+                        </button>
+                      ) : (
+                        <span
+                          className="badge badge--neutral"
+                          title="Bu iş fonksiyonunun soru paketi hazırlanma aşamasındadır"
+                          style={{
+                            fontSize: "0.75rem",
+                            padding: "0.25rem 0.5rem",
+                            borderRadius: "4px",
+                            background: "var(--color-neutral-100)",
+                            color: "var(--color-neutral-500)",
+                            border: "1px solid var(--color-neutral-200)",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                            cursor: "default",
+                          }}
+                        >
+                          Hazırlanıyor
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* FAZ-3: Semantic Analysis Layer (Findings, Requirements, Risks, Notes) */}
+          <SemanticSummarySection projectId={projectId} />
+        </div>
+      ) : (
+        <GovernanceDashboardView
+          projectId={projectId}
+          projectName={project.name}
+          companyName={company.company_name}
+        />
+      )}
     </div>
   );
 };

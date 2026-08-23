@@ -26,6 +26,8 @@ import {
   X,
   FolderOpen,
 } from "lucide-react";
+
+
 import { buildReportModel } from "../report/builder";
 import type { ReportModel, ReportAttachmentItem } from "../report/types";
 import { ReportProfileModal } from "../components/ReportProfileModal";
@@ -321,10 +323,16 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 </a>
               ))}
             </div>
+            {report.governance && (
+              <a href="#sec-governance" className="report-toc__link">
+                5. Veri Sahipliği ve Yönetişim
+              </a>
+            )}
             <a href="#sec-notes" className="report-toc__link">
-              5. Proje Notları & Açık Konular
+              {report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular"}
             </a>
           </nav>
+
         </aside>
 
         {/* ── Main Report Document ──────────────────────────────────────── */}
@@ -820,12 +828,212 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             ))}
           </section>
 
-          {/* ── Bölüm 5: Proje Notları & Açık Konular ───────────────────── */}
+          {/* ── Bölüm 5: Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi (FAZ-46) ── */}
+          {report.governance && (
+            <section id="sec-governance" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">BÖLÜM 5</span>
+                <h2 className="report-section__title">Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi</h2>
+              </div>
+
+              {/* Yönetişim KPI Özeti */}
+              <div className="report-kpi-band" style={{ marginBottom: "1rem" }}>
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count">{report.governance.summary.totalObjects}</span>
+                  <span className="report-kpi-band__label">Yönetişim Nesnesi</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.governance.summary.unassignedOwnerCount > 0 ? "text-danger" : ""}`}>
+                    {report.governance.summary.unassignedOwnerCount}
+                  </span>
+                  <span className="report-kpi-band__label">Sahipsiz Veri (Owner Yok)</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.governance.summary.criticalSodRiskCount > 0 ? "text-danger" : ""}`}>
+                    {report.governance.summary.criticalSodRiskCount}
+                  </span>
+                  <span className="report-kpi-band__label">Kritik SoD Riski</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count">{report.governance.summary.discrepancyCount}</span>
+                  <span className="report-kpi-band__label">Yetki Sapması</span>
+                </div>
+              </div>
+
+              {/* Sorumluluk ve Veri Sahipliği Matrisi */}
+              {report.governance.responsibilities.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
+                  <h3 className="report-summary-box__title">5.1 Veri Sahipliği ve Rol Matrisi</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th>Yönetişim Nesnesi</th>
+                          <th>Sorumluluk Türü</th>
+                          <th>Atanan Özne (Kişi/Rol)</th>
+                          <th>Kapsam</th>
+                          <th>Model</th>
+                          <th>Notlar</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.governance.responsibilities.map((r) => (
+                          <tr key={r.id}>
+                            <td><strong>{r.object_name_tr}</strong> ({r.object_code})</td>
+                            <td><span className="badge badge--info">{r.responsibility_type}</span></td>
+                            <td>{r.subject_name} ({r.subject_type})</td>
+                            <td>{r.scope_name || "Tüm Organizasyon"}</td>
+                            <td>{r.state_type === "to_be" ? "Hedef (To-Be)" : "Mevcut (As-Is)"}</td>
+                            <td>{r.notes || "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Yetki ve Erişim Matrisi */}
+              {report.governance.authorizations.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
+                  <h3 className="report-summary-box__title">5.2 Yetki ve Erişim Matrisi</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th>Özne (Rol/Kişi)</th>
+                          <th>Yönetişim Nesnesi</th>
+                          <th>Beyan Edilen Yetki</th>
+                          <th>Efektif Yetki / Sapma</th>
+                          <th>Kapsam</th>
+                          <th>İzin Detayı (G/E/D/S/O/İ/X/M)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.governance.authorizations.map((a) => (
+                          <tr key={a.id}>
+                            <td><strong>{a.subject_name}</strong> ({a.subject_type})</td>
+                            <td>{a.object_name_tr}</td>
+                            <td><span className="badge badge--secondary">{a.permission_level}</span></td>
+                            <td>
+                              {a.has_discrepancy === 1 && a.effective_level ? (
+                                <span className="badge badge--danger">Sapma: {a.effective_level}</span>
+                              ) : (
+                                "Sapma Yok"
+                              )}
+                            </td>
+                            <td>{a.scope_name || "Genel"}</td>
+                            <td>
+                              <code>
+                                {[
+                                  a.can_view ? "G" : "-",
+                                  a.can_create ? "E" : "-",
+                                  a.can_edit ? "D" : "-",
+                                  a.can_delete ? "S" : "-",
+                                  a.can_approve ? "O" : "-",
+                                  a.can_cancel ? "İ" : "-",
+                                  a.can_export ? "X" : "-",
+                                  a.can_view_cost ? "M" : "-",
+                                ].join("")}
+                              </code>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Limitler ve Onay Kademeleri */}
+              {report.governance.limits.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
+                  <h3 className="report-summary-box__title">5.3 Yetki ve Onay Limitleri</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th>Limit Türü</th>
+                          <th>Limit Sahibi (Özne)</th>
+                          <th>Limit Aralığı</th>
+                          <th>Onay Kademesi</th>
+                          <th>Onaylayan Rol/Kişi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.governance.limits.map((l) => (
+                          <tr key={l.id}>
+                            <td><strong>{l.limit_type}</strong></td>
+                            <td>{l.subject_name}</td>
+                            <td>
+                              {l.min_value != null || l.max_value != null
+                                ? `${l.min_value ?? 0} — ${l.max_value ?? "∞"} ${l.currency_or_unit}`
+                                : `Limitsiz (${l.currency_or_unit})`}
+                            </td>
+                            <td>{l.approval_tier || "Standart"}</td>
+                            <td>{l.approver_subject_name || "Doğrudan Yetkili"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Görevler Ayrılığı (SoD) Riskleri */}
+              {report.governance.sodRisks.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
+                  <h3 className="report-summary-box__title">5.4 Görevler Ayrılığı (SoD) Risk Matrisi</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th>Risk Başlığı</th>
+                          <th>Ciddiyet</th>
+                          <th>Çatışan Görevler (A vs B)</th>
+                          <th>Mevcut Kontrol</th>
+                          <th>Önerilen Çözüm (To-Be)</th>
+                          <th>Durum</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.governance.sodRisks.map((s) => (
+                          <tr key={s.id}>
+                            <td><strong>{s.risk_title}</strong></td>
+                            <td>
+                              <span className={`badge ${s.risk_severity === "critical" ? "badge--danger" : "badge--warning"}`}>
+                                {s.risk_severity.toUpperCase()}
+                              </span>
+                            </td>
+                            <td>
+                              <div style={{ fontSize: "0.75rem" }}>
+                                <div><strong>A:</strong> {s.conflicting_duty_a}</div>
+                                <div><strong>B:</strong> {s.conflicting_duty_b}</div>
+                              </div>
+                            </td>
+                            <td>{s.current_control || "Kontrol Yok"}</td>
+                            <td>{s.mitigation_action || "—"}</td>
+                            <td><span className="badge badge--secondary">{s.status}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ── Bölüm {report.governance ? "6" : "5"}: Proje Notları & Açık Konular ── */}
           <section id="sec-notes" className="report-section">
             <div className="report-section__header">
-              <span className="report-section__num">BÖLÜM 5</span>
+              <span className="report-section__num">BÖLÜM {report.governance ? "6" : "5"}</span>
               <h2 className="report-section__title">Proje Notları & Açık Konular</h2>
             </div>
+
 
             {/* Açık Sorular ve Teyit Bekleyen Konular Tablosu (FAZ-9) */}
             {report.followups && report.followups.length > 0 && (

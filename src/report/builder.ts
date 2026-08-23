@@ -17,6 +17,13 @@ import {
   getCustomAnswers,
   getAllProjectFollowups,
   getProjectAttachments,
+  getGovernanceSummary,
+  getGovernanceObjects,
+  getGovernanceResponsibilities,
+  getGovernanceAuthorizations,
+  getGovernanceLimits,
+  getGovernanceSodRisks,
+  getGovernanceAttachments,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -56,7 +63,23 @@ export async function buildReportModel(
   const includeUnanswered = options.includeUnanswered ?? false;
 
   // 1. Fetch core data in parallel
-  const [detailData, reportProfile, findings, requirements, risks, notes, dbFollowups, dbAttachments] = await Promise.all([
+  const [
+    detailData,
+    reportProfile,
+    findings,
+    requirements,
+    risks,
+    notes,
+    dbFollowups,
+    dbAttachments,
+    govSummary,
+    govObjects,
+    govResponsibilities,
+    govAuthorizations,
+    govLimits,
+    govSodRisks,
+    govAttachments,
+  ] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
     getFindings(projectId),
@@ -65,7 +88,15 @@ export async function buildReportModel(
     getProjectNotes(projectId),
     getAllProjectFollowups(projectId),
     getProjectAttachments(projectId),
+    getGovernanceSummary(projectId),
+    getGovernanceObjects(projectId),
+    getGovernanceResponsibilities(projectId),
+    getGovernanceAuthorizations(projectId),
+    getGovernanceLimits(projectId),
+    getGovernanceSodRisks(projectId),
+    getGovernanceAttachments(projectId),
   ]);
+
 
   if (!detailData) {
     throw new Error(`Analiz projesi bulunamadı: ${projectId}`);
@@ -564,6 +595,24 @@ export async function buildReportModel(
     updated_at: reportProfile?.updated_at,
   };
 
+  const reportGovernance =
+    govObjects.length > 0 ||
+    govResponsibilities.length > 0 ||
+    govAuthorizations.length > 0 ||
+    govLimits.length > 0 ||
+    govSodRisks.length > 0 ||
+    govAttachments.length > 0
+      ? {
+          summary: govSummary,
+          objects: govObjects,
+          responsibilities: govResponsibilities,
+          authorizations: govAuthorizations,
+          limits: govLimits,
+          sodRisks: govSodRisks,
+          attachments: govAttachments,
+        }
+      : undefined;
+
   return {
     metadata,
     profile,
@@ -572,6 +621,7 @@ export async function buildReportModel(
     businessFunctions: reportFunctions,
     followups: reportFollowups,
     attachments: reportAttachments,
+    governance: reportGovernance,
     globalFindings,
     globalRequirements,
     globalRisks,
@@ -579,3 +629,4 @@ export async function buildReportModel(
     summaryStats,
   };
 }
+

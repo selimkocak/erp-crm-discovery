@@ -137,6 +137,14 @@ for (const expected of [
   "project_custom_question_answers",
   "question_followups",
   "question_attachments",
+  "governance_objects",
+  "governance_subjects",
+  "governance_scopes",
+  "governance_responsibilities",
+  "governance_authorizations",
+  "governance_limits",
+  "governance_sod_risks",
+  "governance_attachments",
 ]) {
   assert(tableNames.includes(expected), `Tablo mevcut: ${expected}`);
 }
@@ -194,7 +202,8 @@ const tableCount2 = (
     .prepare("SELECT COUNT(*) as c FROM sqlite_master WHERE type='table'")
     .get() as { c: number }
 ).c;
-assert(tableCount2 === 16, `Tablo sayısı değişmedi: 16 (gerçek: ${tableCount2})`);
+assert(tableCount2 === 24, `Tablo sayısı değişmedi: 24 (gerçek: ${tableCount2})`);
+
 
 // ─── TEST 7: Sales Answer Persistence ───────────────────────────────────────
 console.log("\n=== T7: Sales Answer Persistence ===");

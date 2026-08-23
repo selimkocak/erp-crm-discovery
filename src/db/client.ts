@@ -1511,4 +1511,6 @@ export async function getAttachmentSummaryStats(
   };
 }
 
+export * from './governanceClient';
+
 

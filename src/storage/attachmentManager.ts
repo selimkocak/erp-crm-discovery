@@ -20,11 +20,15 @@ import type {
   AllowedAttachmentExtension,
   AllowedAttachmentMimeType,
   QuestionAttachment,
+  GovernanceAttachment,
+  GovernanceAttachmentEntityType,
 } from "../types";
 import {
   addQuestionAttachment,
   findAttachmentBySha256,
   updateQuestionAttachmentReimport,
+  createGovernanceAttachmentRecord,
+  deleteGovernanceAttachmentRecord,
 } from "../db/client";
 
 // ─────────────────────────────────────────────────────────────
@@ -711,4 +715,119 @@ export async function reimportAttachmentFile(
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
+}
+
+// ─────────────────────────────────────────────────────────────
+// 8. Governance Attachment Vault Orkestrasyonu (FAZ-46)
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Standart yönetişim göreli yolunu oluşturur:
+ * attachment/{projectId}/GOVERNANCE/{entityType}/{entityId}/{storedFileName}
+ */
+export function buildGovernanceRelativePath(
+  projectId: string,
+  entityType: GovernanceAttachmentEntityType,
+  entityId: string,
+  storedFileName: string
+): string {
+  const cleanProj = sanitizeFileName(projectId);
+  const cleanType = sanitizeFileName(entityType);
+  const cleanId = sanitizeFileName(entityId);
+  const cleanStored = sanitizeFileName(storedFileName);
+
+  return `attachment/${cleanProj}/GOVERNANCE/${cleanType}/${cleanId}/${cleanStored}`;
+}
+
+export interface ImportGovernanceAttachmentOptions {
+  projectId: string;
+  entityType: GovernanceAttachmentEntityType;
+  entityId: string;
+  file: {
+    name: string;
+    size: number;
+    type?: string;
+    data: Uint8Array;
+    sourcePath?: string;
+  };
+}
+
+/**
+ * Yönetişim kanıt dosyasını fiziksel Managed Vault'a kaydeder, varlığını ve SHA-256'sını teyit eder,
+ * ardından SQLite `governance_attachments` tablosuna kaydeder.
+ */
+export async function importGovernanceFileToManagedVault(
+  options: ImportGovernanceAttachmentOptions
+): Promise<GovernanceAttachment> {
+  const { projectId, entityType, entityId, file } = options;
+
+  // 1. Doğrulama
+  const validation = validateAttachment(file);
+  if (!validation.valid) {
+    throw new Error(validation.error || "Geçersiz dosya.");
+  }
+
+  // 2. SHA-256 Checksum hesapla
+  const sha256 = await calculateSha256(file.data);
+
+  // 3. Managed depolama dosya adı ve göreli yolu oluştur
+  const ext = (file.name.split(".").pop()?.toLowerCase() || "") as keyof typeof EXTENSION_TO_MIME;
+  const storedFileName = generateStoredFileName(file.name);
+  const relativePath = buildGovernanceRelativePath(projectId, entityType, entityId, storedFileName);
+  const resolvedMime = file.type || EXTENSION_TO_MIME[ext] || "application/octet-stream";
+
+  // 4. Dosyayı fiziksel olarak Managed Vault'a kaydet
+  await saveAttachmentFile(relativePath, file.data, file.sourcePath);
+
+  // 5. Fiziksel varlığı ve hash bütünlüğünü doğrula
+  const savedData = await readAttachmentFile(relativePath);
+  if (!savedData || savedData.byteLength !== file.data.byteLength) {
+    await deleteAttachmentFile(relativePath);
+    throw new Error("Yönetişim kanıt kasasına fiziksel yazma işlemi doğrulanamadı (boyut uyuşmazlığı).");
+  }
+
+  const savedSha256 = await calculateSha256(savedData);
+  if (savedSha256 !== sha256) {
+    await deleteAttachmentFile(relativePath);
+    throw new Error("Fiziksel kopya bütünlük hatası: SHA-256 sağlama değeri uyuşmuyor.");
+  }
+
+  // 6. SQLite metadata kaydı oluştur
+  try {
+    const now = new Date().toISOString();
+    return await createGovernanceAttachmentRecord({
+      analysis_project_id: projectId,
+      entity_type: entityType,
+      entity_id: entityId,
+      original_file_name: file.name,
+      stored_file_name: storedFileName,
+      relative_path: relativePath,
+      mime_type: resolvedMime,
+      file_size: file.size,
+      sha256,
+      imported_at: now,
+    });
+  } catch (dbErr: any) {
+    await deleteAttachmentFile(relativePath);
+    throw new Error(`Veritabanı kaydı oluşturulamadı: ${dbErr?.message || dbErr}`);
+  }
+}
+
+/**
+ * Yönetişim kanıt dosyasını fiziksel Managed Vault'tan ve SQLite'tan siler.
+ */
+export async function removeGovernanceAttachmentPhysicalAndDb(
+  attachmentId: string,
+  projectId: string,
+  relativePath: string
+): Promise<void> {
+  // 1. Fiziksel dosyayı sil
+  try {
+    await deleteAttachmentFile(relativePath);
+  } catch (fileErr) {
+    console.warn("[Managed Vault] Yönetişim fiziksel dosya silme uyarısı:", fileErr);
+  }
+
+  // 2. DB kaydını sil
+  await deleteGovernanceAttachmentRecord(attachmentId, projectId);
 }
