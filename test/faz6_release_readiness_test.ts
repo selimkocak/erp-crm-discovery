@@ -169,12 +169,12 @@ assert(macosContent.includes('npm run build'), 'macOS-build runs npm run build')
 assert(macosContent.includes('cargo check'), 'macOS-build runs cargo check');
 assert(macosContent.includes('npm run tauri build'), 'macOS-build runs npm run tauri build');
 assert(macosContent.includes('upload-artifact'), 'macOS-build uploads macOS artifact');
-assert(macosContent.includes('cp MACOS_KURULUM_YARDIMI.txt macos-artifacts/'), 'macOS-build packages MACOS_KURULUM_YARDIMI.txt into artifact');
+assert(macosContent.includes('MACOS_KURULUM_YARDIMI.txt macos-artifacts/'), 'macOS-build packages MACOS_KURULUM_YARDIMI.txt into artifact');
 
 // ── T07: macOS Artifact Kurulum Yardım Belgesi (FAZ-9.1) ──
 console.log('\n=== T07: macOS Artifact Kurulum Yardım Belgesi (FAZ-9.1) ===');
-const macosHelpPath = path.join(ROOT_DIR, 'MACOS_KURULUM_YARDIMI.txt');
-assert(fs.existsSync(macosHelpPath), 'MACOS_KURULUM_YARDIMI.txt exists in repository root');
+const macosHelpPath = path.join(ROOT_DIR, 'docs', 'guides', 'installation', 'MACOS_KURULUM_YARDIMI.txt');
+assert(fs.existsSync(macosHelpPath), 'MACOS_KURULUM_YARDIMI.txt exists in docs/guides/installation/');
 const macosHelpContent = fs.readFileSync(macosHelpPath, 'utf-8');
 assert(macosHelpContent.includes('xattr -dr com.apple.quarantine "/Applications/ERP CRM Discovery.app"'), 'Kurulum belgesinde quarantine xattr komutu mevcut');
 assert(macosHelpContent.includes('open "/Applications/ERP CRM Discovery.app"'), 'Kurulum belgesinde open komutu mevcut');
@@ -183,8 +183,8 @@ assert(macosHelpContent.includes('Apple Developer ID') || macosHelpContent.inclu
 
 // ── T08: Windows Artifact Kurulum Yardım Belgesi (FAZ-9.2) ──
 console.log('\n=== T08: Windows Artifact Kurulum Yardım Belgesi (FAZ-9.2) ===');
-const winHelpPath = path.join(ROOT_DIR, 'WINDOWS_KURULUM_YARDIMI.txt');
-assert(fs.existsSync(winHelpPath), 'WINDOWS_KURULUM_YARDIMI.txt exists in repository root');
+const winHelpPath = path.join(ROOT_DIR, 'docs', 'guides', 'installation', 'WINDOWS_KURULUM_YARDIMI.txt');
+assert(fs.existsSync(winHelpPath), 'WINDOWS_KURULUM_YARDIMI.txt exists in docs/guides/installation/');
 const winHelpContent = fs.readFileSync(winHelpPath, 'utf-8');
 assert(winHelpContent.includes('ERP-CRM-Discovery_0.1.0_x64-setup.exe'), 'Windows yardım belgesinde Setup EXE adı mevcut');
 assert(winHelpContent.includes('Ek Bilgi') && winHelpContent.includes('Yine de Çalıştır'), 'SmartScreen Ek Bilgi -> Yine de Çalıştır kılavuzu mevcut');
@@ -307,4 +307,5 @@ if (failed > 0) {
   process.exit(1);
 } else {
   console.log('BAŞARILI: FAZ-6 RELEASE READINESS ACCEPTANCE: PASS\n');
+  process.exit(0);
 }

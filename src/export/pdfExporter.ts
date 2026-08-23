@@ -537,6 +537,24 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY = (doc as any).lastAutoTable.finalY + 4;
   }
 
+  // ── Rapor Kapanış ve Atıf Notu (Sade ve Profesyonel) ────────────────────────
+  if (currentY + 14 > pageHeight - 16) {
+    doc.addPage();
+    currentY = 20;
+  } else {
+    currentY += 4;
+  }
+  doc.setDrawColor(226, 232, 240);
+  doc.line(marginX, currentY, pageWidth - marginX, currentY);
+  currentY += 4;
+
+  doc.setFont(PDF_FONT_FAMILY, "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(148, 163, 184);
+  doc.text("ERP CRM Discovery tarafından oluşturulmuştur.", marginX, currentY);
+  currentY += 3.5;
+  doc.text("Geliştirici ve bakımcı: Selim Koçak  •  İletişim: selimkocak@gmail.com", marginX, currentY);
+
   // ── Page Numbers & Running Headers ────────────────────────────────────────
   const totalPages = doc.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {

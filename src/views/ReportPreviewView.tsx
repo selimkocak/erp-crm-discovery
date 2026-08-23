@@ -1038,6 +1038,9 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             <p>
               ERP CRM Discovery • Açık Kaynak & Offline-First ERP/CRM Ön Analiz Aracı • {metadata.generatedAt}
             </p>
+            <p style={{ marginTop: "0.25rem", fontSize: "0.75rem", color: "var(--text-muted)" }}>
+              ERP CRM Discovery tarafından oluşturulmuştur. | Geliştirici ve bakımcı: Selim Koçak | İletişim: selimkocak@gmail.com
+            </p>
           </footer>
         </main>
       </div>

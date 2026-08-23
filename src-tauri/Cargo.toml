@@ -2,7 +2,9 @@
 name = "erp-crm-discovery"
 version = "0.1.0"
 description = "ERP CRM Discovery Desktop Application"
-authors = ["ERP CRM Discovery Team"]
+authors = ["Selim Koçak <selimkocak@gmail.com>"]
+license = "MIT"
+repository = "https://github.com/selimkocak/erp-crm-discovery"
 edition = "2021"
 
 [lib]

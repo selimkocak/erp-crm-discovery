@@ -71,7 +71,7 @@ jobs:
             exit 1
           }
           Copy-Item -Path $installer.FullName -Destination "windows-artifacts\"
-          Copy-Item -Path "WINDOWS_KURULUM_YARDIMI.txt" -Destination "windows-artifacts\"
+          Copy-Item -Path "docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt" -Destination "windows-artifacts\"
           
           # Generate SHA256SUMS.txt
           $files = Get-ChildItem -Path "windows-artifacts" -File

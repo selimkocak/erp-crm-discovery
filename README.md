@@ -298,9 +298,12 @@ Her modül testi şu 15 alanı doğrular:
 
 - **Birincil Hedef:** Windows 11 x64 / Windows 10 x64.
 - **Paketleme Formatı:** NSIS Setup Executable (`ERP-CRM-Discovery_0.1.0_x64-setup.exe`).
-- **Mevcut Durum:** `v0.1.0 Release Candidate 1` — 33 soru paketi tamamlandı, Windows native acceptance aşamasında.
-- **Kurulum Rehberi:** [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
-- **Kabul Kontrol Listesi:** [`docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md`](docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md)
+- **Mevcut Durum:** `v0.1.0 Release Candidate 1` — 34 soru paketi tamamlandı, masaüstü kabul aşamasında.
+- **Kurulum ve Dağıtım Belgeleri:**
+  - Windows Derleme & Dağıtım: [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
+  - Windows Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt`](docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt)
+  - macOS Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/MACOS_KURULUM_YARDIMI.txt`](docs/guides/installation/MACOS_KURULUM_YARDIMI.txt)
+  - Windows Kabul Kontrol Listesi: [`docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md`](docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md)
 
 ### Windows Managed Attachment Vault Manuel Doğrulama Listesi
 Windows'ta installer ile kurulum yapıldıktan sonra `%LOCALAPPDATA%\ERP CRM Discovery\attachment` kökünde şu 5 adım doğrulanmalıdır:
@@ -324,8 +327,20 @@ Her geliştirme fazının kabul raporu [`docs/`](docs/) dizininde saklanmaktadı
 
 ---
 
+## Proje ve İletişim (Project & Contact)
+
+- **Proje:** ERP CRM Discovery
+- **Açıklama:** Açık kaynaklı, %100 çevrimdışı ve yapay zekâ içermeyen ERP / CRM ön analiz ve saha keşif aracı.
+- **Geliştirici ve Bakımcı:** Selim Koçak
+- **E-posta:** `selimkocak@gmail.com`
+- **Kaynak Kod Deposu:** [GitHub Repository](https://github.com/selimkocak/erp-crm-discovery)
+- **Lisans:** [MIT License](LICENSE)
+- **Katkı ve Hata Bildirimi:** Hata bildirimleri, öneriler ve yeni soru paketi katkıları için GitHub Issues ve Pull Request kanallarını kullanabilirsiniz ([`CONTRIBUTING.md`](CONTRIBUTING.md)).
+
+---
+
 ## Lisans (License)
 
-- **Uygulama Kaynak Kodu:** [MIT License](LICENSE) — Copyright (c) 2026 ERP CRM Discovery Contributors.
+- **Uygulama Kaynak Kodu:** [MIT License](LICENSE) — Copyright (c) 2026 Selim Koçak (ERP CRM Discovery Contributors).
 - **Gömülü Liberation Sans Fontu:** GNU GPL v2 + Font Exception ([`licenses/FONT_LICENSE.txt`](licenses/FONT_LICENSE.txt)).
 - **Üçüncü Taraf Bildirimleri:** [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

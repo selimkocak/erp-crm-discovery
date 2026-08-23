@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Header } from "./components/Header";
+import { AboutModal } from "./components/AboutModal";
 import { HomeView } from "./views/HomeView";
 import { NewProjectView } from "./views/NewProjectView";
 import { ProjectDetailView } from "./views/ProjectDetailView";
@@ -9,6 +10,7 @@ type AppView = "home" | "new-project" | "edit-project" | "project-detail";
 export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<AppView>("home");
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
+  const [isAboutOpen, setIsAboutOpen] = useState<boolean>(false);
 
   const handleNavigateHome = () => {
     setActiveProjectId(null);
@@ -46,6 +48,7 @@ export const App: React.FC = () => {
         currentView={currentView}
         onNavigateHome={handleNavigateHome}
         onNewProject={handleStartNewProject}
+        onOpenAbout={() => setIsAboutOpen(true)}
       />
 
       <main className="main-content">
@@ -83,6 +86,10 @@ export const App: React.FC = () => {
           />
         )}
       </main>
+
+      {isAboutOpen && (
+        <AboutModal onClose={() => setIsAboutOpen(false)} />
+      )}
     </div>
   );
 };

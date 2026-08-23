@@ -1097,6 +1097,35 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     );
   }
 
+  // 7. Rapor Kapanış ve Atıf Notu (Sade ve Profesyonel)
+  docChildren.push(
+    new Paragraph({
+      spacing: { before: 360, after: 60 },
+      border: {
+        top: { style: BorderStyle.SINGLE, size: 4, color: COLOR_BORDER },
+      },
+      children: [
+        new TextRun({
+          text: "ERP CRM Discovery tarafından oluşturulmuştur.",
+          size: 16,
+          color: COLOR_MUTED,
+          font: FONT_FAMILY,
+        }),
+      ],
+    }),
+    new Paragraph({
+      spacing: { after: 120 },
+      children: [
+        new TextRun({
+          text: "Geliştirici ve bakımcı: Selim Koçak  •  İletişim: selimkocak@gmail.com",
+          size: 15,
+          color: COLOR_MUTED,
+          font: FONT_FAMILY,
+        }),
+      ],
+    })
+  );
+
   // Document Assembly with Headers & Footers
   const doc = new Document({
     creator: "ERP CRM Discovery",

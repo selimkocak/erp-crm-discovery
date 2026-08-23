@@ -200,6 +200,9 @@ const faz10ReportModel: ReportModel = {
     city: "Bursa",
     country: "Türkiye",
     employeeCount: "150",
+    businessSector: "Mobilya İmalat",
+    hasBranches: "yes",
+    branchCount: 3,
     notes: "Saha görüşmesi başarıyla tamamlandı.",
   },
   profile: {
@@ -303,14 +306,14 @@ assert(friendlyPerm.includes("Seçilen konuma dosya yazma izni bulunmuyor"), `İ
 
 // ─── TEST 9: Distribution Packaging Asset Verification ───────────────────────
 console.log("\n=== T09: Distribution Packaging Asset Verification ===");
-const winHelpPath = path.join(ROOT_DIR, "WINDOWS_KURULUM_YARDIMI.txt");
+const winHelpPath = path.join(ROOT_DIR, "docs", "guides", "installation", "WINDOWS_KURULUM_YARDIMI.txt");
 assert(fs.existsSync(winHelpPath), "WINDOWS_KURULUM_YARDIMI.txt mevcut");
 const winContent = fs.readFileSync(winHelpPath, "utf-8");
 assert(winContent.includes("Ek Bilgi"), "Windows yardım belgesinde SmartScreen Ek Bilgi mevcut");
 assert(winContent.includes("Yine de Çalıştır"), "Windows yardım belgesinde Yine de Çalıştır mevcut");
 assert(winContent.includes("erp_discovery.db"), "Windows yardım belgesinde SQLite dosya adı mevcut");
 
-const macHelpPath = path.join(ROOT_DIR, "MACOS_KURULUM_YARDIMI.txt");
+const macHelpPath = path.join(ROOT_DIR, "docs", "guides", "installation", "MACOS_KURULUM_YARDIMI.txt");
 assert(fs.existsSync(macHelpPath), "MACOS_KURULUM_YARDIMI.txt mevcut");
 const macContent = fs.readFileSync(macHelpPath, "utf-8");
 assert(macContent.includes("xattr -dr com.apple.quarantine"), "macOS yardım belgesinde quarantine xattr komutu mevcut");
@@ -334,4 +337,5 @@ if (failCount > 0) {
   process.exit(1);
 } else {
   console.log("BAŞARILI: FAZ-10 FIELD ACCEPTANCE & REPORT QUALITY: PASS\n");
+  process.exit(0);
 }

@@ -35,11 +35,11 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "copyright": "Copyright © 2026 ERP CRM Discovery Team",
+    "copyright": "Copyright © 2026 Selim Koçak (ERP CRM Discovery Contributors)",
     "category": "Business",
     "shortDescription": "ERP and CRM Pre-Analysis & Discovery Application",
     "longDescription": "Vendor-neutral desktop tool for ERP and CRM pre-implementation discovery, process maturity evaluation, and structured report generation.",
-    "publisher": "ERP CRM Discovery Team",
+    "publisher": "Selim Koçak",
     "windows": {
       "webviewInstallMode": {
         "type": "downloadBootstrapper"
