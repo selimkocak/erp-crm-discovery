@@ -2,28 +2,145 @@
  * ERP CRM Discovery — Database Migration Runner (Tauri plugin-sql)
  *
  * Single Source of Truth for definitions: src/db/migrationDefinitions.ts
+ *
+ * FAZ-48: Hardened Migration Runner with Transaction, Rollback and schema_migrations tracking.
  */
 
 import Database from "@tauri-apps/plugin-sql";
 import { MIGRATION_DEFINITIONS } from "./migrationDefinitions";
 import { INITIAL_BUSINESS_FUNCTIONS } from "./seedData";
 
+export interface SchemaMigrationRecord {
+  version: number;
+  name: string;
+  applied_at: string;
+}
+
+/**
+ * Eski v1..v11 veritabanlarında schema_migrations tablosu bulunmadığında
+ * mevcut şema nesnelerine bakarak güvenli baseline sürümünü tespit eder.
+ */
+export async function detectLegacyBaselineVersion(db: Database): Promise<number> {
+  const tables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='analysis_projects'"
+  );
+  if (tables.length === 0) {
+    return 0; // Temiz / Boş veritabanı
+  }
+
+  // v11: governance_objects tablosu
+  const govTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='governance_objects'"
+  );
+  if (govTables.length > 0) return 11;
+
+  // v10: company_profiles.business_sector kolonu
+  const cols = await db.select<{ name: string }[]>(
+    "PRAGMA table_info(company_profiles)"
+  );
+  const colNames = new Set(cols.map((c) => c.name));
+  if (colNames.has("business_sector")) return 10;
+
+  // v6: question_attachments tablosu
+  const attTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='question_attachments'"
+  );
+  if (attTables.length > 0) return 6;
+
+  // v5: analysis_report_profiles tablosu
+  const repTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='analysis_report_profiles'"
+  );
+  if (repTables.length > 0) return 5;
+
+  // v4: question_followups tablosu
+  const folTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='question_followups'"
+  );
+  if (folTables.length > 0) return 4;
+
+  // v3: project_custom_questions tablosu
+  const cusTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='project_custom_questions'"
+  );
+  if (cusTables.length > 0) return 3;
+
+  // v2: project_notes tablosu
+  const notTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='project_notes'"
+  );
+  if (notTables.length > 0) return 2;
+
+  return 1;
+}
+
+/**
+ * Migration tanımlarını atomik transaction blokları içerisinde çalıştırır ve
+ * schema_migrations tablosuna kaydeder.
+ */
 export async function runMigrations(db: Database): Promise<void> {
-  // Execute table creations and indices from migration definitions
-  for (const migration of MIGRATION_DEFINITIONS) {
-    for (const sqlStatement of migration.sql) {
-      const trimmed = sqlStatement.trim();
-      if (trimmed.length > 0) {
-        try {
-          await db.execute(trimmed);
-        } catch (err) {
-          // Log and continue if idempotent schema alter statement fails (e.g. column already exists)
+  // 1. schema_migrations tablosunu oluştur
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS schema_migrations (
+      version INTEGER PRIMARY KEY,
+      name TEXT NOT NULL,
+      applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // 2. Uygulanmış migration'ları sorgula
+  const appliedRecords = await db.select<{ version: number }[]>(
+    "SELECT version FROM schema_migrations ORDER BY version ASC"
+  );
+  const appliedVersions = new Set(appliedRecords.map((r) => r.version));
+
+  // 3. schema_migrations boşsa, eski DB baseline tespitini yap ve geçmişi doldur
+  if (appliedVersions.size === 0) {
+    const baselineVersion = await detectLegacyBaselineVersion(db);
+    if (baselineVersion > 0) {
+      for (const m of MIGRATION_DEFINITIONS) {
+        if (m.version <= baselineVersion) {
+          await db.execute(
+            "INSERT INTO schema_migrations (version, name, applied_at) VALUES ($1, $2, CURRENT_TIMESTAMP) ON CONFLICT(version) DO NOTHING",
+            [m.version, m.description]
+          );
+          appliedVersions.add(m.version);
         }
       }
     }
   }
 
-  // Seed business functions if empty (idempotent ON CONFLICT)
+  // 4. Henüz uygulanmamış migration'ları transaction içinde sırayla çalıştır
+  for (const migration of MIGRATION_DEFINITIONS) {
+    if (appliedVersions.has(migration.version)) {
+      continue;
+    }
+
+    try {
+      await db.execute("BEGIN TRANSACTION;");
+      for (const sqlStatement of migration.sql) {
+        const trimmed = sqlStatement.trim();
+        if (trimmed.length > 0) {
+          await db.execute(trimmed);
+        }
+      }
+      await db.execute(
+        "INSERT INTO schema_migrations (version, name, applied_at) VALUES ($1, $2, CURRENT_TIMESTAMP);",
+        [migration.version, migration.description]
+      );
+      await db.execute("COMMIT;");
+      appliedVersions.add(migration.version);
+    } catch (err) {
+      try {
+        await db.execute("ROLLBACK;");
+      } catch {
+        // Rollback error if already rolled back
+      }
+      throw new Error(`[Migration Error] Migration v${migration.version} (${migration.description}) failed: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  // 5. Başlangıç iş fonksiyonlarını tohumla (idempotent ON CONFLICT)
   const existing = await db.select<{ count: number }[]>(
     "SELECT count(*) as count FROM business_functions"
   );

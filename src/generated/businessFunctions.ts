@@ -2,9 +2,8 @@
  * AUTO-GENERATED.
  * DO NOT EDIT MANUALLY.
  * Source: data/business-functions.json
- *
- * Generated at: 2026-08-23T11:16:22.017Z
  */
+
 
 export interface BusinessFunctionEntry {
   code: string;
