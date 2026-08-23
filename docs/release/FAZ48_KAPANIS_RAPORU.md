@@ -59,3 +59,17 @@ Bu fazda:
 * **Test Süiti:** `npm test` (71 / 71 Test Paketi — 2.120+ Test %100 PASS)
 * **TypeScript & Vite Build:** `npm run build` (0 Hata)
 * **Rust Backend:** `cargo check` (0 Hata)
+
+---
+
+## 6. Çoklu Platform CI ve Kabul Matrisi
+
+| Platform / Hat | better-sqlite3 Durumu | Migration Transaction Testi | CI/CD Paketleme | Durum |
+|:---|:---:|:---:|:---:|:---:|
+| **Linux (Ubuntu CI)** | Mevcut | **11 / 11 PASS** | Test, Lint & Bundle | **PASS (✓)** |
+| **Windows (x64 NSIS)** | Yok (Opsiyonel Fallback) | **SKIPPED — BETTER_SQLITE3 UNAVAILABLE** | PE32+ NSIS Setup EXE | **PASS (✓)** |
+| **macOS (Apple Silicon)** | Yok (Opsiyonel Fallback) | **SKIPPED — BETTER_SQLITE3 UNAVAILABLE** | Mach-O arm64 DMG | **PASS (✓)** |
+
+> **Platform Doğrulama Notu:**  
+> Migration transaction ve rollback davranışı `better-sqlite3` sürücüsünün bulunduğu ortamlarda 11/11 PASS ile doğrulanmıştır. Native derleyici sürücüsünün bulunmadığı Windows/macOS CI derleme ortamlarında test kontrollü biçimde açık `SKIPPED` sonucu üreterek derleme ve paketlemeyi engellemez.
+
