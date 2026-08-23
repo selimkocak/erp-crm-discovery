@@ -329,4 +329,5 @@ export interface AttachmentSummaryStats {
 }
 
 export * from './governance';
+export * from './backup';
 

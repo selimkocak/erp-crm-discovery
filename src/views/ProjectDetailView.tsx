@@ -16,27 +16,42 @@ import {
   FileText,
   Pencil,
   Shield,
+  Download,
+  Upload,
+  Copy,
+  Trash2,
+  Info,
+  X as XIcon,
 } from "lucide-react";
-import { getProjectDetail, updateProjectBusinessFunction } from "../db/client";
+import { getProjectDetail, updateProjectBusinessFunction, deleteProject } from "../db/client";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
 import { loadQuestionPack, getPackIdForFunction, hasQuestionPack } from "../engine/loader";
+import { exportProjectBackup } from "../storage/backupManager";
+import {
+  RestoreProjectModal,
+  DuplicateProjectModal,
+  triggerFileDownload,
+} from "../components/ProjectBackupModals";
 import type { QuestionPack } from "../engine/types";
 import type { FunctionStatus, ProjectDetailData } from "../types";
+
 
 interface ProjectDetailViewProps {
   projectId: string;
   onBack: () => void;
   onEditProject?: (projectId: string) => void;
+  onOpenProject?: (projectId: string) => void;
 }
 
 export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   projectId,
   onBack,
   onEditProject,
+  onOpenProject,
 }) => {
   const [data, setData] = useState<ProjectDetailData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -44,6 +59,21 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error" | "idle">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const [viewMode, setViewMode] = useState<"process" | "governance">("process");
+
+  // Backup & Operations state
+  const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [isDuplicateOpen, setIsDuplicateOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "info" | "error"; message: string } | null>(null);
+
+  const showToast = (type: "success" | "info" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((current) => (current?.message === message ? null : current));
+    }, 4000);
+  };
+
+
 
   // Question Engine state
   const [activeBfCode, setActiveBfCode] = useState<string | null>(null);
@@ -153,6 +183,35 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
     }
   };
 
+  const handleExportBackup = async () => {
+    setIsExporting(true);
+    try {
+      const res = await exportProjectBackup(projectId);
+      triggerFileDownload(res.blob, res.fileName);
+      showToast("success", `"${res.manifest.projectName}" yedeği başarıyla oluşturuldu (.erpcrm).`);
+    } catch (err: any) {
+      showToast("error", `Yedekleme başarısız: ${err?.message || err}`);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    if (
+      window.confirm(
+        `"${data?.project?.name || "Bu"}" analiz projesini ve bağlı tüm verilerini kalıcı olarak silmek istediğinize emin misiniz?`
+      )
+    ) {
+      try {
+        await deleteProject(projectId);
+        onBack();
+      } catch (err: any) {
+        showToast("error", `Silme başarısız: ${err?.message || err}`);
+      }
+    }
+  };
+
+
   if (isLoading) {
     return (
       <div style={{ textAlign: "center", padding: "4rem", color: "var(--text-muted)" }}>
@@ -212,6 +271,39 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`gov-toast gov-toast--${toast.type}`}
+          role="status"
+          style={{
+            position: "fixed",
+            top: "1.5rem",
+            right: "1.5rem",
+            zIndex: 9999,
+            maxWidth: "440px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+          }}
+        >
+          <div className="gov-toast__content">
+            <span className="gov-toast__icon">
+              {toast.type === "success" && <CheckCircle2 size={18} />}
+              {toast.type === "info" && <Info size={18} />}
+              {toast.type === "error" && <AlertCircle size={18} />}
+            </span>
+            <span className="gov-toast__message">{toast.message}</span>
+          </div>
+          <button
+            type="button"
+            className="gov-toast__close"
+            onClick={() => setToast(null)}
+            aria-label="Kapat"
+          >
+            <XIcon size={16} />
+          </button>
+        </div>
+      )}
+
       {/* Top Header */}
       <div className="view-header">
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -227,7 +319,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
           <button
             className="btn btn-report-primary btn--report btn--sm"
             onClick={() => setIsViewingReport(true)}
@@ -235,12 +327,83 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           >
             <FileText size={15} /> Rapor Önizleme
           </button>
+
+          <button
+            className="btn btn-secondary btn--sm"
+            onClick={handleExportBackup}
+            disabled={isExporting}
+            title="Projeyi .erpcrm arşiv paketi olarak dışa aktar"
+          >
+            <Download size={14} />
+            {isExporting ? "Yedekleniyor..." : "Yedekle"}
+          </button>
+
+          <button
+            className="btn btn-secondary btn--sm"
+            onClick={() => setIsDuplicateOpen(true)}
+            title="Bu projeden yeni bir çalışma kopyası üret"
+          >
+            <Copy size={14} />
+            Çoğalt
+          </button>
+
+          <button
+            className="btn btn-secondary btn--sm"
+            onClick={() => setIsRestoreOpen(true)}
+            title="Dışarıdan bir .erpcrm yedek paketi yükle"
+          >
+            <Upload size={14} />
+            Geri Yükle
+          </button>
+
+          <button
+            className="btn btn-secondary btn--sm"
+            style={{ color: "var(--danger)" }}
+            onClick={handleDeleteProject}
+            title="Projeyi ve tüm verilerini kalıcı olarak sil"
+          >
+            <Trash2 size={14} />
+            Sil
+          </button>
+
           <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
           <span className="badge badge-completed">
             {project.status.toUpperCase()}
           </span>
         </div>
       </div>
+
+      {/* Modals */}
+      <RestoreProjectModal
+        isOpen={isRestoreOpen}
+        onClose={() => setIsRestoreOpen(false)}
+        onSuccess={(msg, newId) => {
+          showToast("success", msg);
+          if (newId && onOpenProject) {
+            onOpenProject(newId);
+          } else {
+            loadData();
+          }
+        }}
+        onError={(err) => showToast("error", err)}
+      />
+
+      <DuplicateProjectModal
+        isOpen={isDuplicateOpen}
+        projectId={projectId}
+        projectName={project.name}
+        onClose={() => setIsDuplicateOpen(false)}
+        onSuccess={(msg, newId) => {
+          showToast("success", msg);
+          if (newId && onOpenProject) {
+            onOpenProject(newId);
+          } else {
+            loadData();
+          }
+        }}
+        onError={(err) => showToast("error", err)}
+      />
+
 
       {/* Company Profile Card */}
       <div className="card" style={{ marginBottom: "1.5rem" }}>

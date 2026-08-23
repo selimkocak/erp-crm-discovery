@@ -1,6 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Plus, FolderOpen, Pencil, Trash2, Calendar, Building2, Layers, AlertCircle } from "lucide-react";
+import {
+  Plus,
+  FolderOpen,
+  Pencil,
+  Trash2,
+  Calendar,
+  Building2,
+  Layers,
+  AlertCircle,
+  Download,
+  Upload,
+  Copy,
+  CheckCircle2,
+  Info,
+  X as XIcon,
+} from "lucide-react";
 import { getProjects, deleteProject } from "../db/client";
+import { exportProjectBackup } from "../storage/backupManager";
+import {
+  RestoreProjectModal,
+  DuplicateProjectModal,
+  triggerFileDownload,
+} from "../components/ProjectBackupModals";
 import type { ProjectListItem } from "../types";
 
 interface HomeViewProps {
@@ -17,6 +38,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Backup & Operations state
+  const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; name: string } | null>(null);
+  const [exportingProjectId, setExportingProjectId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "info" | "error"; message: string } | null>(null);
+
+  const showToast = (type: "success" | "info" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((current) => (current?.message === message ? null : current));
+    }, 4000);
+  };
 
   const loadProjects = async () => {
     try {
@@ -36,13 +70,27 @@ export const HomeView: React.FC<HomeViewProps> = ({
     loadProjects();
   }, []);
 
+  const handleExport = async (projId: string, projName: string) => {
+    setExportingProjectId(projId);
+    try {
+      const res = await exportProjectBackup(projId);
+      triggerFileDownload(res.blob, res.fileName);
+      showToast("success", `"${projName}" yedeği başarıyla oluşturuldu (.erpcrm).`);
+    } catch (err: any) {
+      showToast("error", `Yedekleme başarısız: ${err?.message || err}`);
+    } finally {
+      setExportingProjectId(null);
+    }
+  };
+
   const handleDelete = async (projectId: string, projectName: string) => {
-    if (window.confirm(`"${projectName}" analizini ve bağlı tüm verilerini silmek istediğinize emin misiniz?`)) {
+    if (window.confirm(`"${projectName}" analizini ve bağlı tüm verilerini kalıcı olarak silmek istediğinize emin misiniz?`)) {
       try {
         await deleteProject(projectId);
+        showToast("info", `"${projectName}" analizi silindi.`);
         await loadProjects();
       } catch (err: any) {
-        alert("Silme işlemi başarısız: " + (err?.message || "Bilinmeyen hata"));
+        showToast("error", "Silme işlemi başarısız: " + (err?.message || "Bilinmeyen hata"));
       }
     }
   };
@@ -64,15 +112,59 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div>
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`gov-toast gov-toast--${toast.type}`}
+          role="status"
+          style={{
+            position: "fixed",
+            top: "1.5rem",
+            right: "1.5rem",
+            zIndex: 9999,
+            maxWidth: "440px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+          }}
+        >
+          <div className="gov-toast__content">
+            <span className="gov-toast__icon">
+              {toast.type === "success" && <CheckCircle2 size={18} />}
+              {toast.type === "info" && <Info size={18} />}
+              {toast.type === "error" && <AlertCircle size={18} />}
+            </span>
+            <span className="gov-toast__message">{toast.message}</span>
+          </div>
+          <button
+            type="button"
+            className="gov-toast__close"
+            onClick={() => setToast(null)}
+            aria-label="Kapat"
+          >
+            <XIcon size={16} />
+          </button>
+        </div>
+      )}
+
+      {/* View Header */}
       <div className="view-header">
         <div className="view-header-title">
           <h2>Mevcut Analiz Projeleri</h2>
           <p>Kayıtlı ERP ve CRM ön analiz çalışmalarını listeleyin ve yönetin.</p>
         </div>
-        <button className="btn btn--start" onClick={onNewProject}>
-          <Plus size={16} />
-          Yeni Analiz
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setIsRestoreOpen(true)}
+            title="Dışarıdan bir .erpcrm yedek paketi yükle"
+          >
+            <Upload size={16} />
+            Yedekten Geri Yükle
+          </button>
+          <button className="btn btn--start" onClick={onNewProject}>
+            <Plus size={16} />
+            Yeni Analiz
+          </button>
+        </div>
       </div>
 
       {error && (
@@ -107,10 +199,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <p>
             Yeni bir ERP / CRM ön analiz projesi başlatmak için aşağıdaki butonu kullanarak firma profili ve kapsam fonksiyonlarını belirleyin.
           </p>
-          <button className="btn btn--start" onClick={onNewProject}>
-            <Plus size={16} />
-            Yeni Analiz Başlat
-          </button>
+          <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
+            <button className="btn btn-secondary" onClick={() => setIsRestoreOpen(true)}>
+              <Upload size={16} />
+              Yedekten Geri Yükle
+            </button>
+            <button className="btn btn--start" onClick={onNewProject}>
+              <Plus size={16} />
+              Yeni Analiz Başlat
+            </button>
+          </div>
         </div>
       ) : (
         <div className="table-container">
@@ -157,6 +255,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     <div style={{ display: "inline-flex", gap: "0.375rem" }}>
                       <button
                         className="btn btn-secondary btn--sm"
+                        title="Projeyi Yedekle (.erpcrm)"
+                        disabled={exportingProjectId === proj.id}
+                        onClick={() => handleExport(proj.id, proj.name)}
+                      >
+                        <Download size={14} />
+                      </button>
+                      <button
+                        className="btn btn-secondary btn--sm"
+                        title="Projeyi Çoğalt"
+                        onClick={() => setDuplicateTarget({ id: proj.id, name: proj.name })}
+                      >
+                        <Copy size={14} />
+                      </button>
+                      <button
+                        className="btn btn-secondary btn--sm"
                         title="Firma Bilgilerini Düzenle"
                         onClick={() => onEditProject(proj.id)}
                       >
@@ -184,6 +297,40 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </tbody>
           </table>
         </div>
+      )}
+
+      {/* Restore Modal */}
+      <RestoreProjectModal
+        isOpen={isRestoreOpen}
+        onClose={() => setIsRestoreOpen(false)}
+        onSuccess={(msg, newId) => {
+          showToast("success", msg);
+          if (newId) {
+            onOpenProject(newId);
+          } else {
+            loadProjects();
+          }
+        }}
+        onError={(err) => showToast("error", err)}
+      />
+
+      {/* Duplicate Modal */}
+      {duplicateTarget && (
+        <DuplicateProjectModal
+          isOpen={true}
+          projectId={duplicateTarget.id}
+          projectName={duplicateTarget.name}
+          onClose={() => setDuplicateTarget(null)}
+          onSuccess={(msg, newId) => {
+            showToast("success", msg);
+            if (newId) {
+              onOpenProject(newId);
+            } else {
+              loadProjects();
+            }
+          }}
+          onError={(err) => showToast("error", err)}
+        />
       )}
     </div>
   );

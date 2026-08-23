@@ -1,0 +1,86 @@
+/**
+ * ERP CRM Discovery — Project Backup, Restore & Portability Types
+ * FAZ-51: Tek arşivli taşınabilir proje paketi (.erpcrm) tanımları
+ */
+
+export interface BackupRecordCounts {
+  businessFunctions: number;
+  answers: number;
+  findings: number;
+  requirements: number;
+  risks: number;
+  notes: number;
+  reportProfiles: number;
+  customQuestions: number;
+  customQuestionAnswers: number;
+  followups: number;
+  governanceObjects: number;
+  governanceSubjects: number;
+  governanceScopes: number;
+  governanceResponsibilities: number;
+  governanceAuthorizations: number;
+  governanceLimits: number;
+  governanceSodRisks: number;
+  governanceAttachments: number;
+  questionAttachments: number;
+}
+
+export interface BackupManifest {
+  formatVersion: string; // e.g. "1.0.0"
+  appVersion: string; // e.g. "0.1.1"
+  createdAt: string; // ISO 8601
+  sourceProjectId: string;
+  projectName: string;
+  companyName: string;
+  schemaVersion: number; // 11
+  recordCounts: BackupRecordCounts;
+  attachmentCount: number;
+  dataChecksum: string; // SHA-256 of project-data.json
+}
+
+export interface ProjectBackupData {
+  project: Record<string, any>;
+  company: Record<string, any>;
+  businessFunctions: Record<string, any>[];
+  answers: Record<string, any>[];
+  sessionStates: Record<string, any>[];
+  findings: Record<string, any>[];
+  requirements: Record<string, any>[];
+  risks: Record<string, any>[];
+  notes: Record<string, any>[];
+  reportProfiles: Record<string, any>[];
+  customQuestions: Record<string, any>[];
+  customQuestionOptions: Record<string, any>[];
+  customQuestionAnswers: Record<string, any>[];
+  followups: Record<string, any>[];
+  questionAttachments: Record<string, any>[];
+  governanceObjects: Record<string, any>[];
+  governanceSubjects: Record<string, any>[];
+  governanceScopes: Record<string, any>[];
+  governanceResponsibilities: Record<string, any>[];
+  governanceAuthorizations: Record<string, any>[];
+  governanceLimits: Record<string, any>[];
+  governanceSodRisks: Record<string, any>[];
+  governanceAttachments: Record<string, any>[];
+}
+
+export interface BackupInspectionResult {
+  valid: boolean;
+  error?: string;
+  manifest?: BackupManifest;
+  warnings?: string[];
+}
+
+export interface RestoreResult {
+  success: boolean;
+  newProjectId?: string;
+  projectName?: string;
+  companyName?: string;
+  attachmentCount?: number;
+  error?: string;
+}
+
+export interface DuplicateProjectOptions {
+  newProjectName?: string;
+  copyAnswersAndAttachments?: boolean;
+}

@@ -70,6 +70,17 @@ export async function getDb(): Promise<Database> {
   }
 }
 
+
+export function setDbInstanceForTesting(db: any): void {
+  dbInstance = db;
+}
+
+export function resetDbInstanceForTesting(): void {
+  dbInstance = null;
+}
+
+
+
 // ---------------------------------------------------------------
 // Yardımcı
 // ---------------------------------------------------------------
