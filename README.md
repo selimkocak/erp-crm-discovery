@@ -41,17 +41,20 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 
 ## Temel Özellikler (Features)
 
-- **33 Kanonik İş Fonksiyonu & 33 Soru Paketi (1.445 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama & Kurumsal Performans ve yatay Ana Veri Yönetimi dahil 33 hazır soru paketi.
+- **33 Kanonik İş Fonksiyonu & 34 Soru Paketi (1.492 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama & Kurumsal Performans ve yatay Ana Veri Yönetimi dahil 34 hazır soru paketi (792 zorunlu, 700 opsiyonel, 213 koşullu).
 - **Deklaratif Soru Motoru (Question Engine):** Kod yazmadan, tamamen açık JSON şeması ile genişletilebilir soru paketleri. Tekli seçim, çoklu seçim, açık uçlu metin, seçenek bazlı özel notlar ve genel görüşme notları.
 - **Tek Seçimli Cevabı Kaldırma (Clear Selection):** Yanlışlıkla yapılan seçimleri kolayca geri alma ve klavyeden `Escape` ile temizleme desteği.
-- **Dinamik Koşullu Dallanma (205 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
+- **Dinamik Koşullu Dallanma (213 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
 - **Semantik Analiz Katmanı:** Ham soru-cevapların ötesinde yapılandırılmış **Bulgu (Finding)**, **Gereksinim (Requirement)**, **Risk** ve **Proje Notu** yönetimi.
 - **Soru Takip Bayrakları:** 🟡 *Sonra Dön* ve 🔴 *Kritik Takip* bayrakları — saha görüşmesinde belirsizleri işaretleyip Bölüm 5 Açık Konular tablosuna otomatik taşıma.
 - **Yönetilen Kanıt Kasası (Managed Attachment Vault):** Soru bazlı eklenen dosyaları (PDF, Excel, resim vb.) proje dizininde izole kopyalayarak koruma ve belgelere `file:///` köprüsüyle doğrudan erişim.
+- **Veri Sahipliği, Yetki ve SoD Yönetişim Katmanı:** 23 kanonik yönetişim nesnesi, As-Is/To-Be RACI sorumluluk matrisleri, efektif yetki sapması (discrepancy) analizi, parasal onay limitleri ve Görevler Ayrılığı (SoD) risk matrisi.
+- **Kurgusal Kesikli Üretim Saha Pilotu:** `[KURGUSAL] DeltaForm Endüstriyel Sistemler A.Ş.` üzerinde 20 iş fonksiyonu, 860 soru cevabı ve 15 kritik operasyonel problem ile uçtan uca doğrulanmış saha senaryosu.
+- **Külliyat Denetim Motoru (`npm run audit:corpus`):** 34 pakette 0 mükerrer ID, 0 bileşik anahtar çakışması ve 0 bozuk branching kuralı garantisi.
 - **Proje Özel Soruları:** Kanonik paketi bozmadan SQLite izolasyonunda müşteriye özel ek sorular tanımlama.
 - **Resumable Analiz & Autosave:** Kapatıp açınca kalınan sorudan devam etme; debounced otomatik kayıt.
-- **Soru Navigatörü:** Modüller ve süreç grupları arasında hızlı atlama, tamamlanma durumu göstergesi.
-- **Kesintisiz Çalışma (Offline Persistence):** Gömülü yerel SQLite veritabanı (16 tablo, 8 migrasyon) — sıfır ağ bağımlılığı.
+- **Soru Navigatörü:** Modüller ve süreç grupları arasında hızlı atlama, tamamlanma durumu ve ataç (📎) göstergesi.
+- **Kesintisiz Çalışma (Offline Persistence):** Gömülü yerel SQLite veritabanı (25 tablo, 11 migrasyon — Transaction & Rollback Korumalı) — sıfır ağ bağımlılığı.
 - **Profesyonel Dışa Aktarım (DOCX & PDF):**
   - **Microsoft Word (.docx):** Tamamen düzenlenebilir kurumsal başlık hiyerarşisi, renkli tablolar, risk kartları ve kanıt ekleri tablosu.
   - **PDF (.pdf):** Yerel gömülü Liberation Sans TrueType fontu ile %100 kayıpsız Türkçe Unicode desteği; seçilebilir ve aranabilir vektörel metin.
@@ -73,11 +76,12 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 ```text
 Frontend:         React 18 / TypeScript 5.x / Vite 6.x / Vanilla CSS (Design Tokens)
 Desktop Engine:   Tauri 2 (Rust)
-Database:         Lokal SQLite (@tauri-apps/plugin-sql / sqlx) — 16 tablo, 8 migrasyon
+Database:         Lokal SQLite (@tauri-apps/plugin-sql / sqlx) — 25 tablo, 11 migrasyon
 Native I/O:       @tauri-apps/plugin-dialog, @tauri-apps/plugin-fs
 Reporting:        docx (npm), jsPDF + jsPDF-AutoTable (Embedded Liberation Sans TrueType)
 Icons:            Lucide React
-Test Runner:      tsx (TypeScript execute) — 52 test suite (1.670+ test)
+Audit Engine:     scripts/audit_question_corpus.mjs
+Test Runner:      tsx (TypeScript execute) — 71 test suite (2.120+ test)
 ```
 
 ---
@@ -104,21 +108,25 @@ npm ci
 # 2. Kanonik iş fonksiyonlarını (33 BF) ve 34 soru paketini TypeScript'e derleyin
 npm run generate
 
-# 3. Tam test suitini çalıştırın (54 test suite, 1.800+ test)
+# 3. Soru külliyatı bütünlük denetimini çalıştırın
+npm run audit:corpus
+
+# 4. Tam test suitini çalıştırın (71 test suite, 2.120+ test)
 npm test
 
-# 4. Windows test paritesini doğrulayın
+# 5. Windows test paritesini doğrulayın
 npm run test:windows
 
-# 5. Web frontend'ini üretim için derleyin
+# 6. Web frontend'ini üretim için derleyin
 npm run build
 
-# 6. Rust backend denetimini yapın
+# 7. Rust backend denetimini yapın
 cargo check --manifest-path src-tauri/Cargo.toml
 
-# 7. Geliştirme sunucusunu başlatın (hot-reload)
+# 8. Geliştirme sunucusunu başlatın (hot-reload)
 npm run tauri dev
 ```
+
 
 ---
 
@@ -269,7 +277,7 @@ JSON Soru Paketi
 Proje **"Tek Modül = Tek Faz = Tek Kabul"** disipliniyle geliştirilmiştir. Her kanonik modülün tam kabul testi mevcuttur.
 
 ```bash
-npm test   # 59 test suite (1.800+ test) — tüm FAZ'lar
+npm test   # 71 test suite (2.120+ test) — %100 PASS
 ```
 
 Her modül testi şu 15 alanı doğrular:
@@ -294,16 +302,18 @@ Her modül testi şu 15 alanı doğrular:
 
 ---
 
-## Dağıtım ve Windows Durumu (Windows Distribution)
+## Dağıtım ve Masaüstü Paketleri (Distribution & Desktop Packages)
 
-- **Birincil Hedef:** Windows 11 x64 / Windows 10 x64.
-- **Paketleme Formatı:** NSIS Setup Executable (`ERP-CRM-Discovery_0.1.0_x64-setup.exe`).
-- **Mevcut Durum:** `v0.1.0 Release Candidate 1` — 34 soru paketi tamamlandı, masaüstü kabul aşamasında.
+- **Birincil Hedef:** Windows 11 x64 / Windows 10 x64 & macOS Apple Silicon (ARM64).
+- **Windows Formatı:** NSIS Setup Executable (`ERP-CRM-Discovery_0.1.0_x64-setup.exe`).
+- **macOS Formatı:** Apple Silicon DMG (`ERP-CRM-Discovery_0.1.0_aarch64.dmg`) & `.app.tar.gz`.
+- **Mevcut Durum:** `v0.1.0 Kararlı Sürüm (Stable Release)` — 34 soru paketi, veri yönetişimi ve üretim pilotu ile mühürlendi.
 - **Kurulum ve Dağıtım Belgeleri:**
   - Windows Derleme & Dağıtım: [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
   - Windows Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt`](docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt)
   - macOS Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/MACOS_KURULUM_YARDIMI.txt`](docs/guides/installation/MACOS_KURULUM_YARDIMI.txt)
-  - Windows Kabul Kontrol Listesi: [`docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md`](docs/WINDOWS_RC_ACCEPTANCE_CHECKLIST.md)
+  - Sürüm Kabul Kontrol Listesi: [`docs/release/FAZ49_V0.1.0_RELEASE_CHECKLIST.md`](docs/release/FAZ49_V0.1.0_RELEASE_CHECKLIST.md)
+
 
 ### Windows Managed Attachment Vault Manuel Doğrulama Listesi
 Windows'ta installer ile kurulum yapıldıktan sonra `%LOCALAPPDATA%\ERP CRM Discovery\attachment` kökünde şu 5 adım doğrulanmalıdır:
