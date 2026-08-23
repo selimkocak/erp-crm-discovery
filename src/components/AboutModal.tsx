@@ -26,6 +26,29 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
+  const handleOpenExternal = async (url: string) => {
+    try {
+      if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+        const { openUrl } = await import("@tauri-apps/plugin-opener");
+        await openUrl(url);
+      } else {
+        if (url.startsWith("mailto:")) {
+          window.location.href = url;
+        } else {
+          window.open(url, "_blank", "noopener,noreferrer");
+        }
+      }
+    } catch (err) {
+      console.error("Harici bağlantı açılamadı:", err);
+      // Fallback
+      if (url.startsWith("mailto:")) {
+        window.location.href = url;
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    }
+  };
+
   return (
     <div
       className="modal-overlay"
@@ -158,12 +181,27 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
               <div>
                 <div style={{ fontSize: "0.6875rem", color: "var(--text-muted)" }}>İletişim / E-posta</div>
                 <div style={{ fontWeight: 600, color: "var(--text-primary)" }}>
-                  <a
-                    href="mailto:selimkocak@gmail.com"
-                    style={{ color: "inherit", textDecoration: "none" }}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenExternal("mailto:selimkocak@gmail.com")}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      font: "inherit",
+                      color: "inherit",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      textDecoration: "underline",
+                      textDecorationColor: "var(--border-subtle, #cbd5e1)",
+                      textUnderlineOffset: "2px",
+                    }}
+                    aria-label="E-posta gönder: selimkocak@gmail.com"
+                    title="E-posta gönder: selimkocak@gmail.com"
                   >
                     selimkocak@gmail.com
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -186,22 +224,29 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
               <Github size={15} style={{ color: "var(--text-muted)" }} />
               <span style={{ color: "var(--text-secondary)" }}>Açık Kaynak Kod Deposu:</span>
             </div>
-            <a
-              href="https://github.com/selimkocak/erp-crm-discovery"
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
+              onClick={() => handleOpenExternal("https://github.com/selimkocak/erp-crm-discovery")}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.25rem",
                 color: "var(--color-primary-600, #0284c7)",
-                textDecoration: "none",
+                background: "none",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                font: "inherit",
                 fontWeight: 600,
+                cursor: "pointer",
+                textDecoration: "none",
               }}
+              aria-label="GitHub deposunu harici tarayıcıda aç: https://github.com/selimkocak/erp-crm-discovery"
+              title="GitHub deposunu harici tarayıcıda aç"
             >
               <span>GitHub / erp-crm-discovery</span>
               <ExternalLink size={12} />
-            </a>
+            </button>
           </div>
         </div>
 

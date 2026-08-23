@@ -9,6 +9,7 @@
     "sql:allow-execute",
     "dialog:default",
     "fs:default",
+    "opener:default",
     {
       "identifier": "fs:allow-write-file",
       "allow": [
