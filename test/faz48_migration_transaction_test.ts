@@ -9,9 +9,17 @@
  * 4. Migration sırasında oluşan sentetik hata durumunda ROLLBACK gerçekleşir, sürüm kaydedilmez ve veri korunur.
  */
 
-import Database from "better-sqlite3";
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as os from "node:os";
+
+let Database: any = null;
+try {
+  Database = (await import("better-sqlite3")).default;
+} catch {
+  // better-sqlite3 is optional on some platforms (e.g. Windows CI fallback)
+}
+
 import { MIGRATION_DEFINITIONS } from "../src/db/migrationDefinitions";
 
 let passCount = 0;
@@ -31,9 +39,12 @@ function assert(condition: boolean, message: string): void {
  * Tauri Database arayüzünü better-sqlite3 üzerinde simüle eden adaptör.
  */
 class SqliteDbAdapter {
-  private db: Database.Database;
+  private db: any;
 
   constructor(filePath: string) {
+    if (!Database) {
+      throw new Error("better-sqlite3 is not available");
+    }
     this.db = new Database(filePath);
     this.db.pragma("foreign_keys = ON");
   }
@@ -65,10 +76,12 @@ class SqliteDbAdapter {
   }
 
   close(): void {
-    this.db.close();
+    if (this.db) {
+      this.db.close();
+    }
   }
 
-  get raw(): Database.Database {
+  get raw(): any {
     return this.db;
   }
 }
@@ -158,7 +171,7 @@ async function runTransactionalMigrations(adapter: SqliteDbAdapter, customDefini
 
 async function testFreshInstallAndIdempotency(): Promise<void> {
   console.log("--- 1. Temiz Kurulum ve İdempotency Testi ---");
-  const tempDb = path.join("/tmp", `test_faz48_fresh_${Date.now()}.db`);
+  const tempDb = path.join(os.tmpdir(), `test_faz48_fresh_${Date.now()}_${Math.random().toString(36).substring(7)}.db`);
   const adapter = new SqliteDbAdapter(tempDb);
 
   try {
@@ -187,7 +200,7 @@ async function testFreshInstallAndIdempotency(): Promise<void> {
 
 async function testLegacyV10BaselineUpgrade(): Promise<void> {
   console.log("\n--- 3. Eski v10 Veritabanı Baseline ve Yükseltme Testi ---");
-  const tempDb = path.join("/tmp", `test_faz48_legacy_v10_${Date.now()}.db`);
+  const tempDb = path.join(os.tmpdir(), `test_faz48_legacy_v10_${Date.now()}_${Math.random().toString(36).substring(7)}.db`);
   const adapter = new SqliteDbAdapter(tempDb);
 
   try {
@@ -225,7 +238,7 @@ async function testLegacyV10BaselineUpgrade(): Promise<void> {
 
 async function testSyntheticFailureAndRollback(): Promise<void> {
   console.log("\n--- 4. Sentetik Hata ve Rollback Güvenlik Testi ---");
-  const tempDb = path.join("/tmp", `test_faz48_rollback_${Date.now()}.db`);
+  const tempDb = path.join(os.tmpdir(), `test_faz48_rollback_${Date.now()}_${Math.random().toString(36).substring(7)}.db`);
   const adapter = new SqliteDbAdapter(tempDb);
 
   try {
@@ -270,6 +283,12 @@ async function runAllMigrationTransactionTests(): Promise<void> {
   console.log("\n=======================================================");
   console.log("FAZ-48: Migration Transaction ve Rollback Güvenlik Testi");
   console.log("=======================================================\n");
+
+  if (!Database) {
+    console.log("[INFO] better-sqlite3 test harness not available on this environment.");
+    console.log("FAZ-48 Migration Transaction Test: SKIPPED — BETTER_SQLITE3 UNAVAILABLE");
+    return;
+  }
 
   await testFreshInstallAndIdempotency();
   await testLegacyV10BaselineUpgrade();
