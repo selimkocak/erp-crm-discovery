@@ -43,6 +43,7 @@ export const GovernanceAttachmentsTab: React.FC<GovernanceAttachmentsTabProps> =
   const [selectedEntityId, setSelectedEntityId] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [openError, setOpenError] = useState<string | null>(null);
 
   const filtered = attachments.filter((att) => {
     const matchesSearch =
@@ -119,19 +120,32 @@ export const GovernanceAttachmentsTab: React.FC<GovernanceAttachmentsTabProps> =
 
   const handleOpenFile = async (relativePath: string) => {
     try {
+      setOpenError(null);
       const result = await openAttachment({ relativePath });
       if (!result.success && result.error) {
-        alert(`Dosya açılamadı: ${result.error}`);
+        setOpenError(`Dosya açılamadı: ${result.error}`);
       }
     } catch (err: any) {
-      alert(`Dosya açılamadı: ${err?.message || err}`);
+      setOpenError(`Dosya açılamadı: ${err?.message || err}`);
     }
   };
 
-
   return (
     <div className="gov-tab-pane">
+      {openError && (
+        <div className="gov-form-error" style={{ marginBottom: "0.5rem" }}>
+          <span>{openError}</span>
+          <button
+            type="button"
+            onClick={() => setOpenError(null)}
+            style={{ background: "none", border: "none", color: "inherit", cursor: "pointer", marginLeft: "auto", fontWeight: 700 }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
       <div className="gov-tab-toolbar">
+
         <div className="gov-tab-toolbar__left">
           <div className="gov-search-box">
             <Search size={16} className="gov-search-icon" />
@@ -267,12 +281,13 @@ export const GovernanceAttachmentsTab: React.FC<GovernanceAttachmentsTabProps> =
                     if (t === "sod_risk") setSelectedEntityId(sodRisks[0]?.id || "");
                   }}
                 >
-                  <option value="object">Yönetişim Nesnesi (Örn: Stok Kartı)</option>
-                  <option value="responsibility">Sorumluluk Ataması (Owner/Steward)</option>
-                  <option value="authorization">Yetki Matrisi Kaydı</option>
+                  <option value="object">Yönetişim Nesnesi</option>
+                  <option value="responsibility">Sorumluluk Ataması</option>
+                  <option value="authorization">Yetki Tanımı</option>
                   <option value="limit">Onay Limiti</option>
                   <option value="sod_risk">Görevler Ayrılığı (SoD) Riski</option>
                 </select>
+
               </div>
 
               <div className="gov-form-group">

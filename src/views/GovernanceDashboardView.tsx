@@ -9,7 +9,12 @@ import {
   ShieldAlert,
   Paperclip,
   RefreshCw,
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Info,
 } from "lucide-react";
+
 
 import {
   getGovernanceSummary,
@@ -127,6 +132,19 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
   const [isSodModalOpen, setIsSodModalOpen] = useState(false);
   const [editingSod, setEditingSod] = useState<GovernanceSodRisk | null>(null);
 
+  // In-App Toast Notification state
+  const [toast, setToast] = useState<{
+    type: "success" | "info" | "error";
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: "success" | "info" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((prev) => (prev?.message === message ? null : prev));
+    }, 4000);
+  };
+
   const loadAllData = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -179,16 +197,17 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
       const count = await seedDefaultGovernanceObjects(projectId);
       await loadAllData();
       if (count > 0) {
-        alert(`${count} adet standart başlangıç yönetişim nesnesi başarıyla eklendi.`);
+        showToast("success", `${count} adet standart başlangıç yönetişim nesnesi başarıyla eklendi.`);
       } else {
-        alert("Standart başlangıç nesneleri zaten projede mevcut.");
+        showToast("info", "Standart başlangıç nesneleri zaten projede mevcut.");
       }
     } catch (err: any) {
-      alert(`Nesneler eklenirken hata: ${err?.message || err}`);
+      showToast("error", `Nesneler eklenirken hata: ${err?.message || err}`);
     } finally {
       setIsSeeding(false);
     }
   };
+
 
   // Object Handlers
   const handleSaveObject = async (payload: any) => {
@@ -342,8 +361,27 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
 
   return (
     <div className="gov-dashboard">
+      {/* In-App Toast Notification */}
+      {toast && (
+        <div className={`gov-toast gov-toast--${toast.type}`} role="status">
+          {toast.type === "success" && <CheckCircle2 size={18} />}
+          {toast.type === "info" && <Info size={18} />}
+          {toast.type === "error" && <AlertCircle size={18} />}
+          <span>{toast.message}</span>
+          <button
+            type="button"
+            className="gov-toast__close"
+            onClick={() => setToast(null)}
+            aria-label="Kapat"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {/* Header & Subtitle */}
       <div className="gov-dashboard-header">
+
         <div>
           <h2 className="gov-dashboard-title">Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi</h2>
           <p className="gov-dashboard-subtitle">

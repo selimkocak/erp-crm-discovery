@@ -7,7 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-08-23
+
+### Fixed
+* **Wide Screen Responsiveness:** Expanded `.main-content` and `.header-inner` containers from 1200px to 1560px max-width, allowing process tables and governance matrices to utilize wide desktop displays (1440px, 1600px, 2048px) comfortably without being squeezed into a narrow center column.
+* **Governance Modal Overflow & Sizing:**
+  * Expanded `.gov-modal-container` default max-width from 580px to `min(880px, calc(100vw - 48px))`.
+  * Added `.gov-modal-container--large` (`min(1080px, calc(100vw - 48px))`) for complex matrices.
+  * Strictly eliminated modal horizontal scrollbars with `overflow-x: hidden` and clean vertical scrolling.
+  * Added responsive `@media (max-width: 768px)` breakdown collapsing two-column forms to a single column on compact screens.
+* **Process Table Column Widths & Select Readability:**
+  * Adjusted column min-widths in `ProjectDetailView.tsx` (Standard Function: 220px, Category: 130px, Department: 190px, Responsible: 180px, Status: 145px, Analysis: 115px).
+  * Status `<select>` width widened to 135px minimum, eliminating dropdown option clipping (`Ba...` / `De...`).
+  * Analysis button widened to 105px minimum with consistent bold typography and iconography.
+* **Governance Navigation Tabs:** Applied `flex-wrap: wrap` to `.gov-nav-tabs` so all 7 tabs remain fully visible, clean, and accessible on medium and compact desktop resolutions without cutoff.
+* **Ergonomic Select Option Labels:** Streamlined verbose multi-hyphen option labels across all governance modals (e.g. `Veri Sahibi (Data Owner)`, `Veri Sorumlusu (Data Steward)`, `Rol / Pozisyon`, `Kritik (Critical)`).
+* **In-App Toast Notification System:** Replaced native browser/OS `alert()` popups in governance views with non-blocking, auto-dismissing in-app toast banners (`.gov-toast`) with success, info, and error variants.
+
+---
+
 ## [0.1.0] - 2026-08-23
+
 
 ### Added
 * **33 Canonical Business Functions & 34 Question Packs:** 1,492 questions (792 required, 700 optional, 213 branching) covering sales, procurement, warehouse, inventory, logistics, accounting, treasury, budget, reporting, crm, proposals, marketing, supplier management, quality, maintenance, production planning, work orders, costing, asset management, human resources, payroll, legal compliance, IT infrastructure, master data management, project management, e-transformation, invoicing, document management, import, export, ecommerce, general management, strategy, and training.

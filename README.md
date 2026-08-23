@@ -277,7 +277,7 @@ JSON Soru Paketi
 Proje **"Tek Modül = Tek Faz = Tek Kabul"** disipliniyle geliştirilmiştir. Her kanonik modülün tam kabul testi mevcuttur.
 
 ```bash
-npm test   # 71 test suite (2.120+ test) — %100 PASS
+npm test   # 72 test suite (2.140+ test) — %100 PASS
 ```
 
 Her modül testi şu 15 alanı doğrular:
@@ -305,14 +305,15 @@ Her modül testi şu 15 alanı doğrular:
 ## Dağıtım ve Masaüstü Paketleri (Distribution & Desktop Packages)
 
 - **Birincil Hedef:** Windows 11 x64 / Windows 10 x64 & macOS Apple Silicon (ARM64).
-- **Windows Formatı:** NSIS Setup Executable (`ERP-CRM-Discovery_0.1.0_x64-setup.exe`).
-- **macOS Formatı:** Apple Silicon DMG (`ERP-CRM-Discovery_0.1.0_aarch64.dmg`) & `.app.tar.gz`.
-- **Mevcut Durum:** `v0.1.0 Kararlı Sürüm (Stable Release)` — 34 soru paketi, veri yönetişimi ve üretim pilotu ile mühürlendi.
+- **Windows Formatı:** NSIS Setup Executable (`ERP.CRM.Discovery_0.1.1_x64-setup.exe`).
+- **macOS Formatı:** Apple Silicon DMG (`ERP.CRM.Discovery_0.1.1_aarch64.dmg`) & `.app.tar.gz`.
+- **Mevcut Durum:** `v0.1.1 Kararlı Sürüm (Stable Release)` — 34 soru paketi, veri yönetişimi, responsive/usability hotfix ve üretim pilotu ile mühürlendi.
 - **Kurulum ve Dağıtım Belgeleri:**
   - Windows Derleme & Dağıtım: [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
   - Windows Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt`](docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt)
   - macOS Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/MACOS_KURULUM_YARDIMI.txt`](docs/guides/installation/MACOS_KURULUM_YARDIMI.txt)
   - Sürüm Kabul Kontrol Listesi: [`docs/release/FAZ49_V0.1.0_RELEASE_CHECKLIST.md`](docs/release/FAZ49_V0.1.0_RELEASE_CHECKLIST.md)
+
 
 
 ### Windows Managed Attachment Vault Manuel Doğrulama Listesi

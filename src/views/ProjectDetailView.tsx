@@ -420,12 +420,12 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             <table className="custom-table">
               <thead>
                 <tr>
-                  <th style={{ width: "22%" }}>Standart İş Fonksiyonu</th>
-                  <th style={{ width: "18%" }}>Kategori</th>
-                  <th style={{ width: "22%" }}>Firma İçi Departman Adı</th>
-                  <th style={{ width: "18%" }}>Sorumlu / Görüşülen Kişi</th>
-                  <th style={{ width: "8%" }}>Durum</th>
-                  <th style={{ width: "12%" }}>Analiz</th>
+                  <th style={{ minWidth: "220px", width: "24%" }}>Standart İş Fonksiyonu</th>
+                  <th style={{ minWidth: "130px", width: "14%" }}>Kategori</th>
+                  <th style={{ minWidth: "190px", width: "22%" }}>Firma İçi Departman Adı</th>
+                  <th style={{ minWidth: "180px", width: "19%" }}>Sorumlu / Görüşülen Kişi</th>
+                  <th style={{ minWidth: "145px", width: "12%" }}>Durum</th>
+                  <th style={{ minWidth: "115px", width: "9%" }}>Analiz</th>
                 </tr>
               </thead>
               <tbody>
@@ -481,7 +481,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                     <td>
                       <select
                         className="form-control"
-                        style={{ padding: "0.375rem 0.5rem", fontSize: "0.8125rem" }}
+                        style={{ minWidth: "135px", padding: "0.375rem 0.5rem", fontSize: "0.8125rem", cursor: "pointer" }}
                         value={fn.status}
                         onChange={(e) =>
                           handleFunctionFieldChange(
@@ -507,14 +507,14 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                               : "btn--start"
                           } btn--sm`}
                           onClick={() => handleStartAnalysis(fn.code, fn.name_tr)}
-
                           disabled={packLoadingCode === fn.code}
                           style={{
-                            minWidth: "90px",
+                            minWidth: "105px",
                             display: "inline-flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            gap: "0.25rem",
+                            gap: "0.35rem",
+                            fontWeight: 600,
                           }}
                         >
                           {packLoadingCode === fn.code ? (
@@ -533,6 +533,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                             </>
                           )}
                         </button>
+
                       ) : (
                         <span
                           className="badge badge--neutral"

@@ -240,8 +240,9 @@ async function runTests(): Promise<void> {
   assert(aboutModalContent.includes("ERP CRM Discovery"), "AboutModal ürün adını 'ERP CRM Discovery' olarak içermeli");
   assert(aboutModalContent.includes("Selim Koçak"), "AboutModal geliştirici olarak 'Selim Koçak' göstermeli");
   assert(aboutModalContent.includes("selimkocak@gmail.com"), "AboutModal iletişim olarak 'selimkocak@gmail.com' göstermeli");
-  assert(aboutModalContent.includes("v0.1.0"), "AboutModal sürüm bilgisini (v0.1.0) içermeli");
+  assert(/v0\.1\.\d+/.test(aboutModalContent), "AboutModal sürüm bilgisini (v0.1.x) içermeli");
   assert(aboutModalContent.includes("role=\"dialog\""), "AboutModal role='dialog' erişilebilirlik özniteliğini içermeli");
+
   assert(aboutModalContent.includes("aria-modal=\"true\""), "AboutModal aria-modal='true' özniteliğini içermeli");
   assert(aboutModalContent.includes("Escape"), "AboutModal Escape tuşu ile kapanmayı desteklemeli");
   assert(aboutModalContent.includes("Offline-First") || aboutModalContent.includes("Çevrimdışı"), "AboutModal offline-first bilgisini içermeli");

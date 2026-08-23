@@ -23,10 +23,11 @@ interface ModalBaseProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
+  className?: string;
   children: React.ReactNode;
 }
 
-const ModalBase: React.FC<ModalBaseProps> = ({ isOpen, onClose, title, children }) => {
+const ModalBase: React.FC<ModalBaseProps> = ({ isOpen, onClose, title, className, children }) => {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -41,7 +42,7 @@ const ModalBase: React.FC<ModalBaseProps> = ({ isOpen, onClose, title, children 
 
   return (
     <div className="gov-modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
-      <div className="gov-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div className={`gov-modal-container ${className || ""}`} onClick={(e) => e.stopPropagation()}>
         <div className="gov-modal-header">
           <h3 className="gov-modal-title">{title}</h3>
           <button className="gov-modal-close-btn" onClick={onClose} aria-label="Kapat">
@@ -53,6 +54,7 @@ const ModalBase: React.FC<ModalBaseProps> = ({ isOpen, onClose, title, children 
     </div>
   );
 };
+
 
 // ============================================================================
 // 1. Object Modal (Yönetişim Nesnesi)
@@ -230,10 +232,11 @@ export const SubjectModal: React.FC<SubjectModalProps> = ({ isOpen, onClose, ini
           <div className="gov-form-group">
             <label>Özne Türü *</label>
             <select value={subjectType} onChange={(e) => setSubjectType(e.target.value as GovernanceSubjectType)}>
-              <option value="role">Rol / Pozisyon (Örn: Satın Alma Müdürü)</option>
-              <option value="group">Grup (Örn: Muhasebe Kullanıcıları)</option>
-              <option value="user">Kullanıcı / Kişi (Örn: Ahmet Yılmaz)</option>
+              <option value="role">Rol / Pozisyon</option>
+              <option value="group">Grup / Ekip</option>
+              <option value="user">Kullanıcı / Kişi</option>
             </select>
+
           </div>
           <div className="gov-form-group">
             <label>Özne Adı *</label>
@@ -458,10 +461,10 @@ export const ResponsibilityModal: React.FC<ResponsibilityModalProps> = ({
           <div className="gov-form-group">
             <label>Sorumluluk Türü *</label>
             <select value={respType} onChange={(e) => setRespType(e.target.value as GovernanceResponsibilityType)}>
-              <option value="data_owner">Veri Sahibi (Data Owner — Anlam ve Kural)</option>
-              <option value="data_steward">Veri Sorumlusu (Data Steward — Kalite ve Operasyon)</option>
-              <option value="technical_custodian">Teknik Emanetçi (Technical Custodian — Sistem/DB)</option>
-              <option value="approver">Onay Sahibi (Approver — Süreç Onayı)</option>
+              <option value="data_owner">Veri Sahibi (Data Owner)</option>
+              <option value="data_steward">Veri Sorumlusu (Data Steward)</option>
+              <option value="technical_custodian">Teknik Emanetçi (Custodian)</option>
+              <option value="approver">Onay Sahibi (Approver)</option>
               <option value="process_owner">Süreç Sahibi (Process Owner)</option>
               <option value="control_owner">Kontrol Sahibi (Control Owner)</option>
             </select>
@@ -654,7 +657,7 @@ export const AuthorizationModal: React.FC<AuthorizationModalProps> = ({
   };
 
   return (
-    <ModalBase isOpen={isOpen} onClose={onClose} title={initialData ? "Yetki Kaydını Düzenle" : "Yeni Yetki Tanımı"}>
+    <ModalBase isOpen={isOpen} onClose={onClose} title={initialData ? "Yetki Kaydını Düzenle" : "Yeni Yetki Tanımı"} className="gov-modal-container--large">
       <form onSubmit={handleSubmit} className="gov-form">
         {error && <div className="gov-form-error"><AlertCircle size={16} /><span>{error}</span></div>}
         <div className="gov-form-row">
@@ -679,9 +682,9 @@ export const AuthorizationModal: React.FC<AuthorizationModalProps> = ({
           <div className="gov-form-group">
             <label>Beyan Edilen Yetki Seviyesi *</label>
             <select value={permLevel} onChange={(e) => handleLevelChange(e.target.value as GovernancePermissionLevel)}>
-              <option value="full">Tam Yetki (Full Access)</option>
-              <option value="read_only">Salt Okunur (Read Only)</option>
-              <option value="none">Yetki Yok (No Access)</option>
+              <option value="full">Tam Yetki (Full)</option>
+              <option value="read_only">Salt Okunur (Read)</option>
+              <option value="none">Yetki Yok (None)</option>
               <option value="partial">Kısmi / Özel (Partial)</option>
               <option value="unspecified">Belirtilmedi</option>
             </select>
@@ -690,9 +693,9 @@ export const AuthorizationModal: React.FC<AuthorizationModalProps> = ({
             <label>Yetki Kaynağı</label>
             <select value={permSource} onChange={(e) => setPermSource(e.target.value as GovernancePermissionSource)}>
               <option value="direct">Doğrudan Atama (Direct)</option>
-              <option value="role">Rol Bazlı (Role Based)</option>
+              <option value="role">Rol Bazlı (Role)</option>
               <option value="group">Grup Üyeliği (Group)</option>
-              <option value="inherited">Miras / Üst Pozisyon (Inherited)</option>
+              <option value="inherited">Miras / Pozisyon (Inherited)</option>
               <option value="exception">Özel İstisna (Exception)</option>
             </select>
           </div>
@@ -718,6 +721,7 @@ export const AuthorizationModal: React.FC<AuthorizationModalProps> = ({
             </select>
           </div>
         </div>
+
         <div className="gov-form-group">
           <label>İşlem Düzeyi İzinleri</label>
           <div className="gov-checkbox-grid">
@@ -1068,7 +1072,7 @@ export const SodRiskModal: React.FC<SodRiskModalProps> = ({
   };
 
   return (
-    <ModalBase isOpen={isOpen} onClose={onClose} title={initialData ? "SoD Riskini Düzenle" : "Yeni Görevler Ayrılığı (SoD) Riski"}>
+    <ModalBase isOpen={isOpen} onClose={onClose} title={initialData ? "SoD Riskini Düzenle" : "Yeni Görevler Ayrılığı (SoD) Riski"} className="gov-modal-container--large">
       <form onSubmit={handleSubmit} className="gov-form">
         {error && <div className="gov-form-error"><AlertCircle size={16} /><span>{error}</span></div>}
         <div className="gov-form-group">
@@ -1089,8 +1093,8 @@ export const SodRiskModal: React.FC<SodRiskModalProps> = ({
           <div className="gov-form-group">
             <label>Risk Ciddiyeti *</label>
             <select value={severity} onChange={(e) => setSeverity(e.target.value as GovernanceRiskSeverity)}>
-              <option value="critical">Kritik (Critical — Yüksek Finansal / Yasal Risk)</option>
-              <option value="high">Yüksek (High — Ciddi Süreç Riski)</option>
+              <option value="critical">Kritik (Critical)</option>
+              <option value="high">Yüksek (High)</option>
               <option value="medium">Orta (Medium)</option>
               <option value="low">Düşük (Low)</option>
             </select>
@@ -1100,12 +1104,13 @@ export const SodRiskModal: React.FC<SodRiskModalProps> = ({
             <select value={status} onChange={(e) => setStatus(e.target.value as GovernanceRiskStatus)}>
               <option value="open">Açık (Open)</option>
               <option value="in_review">İnceleniyor (In Review)</option>
-              <option value="mitigated">Azaltıldı / Kontrol Eklendi (Mitigated)</option>
-              <option value="accepted">Kabul Edildi / Risk Alındı (Accepted)</option>
+              <option value="mitigated">Kontrol Altında (Mitigated)</option>
+              <option value="accepted">Kabul Edildi (Accepted)</option>
               <option value="closed">Kapatıldı (Closed)</option>
             </select>
           </div>
         </div>
+
         <div className="gov-form-row">
           <div className="gov-form-group">
             <label>İlgili Özne (Kişi/Rol)</label>
