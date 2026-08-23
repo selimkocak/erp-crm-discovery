@@ -16,11 +16,11 @@ import {
   X as XIcon,
 } from "lucide-react";
 import { getProjects, deleteProject } from "../db/client";
-import { exportProjectBackup } from "../storage/backupManager";
+import { saveProjectBackupToFile, type SaveBackupResult } from "../storage/backupManager";
 import {
   RestoreProjectModal,
   DuplicateProjectModal,
-  triggerFileDownload,
+  BackupSuccessModal,
 } from "../components/ProjectBackupModals";
 import type { ProjectListItem } from "../types";
 
@@ -43,6 +43,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
   const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; name: string } | null>(null);
   const [exportingProjectId, setExportingProjectId] = useState<string | null>(null);
+  const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "info" | "error"; message: string } | null>(null);
 
   const showToast = (type: "success" | "info" | "error", message: string) => {
@@ -70,12 +71,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
     loadProjects();
   }, []);
 
-  const handleExport = async (projId: string, projName: string) => {
+  const handleExport = async (projId: string) => {
     setExportingProjectId(projId);
     try {
-      const res = await exportProjectBackup(projId);
-      triggerFileDownload(res.blob, res.fileName);
-      showToast("success", `"${projName}" yedeği başarıyla oluşturuldu (.erpcrm).`);
+      const res = await saveProjectBackupToFile(projId);
+      if (!res.cancelled) {
+        setBackupSuccessResult(res);
+      }
     } catch (err: any) {
       showToast("error", `Yedekleme başarısız: ${err?.message || err}`);
     } finally {
@@ -257,7 +259,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         className="btn btn-secondary btn--sm"
                         title="Projeyi Yedekle (.erpcrm)"
                         disabled={exportingProjectId === proj.id}
-                        onClick={() => handleExport(proj.id, proj.name)}
+                        onClick={() => handleExport(proj.id)}
                       >
                         <Download size={14} />
                       </button>
@@ -299,10 +301,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       )}
 
+      {/* Backup Success Modal */}
+      <BackupSuccessModal
+        isOpen={!!backupSuccessResult}
+        onClose={() => setBackupSuccessResult(null)}
+        result={backupSuccessResult}
+      />
+
       {/* Restore Modal */}
       <RestoreProjectModal
         isOpen={isRestoreOpen}
         onClose={() => setIsRestoreOpen(false)}
+        onOpenProject={onOpenProject}
         onSuccess={(msg, newId) => {
           showToast("success", msg);
           if (newId) {

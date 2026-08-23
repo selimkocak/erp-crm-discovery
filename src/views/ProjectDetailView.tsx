@@ -30,11 +30,11 @@ import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
 import { loadQuestionPack, getPackIdForFunction, hasQuestionPack } from "../engine/loader";
-import { exportProjectBackup } from "../storage/backupManager";
+import { saveProjectBackupToFile, type SaveBackupResult } from "../storage/backupManager";
 import {
   RestoreProjectModal,
   DuplicateProjectModal,
-  triggerFileDownload,
+  BackupSuccessModal,
 } from "../components/ProjectBackupModals";
 import type { QuestionPack } from "../engine/types";
 import type { FunctionStatus, ProjectDetailData } from "../types";
@@ -64,6 +64,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
   const [isDuplicateOpen, setIsDuplicateOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "info" | "error"; message: string } | null>(null);
 
   const showToast = (type: "success" | "info" | "error", message: string) => {
@@ -186,9 +187,10 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const handleExportBackup = async () => {
     setIsExporting(true);
     try {
-      const res = await exportProjectBackup(projectId);
-      triggerFileDownload(res.blob, res.fileName);
-      showToast("success", `"${res.manifest.projectName}" yedeği başarıyla oluşturuldu (.erpcrm).`);
+      const res = await saveProjectBackupToFile(projectId);
+      if (!res.cancelled) {
+        setBackupSuccessResult(res);
+      }
     } catch (err: any) {
       showToast("error", `Yedekleme başarısız: ${err?.message || err}`);
     } finally {
@@ -374,9 +376,16 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
       </div>
 
       {/* Modals */}
+      <BackupSuccessModal
+        isOpen={!!backupSuccessResult}
+        onClose={() => setBackupSuccessResult(null)}
+        result={backupSuccessResult}
+      />
+
       <RestoreProjectModal
         isOpen={isRestoreOpen}
         onClose={() => setIsRestoreOpen(false)}
+        onOpenProject={onOpenProject}
         onSuccess={(msg, newId) => {
           showToast("success", msg);
           if (newId && onOpenProject) {

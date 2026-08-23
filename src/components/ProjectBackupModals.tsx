@@ -4,21 +4,25 @@ import {
   Copy,
   FileArchive,
   CheckCircle2,
+  FolderOpen,
+  ArrowRight,
   X,
 } from "lucide-react";
 import {
   inspectProjectBackup,
   restoreProjectBackup,
   duplicateProject,
+  type SaveBackupResult,
 } from "../storage/backupManager";
 import type { BackupInspectionResult } from "../types/backup";
 
-
 /**
- * Tarayıcı ve masaüstünde blob indirme yardımcısı
+ * Tarayıcı ve masaüstünde blob indirme yardımcısı (fallback)
  */
-
 export function triggerFileDownload(blob: Blob, fileName: string): void {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
@@ -30,6 +34,130 @@ export function triggerFileDownload(blob: Blob, fileName: string): void {
 }
 
 /**
+ * Yedekleme Başarı Modalı (Görünür dosya adı, konum ve Klasörde Göster)
+ */
+export const BackupSuccessModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  result: SaveBackupResult | null;
+}> = ({ isOpen, onClose, result }) => {
+  if (!isOpen || !result) return null;
+
+  const handleReveal = async () => {
+    if (!result.filePath) return;
+    try {
+      if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+        const { revealItemInDir } = await import("@tauri-apps/plugin-opener");
+        await revealItemInDir(result.filePath);
+      } else {
+        const { showAttachmentInFolder } = await import("../storage/attachmentLinks");
+        await showAttachmentInFolder(result.filePath);
+      }
+    } catch (err) {
+      console.error("Klasörde gösterme hatası:", err);
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  return (
+    <div className="modal-backdrop" onClick={onClose} role="presentation">
+      <div
+        className="modal-container gov-modal-container"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="backup-success-title"
+        style={{ maxWidth: "560px" }}
+      >
+        <div className="modal-header">
+          <div className="modal-header__title" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <CheckCircle2 size={22} style={{ color: "var(--color-success, #16a34a)" }} />
+            <h3 id="backup-success-title" style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>
+              Yedekleme Başarıyla Tamamlandı
+            </h3>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Kapat">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="modal-body" style={{ padding: "1.25rem" }}>
+          <p style={{ margin: "0 0 1rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
+            <strong>&quot;{result.projectName}&quot;</strong> analiz projesinin taşınabilir yedek arşivi (.erpcrm) başarıyla oluşturuldu.
+          </p>
+
+          <div
+            style={{
+              backgroundColor: "var(--bg-surface-subtle, #f8fafc)",
+              border: "1px solid var(--border-subtle, #e2e8f0)",
+              borderRadius: "8px",
+              padding: "1rem",
+              fontSize: "0.85rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.6rem",
+            }}
+          >
+            <div>
+              <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Dosya Adı:</span>
+              <strong style={{ color: "var(--text-primary)", wordBreak: "break-all" }}>{result.fileName}</strong>
+            </div>
+
+            {result.filePath && (
+              <div>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Kaydedilen Konum:</span>
+                <code
+                  style={{
+                    display: "block",
+                    padding: "0.4rem 0.6rem",
+                    background: "var(--bg-card, #ffffff)",
+                    border: "1px solid var(--border-subtle, #e2e8f0)",
+                    borderRadius: "4px",
+                    color: "var(--text-primary)",
+                    wordBreak: "break-all",
+                    fontSize: "0.8rem",
+                    fontFamily: "monospace",
+                  }}
+                >
+                  {result.filePath}
+                </code>
+              </div>
+            )}
+
+            <div>
+              <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Paket Boyutu:</span>
+              <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{formatFileSize(result.fileSize)}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+          {result.filePath && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleReveal}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+            >
+              <FolderOpen size={16} />
+              Klasörde Göster
+            </button>
+          )}
+          <button type="button" className="btn btn--save" onClick={onClose}>
+            Tamam
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/**
  * Yedekten Geri Yükleme Modalı
  */
 export const RestoreProjectModal: React.FC<{
@@ -37,18 +165,64 @@ export const RestoreProjectModal: React.FC<{
   onClose: () => void;
   onSuccess: (message: string, newProjectId?: string) => void;
   onError: (errorMessage: string) => void;
-}> = ({ isOpen, onClose, onSuccess, onError }) => {
+  onOpenProject?: (newProjectId: string) => void;
+}> = ({ isOpen, onClose, onSuccess, onError, onOpenProject }) => {
   const [fileBuffer, setFileBuffer] = useState<ArrayBuffer | null>(null);
+  const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [inspection, setInspection] = useState<BackupInspectionResult | null>(null);
   const [isInspecting, setIsInspecting] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [customProjectName, setCustomProjectName] = useState("");
+  const [restoredResult, setRestoredResult] = useState<{ newProjectId: string; projectName: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
 
   if (!isOpen) return null;
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectFile = async () => {
+    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+      try {
+        const { open } = await import("@tauri-apps/plugin-dialog");
+        const { readFile } = await import("@tauri-apps/plugin-fs");
+
+        const selected = await open({
+          multiple: false,
+          filters: [
+            {
+              name: "ERP CRM Discovery Yedeği",
+              extensions: ["erpcrm"],
+            },
+          ],
+        });
+
+        if (!selected || typeof selected !== "string") return;
+
+        setIsInspecting(true);
+        setInspection(null);
+
+        const bytes = await readFile(selected);
+        const fileName = selected.replace(/\\/g, "/").split("/").pop() || "yedek.erpcrm";
+        setSelectedFileName(fileName);
+        setFileBuffer(bytes.buffer);
+
+        const res = await inspectProjectBackup(bytes);
+        setInspection(res);
+        if (res.valid && res.manifest) {
+          setCustomProjectName(`${res.manifest.projectName} (Geri Yüklenen)`);
+        } else {
+          onError(res.error || "Paket bütünlüğü doğrulanamadı.");
+        }
+        return;
+      } catch (nativeErr) {
+        console.warn("Tauri native open fallback:", nativeErr);
+      } finally {
+        setIsInspecting(false);
+      }
+    }
+
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -59,6 +233,7 @@ export const RestoreProjectModal: React.FC<{
 
     setIsInspecting(true);
     setInspection(null);
+    setSelectedFileName(file.name);
 
     try {
       const buffer = await file.arrayBuffer();
@@ -66,7 +241,7 @@ export const RestoreProjectModal: React.FC<{
       const res = await inspectProjectBackup(buffer);
       setInspection(res);
       if (res.valid && res.manifest) {
-        setCustomProjectName(`${res.manifest.projectName} — İçe Aktarılan Kopya`);
+        setCustomProjectName(`${res.manifest.projectName} (Geri Yüklenen)`);
       } else {
         onError(res.error || "Paket bütünlüğü doğrulanamadı.");
       }
@@ -86,11 +261,15 @@ export const RestoreProjectModal: React.FC<{
         newProjectName: customProjectName.trim() || undefined,
       });
 
+      setRestoredResult({
+        newProjectId: res.newProjectId!,
+        projectName: res.projectName!,
+      });
+
       onSuccess(
         `"${res.projectName}" projesi başarıyla geri yüklendi (${res.attachmentCount || 0} ek dosya aktarıldı).`,
         res.newProjectId
       );
-      handleClose();
     } catch (err: any) {
       onError(`Geri yükleme başarısız oldu: ${err?.message || err}`);
     } finally {
@@ -100,11 +279,12 @@ export const RestoreProjectModal: React.FC<{
 
   const handleClose = () => {
     setFileBuffer(null);
+    setSelectedFileName("");
     setInspection(null);
     setCustomProjectName("");
+    setRestoredResult(null);
     onClose();
   };
-
 
   const manifest = inspection?.manifest;
 
@@ -116,6 +296,7 @@ export const RestoreProjectModal: React.FC<{
         role="dialog"
         aria-modal="true"
         aria-labelledby="restore-modal-title"
+        style={{ maxWidth: "580px" }}
       >
         <div className="modal-header">
           <div className="modal-header__title" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -130,32 +311,63 @@ export const RestoreProjectModal: React.FC<{
         </div>
 
         <div className="modal-body" style={{ padding: "1.25rem" }}>
-          {!inspection?.valid ? (
-            <div style={{ textAlign: "center", padding: "2rem 1rem" }}>
+          {restoredResult ? (
+            /* Başarı Sonuç Ekranı */
+            <div style={{ textAlign: "center", padding: "1.5rem 0.5rem" }}>
+              <CheckCircle2 size={48} style={{ color: "var(--color-success, #16a34a)", margin: "0 auto 1rem" }} />
+              <h4 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem", fontWeight: 700 }}>
+                Geri Yükleme Başarılı
+              </h4>
+              <p style={{ margin: "0 0 1.5rem", fontSize: "0.9rem", color: "var(--text-secondary)" }}>
+                <strong>&quot;{restoredResult.projectName}&quot;</strong> yeni bir analiz projesi olarak sisteme eklendi.
+              </p>
+              <div style={{ display: "flex", justifyContent: "center", gap: "0.75rem" }}>
+                {onOpenProject && (
+                  <button
+                    type="button"
+                    className="btn btn--save"
+                    onClick={() => {
+                      const id = restoredResult.newProjectId;
+                      handleClose();
+                      onOpenProject(id);
+                    }}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+                  >
+                    <span>Projeyi Aç</span>
+                    <ArrowRight size={16} />
+                  </button>
+                )}
+                <button type="button" className="btn btn-secondary" onClick={handleClose}>
+                  Kapat
+                </button>
+              </div>
+            </div>
+          ) : !inspection?.valid ? (
+            <div style={{ textAlign: "center", padding: "1.5rem 0.5rem" }}>
               <div
                 style={{
-                  border: "2px dashed var(--border-color)",
-                  borderRadius: "var(--radius-lg)",
+                  border: "2px dashed var(--border-color, #cbd5e1)",
+                  borderRadius: "var(--radius-lg, 8px)",
                   padding: "2.5rem 1.5rem",
                   cursor: "pointer",
-                  backgroundColor: "var(--bg-surface)",
+                  backgroundColor: "var(--bg-surface-subtle, #f8fafc)",
                   transition: "all 0.2s",
                 }}
-                onClick={() => fileInputRef.current?.click()}
+                onClick={handleSelectFile}
               >
-                <FileArchive size={48} style={{ color: "var(--primary)", margin: "0 auto 1rem" }} />
+                <FileArchive size={48} style={{ color: "var(--color-primary-600, #0284c7)", margin: "0 auto 1rem" }} />
                 <h4 style={{ margin: "0 0 0.5rem", fontSize: "1.05rem", fontWeight: 600 }}>
                   .erpcrm Proje Paketi Seçin
                 </h4>
                 <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--text-muted)" }}>
-                  Daha önce yedeklenmiş taşınabilir proje dosyasını yükleyin
+                  Daha önce yedeklenmiş taşınabilir proje dosyasını seçin
                 </p>
                 <input
                   ref={fileInputRef}
                   type="file"
                   accept=".erpcrm"
                   style={{ display: "none" }}
-                  onChange={handleFileChange}
+                  onChange={handleFileInputChange}
                 />
               </div>
 
@@ -170,19 +382,23 @@ export const RestoreProjectModal: React.FC<{
               {/* Inspection Summary Card */}
               <div
                 style={{
-                  backgroundColor: "var(--bg-surface)",
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "var(--radius-md)",
+                  backgroundColor: "var(--bg-surface-subtle, #f8fafc)",
+                  border: "1px solid var(--border-subtle, #e2e8f0)",
+                  borderRadius: "var(--radius-md, 6px)",
                   padding: "1rem",
                   marginBottom: "1.25rem",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.75rem" }}>
-                  <CheckCircle2 size={18} style={{ color: "var(--success)" }} />
+                  <CheckCircle2 size={18} style={{ color: "var(--color-success, #16a34a)" }} />
                   <strong style={{ fontSize: "0.95rem" }}>Geçerli Proje Paketi Doğrulandı</strong>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", fontSize: "0.85rem" }}>
+                  <div>
+                    <span style={{ color: "var(--text-muted)" }}>Dosya Adı:</span>{" "}
+                    <strong>{selectedFileName}</strong>
+                  </div>
                   <div>
                     <span style={{ color: "var(--text-muted)" }}>Firma:</span>{" "}
                     <strong>{manifest?.companyName}</strong>
@@ -196,10 +412,6 @@ export const RestoreProjectModal: React.FC<{
                     <span>
                       {manifest?.createdAt ? new Date(manifest.createdAt).toLocaleDateString("tr-TR") : "—"}
                     </span>
-                  </div>
-                  <div>
-                    <span style={{ color: "var(--text-muted)" }}>Kaynak Sürüm:</span>{" "}
-                    <span>v{manifest?.appVersion || "0.1.0"}</span>
                   </div>
                 </div>
 
@@ -247,21 +459,23 @@ export const RestoreProjectModal: React.FC<{
           )}
         </div>
 
-        <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
-          <button type="button" className="btn btn-secondary" onClick={handleClose} disabled={isRestoring}>
-            Vazgeç
-          </button>
-          {inspection?.valid && (
-            <button
-              type="button"
-              className="btn btn--save"
-              onClick={handleRestore}
-              disabled={isRestoring || !customProjectName.trim()}
-            >
-              {isRestoring ? "Geri Yükleniyor..." : "Projeyi Geri Yükle"}
+        {!restoredResult && (
+          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+            <button type="button" className="btn btn-secondary" onClick={handleClose} disabled={isRestoring}>
+              Vazgeç
             </button>
-          )}
-        </div>
+            {inspection?.valid && (
+              <button
+                type="button"
+                className="btn btn--save"
+                onClick={handleRestore}
+                disabled={isRestoring || !customProjectName.trim()}
+              >
+                {isRestoring ? "Geri Yükleniyor..." : "Projeyi Geri Yükle"}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -285,7 +499,7 @@ export const DuplicateProjectModal: React.FC<{
   if (!isOpen) return null;
 
   const handleDuplicate = async () => {
-    if (!newProjectName.trim()) return;
+    if (!newProjectName.trim() || isDuplicating) return;
 
     setIsDuplicating(true);
     try {
@@ -300,7 +514,12 @@ export const DuplicateProjectModal: React.FC<{
       );
       onClose();
     } catch (err: any) {
-      onError(`Çoğaltma işlemi başarısız oldu: ${err?.message || err}`);
+      console.error("Çoğaltma hatası:", err);
+      onError(
+        err?.message && !err.message.includes("database is locked")
+          ? err.message
+          : "Proje çoğaltılamadı. Veritabanı işlemi tamamlanamadı; hiçbir değişiklik kaydedilmedi."
+      );
     } finally {
       setIsDuplicating(false);
     }
@@ -322,7 +541,7 @@ export const DuplicateProjectModal: React.FC<{
               Projeyi Çoğalt
             </h3>
           </div>
-          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Kapat">
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Kapat" disabled={isDuplicating}>
             <X size={18} />
           </button>
         </div>
@@ -337,6 +556,7 @@ export const DuplicateProjectModal: React.FC<{
               className="form-control"
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
+              disabled={isDuplicating}
               style={{ width: "100%", boxSizing: "border-box" }}
             />
           </div>
@@ -350,11 +570,12 @@ export const DuplicateProjectModal: React.FC<{
               marginBottom: "1rem",
             }}
           >
-            <label style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", cursor: "pointer" }}>
+            <label style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", cursor: isDuplicating ? "default" : "pointer" }}>
               <input
                 type="checkbox"
                 checked={copyAnswersAndAttachments}
                 onChange={(e) => setCopyAnswersAndAttachments(e.target.checked)}
+                disabled={isDuplicating}
                 style={{ marginTop: "0.25rem" }}
               />
               <div>

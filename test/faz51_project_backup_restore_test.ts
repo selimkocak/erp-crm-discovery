@@ -60,6 +60,7 @@ import {
 } from "../src/storage/tarArchive";
 import {
   exportProjectBackup,
+  saveProjectBackupToFile,
   inspectProjectBackup,
   restoreProjectBackup,
   duplicateProject,
@@ -632,6 +633,26 @@ async function runFaz51BackupRestoreTests(): Promise<void> {
     assert(rollbackOccurred, "Hata durumunda restoreProjectBackup beklenen hatayı fırlattı.");
     assert(countBefore === countAfter, "Rollback başarıyla gerçekleşti, veritabanında yarım proje kaydı oluşmadı.");
 
+    console.log("\n--- 8. FAZ-54 Regresyon Doğrulamaları ---");
+
+    // 8A. saveProjectBackupToFile dönüş modeli ve görünürlük alanları
+    const saveRes = await saveProjectBackupToFile(projectId);
+    assert(Boolean(saveRes.fileName && saveRes.fileName.endsWith(".erpcrm")), "saveProjectBackupToFile geçerli dosya adı üretti: " + saveRes.fileName);
+    assert(Boolean(saveRes.fileSize && saveRes.fileSize > 0), "saveProjectBackupToFile geçerli dosya boyutu döndürdü: " + saveRes.fileSize);
+    assert(Boolean(saveRes.projectName), "saveProjectBackupToFile proje adını korudu: " + saveRes.projectName);
+
+    // 8B. Rollback sonrasında veritabanının kilitli kalmadığı ve 2. denemenin başarılı olduğu doğrulandı
+    const dupAfterRollback = await duplicateProject(projectId, {
+      newProjectName: "Atlas Makine — Rollback Sonrası Başarılı Kopya",
+      copyAnswersAndAttachments: true,
+    });
+    assert(Boolean(dupAfterRollback.newProjectId), "Rollback sonrasında veritabanı kilitli kalmadı ve çoğaltma başarıyla tamamlandı.");
+
+    const dupAfterCount = (await adapter.select<any[]>(
+      "SELECT COUNT(*) as cnt FROM question_answers WHERE analysis_project_id = $1",
+      [dupAfterRollback.newProjectId]
+    ))[0].cnt;
+    assert(dupAfterCount === 10, "İkinci denemede tüm 10 soru cevabı eksiksiz çoğaltıldı.");
   } finally {
     resetDbInstanceForTesting();
     if (adapter && adapter.db) {

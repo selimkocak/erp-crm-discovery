@@ -3,11 +3,10 @@
  * FAZ-51: Tek arşivli (.erpcrm) proje dışa aktarma, içe aktarma ve çoğaltma servisi
  */
 
-import { getDb, generateId } from "../db/client";
+import { getDb, generateId, deleteProject } from "../db/client";
 import {
   readAttachmentFile,
   saveAttachmentFile,
-  deleteProjectAttachmentsDirectory,
   sanitizeFileName,
 } from "./attachmentManager";
 
@@ -297,6 +296,82 @@ export async function exportProjectBackup(
   };
 }
 
+export interface SaveBackupResult {
+  cancelled?: boolean;
+  filePath?: string;
+  fileName: string;
+  fileSize: number;
+  projectName: string;
+}
+
+/**
+ * Kullanıcıya işletim sistemi dosya kaydetme penceresi göstererek .erpcrm yedeğini seçilen konuma yazar.
+ */
+export async function saveProjectBackupToFile(
+  projectId: string,
+  options?: { defaultPathOverride?: string }
+): Promise<SaveBackupResult> {
+  const exportData = await exportProjectBackup(projectId);
+
+  if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+    try {
+      const { save } = await import("@tauri-apps/plugin-dialog");
+      const { writeFile } = await import("@tauri-apps/plugin-fs");
+
+      const selectedPath = await save({
+        defaultPath: options?.defaultPathOverride || exportData.fileName,
+        filters: [
+          {
+            name: "ERP CRM Discovery Yedeği",
+            extensions: ["erpcrm"],
+          },
+        ],
+      });
+
+      if (!selectedPath) {
+        return {
+          cancelled: true,
+          fileName: exportData.fileName,
+          fileSize: exportData.buffer.byteLength,
+          projectName: exportData.manifest.projectName,
+        };
+      }
+
+      await writeFile(selectedPath, exportData.buffer);
+
+      return {
+        filePath: selectedPath,
+        fileName: exportData.fileName,
+        fileSize: exportData.buffer.byteLength,
+        projectName: exportData.manifest.projectName,
+      };
+    } catch (dialogErr: any) {
+      console.warn("Tauri native save dialog fallback:", dialogErr);
+    }
+  }
+
+  // Web / fallback ortamı
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    try {
+      const url = URL.createObjectURL(exportData.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = exportData.fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch (dlErr) {
+      console.warn("Browser download error:", dlErr);
+    }
+  }
+  return {
+    fileName: exportData.fileName,
+    fileSize: exportData.buffer.byteLength,
+    projectName: exportData.manifest.projectName,
+  };
+}
+
 /**
  * .erpcrm arşivini veritabanına dokunmadan inceler ve bütünlüğünü doğrular.
  */
@@ -450,31 +525,12 @@ export async function restoreProjectBackup(
     sodIdMap.set(sod.id, generateId("sod"));
   }
 
-  // 1. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
-  const writtenRelativePaths: string[] = [];
   const remapAttachmentPath = (oldRelPath: string): string => {
     return oldRelPath.replace(oldProjectId, newProjectId);
   };
 
-  try {
-    for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
-      if (!archivePath.startsWith("attachments/")) continue;
-      const originalRelPath = archivePath.substring("attachments/".length);
-      const newRelPath = remapAttachmentPath(originalRelPath);
-
-      await saveAttachmentFile(newRelPath, fileData);
-      writtenRelativePaths.push(newRelPath);
-
-    }
-  } catch (fileErr: any) {
-    // Hata durumunda yazılan dosyaları temizle
-    await deleteProjectAttachmentsDirectory(newProjectId);
-    throw new Error(`Ek dosyalar kasaya aktarılırken hata oluştu: ${fileErr?.message || fileErr}`);
-  }
-
-  // 2. Veritabanı Kayıtlarını Atomik Transaction İçinde Ekle
+  // 1. Veritabanı Kayıtlarını Sıralı Ekle (Hata durumunda kontrollü telafi temizliği)
   const db = await getDb();
-  await db.execute("BEGIN TRANSACTION");
 
   try {
     // A. analysis_projects
@@ -1017,11 +1073,35 @@ export async function restoreProjectBackup(
     }
 
 
-    await db.execute("COMMIT");
   } catch (dbErr: any) {
-    await db.execute("ROLLBACK");
-    await deleteProjectAttachmentsDirectory(newProjectId);
-    throw new Error(`Veritabanına geri yükleme başarısız oldu (Rollback yapıldı): ${dbErr?.message || dbErr}`);
+    console.error("[BackupManager] Veritabanı yazma hatası:", dbErr);
+    try {
+      await deleteProject(newProjectId);
+    } catch (cleanupErr) {
+      console.warn("[BackupManager] Telafi temizleme hatası:", cleanupErr);
+    }
+    throw new Error("Proje çoğaltılamadı. Veritabanı işlemi tamamlanamadı; hiçbir değişiklik kaydedilmedi.");
+  }
+
+  // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz (Transaction Dışında)
+  const writtenRelativePaths: string[] = [];
+  try {
+    for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
+      if (!archivePath.startsWith("attachments/")) continue;
+      const originalRelPath = archivePath.substring("attachments/".length);
+      const newRelPath = remapAttachmentPath(originalRelPath);
+
+      await saveAttachmentFile(newRelPath, fileData);
+      writtenRelativePaths.push(newRelPath);
+    }
+  } catch (fileErr: any) {
+    console.error("[BackupManager] Ek dosya kopyalama hatası:", fileErr);
+    try {
+      await deleteProject(newProjectId);
+    } catch (cleanupErr) {
+      console.warn("[BackupManager] Telafi temizleme hatası:", cleanupErr);
+    }
+    throw new Error("Proje ek dosyaları aktarılamadı; işlem geri alındı.");
   }
 
   return {
