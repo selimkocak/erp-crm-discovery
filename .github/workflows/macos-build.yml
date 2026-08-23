@@ -2,13 +2,8 @@ name: macOS Apple Silicon Build & Artifact Packaging
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 concurrency:
