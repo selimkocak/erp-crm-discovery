@@ -237,14 +237,14 @@ erp-crm-discovery/
 │   └── business-functions.json  # 33 BF kanonik registry (tek doğruluk kaynağı)
 ├── scripts/
 │   └── generate_business_functions.mjs  # Kod üretici
-├── test/                        # 53 TypeScript kabul testi (1.750+ test)
+├── test/                        # 59 TypeScript kabul testi (1.800+ test)
 │   ├── vertical_slice_test.ts
 │   ├── faz2_tests.ts
 │   ├── faz41_ecommerce_question_pack_test.ts
 │   ├── faz42_management_question_pack_test.ts
 │   ├── faz43_strategy_question_pack_test.ts
 │   ├── cross_pack_question_identity_test.ts
-│   └── ... (53 dosya)
+│   └── ... (59 dosya)
 └── docs/                        # Faz kapanış raporları & şema kılavuzları
 ```
 
@@ -269,7 +269,7 @@ JSON Soru Paketi
 Proje **"Tek Modül = Tek Faz = Tek Kabul"** disipliniyle geliştirilmiştir. Her kanonik modülün tam kabul testi mevcuttur.
 
 ```bash
-npm test   # 53 test suite (1.700+ test) — tüm FAZ'lar
+npm test   # 59 test suite (1.800+ test) — tüm FAZ'lar
 ```
 
 Her modül testi şu 15 alanı doğrular:

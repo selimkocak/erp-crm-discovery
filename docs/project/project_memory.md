@@ -1,10 +1,10 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.0 (Release Candidate 1) | Git Durumu: 34 Paket Tamamlandı + Soru Navigatörü Ek Göstergesi + Semantik Buton Sistemi + Managed Vault Windows Native İkiz Kopya + Sektör/Şube Alanları + Mevcut Proje Firma Bilgilerini Düzenleme (Edit Mode) + Kaynak Yolu Gizlilik Mühürü + GitHub Actions CI 3/3 Yeşil (Temiz Çalışma Ağacı)
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_company_profile_edit_and_rc1_gate_2026_08_22
-Doğrulama Durumu: 58 Test Paketinde 1.800+ Test %100 PASS, npm run build (0 Hata, Vite 1921 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
-Git HEAD: 83e81e1 (main = origin/main)
+Mevcut Sürüm: v0.1.0 (Release Candidate 1) | Git Durumu: 34 Paket Tamamlandı + Soru Navigatörü Ek Göstergesi + Semantik Buton Sistemi + Managed Vault Windows Native İkiz Kopya + Sektör/Şube Alanları + Mevcut Proje Firma Bilgilerini Düzenleme (Edit Mode) + Kaynak Yolu Gizlilik Mühürü + Geliştirici Atıf & Hakkında Modalı + Kök Dizin Kütüphaneci Arşiv Düzenlemesi (Temiz Çalışma Ağacı)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_attribution_and_root_archive_2026_08_23
+Doğrulama Durumu: 59 Test Paketinde 1.800+ Test %100 PASS, npm run build (0 Hata, Vite 1922 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
+Git HEAD: 213d7bc (main = origin/main)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
