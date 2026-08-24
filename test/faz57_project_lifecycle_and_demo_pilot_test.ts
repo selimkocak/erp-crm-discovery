@@ -223,7 +223,7 @@ async function runTests() {
     // ------------------------------------------------------------------
     console.log("\n--- 3. Pasife Alırken Verilerin Korunması ---");
     // Çalışma verileri ekle
-    await saveAnswer(projId1, "SALES", "tr.sales.core", "0.1.0", "SALES-001", { selected: ["direct_b2b"] }, undefined, "Toplantı notu");
+    await saveAnswer(projId1, "SALES", "tr.sales.core", "0.1.0", "SALES-001", { selected: [{ value: "erp_crm" }], general_note: "Toplantı notu" });
     await createFinding({ analysis_project_id: projId1, business_function_code: "SALES", question_id: null, title: "Kritik Fiyatlama Bulgusu", description: "Açıklama", priority: "critical", status: "open" });
     await createRequirement({ analysis_project_id: projId1, business_function_code: "SALES", question_id: null, title: "Kapsamlı ERP İhtiyacı", description: "Açıklama", priority: "critical", status: "draft" });
     await createRisk({ analysis_project_id: projId1, business_function_code: "SALES", question_id: null, title: "Tedarik Gecikme Riski", description: "Açıklama", impact: "critical", probability: "high", mitigation_note: null, status: "open" });
@@ -389,6 +389,56 @@ async function runTests() {
     // 94 cevabın bf_code değerleri seçili 19 fonksiyon içinde
     const invalidAnswers = demoAnswers.filter((a: any) => !activeBfCodes.has(a.business_function_code));
     assert(invalidAnswers.length === 0, `94 cevabın tümünün business_function_code değerleri seçili 19 fonksiyon içinde (Geçersiz: ${invalidAnswers.length})`);
+
+    // Soru Külliyatı & UI Formatlama Regresyon Denetimi (94/94 Eşleşme)
+    const { CANONICAL_QUESTION_PACKS, CANONICAL_CODE_TO_PACK_ID } = await import("../src/generated/questionPacks");
+    const { formatAnswer } = await import("../src/report/formatters");
+    const { getAllAnswers } = await import("../src/db/client");
+
+    let canonicalPackMismatches = 0;
+    let formatFailures = 0;
+    const answeredBfCounts = new Map<string, number>();
+
+    for (const a of demoAnswers) {
+      answeredBfCounts.set(a.business_function_code, (answeredBfCounts.get(a.business_function_code) || 0) + 1);
+      const expectedPackId = CANONICAL_CODE_TO_PACK_ID[a.business_function_code];
+      const pack = CANONICAL_QUESTION_PACKS[expectedPackId];
+      if (!pack) {
+        canonicalPackMismatches++;
+        continue;
+      }
+      const q = pack.questions.find((x: any) => x.id === a.question_id);
+      if (!q) {
+        canonicalPackMismatches++;
+        continue;
+      }
+      const parsedAnswer = JSON.parse(a.answer_data);
+      const formatted = formatAnswer(q, parsedAnswer);
+      if (!formatted.isAnswered || formatted.summaryText.includes("undefined")) {
+        formatFailures++;
+      }
+      if (parsedAnswer.selected) {
+        for (const sel of parsedAnswer.selected) {
+          const optExists = q.options?.some((opt: any) => opt.value === sel.value);
+          if (!optExists && q.answer_type !== "short_text" && q.answer_type !== "long_text") {
+            formatFailures++;
+          }
+        }
+      }
+    }
+
+    assert(canonicalPackMismatches === 0, `94/94 cevabın soru ve paket kimlikleri kanonik külliyatta mevcut (Uyuşmazlık: ${canonicalPackMismatches})`);
+    assert(formatFailures === 0, `94/94 cevap formatlayıcı ve UI modelinde geçerli ve eksiksiz render ediliyor (Hata: ${formatFailures})`);
+    assert(answeredBfCounts.size === 19, `19 fonksiyonun tamamında en az 1 cevap mevcut (Gerçek: ${answeredBfCounts.size})`);
+    for (const [bf, count] of answeredBfCounts.entries()) {
+      assert(count >= 2, `${bf} fonksiyonunda en az 2 cevap mevcut (Gerçek: ${count})`);
+    }
+
+    // SALES fonksiyonu için getAllAnswers UI modeli testi
+    const salesAnswersMap = await getAllAnswers(demoId, "SALES");
+    assert(salesAnswersMap.size >= 5, `SALES fonksiyonunda en az 5 cevap Map olarak okundu (Gerçek: ${salesAnswersMap.size})`);
+    const salesFirst = salesAnswersMap.get("SALES-001");
+    assert(!!salesFirst && Array.isArray(salesFirst.selected) && salesFirst.selected.length > 0, "SALES-001 cevabı UI AnswerData modeline uygun nesne formatında");
 
     // Yönetişim nesneleri, özneleri ve kapsamları FK geçerliliği
     const allGovObjects = await mockDb.select<any[]>(`SELECT id FROM governance_objects WHERE analysis_project_id = $1`, [demoId]);

@@ -7,6 +7,8 @@
  */
 
 import { getDb, generateId, deleteProject, assignBusinessFunctionsToProject } from "../db/client";
+import { CANONICAL_QUESTION_PACKS, CANONICAL_CODE_TO_PACK_ID } from "../generated/questionPacks";
+import type { AnswerData } from "../engine/types";
 import {
   seedDefaultGovernanceObjects,
   getGovernanceObjects,
@@ -23,6 +25,106 @@ export interface CreateManufacturingDemoResult {
   projectName: string;
   functionCount: number;
   answerCount: number;
+}
+
+/**
+ * 19 aktif iş fonksiyonu için kanonik soru külliyatına %100 uyumlu 94 geçerli sentetik cevap üretir.
+ */
+export function buildManufacturingPilotAnswers(): Array<{
+  bfCode: string;
+  packId: string;
+  packVersion: string;
+  qId: string;
+  answerData: AnswerData;
+}> {
+  const targetFunctions: Array<{ code: string; count: number }> = [
+    { code: "SALES", count: 5 },
+    { code: "CRM", count: 5 },
+    { code: "PROPOSALS", count: 5 },
+    { code: "PROCUREMENT", count: 5 },
+    { code: "SUPPLIER_MANAGEMENT", count: 5 },
+    { code: "WAREHOUSE", count: 5 },
+    { code: "INVENTORY", count: 5 },
+    { code: "PRODUCTION_PLANNING", count: 5 },
+    { code: "WORK_ORDERS", count: 5 },
+    { code: "QUALITY", count: 5 },
+    { code: "MAINTENANCE", count: 5 },
+    { code: "ACCOUNTING", count: 5 },
+    { code: "TREASURY", count: 5 },
+    { code: "HUMAN_RESOURCES", count: 5 },
+    { code: "INFORMATION_TECHNOLOGY", count: 5 },
+    { code: "LOGISTICS", count: 5 },
+    { code: "INVOICING", count: 5 },
+    { code: "DOCUMENT_MANAGEMENT", count: 5 },
+    { code: "E_TRANSFORMATION", count: 4 }, // 18*5 + 4 = 94
+  ];
+
+  const result: Array<{
+    bfCode: string;
+    packId: string;
+    packVersion: string;
+    qId: string;
+    answerData: AnswerData;
+  }> = [];
+
+  for (const tf of targetFunctions) {
+    const packId = CANONICAL_CODE_TO_PACK_ID[tf.code];
+    if (!packId) {
+      throw new Error(`Kanonik paket eşleşmesi bulunamadı: ${tf.code}`);
+    }
+    const pack = CANONICAL_QUESTION_PACKS[packId];
+    if (!pack) {
+      throw new Error(`Kanonik soru paketi yüklenemedi: ${packId}`);
+    }
+
+    const questions = pack.questions.slice(0, tf.count);
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      let answerData: AnswerData = {};
+
+      if (q.answer_type === "single_choice" || q.answer_type === "yes_no") {
+        const opt = q.options && q.options.length > 0 ? q.options[0] : { value: "yes", label: "Evet", allow_note: false, is_other: false };
+        answerData = {
+          selected: [
+            {
+              value: opt.value,
+              note: opt.allow_note ? "Marmara Endüstriyel kurumsal prosedürüne göre uygulanmaktadır." : undefined,
+            }
+          ],
+          general_note: "Birim yöneticisi ile yapılan saha mülakatında teyit edildi.",
+        };
+      } else if (q.answer_type === "multiple_choice") {
+        const opts = q.options && q.options.length >= 2 ? q.options.slice(0, 2) : (q.options || []);
+        answerData = {
+          selected: opts.map((opt, idx) => ({
+            value: opt.value,
+            note: idx === 0 ? "Birincil ve ana operasyonel yöntem." : undefined,
+          })),
+          general_note: "Süreç adımları fabrika genelinde aktiftir.",
+        };
+      } else if (q.answer_type === "number") {
+        answerData = {
+          text: "15",
+          general_note: "Güncel fabrika operasyon verisidir.",
+        };
+      } else {
+        answerData = {
+          text: "Marmara Endüstriyel bünyesinde kesikli üretim ve montaj modeline uygun olarak yürütülmektedir.",
+          general_note: "Saha keşif mülakatı notu.",
+        };
+      }
+
+      result.push({
+        bfCode: tf.code,
+        packId: pack.meta.pack_id,
+        packVersion: pack.meta.version,
+        qId: q.id,
+        answerData,
+      });
+    }
+  }
+
+  return result;
 }
 
 /**
@@ -155,516 +257,15 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
 
     const activeFunctionCodes = new Set(businessFunctions.map((b) => b.code));
 
-  // 4. Saha Soru Cevapları (92 Gerçekçi Cevap)
-  const answersData: {
-    bfCode: string;
-    packId: string;
-    packVersion: string;
-    qId: string;
-    answerJson: any;
-    choiceNotesJson?: any;
-    meetingNote?: string;
-  }[] = [
-    // SALES (10)
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-001",
-      answerJson: { selected: ["b2b_ve_b2c"] },
-      meetingNote: "Satışların %85'i endüstriyel makine üreticilerine B2B, %15'i bayi ağı üzerinden yapılmaktadır."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-002",
-      answerJson: { selected: ["merkezi_satis_yonetimi"] },
-      meetingNote: "İstanbul satış ofisi ve Bursa merkez fabrika ortak fiyat listesi kullanmaktadır."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-003",
-      answerJson: { selected: ["teklifli_satis_agirlikli"] },
-      choiceNotesJson: { teklifli_satis_agirlikli: "Özel mühendislik makinelerinde teklif onayı 3 kademelidir." },
-      meetingNote: "Standart makinelerde liste fiyatı, özel projelerde konfigüratör teklifi esastır."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-004",
-      answerJson: { selected: ["dovizli_ve_tl_karisik"] },
-      meetingNote: "İhracat teklifleri EUR/USD, yurt içi sözleşmeler TCMB döviz endeksli TL olarak hazırlanır."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-005",
-      answerJson: { selected: ["sozlesme_ve_siparis_birlikte"] },
-      meetingNote: "Büyük montaj hatlarında sözleşme şartnamesi sipariş belgesine bağlanır."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-006",
-      answerJson: { selected: ["avansli_ve_vade_farkli"] },
-      meetingNote: "%30 siparişte nakit avans, %50 teslimatta, %20 devreye alma kabulünde tahsil edilir."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-007",
-      answerJson: { selected: ["satis_temsilcisi_prim_sistemi_var"] },
-      meetingNote: "Bölge satış kotalarına göre çeyreklik prim hakedişi hesaplanır."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-008",
-      answerJson: { selected: ["teslimat_adresi_ve_fatura_adresi_farkli"] },
-      meetingNote: "Müşterinin şantiye ve fabrika lokasyonlarına doğrudan sevkiyat yapılabilmelidir."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-009",
-      answerJson: { selected: ["iskonto_onay_matrisi_var"] },
-      choiceNotesJson: { iskonto_onay_matrisi_var: "%10 üzeri Satış Müdürü, %15 üzeri Genel Müdür onayı gerektirir." },
-      meetingNote: "İskonto sapmaları mevcut sistemde e-posta ile yönetilmektedir."
-    },
-    {
-      bfCode: "SALES", packId: "tr.sales.core", packVersion: "0.1.0", qId: "SALES-010",
-      answerJson: { selected: ["kredi_limiti_ve_risk_kontrolu_zorunlu"] },
-      meetingNote: "Açık hesap çalışan müşterilerde DBS ve teminat mektubu kontrolü aranır."
-    },
-
-    // PROCUREMENT (10)
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-001",
-      answerJson: { selected: ["merkezi_satinalma_departmani"] },
-      meetingNote: "Tüm hammadde, motor, redüktör ve elektronik komponent alımları Bursa merkezden yönetilir."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-002",
-      answerJson: { selected: ["mrp_ve_talep_birlikte"] },
-      choiceNotesJson: { mrp_ve_talep_birlikte: "Standart parçalar MRP ile, özel imalat parçalar proje talebiyle açılır." }
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-003",
-      answerJson: { selected: ["en_az_uc_teklif_kurali"] },
-      meetingNote: "50.000 TL üzeri alımlarda 3 teklif karşılaştırma tablosu zorunludur."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-004",
-      answerJson: { selected: ["tedarikci_sozlesmesi_ve_cerceve_anlasma"] },
-      meetingNote: "Çelik sac ve profil alımlarında yıllık tonaj taahhütlü çerçeve sözleşme uygulanır."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-005",
-      answerJson: { selected: ["ithalat_ve_yurtici_karma"] },
-      meetingNote: "Özel CNC sürücüler ve hidrolik valfler Almanya ve İtalya'dan ithal edilmektedir."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-006",
-      answerJson: { selected: ["siparis_onay_hiyerarsisi_var"] },
-      choiceNotesJson: { siparis_onay_hiyerarsisi_var: "Bölüm Müdürü -> Satınalma Müdürü -> Mali İşler onaylar." }
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-007",
-      answerJson: { selected: ["termin_takibi_ve_gecikme_cezasi_var"] },
-      meetingNote: "Kritik termin gecikmelerinde haftalık %1 ceza maddesi sözleşmelerde yer alır."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-008",
-      answerJson: { selected: ["kalite_onayli_tedarikci_listesi_zorunlu"] },
-      meetingNote: "Kalite Güvence onayı olmayan tedarikçilerden sipariş açılamaz."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-009",
-      answerJson: { selected: ["irsaliye_fatura_siparis_3lu_esleme"] },
-      meetingNote: "Mali işler fatura girişinde irsaliye ve sipariş miktar/fiyat toleransını doğrular."
-    },
-    {
-      bfCode: "PROCUREMENT", packId: "tr.procurement.core", packVersion: "0.1.0", qId: "PRC-010",
-      answerJson: { selected: ["tedarikci_degerlendirme_sistemi_var"] },
-      meetingNote: "6 aylık periyotlarla kalite, termin ve fiyat performans puanı hesaplanır."
-    },
-
-    // WAREHOUSE & INVENTORY (16)
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-001",
-      answerJson: { selected: ["cok_lokasyonlu_ve_cok_bolumlu_depo"] },
-      meetingNote: "Hammadde, Yarı Mamul, Mamul, Yedek Parça ve Karantina depoları fiziksel olarak ayrıdır."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-002",
-      answerJson: { selected: ["adresli_raf_ve_koridor_yonetimi_var"] },
-      meetingNote: "A-Z koridor, 1-10 raf, 1-4 kat formatında adresleme kullanılmaktadır."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-003",
-      answerJson: { selected: ["barkodlu_el_terminali_kullaniliyor"] },
-      meetingNote: "Mal kabul ve sevkiyat işlemlerinde 2D karekodlu etiketler taranmaktadır."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-004",
-      answerJson: { selected: ["karantina_alani_ve_giris_kalite_kontrol_var"] },
-      meetingNote: "Kalite onayı almayan malzemeler kırmızı etiketle karantina rafına alınır."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-005",
-      answerJson: { selected: ["fifo_ve_parti_lot_takibi"] },
-      meetingNote: "Isıl işlem görmüş çelik miller lot numarası ile takip edilir."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-006",
-      answerJson: { selected: ["sayim_yonetimi_periyodik_ve_dongusel"] },
-      meetingNote: "Yılda bir genel sayım, her ay ABC sınıfı A grubu malzemelerde döngüsel sayım yapılır."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-007",
-      answerJson: { selected: ["uretime_cikis_rezervasyon_ve_is_emriyle"] },
-      meetingNote: "Hammadde çıkışları doğrudan iş emri numarasına rezervasyonlu olarak verilir."
-    },
-    {
-      bfCode: "WAREHOUSE", packId: "tr.warehouse.core", packVersion: "0.1.0", qId: "WAR-008",
-      answerJson: { selected: ["hurda_ve_atık_alani_ayri"] },
-      meetingNote: "İşleme talaşları ve sac hurdaları lisanslı geri dönüşüm alanında toplanır."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-001",
-      answerJson: { selected: ["agirlikli_ortalama_ve_lot_maliyeti"] },
-      meetingNote: "Envanter değerlemesinde dönemsel ağırlıklı ortalama maliyet yöntemi esastır."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-002",
-      answerJson: { selected: ["emniyet_stogu_ve_yeniden_siparis_noktasi_var"] },
-      meetingNote: "Rulman, civata ve conta gibi C grubu sarf malzemelerde min-max seviyesi izlenir."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-003",
-      answerJson: { selected: ["fason_stok_takibi_var"] },
-      choiceNotesJson: { fason_stok_takibi_var: "Boya ve kaplama işlemleri dış fasoncularda takip edilir." }
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-004",
-      answerJson: { selected: ["seri_numarasi_takibi_mamul_ve_kritik_parca"] },
-      meetingNote: "Üretilen her endüstriyel makineye şasi ve plaka seri numarası basılır."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-005",
-      answerJson: { selected: ["konsinye_stok_uygulamasi_var"] },
-      meetingNote: "Kesici takım tedarikçisi fabrika içinde konsinye otomat dolabı işletmektedir."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-006",
-      answerJson: { selected: ["stok_yaslandirma_ve_hareketsiz_stok_raporu_var"] },
-      meetingNote: "180 günden uzun süre hareket görmeyen malzemeler her ay komisyonca incelenir."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-007",
-      answerJson: { selected: ["cift_birim_takibi_kg_ve_adet"] },
-      meetingNote: "Sac malzemeler plaka adet ve kg cinsinden çift birimli izlenir."
-    },
-    {
-      bfCode: "INVENTORY", packId: "tr.inventory.core", packVersion: "0.1.0", qId: "INV-008",
-      answerJson: { selected: ["stok_transfer_onay_mekanizmasi_var"] },
-      meetingNote: "Bursa fabrika ve Ankara servis deposu arası transferler sevk irsaliyesi ile yürütülür."
-    },
-
-    // PRODUCTION PLANNING & WORK ORDERS (18)
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-001",
-      answerJson: { selected: ["siparis_uzerine_ve_stoga_karma_uretim"] },
-      meetingNote: "Standart hidrolik presler stoka, özel otomasyon hatları siparişe göre üretilir."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-002",
-      answerJson: { selected: ["cok_seviyeli_urun_agaci_bom_var"] },
-      choiceNotesJson: { cok_seviyeli_urun_agaci_bom_var: "Makinelerde 4-6 seviyeli derin ürün ağacı yapısı bulunmaktadır." }
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-003",
-      answerJson: { selected: ["mühendislik_degisiklik_yonetimi_ecn_var"] },
-      meetingNote: "Ürün ağacı revizyonları şu anda Excel tablolarında takip edilmektedir (Kritik Risk)."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-004",
-      answerJson: { selected: ["mrp_hesaplama_motoru_haftalik"] },
-      meetingNote: "Pazartesi sabahları haftalık net ihtiyaç planlama (MRP) çalıştırılır."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-005",
-      answerJson: { selected: ["kapasite_ihtiyac_planlamasi_crp_kismi"] },
-      meetingNote: "CNC işleme merkezleri ve kaynak istasyonlarında darboğaz analizi yapılır."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-006",
-      answerJson: { selected: ["rota_ve_operasyon_adimlari_tanimli"] },
-      meetingNote: "Kesim -> Büküm -> Kaynak -> Talaşlı İmalat -> Boya -> Montaj -> Test sıralı rotadır."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-007",
-      answerJson: { selected: ["standart_ve_gerceklesen_hazirlik_setup_suresi_var"] },
-      meetingNote: "Kalıp bağlama ve CNC program yükleme süreleri operasyon kartına işlenir."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-008",
-      answerJson: { selected: ["fason_operasyon_entegrasyonu_var"] },
-      meetingNote: "Galvaniz kaplama ve elektrostatik toz boya fason rotaya dahildir."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-009",
-      answerJson: { selected: ["alternatif_rota_ve_makine_tanimi_var"] },
-      meetingNote: "5 eksen CNC arızalandığında 3 eksen CNC + üniversal freze alternatif rotadır."
-    },
-    {
-      bfCode: "PRODUCTION_PLANNING", packId: "tr.production_planning.core", packVersion: "0.1.0", qId: "PRP-010",
-      answerJson: { selected: ["uretim_cizelgeleme_gantt_semasi_var"] },
-      meetingNote: "Gantt şeması mevcut yazılımda statik olup dinamik yeniden çizelgeleme gerekmektedir."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-001",
-      answerJson: { selected: ["barkodlu_is_emri_refakat_karti"] },
-      meetingNote: "Üretim sahasında her parça sepetine lamine iş emri refakat kartı iliştirilir."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-002",
-      answerJson: { selected: ["operasyon_bazinda_baslat_durdur_bildirimi"] },
-      meetingNote: "Operatörler iş başlangıç ve bitişini dokunmatik ekran terminalinden okutur."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-003",
-      answerJson: { selected: ["gerceklesen_iscilik_ve_makine_zaman_kaydi"] },
-      meetingNote: "Fiili süreler ile standart süreler karşılaştırılarak operasyon verimliliği ölçülür."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-004",
-      answerJson: { selected: ["fire_hurda_ve_yeniden_isleme_kaydi_var"] },
-      meetingNote: "Fire neden kodları (malzeme hatası, operatör hatası, ayar bozukluğu) girilir."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-005",
-      answerJson: { selected: ["otomatik_stok_dusumu_backflush_yari_otomatik"] },
-      meetingNote: "Bağlantı elemanları backflush ile, ana gövde sacları parti numarasıyla düşülür."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-006",
-      answerJson: { selected: ["ara_stok_ve_wip_takibi_var"] },
-      meetingNote: "Montaj hattı öncesi tampon yarı mamul alanında stok miktarı izlenir."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-007",
-      answerJson: { selected: ["kismen_tamamlanmis_is_emri_kapatma"] },
-      meetingNote: "Müşteri acil kısmi sevkiyat istediğinde iş emrinden kısmi mamul çıkışı yapılır."
-    },
-    {
-      bfCode: "WORK_ORDERS", packId: "tr.work_orders.core", packVersion: "0.1.0", qId: "WKO-008",
-      answerJson: { selected: ["durus_nedenleri_kaydi_var"] },
-      meetingNote: "Arıza, ayar, hammadde bekleme, elektrik kesintisi ve yemek molası kaydedilir."
-    },
-
-    // QUALITY & MAINTENANCE (16)
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-001",
-      answerJson: { selected: ["giris_proses_ve_son_kontrol_uc_asamali"] },
-      meetingNote: "Tüm hammadde girişlerinde, talaşlı imalatta ve son montaj testinde kontrol uygulanır."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-002",
-      answerJson: { selected: ["ornekleme_ve_aql_standartlari"] },
-      meetingNote: "ISO 2859-1 Tablo 1 Normal Seviye II genel muayene standardı uygulanmaktadır."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-003",
-      answerJson: { selected: ["olcum_cihazi_ve_kalibrasyon_takibi_var"] },
-      meetingNote: "Kumpas, mikrometre ve tork anahtarları yıllık akredite laboratuvara gönderilir."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-004",
-      answerJson: { selected: ["uygunsuzluk_yonetimi_ve_dof_acma_var"] },
-      meetingNote: "Düzeltici Önleyici Faaliyetler (DÖF) 8D metodolojisiyle kapatılır."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-005",
-      answerJson: { selected: ["tedarikci_hata_bildirimi_ve_iade_raporu"] },
-      meetingNote: "Hatalı partilerde tedarikçiye resmi 8D hata raporu ve navlun dekontu iletilir."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-006",
-      answerJson: { selected: ["test_sertifikasi_ve_raporu_uretimi_var"] },
-      meetingNote: "Her makineyle birlikte EN 10204 3.1 malzeme ve fabrika kabul test sertifikası verilir."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-007",
-      answerJson: { selected: ["spc_istatistiksel_proses_kontrol_kismi"] },
-      meetingNote: "Kritik mil taşlama çaplarında X-bar R kontrol kartları tutulur."
-    },
-    {
-      bfCode: "QUALITY", packId: "tr.quality.core", packVersion: "0.1.0", qId: "QLT-008",
-      answerJson: { selected: ["musteri_sikayetleri_ve_iade_kalite_analizi"] },
-      meetingNote: "Garanti içi saha arızaları kök neden analizine alınarak mühendisliğe aktarılır."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-001",
-      answerJson: { selected: ["periyodik_ariza_ve_kestirimci_bakim_karma"] },
-      meetingNote: "Ağır preslerde hidrolik yağ analizi ve titreşim ölçümüyle kestirimci bakım yapılır."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-002",
-      answerJson: { selected: ["makine_sicil_karti_ve_bakim_tarihcesi_var"] },
-      meetingNote: "Tüm tezgahların motor gücü, yağ tipi, yedek parça listesi ve arıza geçmişi kayıtlıdır."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-003",
-      answerJson: { selected: ["ariza_bildirimi_ve_bakim_is_emri_akisi"] },
-      meetingNote: "Operatör arıza bildiriminde duruş saati otomatik başlar ve müdahalede durdurulur."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-004",
-      answerJson: { selected: ["bakim_yedek_parca_stok_entegrasyonu"] },
-      meetingNote: "Kritik rulman, kayış ve hidrolik filtreler bakım deposunda minimum stoklu tutulur."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-005",
-      answerJson: { selected: ["mtbf_ve_mttr_performans_kpi_takibi"] },
-      meetingNote: "Arızalar arası ortalama süre (MTBF) ve ortalama onarım süresi (MTTR) hesaplanır."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-006",
-      answerJson: { selected: ["dis_kaynak_yetkili_servis_sozlesmeleri"] },
-      meetingNote: "CNC lazer ve punch tezgahları üretici yetkili servisi ile yıllık bakım anlaşmalıdır."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-007",
-      answerJson: { selected: ["otonom_bakim_gunluk_operator_kontrol_listesi"] },
-      meetingNote: "Vardiya başında yağ seviyesi, hava basıncı ve temizlik kontrolü operatörce yapılır."
-    },
-    {
-      bfCode: "MAINTENANCE", packId: "tr.maintenance.core", packVersion: "0.1.0", qId: "MNT-008",
-      answerJson: { selected: ["enerji_tuketimi_ve_verimlilik_izleme"] },
-      meetingNote: "Kompresör dairesi ve ana dağıtım panolarında reaktif ceza ve güç tüketimi izlenir."
-    },
-
-    // LOGISTICS & IT INFRASTRUCTURE (16)
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-001",
-      answerJson: { selected: ["otomatik_teslimat_emri"] },
-      meetingNote: "Onaylanan satış siparişinden sistem otomatik olarak Teslimat / Sevk Emri oluşturur."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-002",
-      answerJson: { selected: ["sistem_otomatik_bloke_koyar"] },
-      meetingNote: "Müşterinin kredi limiti aşılmışsa veya vadesi geçmiş borcu varsa sistem sevk irsaliyesi kesilmesini otomatik engeller."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-003",
-      answerJson: { selected: ["rota_ve_arac_kapasite_planlama"] },
-      meetingNote: "Kamyon ve tır bazında hacim, ağırlık ve teslim rotası optimizasyonu yapılır."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-004",
-      answerJson: { selected: ["e_irsaliye_gib_entegre_anlik"] },
-      meetingNote: "Araç çıkış kapısında karekodlu e-İrsaliye çıktısı alınarak sevkiyat başlatılır."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-005",
-      answerJson: { selected: ["anlasmali_kargo_ve_ambar_entegrasyonu"] },
-      meetingNote: "Parsiyel gönderiler ambar ve kargo takip numarasıyla sistem üzerinden izlenir."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-006",
-      answerJson: { selected: ["dijital_teslim_kaniti_pod_takibi"] },
-      meetingNote: "Müşteri teslim tesellüm fişleri taranarak sisteme teslim kanıtı (POD) olarak yüklenir."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-007",
-      answerJson: { selected: ["navlun_maliyet_analizi_ve_fatura_esleme"] },
-      meetingNote: "Nakliye faturaları sevk irsaliyeleriyle eşleştirilerek navlun maliyeti kontrol edilir."
-    },
-    {
-      bfCode: "LOGISTICS", packId: "tr.logistics.core", packVersion: "0.1.0", qId: "LOG-008",
-      answerJson: { selected: ["otif_zamaninda_ve_eksiksiz_teslimat_kpi"] },
-      meetingNote: "Aylık OTIF zamanında ve eksiksiz teslimat KPI raporu yönetime sunulmaktadır."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-001",
-      answerJson: { selected: ["yerel_sunucu_ve_kvkk_uyumlu_altyapi"] },
-      meetingNote: "Sistem odasında cluster çalışan VMware ESXi sanallaştırma altyapısı mevcuttur."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-002",
-      answerJson: { selected: ["otomatik_gunluk_yedekleme_ve_3_2_1_kurali"] },
-      meetingNote: "Günlük yerel NAS yedeği ve haftalık kilitli harici medya çevrimdışı kasaya alınır."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-003",
-      answerJson: { selected: ["active_directory_ve_rol_tabanli_yetkilendirme"] },
-      meetingNote: "Kullanıcı hesapları merkezi Windows Domain Controller üzerinden yönetilir."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-004",
-      answerJson: { selected: ["guvenlik_duvari_firewall_ve_vpn_erisim"] },
-      meetingNote: "İstanbul ve Ankara şubeleri IPsec VPN tüneli üzerinden merkeze bağlanır."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-005",
-      answerJson: { selected: ["kesintisiz_guc_kaynagi_ups_ve_jenerator"] },
-      meetingNote: "Fabrika 400 kVA otomatik jeneratör ve sistem odası 40 kVA online UPS ile korunur."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-006",
-      answerJson: { selected: ["antivirus_ve_edr_uclara_yuklu"] },
-      meetingNote: "Tüm istemci ve saha terminallerinde merkezi yönetimli EDR yazılımı aktiftir."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-007",
-      answerJson: { selected: ["felaket_kurtarma_senaryosu_diger_lokasyonda"] },
-      meetingNote: "İstanbul ofisinde soğuk yedek sunucu felaket kurtarma senaryosu için ayrılmıştır."
-    },
-    {
-      bfCode: "INFORMATION_TECHNOLOGY", packId: "tr.it_infrastructure.core", packVersion: "0.1.0", qId: "IT-008",
-      answerJson: { selected: ["bt_hizmet_yonetimi_ve_talep_takip_yazilimi"] },
-      meetingNote: "Kullanıcı donanım ve yazılım arıza talepleri yardım masası sistemiyle izlenir."
-    },
-
-    // ACCOUNTING (8)
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-001",
-      answerJson: { selected: ["tek_duzen_hesap_plani_ve_masraf_merkezi"] },
-      meetingNote: "Maliye Bakanlığı TDHP standardı ve 7/A seçeneği masraf yerleri kullanılmaktadır."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-002",
-      answerJson: { selected: ["otomatik_muhasebelestirme_entegrasyonu"] },
-      meetingNote: "Fatura, irsaliye, çek/senet ve banka hareketleri otomatik muhasebe fişi üretir."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-003",
-      answerJson: { selected: ["e_defter_ve_gib_uyumlu_berat_gonderimi"] },
-      meetingNote: "Yevmiye ve Kebir beratları aylık periyotlarla GİB sistemine yüklenmektedir."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-004",
-      answerJson: { selected: ["kdv_tevkifat_ve_stopaj_otomasyonu"] },
-      meetingNote: "Fason talaşlı imalat ve tevkifatlı hurda satışları doğru hesap kodlarına ayrıştırılır."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-005",
-      answerJson: { selected: ["dovizli_muhasebe_ve_otomatik_kur_farki"] },
-      meetingNote: "Ay sonu dövizli cari ve banka hesaplarında değerleme fişleri otomatik üretilir."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-006",
-      answerJson: { selected: ["sabit_kiymet_ve_amortisman_modulu_var"] },
-      meetingNote: "Üretim makineleri ve taşıtlar VUK faydalı ömür listesine göre amortismana tabi tutulur."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-007",
-      answerJson: { selected: ["cari_hesap_mutabakati_ve_ba_bs_formlari"] },
-      meetingNote: "Aylık e-Mutabakat sistemi üzerinden müşteri ve satıcı bakiyeleri doğrulanır."
-    },
-    {
-      bfCode: "ACCOUNTING", packId: "tr.accounting.core", packVersion: "0.1.0", qId: "ACC-008",
-      answerJson: { selected: ["donem_sonu_kapanis_ve_mizan_kontrolu"] },
-      meetingNote: "Geçici vergi ve yıl sonu mali kapanış kontrol listesi uygulanır."
-    },
-  ];
-
     // 4. STAGE: answers
     currentStage = "answers";
+    const answersData = buildManufacturingPilotAnswers();
     for (let i = 0; i < answersData.length; i++) {
       const a = answersData[i];
       currentKey = `bf=${a.bfCode}, qId=${a.qId}`;
       if (!activeFunctionCodes.has(a.bfCode)) {
         throw new Error(`Cevap için aktif iş fonksiyonu bulunamadı: ${a.bfCode}`);
       }
-      const answerDataObj = {
-        selected: a.answerJson.selected || [],
-        choiceNotes: a.choiceNotesJson || {},
-        meetingNote: a.meetingNote || "",
-      };
       await db.execute(
         `INSERT INTO question_answers
          (id, analysis_project_id, business_function_code, question_pack_id, question_pack_version, question_id, answer_data, created_at, updated_at)
@@ -676,7 +277,7 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
           a.packId,
           a.packVersion,
           a.qId,
-          JSON.stringify(answerDataObj),
+          JSON.stringify(a.answerData),
           now,
         ]
       );
@@ -686,15 +287,15 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
     currentStage = "flags";
     const followupsData = [
       {
-        bfCode: "PRODUCTION_PLANNING", qId: "PRP-003", flagType: "critical",
+        bfCode: "PRODUCTION_PLANNING", qId: "PRD-003", flagType: "critical",
         note: "Ürün ağacı revizyonlarının Excel'de tutulması imalat hattında eski parça üretilmesine yol açıyor. ECN onay mekanizması kurulmalı."
       },
       {
-        bfCode: "PROCUREMENT", qId: "PRC-007", flagType: "critical",
+        bfCode: "PROCUREMENT", qId: "PRC-003", flagType: "critical",
         note: "Yurt dışı motor tedarikçilerinde 4 haftayı bulan termin sapması yaşanıyor. Güvenlik stoku ve yerli alternatif tedarikçi belirlenmeli."
       },
       {
-        bfCode: "SALES", qId: "SALES-009", flagType: "revisit",
+        bfCode: "SALES", qId: "SALES-003", flagType: "revisit",
         note: "İskonto onay yetki matrisinin yeni ERP yetkilendirme modülüyle entegrasyonu tekrar görüşülecek."
       },
       {
