@@ -71,11 +71,9 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
               <h3 id="about-modal-title" style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700 }}>
                 ERP CRM Discovery
               </h3>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                Sürüm: v0.1.3 • MIT Lisansı
-              </span>
-
-
+              <div style={{ fontSize: "0.8125rem", color: "var(--text-muted, #64748b)", marginTop: "0.15rem" }}>
+                Sürüm: v0.1.4 • MIT Lisansı
+              </div>
             </div>
           </div>
           <button

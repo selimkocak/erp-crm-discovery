@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.4] - 2026-08-24
+
+### Fixed
+* **Sentetik Üretim Pilotu Foreign Key Eşleme Onarımı:** `src/demo/manufacturingPilot.ts` içinde iş fonksiyonları eklenirken statik id yerine `business_functions` master tablosundaki gerçek anahtar kimliklerinin dinamik olarak sorgulanıp eşlenmesi sağlandı.
+* **Aşama Bazlı Hata İzolasyonu ve Atomik Temizlik:** Demo oluşturma sürecindeki 13 ayrı veri grubu aşamalandırıldı; beklenmeyen bir hata durumunda `deleteProject` mekanizmasıyla yarım projenin ve bağlı kayıtların disk/veritabanından otomatik temizlenmesi güvence altına alındı.
+* **SQLite Bütünlük Denetimi (PRAGMA foreign_key_check):** Demo proje kurulumu sonrasında `PRAGMA foreign_key_check` ile 0 ihlal kontrolü eklendi; `PRAGMA foreign_keys = ON` ortamlarında `%100` hatasız sentetik demo başlatma sağlandı.
+
+---
+
 ## [0.1.3] - 2026-08-24
 
 ### Added
