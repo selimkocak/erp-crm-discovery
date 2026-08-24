@@ -12,6 +12,7 @@ import {
   CircleDot,
   AlertCircle,
   Play,
+  PauseCircle,
   BookOpen,
   FileText,
   Pencil,
@@ -38,6 +39,7 @@ import {
   BackupSuccessModal,
 } from "../components/ProjectBackupModals";
 import { ProjectScopeModal } from "../components/modals/ProjectScopeModal";
+import { ProjectDeactivateModal } from "../components/modals/ProjectDeactivateModal";
 import type { QuestionPack } from "../engine/types";
 import type { FunctionStatus, ProjectDetailData } from "../types";
 
@@ -67,6 +69,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [restoreInitialPath, setRestoreInitialPath] = useState<string | null>(null);
   const [isDuplicateOpen, setIsDuplicateOpen] = useState(false);
   const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
@@ -78,8 +81,6 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
       setToast((current) => (current?.message === message ? null : current));
     }, 4000);
   };
-
-
 
   // Question Engine state
   const [activeBfCode, setActiveBfCode] = useState<string | null>(null);
@@ -108,6 +109,10 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   };
 
   const handleStartAnalysis = async (bfCode: string, bfNameTr: string) => {
+    if (data?.project?.status === "passive") {
+      showToast("info", "Bu proje pasiftir. Analiz yapmak için lütfen önce projeyi aktifleştirin.");
+      return;
+    }
     if (!hasQuestionPack(bfCode)) {
       setPackError(`"${bfNameTr}" için soru paketi henüz geliştirme aşamasındadır.`);
       return;
@@ -142,34 +147,32 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
     loadData();
   }, [projectId]);
 
-  // Handle inline updates
   const handleFunctionFieldChange = async (
-    funcId: string,
+    pbfId: string,
     field: "company_department_name" | "responsible_person" | "status",
     value: string
   ) => {
-    if (!data) return;
-
-    // Optimistic UI update
-    setData((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        functions: prev.functions.map((fn) =>
-          fn.id === funcId ? { ...fn, [field]: value } : fn
-        ),
-      };
-    });
-
+    if (data?.project?.status === "passive") {
+      showToast("info", "Bu proje pasiftir. Değişiklik yapmak için lütfen önce projeyi aktifleştirin.");
+      return;
+    }
+    setSaveStatus("saving");
     try {
-      setSaveStatus("saving");
-      await updateProjectBusinessFunction(funcId, {
-        [field]: value,
-      });
+      await updateProjectBusinessFunction(pbfId, { [field]: value });
       setSaveStatus("saved");
       setLastSavedAt(new Date());
-    } catch (err: any) {
-      console.error("Güncelleme hatası:", err);
+      // Local state'i güncelle
+      setData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          functions: prev.functions.map((fn) =>
+            fn.id === pbfId ? { ...fn, [field]: value } : fn
+          ),
+        };
+      });
+    } catch (err) {
+      console.error("Fonksiyon güncellenirken hata:", err);
       setSaveStatus("error");
     }
   };
@@ -218,6 +221,36 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
     }
   };
 
+  const handleDeactivateConfirm = async (_reason?: string) => {
+    if (!data) return;
+    try {
+      setIsUpdatingStatus(true);
+      await updateProjectStatus(projectId, "passive");
+      showToast("success", `"${data.project.name}" projesi pasife alındı.`);
+      setIsDeactivateModalOpen(false);
+      await loadData();
+    } catch (err: any) {
+      console.error("Proje pasife alınırken hata:", err);
+      showToast("error", "Proje pasife alınamadı: " + (err?.message || err));
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  const handleActivateProject = async () => {
+    if (!data) return;
+    try {
+      setIsUpdatingStatus(true);
+      await updateProjectStatus(projectId, "active");
+      showToast("success", `"${data.project.name}" projesi aktifleştirildi.`);
+      await loadData();
+    } catch (err: any) {
+      console.error("Proje aktifleştirilirken hata:", err);
+      showToast("error", "Proje aktifleştirilemedi: " + (err?.message || err));
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -242,33 +275,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   }
 
   const { project, company, functions } = data;
+  const isPassive = project.status === "passive";
   const activeFunctions = functions.filter((f) => f.is_active === 1 || f.is_active === undefined);
   const completedCount = activeFunctions.filter((f) => f.status === "completed").length;
   const inProgressCount = activeFunctions.filter((f) => f.status === "in_progress").length;
   const notStartedCount = activeFunctions.filter((f) => f.status === "not_started").length;
-
-  const handleToggleProjectStatus = async () => {
-    if (isUpdatingStatus || !data) return;
-    const currentStatus = data.project.status || "active";
-    const newStatus = currentStatus === "active" ? "passive" : "active";
-    const actionText = newStatus === "passive" ? "pasife almak" : "aktifleştirmek";
-
-    if (!window.confirm(`"${data.project.name}" projesini ${actionText} istediğinizden emin misiniz?`)) {
-      return;
-    }
-
-    try {
-      setIsUpdatingStatus(true);
-      await updateProjectStatus(projectId, newStatus);
-      showToast("success", `Proje durumu "${newStatus === "active" ? "Aktif" : "Pasif"}" olarak güncellendi.`);
-      await loadData();
-    } catch (err: any) {
-      console.error("Proje durumu güncellenirken hata:", err);
-      showToast("error", err?.message || "Proje durumu güncellenemedi.");
-    } finally {
-      setIsUpdatingStatus(false);
-    }
-  };
 
   // ReportPreviewView modu
   if (isViewingReport) {
@@ -350,7 +361,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
           <button
             className="btn btn-report-primary btn--report btn--sm"
             onClick={() => setIsViewingReport(true)}
@@ -387,15 +398,32 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             Geri Yükle
           </button>
 
-          <button
-            type="button"
-            className={`btn ${project.status === "passive" ? "btn--start" : "btn-secondary"} btn--sm`}
-            onClick={handleToggleProjectStatus}
-            disabled={isUpdatingStatus}
-            title={project.status === "passive" ? "Projeyi Aktif Yap" : "Projeyi Pasife Al"}
-          >
-            {project.status === "passive" ? "Aktif Yap" : "Pasife Al"}
-          </button>
+          {/* Durum Değiştirme Butonu (Rozetin yanına ayrı buton) */}
+          {isPassive ? (
+            <button
+              type="button"
+              className="btn btn--start btn--sm"
+              onClick={handleActivateProject}
+              disabled={isUpdatingStatus}
+              title="Projeyi Aktifleştir"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+            >
+              <Play size={13} />
+              Projeyi Aktifleştir
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-secondary btn--sm"
+              onClick={() => setIsDeactivateModalOpen(true)}
+              disabled={isUpdatingStatus}
+              title="Projeyi Pasife Al"
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+            >
+              <PauseCircle size={13} style={{ color: "var(--warning, #d97706)" }} />
+              Projeyi Pasife Al
+            </button>
+          )}
 
           <button
             className="btn btn-secondary btn--sm"
@@ -408,14 +436,19 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           </button>
 
           <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
-          <span className={`badge ${project.status === "passive" ? "badge--secondary" : "badge-completed"}`}>
-            {project.status === "passive" ? "PASİF" : "AKTİF"}
+
+          {/* Tıklanamaz Durum Rozeti */}
+          <span
+            className={`badge ${isPassive ? "badge--secondary" : "badge-completed"}`}
+            style={{ cursor: "default", userSelect: "none" }}
+          >
+            {isPassive ? "PASİF" : "AKTİF"}
           </span>
         </div>
       </div>
 
       {/* Passive Project Warning Banner */}
-      {project.status === "passive" && (
+      {isPassive && (
         <div
           style={{
             backgroundColor: "var(--bg-surface-subtle, #f8fafc)",
@@ -430,33 +463,43 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <Clock size={20} style={{ color: "var(--text-muted)" }} />
+            <Clock size={20} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
             <div>
-              <strong style={{ display: "block", fontSize: "0.95rem" }}>Bu analiz projesi şu anda PASİF durumdadır</strong>
-              <span style={{ fontSize: "0.825rem", color: "var(--text-muted)" }}>
-                Pasif projeler arşiv amaçlı tutulur. Soru cevaplamak veya kapsamı değiştirmek için projeyi aktif duruma getirin.
-              </span>
+              <strong style={{ display: "block", fontSize: "0.95rem" }}>
+                Bu proje pasiftir. Verileri korunmaktadır. Çalışmaya devam etmek için projeyi aktifleştirin.
+              </strong>
             </div>
           </div>
           <button
             type="button"
             className="btn btn--start btn--sm"
-            onClick={handleToggleProjectStatus}
+            onClick={handleActivateProject}
             disabled={isUpdatingStatus}
+            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
           >
-            Projeyi Aktif Yap
+            <Play size={13} />
+            Projeyi Aktifleştir
           </button>
         </div>
       )}
 
       {/* Modals */}
+      <ProjectDeactivateModal
+        isOpen={isDeactivateModalOpen}
+        projectId={projectId}
+        projectName={project.name}
+        onClose={() => setIsDeactivateModalOpen(false)}
+        onConfirm={handleDeactivateConfirm}
+        isSubmitting={isUpdatingStatus}
+      />
+
       <ProjectScopeModal
         isOpen={isScopeModalOpen}
         projectId={projectId}
         projectName={project.name}
         onClose={() => setIsScopeModalOpen(false)}
         onScopeUpdated={() => loadData()}
-        isProjectPassive={project.status === "passive"}
+        isProjectPassive={isPassive}
       />
 
       <BackupSuccessModal
@@ -504,7 +547,6 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         }}
         onError={(err) => showToast("error", err)}
       />
-
 
       {/* Company Profile Card */}
       <div className="card" style={{ marginBottom: "1.5rem" }}>
@@ -665,8 +707,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
               <button
                 type="button"
                 className="btn btn-secondary btn--sm"
-                onClick={() => setIsScopeModalOpen(true)}
-                title="İş fonksiyonlarını ekle veya kapsam dışına al"
+                onClick={() => {
+                  if (isPassive) {
+                    showToast("info", "Bu proje pasiftir. Kapsamı düzenlemek için lütfen önce projeyi aktifleştirin.");
+                    return;
+                  }
+                  setIsScopeModalOpen(true);
+                }}
+                disabled={isPassive}
+                title={isPassive ? "Pasif projede kapsam düzenlenemez" : "İş fonksiyonlarını ekle veya kapsam dışına al"}
               >
                 <Layers size={14} />
                 <span>Kapsamı Düzenle</span>
@@ -725,6 +774,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                         className="form-control"
                         style={{ padding: "0.375rem 0.625rem", fontSize: "0.8125rem" }}
                         placeholder="Örn: Fabrika Müdürlüğü"
+                        disabled={isPassive}
                         defaultValue={fn.company_department_name || ""}
                         onBlur={(e) =>
                           handleFunctionFieldChange(
@@ -741,6 +791,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                         className="form-control"
                         style={{ padding: "0.375rem 0.625rem", fontSize: "0.8125rem" }}
                         placeholder="Örn: Ahmet Yılmaz (Müdür)"
+                        disabled={isPassive}
                         defaultValue={fn.responsible_person || ""}
                         onBlur={(e) =>
                           handleFunctionFieldChange(
@@ -754,8 +805,9 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                     <td>
                       <select
                         className="form-control"
-                        style={{ minWidth: "135px", padding: "0.375rem 0.5rem", fontSize: "0.8125rem", cursor: "pointer" }}
+                        style={{ minWidth: "135px", padding: "0.375rem 0.5rem", fontSize: "0.8125rem", cursor: isPassive ? "not-allowed" : "pointer" }}
                         value={fn.status}
+                        disabled={isPassive}
                         onChange={(e) =>
                           handleFunctionFieldChange(
                             fn.id,
@@ -780,7 +832,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                               : "btn--start"
                           } btn--sm`}
                           onClick={() => handleStartAnalysis(fn.code, fn.name_tr)}
-                          disabled={packLoadingCode === fn.code}
+                          disabled={packLoadingCode === fn.code || isPassive}
+                          title={isPassive ? "Pasif projede analiz başlatılamaz" : undefined}
                           style={{
                             minWidth: "105px",
                             display: "inline-flex",
@@ -798,33 +851,23 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                             </>
                           ) : fn.status === "in_progress" ? (
                             <>
-                              <Play size={13} /> Devam Et
+                              <Clock size={13} /> Devam Et
                             </>
                           ) : (
                             <>
-                              <Play size={13} /> Başlat
+                              <Play size={13} /> Analize Başla
                             </>
                           )}
                         </button>
-
                       ) : (
                         <span
-                          className="badge badge--neutral"
-                          title="Bu iş fonksiyonunun soru paketi hazırlanma aşamasındadır"
                           style={{
                             fontSize: "0.75rem",
-                            padding: "0.25rem 0.5rem",
-                            borderRadius: "4px",
-                            background: "var(--color-neutral-100)",
-                            color: "var(--color-neutral-500)",
-                            border: "1px solid var(--color-neutral-200)",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.25rem",
-                            cursor: "default",
+                            color: "var(--text-muted)",
+                            fontStyle: "italic",
                           }}
                         >
-                          Hazırlanıyor
+                          Geliştiriliyor
                         </span>
                       )}
                     </td>
@@ -833,17 +876,17 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
               </tbody>
             </table>
           </div>
-
-          {/* FAZ-3: Semantic Analysis Layer (Findings, Requirements, Risks, Notes) */}
-          <SemanticSummarySection projectId={projectId} />
         </div>
       ) : (
+        /* Governance Dashboard View Mode */
         <GovernanceDashboardView
           projectId={projectId}
-          projectName={project.name}
-          companyName={company.company_name}
+          isProjectPassive={isPassive}
         />
       )}
+
+      {/* Semantic Summary Section (Bulgular, Gereksinimler, Riskler, Notlar) */}
+      <SemanticSummarySection projectId={projectId} />
     </div>
   );
 };

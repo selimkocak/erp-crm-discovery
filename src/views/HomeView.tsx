@@ -14,14 +14,20 @@ import {
   CheckCircle2,
   Info,
   X as XIcon,
+  PauseCircle,
+  Play,
+  Sparkles,
 } from "lucide-react";
-import { getProjects, deleteProject } from "../db/client";
+import { getProjects, deleteProject, updateProjectStatus } from "../db/client";
 import { saveProjectBackupToFile, type SaveBackupResult } from "../storage/backupManager";
 import {
   RestoreProjectModal,
   DuplicateProjectModal,
   BackupSuccessModal,
 } from "../components/ProjectBackupModals";
+import { ProjectDeactivateModal } from "../components/modals/ProjectDeactivateModal";
+import { CreateDemoProjectModal } from "../components/modals/CreateDemoProjectModal";
+import { createManufacturingDemoProject } from "../demo/manufacturingPilot";
 import type { ProjectListItem } from "../types";
 
 interface HomeViewProps {
@@ -44,6 +50,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
   const [restoreInitialPath, setRestoreInitialPath] = useState<string | null>(null);
   const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deactivateTarget, setDeactivateTarget] = useState<{ id: string; name: string } | null>(null);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isCreateDemoOpen, setIsCreateDemoOpen] = useState(false);
+  const [isCreatingDemo, setIsCreatingDemo] = useState(false);
   const [exportingProjectId, setExportingProjectId] = useState<string | null>(null);
   const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "info" | "error"; message: string } | null>(null);
@@ -108,6 +118,46 @@ export const HomeView: React.FC<HomeViewProps> = ({
     }
   };
 
+  const handleActivate = async (projectId: string, projectName: string) => {
+    try {
+      await updateProjectStatus(projectId, "active");
+      showToast("success", `"${projectName}" projesi aktifleştirildi.`);
+      await loadProjects();
+    } catch (err: any) {
+      showToast("error", "Proje aktifleştirilemedi: " + (err?.message || err));
+    }
+  };
+
+  const handleDeactivateConfirm = async (_reason?: string) => {
+    if (!deactivateTarget) return;
+    try {
+      setIsDeactivating(true);
+      await updateProjectStatus(deactivateTarget.id, "passive");
+      showToast("success", `"${deactivateTarget.name}" projesi pasife alındı.`);
+      setDeactivateTarget(null);
+      await loadProjects();
+    } catch (err: any) {
+      showToast("error", "Proje pasife alınamadı: " + (err?.message || err));
+    } finally {
+      setIsDeactivating(false);
+    }
+  };
+
+  const handleCreateDemoConfirm = async () => {
+    try {
+      setIsCreatingDemo(true);
+      const res = await createManufacturingDemoProject();
+      showToast("success", `Kurgusal demo projesi ("${res.projectName}") başarıyla oluşturuldu.`);
+      setIsCreateDemoOpen(false);
+      onOpenProject(res.projectId);
+    } catch (err: any) {
+      console.error("Demo proje oluşturulurken hata:", err);
+      showToast("error", "Demo proje oluşturulamadı: " + (err?.message || err));
+    } finally {
+      setIsCreatingDemo(false);
+    }
+  };
+
   const formatDate = (isoString: string) => {
     try {
       const d = new Date(isoString);
@@ -164,7 +214,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <h2>Mevcut Analiz Projeleri</h2>
           <p>Kayıtlı ERP ve CRM ön analiz çalışmalarını listeleyin ve yönetin.</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setIsCreateDemoOpen(true)}
+            title="Tamamen kurgusal kesikli üretim pilot projesi oluştur"
+            style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+          >
+            <Sparkles size={16} style={{ color: "var(--primary)" }} />
+            Örnek Üretim Projesi Oluştur
+          </button>
           <button
             className="btn btn-secondary"
             onClick={() => setIsRestoreOpen(true)}
@@ -236,9 +295,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
           <h3>Henüz analiz oluşturulmadı.</h3>
           <p>
-            Yeni bir ERP / CRM ön analiz projesi başlatmak için aşağıdaki butonu kullanarak firma profili ve kapsam fonksiyonlarını belirleyin.
+            Yeni bir ERP / CRM ön analiz projesi başlatabilir veya hazır sentetik üretim pilot projesini tek tıkla yükleyerek inceleyebilirsiniz.
           </p>
-          <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
+          <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center", flexWrap: "wrap" }}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setIsCreateDemoOpen(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+            >
+              <Sparkles size={16} style={{ color: "var(--primary)" }} />
+              Örnek Üretim Projesi Oluştur
+            </button>
             <button className="btn btn-secondary" onClick={() => setIsRestoreOpen(true)}>
               <Upload size={16} />
               Yedekten Geri Yükle
@@ -307,7 +374,30 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       </div>
                     </td>
                     <td style={{ textAlign: "right" }}>
-                      <div style={{ display: "inline-flex", gap: "0.375rem" }}>
+                      <div style={{ display: "inline-flex", gap: "0.375rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        {/* Aktif / Pasif Değiştirme Butonu (Görünür Metin) */}
+                        {isPassive ? (
+                          <button
+                            className="btn btn--start btn--sm"
+                            title="Projeyi Aktifleştir"
+                            onClick={() => handleActivate(proj.id, proj.name)}
+                            style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+                          >
+                            <Play size={13} />
+                            Aktifleştir
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-secondary btn--sm"
+                            title="Projeyi Pasife Al"
+                            onClick={() => setDeactivateTarget({ id: proj.id, name: proj.name })}
+                            style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+                          >
+                            <PauseCircle size={13} style={{ color: "var(--warning, #d97706)" }} />
+                            Pasife Al
+                          </button>
+                        )}
+
                         <button
                           className="btn btn-secondary btn--sm"
                           title="Projeyi Yedekle (.erpcrm)"
@@ -354,6 +444,26 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </table>
         </div>
       )}
+
+      {/* Deactivate Confirmation Modal */}
+      {deactivateTarget && (
+        <ProjectDeactivateModal
+          isOpen={true}
+          projectId={deactivateTarget.id}
+          projectName={deactivateTarget.name}
+          onClose={() => setDeactivateTarget(null)}
+          onConfirm={handleDeactivateConfirm}
+          isSubmitting={isDeactivating}
+        />
+      )}
+
+      {/* Create Demo Project Modal */}
+      <CreateDemoProjectModal
+        isOpen={isCreateDemoOpen}
+        onClose={() => setIsCreateDemoOpen(false)}
+        onConfirm={handleCreateDemoConfirm}
+        isCreating={isCreatingDemo}
+      />
 
       {/* Backup Success Modal */}
       <BackupSuccessModal

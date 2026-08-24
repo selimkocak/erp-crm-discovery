@@ -88,12 +88,14 @@ interface GovernanceDashboardViewProps {
   projectId: string;
   projectName?: string;
   companyName?: string;
+  isProjectPassive?: boolean;
 }
 
 export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = ({
   projectId,
   projectName,
   companyName,
+  isProjectPassive = false,
 }) => {
   const [activeTab, setActiveTab] = useState<string>("objects");
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -192,6 +194,10 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
 
   // Seed default 23 starter objects
   const handleSeedDefaults = async () => {
+    if (isProjectPassive) {
+      showToast("info", "Bu proje pasiftir. Yönetişim şablonu eklemek için lütfen önce projeyi aktifleştirin.");
+      return;
+    }
     try {
       setIsSeeding(true);
       const count = await seedDefaultGovernanceObjects(projectId);
