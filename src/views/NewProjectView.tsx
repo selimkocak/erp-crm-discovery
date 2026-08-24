@@ -196,7 +196,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
   const handleSubmit = async () => {
     if (selectedFunctionIds.length === 0) {
-      alert("Lütfen analiz kapsamına alınacak en az bir iş fonksiyonu seçin.");
+      setErrorMessage("Lütfen analiz kapsamına alınacak en az bir iş fonksiyonu seçin.");
       return;
     }
 
