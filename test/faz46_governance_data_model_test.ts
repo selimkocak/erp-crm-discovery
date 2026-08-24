@@ -80,7 +80,7 @@ async function runGovernanceDataModelTests(): Promise<void> {
 
 
     const appliedCount = db.prepare("SELECT COUNT(*) as c FROM _migrations").get().c;
-    assert(appliedCount === 11, `11 migration eksiksiz uygulandı (Mevcut: ${appliedCount})`);
+    assert(appliedCount === MIGRATION_DEFINITIONS.length, `${MIGRATION_DEFINITIONS.length} migration eksiksiz uygulandı (Mevcut: ${appliedCount})`);
 
     // Verify tables
     const expectedTables = [
@@ -128,7 +128,7 @@ async function runGovernanceDataModelTests(): Promise<void> {
         item.name_tr,
         item.name_en,
         item.related_bf_code || null,
-        item.description || null,
+        (item as any).description || null,
         item.sort_order || i + 1,
         now,
         now
@@ -149,7 +149,7 @@ async function runGovernanceDataModelTests(): Promise<void> {
         item.name_tr,
         item.name_en,
         item.related_bf_code || null,
-        item.description || null,
+        (item as any).description || null,
         item.sort_order || i + 1,
         now,
         now
