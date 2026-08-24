@@ -1,7 +1,7 @@
 {
   "name": "erp-crm-discovery",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Açık kaynaklı, %100 çevrimdışı ve yapay zekâ içermeyen ERP / CRM ön analiz ve saha keşif aracı",
   "author": "Selim Koçak <selimkocak@gmail.com>",
   "license": "MIT",

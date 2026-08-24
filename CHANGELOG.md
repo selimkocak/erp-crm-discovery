@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.2] - 2026-08-24
+
+### Added
+* **Project Backup & Restore Engine (.erpcrm Archive):** Zero-dependency pure TypeScript POSIX USTAR + GZIP portable archive engine (`src/storage/tar.ts`, `src/storage/backupManager.ts`), backing up and restoring complete project data (25 SQLite tables, Managed Attachment Vault digital twin evidence files, and JSON manifest) with SHA-256 integrity checksums and strict path traversal protection.
+* **Visible Backup Location & Show in Folder:** Explicit native Save Dialog with folder memory, displaying the full physical path of the generated `.erpcrm` backup file, alongside a "Klasörde Göster" (Show in Explorer / Finder) button and single-click "Yedekten Ön İnceleme" (Inspect Backup) preview.
+* **Active / Passive Project Lifecycle Management:** Full status lifecycle transitions (`active` / `passive` / `completed` / `archived`) across `HomeView`, `NewProjectView`, and `ProjectDetailView`, including dedicated status filter tabs and non-destructive status updates.
+* **Reversible Scope Management (Kapsamı Düzenle):** `ProjectScopeModal` allowing soft-removal of business functions with mandatory removal reasons and data count warnings, preserving all past responses in SQLite while recording changes in the `project_scope_changes` audit trail table (Migration 12).
+* **Cross-Platform Semantic Status Normalization:** Built-in `statusDictionary` (`src/models/statusDictionary.ts`) unifying findings, requirements, risks, and notes statuses across Windows and macOS with zero data loss and WCAG AA accessible badges.
+
+### Fixed
+* **Pure Desktop & Zero-Transaction Multi-Connection Hotfix:** Removed raw SQL `BEGIN TRANSACTION`/`COMMIT`/`ROLLBACK` statements sent over `@tauri-apps/plugin-sql` IPC pool to eliminate `cannot rollback - no transaction is active` errors across macOS and Windows, using sequential executions and application-level compensation cleanup (`deleteProject`).
+* **External Hyperlink Resolution:** Integrated `@tauri-apps/plugin-opener` with fallback handlers for AboutModal GitHub repository links and developer email triggers on desktop platforms.
+* **Database Schema Migration 12 & CI Alignment:** Integrated `project_scope_changes` and soft-removal columns (`is_active`, `removed_at`, `removal_reason`), synchronizing clean install and migration transaction test expectations (25 tables).
+
+---
+
 ## [0.1.1] - 2026-08-23
 
 ### Fixed

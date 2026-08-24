@@ -1,6 +1,6 @@
 [package]
 name = "erp-crm-discovery"
-version = "0.1.1"
+version = "0.1.2"
 description = "ERP CRM Discovery Desktop Application"
 
 authors = ["Selim Koçak <selimkocak@gmail.com>"]
