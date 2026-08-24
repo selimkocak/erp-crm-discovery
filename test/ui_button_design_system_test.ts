@@ -162,7 +162,7 @@ assert(bodyTextRatio >= 7.0, `Body Text (#0f172a vs #f8fafc) Kontrast: ${bodyTex
 console.log("\n=== T04: Core Views Button Semantic Alignment ===");
 
 const projectDetailCode = fs.readFileSync(path.join(ROOT_DIR, "src/views/ProjectDetailView.tsx"), "utf-8");
-assert(projectDetailCode.includes("btn--start") && projectDetailCode.includes("Başlat"), "ProjectDetailView: Başlat butonu btn--start (Mavi #2563eb) sınıfına sahip");
+assert(projectDetailCode.includes("btn--start") && projectDetailCode.includes("Analize Başla"), "ProjectDetailView: Analize Başla butonu btn--start sınıfına sahip");
 assert(projectDetailCode.includes("btn--continue") && projectDetailCode.includes("Devam"), "ProjectDetailView: Devam butonu btn--continue (Teal #0f766e) sınıfına sahip");
 assert((projectDetailCode.includes("btn-report-primary") || projectDetailCode.includes("btn--report")) && projectDetailCode.includes("Rapor Önizleme"), "ProjectDetailView: Rapor Önizleme butonu btn-report-primary (Indigo #4f46e5) sınıfına sahip");
 assert(projectDetailCode.includes("btn--back") && projectDetailCode.includes("Geri"), "ProjectDetailView: Geri butonu btn--back sınıfına sahip");
