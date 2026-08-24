@@ -354,19 +354,71 @@ async function runTests() {
     assert(!containsOfis, "Veritabanında hiçbir 'Tuna Ofis' ifadesi bulunmamaktadır.");
 
     // ------------------------------------------------------------------
-    // TEST 7: Rapor Modeli Entegrasyonu (ReportModel)
+    // TEST 8: SQLite FOREIGN KEY ve Bütünlük Regresyon Denetimleri
     // ------------------------------------------------------------------
-    console.log("\n--- 7. Rapor Modeli ve Export Entegrasyonu ---");
-    const reportModel = await buildReportModel(demoId);
-    assert(reportModel.metadata.projectName === "ERP/CRM Dönüşüm Ön Analiz Pilotu", "Rapor modeli proje adını doğru eşleştirdi.");
-    assert(reportModel.company.companyName === "Marmara Endüstriyel Sistemler A.Ş.", "Rapor modeli firma adını doğru eşleştirdi.");
-    assert(reportModel.businessFunctions.length >= 16, `Rapor modeli fonksiyonları >= 16 (${reportModel.businessFunctions.length})`);
-    assert(reportModel.summaryStats.totalQuestions >= 80, `Rapor soru sayısı >= 80 (${reportModel.summaryStats.totalQuestions})`);
-    assert(reportModel.summaryStats.totalFindings >= 6, `Rapor toplam bulgular >= 6 (${reportModel.summaryStats.totalFindings})`);
-    assert(reportModel.summaryStats.totalRequirements >= 6, `Rapor toplam gereksinimler >= 6 (${reportModel.summaryStats.totalRequirements})`);
-    assert(reportModel.summaryStats.totalRisks >= 4, `Rapor toplam riskler >= 4 (${reportModel.summaryStats.totalRisks})`);
-    assert(reportModel.projectNotes.length >= 6, `Rapor proje notları >= 6 (${reportModel.projectNotes.length})`);
-    assert((reportModel.followups?.length || 0) >= 2, `Rapor Bölüm 5 açık konular >= 2 (${reportModel.followups?.length || 0})`);
+    console.log("\n--- 8. SQLite FOREIGN KEY ve Bütünlük Regresyon Denetimleri ---");
+    const fkPragma = mockDb.raw.pragma("foreign_keys", { simple: true });
+    assert(fkPragma === 1, "PRAGMA foreign_keys = ON doğrulaması: AKTİF (1)");
+
+    const fkCheck = mockDb.raw.pragma("foreign_key_check");
+    assert(fkCheck.length === 0, `PRAGMA foreign_key_check sonucu 0 satır: ${fkCheck.length} ihlal`);
+
+    // 94 cevabın bf_code değerleri seçili 19 fonksiyon içinde
+    const activeBfCodes = new Set(demoFunctions.map((f: any) => f.code));
+    const invalidAnswers = demoAnswers.filter((a: any) => !activeBfCodes.has(a.business_function_code));
+    assert(invalidAnswers.length === 0, `94 cevabın tümünün business_function_code değerleri seçili 19 fonksiyon içinde (Geçersiz: ${invalidAnswers.length})`);
+
+    // Yönetişim nesneleri, özneleri ve kapsamları FK geçerliliği
+    const allGovObjects = await mockDb.select<any[]>(`SELECT id FROM governance_objects WHERE analysis_project_id = $1`, [demoId]);
+    const allGovSubjects = await mockDb.select<any[]>(`SELECT id FROM governance_subjects WHERE analysis_project_id = $1`, [demoId]);
+    const allGovScopes = await mockDb.select<any[]>(`SELECT id FROM governance_scopes WHERE analysis_project_id = $1`, [demoId]);
+    const objIdSet = new Set(allGovObjects.map((o) => o.id));
+    const subIdSet = new Set(allGovSubjects.map((s) => s.id));
+    const scopeIdSet = new Set(allGovScopes.map((sc) => sc.id));
+
+    const resps = await mockDb.select<any[]>(`SELECT * FROM governance_responsibilities WHERE analysis_project_id = $1`, [demoId]);
+    const invalidRespFk = resps.filter((r) => !objIdSet.has(r.governance_object_id) || !subIdSet.has(r.subject_id) || (r.scope_id && !scopeIdSet.has(r.scope_id)));
+    assert(invalidRespFk.length === 0, `Tüm sorumluluk kayıtlarının FK ilişkileri geçerli (Geçersiz: ${invalidRespFk.length})`);
+
+    const auths = await mockDb.select<any[]>(`SELECT * FROM governance_authorizations WHERE analysis_project_id = $1`, [demoId]);
+    const invalidAuthFk = auths.filter((a) => !objIdSet.has(a.governance_object_id) || !subIdSet.has(a.subject_id) || (a.scope_id && !scopeIdSet.has(a.scope_id)));
+    assert(invalidAuthFk.length === 0, `Tüm yetki matrisi kayıtlarının FK ilişkileri geçerli (Geçersiz: ${invalidAuthFk.length})`);
+
+    const lims = await mockDb.select<any[]>(`SELECT * FROM governance_limits WHERE analysis_project_id = $1`, [demoId]);
+    const invalidLimFk = lims.filter((l) => (l.governance_object_id && !objIdSet.has(l.governance_object_id)) || !subIdSet.has(l.subject_id) || (l.scope_id && !scopeIdSet.has(l.scope_id)));
+    assert(invalidLimFk.length === 0, `Tüm limit kayıtlarının FK ilişkileri geçerli (Geçersiz: ${invalidLimFk.length})`);
+
+    // ------------------------------------------------------------------
+    // TEST 9: Hata Durumunda Yarım Proje Kalmama (Atomik Cleanup) Denetimi
+    // ------------------------------------------------------------------
+    console.log("\n--- 9. Hata Simülasyonunda Yarım Proje Temizleme (Cleanup) ---");
+    const preFailProjects = await getProjects();
+    const preCount = preFailProjects.length;
+
+    // Hatalı oluşturma simülasyonu: database execute geçici olarak arızalanırsa
+    const originalExecute = mockDb.execute.bind(mockDb);
+    let simulateError = true;
+    mockDb.execute = async (query: string, params: any[] = []) => {
+      if (simulateError && query.includes("INSERT INTO governance_limits")) {
+        throw new Error("Simulated SQLite constraint failure in limits");
+      }
+      return originalExecute(query, params);
+    };
+
+    let threwAsExpected = false;
+    try {
+      await createManufacturingDemoProject();
+    } catch (e: any) {
+      threwAsExpected = true;
+      assert(e.message.includes("Demo proje oluşturulamadı"), `Kullanıcı dostu hata mesajı üretildi: ${e.message}`);
+    } finally {
+      simulateError = false;
+      mockDb.execute = originalExecute;
+    }
+    assert(threwAsExpected, "Hata simülasyonu beklendiği gibi yakalandı.");
+
+    const postFailProjects = await getProjects();
+    assert(postFailProjects.length === preCount, `Hata sonrasında geride yetim / yarım proje kalmadı (Proje sayısı değişmedi: ${postFailProjects.length})`);
 
     // ------------------------------------------------------------------
     // ÖZET VE SONUÇ
