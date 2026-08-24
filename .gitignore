@@ -26,6 +26,7 @@ src-tauri/target/
 
 # Logs
 *.log
+dev.log
 logs/
 
 # Operating System Files
