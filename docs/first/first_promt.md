@@ -1,17 +1,17 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.4+ | Git Durumu: 34 Soru Paketi (1.492 Soru) + Yönetişim Matrisi (FAZ-46..50) + .erpcrm Taşınabilir Arşiv Motoru (FAZ-51..54.2) + Proje Yaşam Döngüsü & Dinamik Kapsam Revizyonu (FAZ-55) + Sentetik Kesikli Üretim Pilotu Marmara Endüstriyel (FAZ-57/58.3) + İki Seviyeli Proje & Fonksiyon Takvim Yönetimi (FAZ-59) + Antigravity Geliştirme Ajanı Kontrol Mimarisi (FAZ-60) + Ajan Mimarisi Operasyonel Saha Testi & Takvim Bütünlüğü (FAZ-61) + .gitignore & dev.log Temizliği
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz60_faz61_agent_architecture_and_schedule_integrity_2026_08_24
-Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hata, 1945 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
+Mevcut Sürüm: v0.1.4+ | Git Durumu: 35 Soru Paketi (1.550 Soru) + Yönetişim Matrisi (FAZ-46..50) + .erpcrm Taşınabilir Arşiv Motoru (FAZ-51..54.2) + Proje Yaşam Döngüsü & Dinamik Kapsam Revizyonu (FAZ-55) + Sentetik Kesikli Üretim Pilotu Marmara Endüstriyel (FAZ-57/58.3) + İki Seviyeli Proje & Fonksiyon Takvim Yönetimi (FAZ-59) + Antigravity Geliştirme Ajanı Kontrol Mimarisi (FAZ-60) + Ajan Mimarisi Operasyonel Saha Testi & Takvim Bütünlüğü (FAZ-61) + Saha Veri Toplama ve Endüstriyel Veri Keşfi (FAZ-62A) + OT İstasyon Profili & Tekrarlayan İstasyon Keşif Akışı (FAZ-62B)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz62a_faz62b_ot_industrial_data_and_station_profile_2026_08_24
+Doğrulama Durumu: 73 Test Paketinde 1.980+ Test %100 PASS, npm run build (0 Hata, 1.948 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
 ======================================================================
 - Temel Konumlandırma: Field-first · Data-first · Analysis-first · Offline-first · Evidence-first · Human-led. Bu proje bir AI uygulaması değildir; AI modeli, tahmin veya otomatik yorum içermez; çekirdek uygulamanın sıfır bulut bağımlılığı vardır.
 - Kabuk: Tauri 2 (Rust) + React 18 + TypeScript + Vite + Vanilla CSS (Design Tokens) + Lucide Icons
-- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 23 Kanonik Tablo, 13 Migrasyon (Tauri plugin-sql)
-- Soru Motoru: 33 Kanonik Fonksiyon kataloğu, 34 Kanonik Soru Paketi (1.492 Soru, ~800 Zorunlu, 200+ Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
+- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 27 Kanonik Tablo, 14 Migrasyon (Tauri plugin-sql)
+- Soru Motoru: 34 Kanonik Fonksiyon kataloğu, 35 Kanonik Soru Paketi (1.550 Soru, ~839 Zorunlu, 209+ Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
 - Geliştirme Ajanı Kontrol Mimarisi (FAZ-60):
   · Antigravity IDE ve Gemini geliştirme ajanları için `.agents/` kanonik kontrol altyapısı kuruldu.
   · Rol Hiyerarşisi: Selim Koçak (Ürün Sahibi & Nihai Kabul Yetkilisi) → ChatGPT / Tars (Mimar, Kapsam & Kabul Kriteri Üreticisi) → Antigravity IDE (Geliştirme & Yürütme Ortamı) → Gemini Geliştirme Ajanları (İnceleme, Kodlama, Test & Raporlama) → ERP CRM Discovery (Masaüstü Ürün).
@@ -20,17 +20,25 @@ Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hat
   · Kök Dizin & ADR-001: Kök `AGENTS.md` → `.agents/agents.md`, 5 iş akışı (`implement-phase`, `diagnose-bug`, `fix-ci`, `verify-release`, `update-memory`), 8 beceri (YAML frontmatter), 6 politika (`change-scope`, `testing-policy`, `ci-recovery-policy`, `git-release-policy`, `user-data-policy`, `communication-policy`), 4 şablon.
 - İki Seviyeli Proje & İş Fonksiyonu Takvim Yönetimi (FAZ-59 & FAZ-61):
   · Proje Seviyesi: `planned_start_date`, `planned_end_date`, `actual_start_date`, `actual_end_date` (Migration 13).
-  · İş Fonksiyonu Seviyesi: 33 modülün her biri için bağımsız 4 takvim tarihi.
+  · İş Fonksiyonu Seviyesi: 34 modülün her biri için bağımsız 4 takvim tarihi.
   · Zero-Timezone / UTC Epoch Güvenliği: `Date.UTC(y, m-1, d)` ve saf matematiksel gün farkı ile yerel saat dilimi ve daylight-saving kaymalarına karşı tam koruma.
   · 9 Durumlu Zaman Motoru: `not_planned`, `planned`, `not_started`, `in_progress`, `on_track`, `due_soon`, `overdue`, `completed_on_time`, `completed_late`.
   · Kapsam İzolasyonu: Kapsam dışı bırakılan modüllerin takvim verileri SQLite'da korunur, aktif takvim istatistiklerine (`scheduleStats`) dahil edilmez.
   · Çoğaltma Kuralı: Şablon kopyada planlanan tarihler korunur, fiilî tarihler sıfırlanır (`null`); tam kopyada tüm anlık tarihler korunur.
   · Rapor & Export Paritesi: UI Önizleme, PDF ve Word (DOCX) çıktıları Bölüm 3.1 Proje Takvimi & Zaman Planı altında aynı kanonik `ReportScheduleSummary` modelini tüketir; sıfır `undefined` ve sıfır ham enum garantisi.
+- OT & Saha İstasyonları Keşif Mimarisi (FAZ-62A & FAZ-62B):
+  · `OT_INDUSTRIAL_DATA` Çekirdek Soru Paketi: İş hedefi odaklı (Purpose-Driven) endüstriyel veri keşfi; 58 soru, 22 süreç, 9 branching.
+  · Hiyerarşi: Plant → Production Area → Production Line → Station → Machine / Device / Sensor.
+  · SQLite Migration 14: `ot_stations` ve `ot_station_answers` tabloları (`FOREIGN KEY ON DELETE CASCADE`, `UNIQUE(project_id, station_code)`, `UNIQUE(project_id, station_id, question_id)`).
+  · İzole İstasyon Cevap Motoru: İstasyon A ve İstasyon B cevapları `station_id` düzeyinde tamamen izole; projenin genel `question_answers` tablosundaki kayıtlar bozulmadan korunur.
+  · Taşınabilir Arşiv (.erpcrm Schema 14): `BACKUP_CURRENT_SCHEMA_VERSION = 14`; geri yüklemede `stationIdMap` ile yeni UUID eşlemeleri; şablon kopyada istasyon yapılandırması korunup cevaplar sıfırlanır; tam kopyada her ikisi kopyalanır.
+  · Rapor & Export Paritesi: HTML Rapor Önizleme, Word (.docx) ve Liberation Sans TrueType PDF (.pdf) çıktıları Bölüm 3.2 "Saha İstasyonları ve Makine Envanteri (OT/IT)" altında aynı kanonik `ReportOtStationsSummary` modelini tüketir.
+  · Kullanıcı Arayüzü: `OtStationModal.tsx`, `OtStationsSection.tsx` (özet istatistik çipleri, tablo, durum değiştirme, istasyon silme, istasyon bazlı soru başlatma) ve `QuestionScreen.tsx` (üst bar istasyon rozeti ve izole persistence).
 - Sentetik Marmara Endüstriyel Pilot Projesi (FAZ-57/58.3 & FAZ-61):
   · 19 Aktif İş Fonksiyonu (9 Tamamlandı, 10 Devam Ediyor, 0 Başlanmadı).
   · 94 Kanonik Cevap, 427 Zorunlu Soru, %22 İlerleme.
   · 5 Dalgalı Deterministik Takvim: Proje 01.09.2026 – 24.11.2026 (12 hafta).
-- Taşınabilir Format (.erpcrm): Sıfır bağımlılıklı POSIX USTAR + GZIP arşiv motoru (`src/storage/tarArchive.ts`). 23 SQLite tablosu, manifest.json (Schema Version 13), project-data.json, checksums.json ve Managed Vault kanıt dosyaları.
+- Taşınabilir Format (.erpcrm): Sıfır bağımlılıklı POSIX USTAR + GZIP arşiv motoru (`src/storage/tarArchive.ts`). 27 SQLite tablosu, manifest.json (Schema Version 14), project-data.json, checksums.json ve Managed Vault kanıt dosyaları.
 - Sıfır SQL Transaction Kilidi: `@tauri-apps/plugin-sql` bağlantı havuzundan (SqlitePool) ötürü frontend'de `BEGIN`/`ROLLBACK` kullanılmaz; sıralı `INSERT` ve hata anında `deleteProject(newProjectId)` telafi temizliği uygulanır.
 - Saf Masaüstü Save/Open: Browser download (Blob URL, `<a download>`) tamamen söküldü; `@tauri-apps/plugin-dialog` ve `@tauri-apps/plugin-fs` kullanılır. Varsayılan klasör: `Belgeler/ERP CRM Discovery Yedekleri` ve `localStorage['erp_crm_last_backup_directory']`.
 - Managed Attachment Vault: Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/ERP CRM Discovery/attachment/{projectId}/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration 8 & 9), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF `file:///` hyperlink garantisi (RFC-8089 3-slash).
@@ -51,9 +59,11 @@ Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hat
 - FAZ-59: Proje Takvimi ve İş Fonksiyonu Zaman Planı (Migration 13, 9 durumlu merkezi zaman motoru, iki seviyeli takvim, modal UI, DOCX/PDF/Önizleme Bölüm 3.1, .erpcrm Schema 13 şablon ve tam çoğaltma).
 - FAZ-60: Antigravity Geliştirme Ajanı Kontrol Mimarisi (.agents/ kanonik yapısı, rol geçiş sözleşmesi, AI izolasyonu ve ADR-001 kararı).
 - FAZ-61: Ajan Mimarisi Operasyonel Saha Testi, Takvim Bütünlüğü Doğrulaması, Satır İçi Hata Standardı, 22 Senaryoluk Kabul Testi ve .gitignore Mühürlemesi.
+- FAZ-62A: Saha Veri Toplama, OT/IT ve Endüstriyel Veri Keşfi Çekirdek Modülü (34. kanonik iş fonksiyonu `OT_INDUSTRIAL_DATA`, `tr.ot_industrial_data.core` v0.1.0, 58 soru, 22 süreç, 9 branching, 1.550 soruluk külliyat).
+- FAZ-62B: OT İstasyon Profili ve Tekrarlayan İstasyon Keşif Akışı (Plant -> Area -> Line -> Station -> Machine hiyerarşisi, SQLite Migration 14 ot_stations & ot_station_answers, izole cevap motoru, .erpcrm Schema 14, HTML/DOCX/PDF Bölüm 3.2 Saha İstasyonları tablosu, OtStationModal & OtStationsSection UI).
 
 ======================================================================
-3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (34 PAKET / 1.492 SORU — %100 TAMAMLANDI)
+3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (35 PAKET / 1.550 SORU — %100 TAMAMLANDI)
 ======================================================================
 1.  SALES (38 Soru) [Kabul Edildi]
 2.  PROCUREMENT (40 Soru) [Kabul Edildi]
@@ -89,6 +99,7 @@ Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hat
 32. MANAGEMENT (47 Soru) [Kabul Edildi]
 33. STRATEGY (47 Soru) [Kabul Edildi]
 34. TRAINING (47 Soru) [Kabul Edildi]
+35. OT_INDUSTRIAL_DATA (58 Soru, Saha Veri Toplama & OT/IT) [Kabul Edildi]
 
 ======================================================================
 4. KRİTİK GÜVENLİK, APİ VE AJAN ÇALIŞTIRMA KURALLARI
@@ -100,9 +111,9 @@ Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hat
 5. Saf Masaüstü Kuralı: ERP CRM Discovery bir masaüstü uygulamasıdır. Tarayıcı indirmesi (`<a download>`, Blob URL, `URL.createObjectURL`) asla kullanılmaz; her zaman `@tauri-apps/plugin-dialog` ve `@tauri-apps/plugin-fs` kullanılır.
 6. Yedek Klasör Hafızası: Son kullanılan klasör `localStorage['erp_crm_last_backup_directory']` hafızasında tutulur; varsayılan yol `documentDir()/ERP CRM Discovery Yedekleri` dizinidir.
 7. Test Çalıştırma Standardı: Testler doğrudan `npm exec -- tsx <test_path>` veya `npm test` ile çalıştırılır (Global paket bağımlılığı yoktur).
-8. Open Handle / SQLite WAL Notu: `better-sqlite3` kullanılan testlerde açık kalan veritabanı bağlantıları (`db.close()`) Node event loop'unu askıda tutabilir; testlerde db lifecycle yönetimine dikkat edilmelidir.
+8. Pager ve Arka Plan Görev Güvenliği: `git diff` veya terminal komutlarında sayfalayıcı kilitlenmelerini önlemek için `PAGER=cat` kullanılmalıdır. Asılı kalan süreçler `manage_task` ile temizlenmelidir.
 9. formatAnswer() dönüş tipi: { isAnswered, selectedOptions, textValue, generalNote, summaryText }
-10. ReportModel şeması: { metadata, company, profile, scope[], businessFunctions[], followups[], scheduleSummary, globalFindings[], globalRequirements[], globalRisks[], projectNotes[], summaryStats }
+10. ReportModel şeması: { metadata, company, profile, scope[], businessFunctions[], followups[], scheduleSummary, otStationsSummary, globalFindings[], globalRequirements[], globalRisks[], projectNotes[], summaryStats }
 11. buildDocxBuffer(report: ReportModel) / buildPdfBuffer(report: ReportModel) — tek argüman, async
 12. PDFParse kullanımı: new PDFParse({ data: pdfBuf }).getText()
 13. Branching & Progress engine: Map<string, AnswerData> kullanılır
@@ -110,8 +121,10 @@ Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hat
 ======================================================================
 5. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- Tüm Testler (72 Test Paketi, 1.900+ Test): npm test
-- Windows Test Paritesi (72 Test Paketi): npm run test:windows
+- Tüm Testler (73 Test Paketi, 1.980+ Test): npm test
+- Windows Test Paritesi (73 Test Paketi): npm run test:windows
+- FAZ-62B OT İstasyon Profili Kabul Testi: npm exec -- tsx test/faz62b_ot_station_profile_test.ts
+- FAZ-62A Endüstriyel Veri Keşfi Kabul Testi: npm exec -- tsx test/faz62a_ot_industrial_data_pack_test.ts
 - FAZ-61 Saha & Takvim Kabul Testi: npm exec -- tsx test/faz61_agent_operational_and_schedule_integrity_test.ts
 - FAZ-60 Ajan Mimarisi Kabul Testi: npm exec -- tsx test/faz60_agent_architecture_test.ts
 - FAZ-59 Proje & Fonksiyon Takvim Testi: npm exec -- tsx test/faz59_project_schedule_and_function_timeline_test.ts
