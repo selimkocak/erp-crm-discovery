@@ -38,10 +38,13 @@ import type {
   QuestionFollowup,
   FollowupFlagType,
   QuestionAttachment,
+  OtStation,
 } from "../types";
 import {
   saveAnswer,
   getAllAnswers,
+  getOtStationAnswers,
+  saveOtStationAnswer,
   saveLastQuestionId,
   getLastQuestionId,
   updateFunctionStatusByCode,
@@ -81,6 +84,7 @@ interface QuestionScreenProps {
   bfCode: string;
   bfNameTr: string;
   pack: QuestionPack;
+  station?: OtStation | null;
   onBack: () => void;
   onOpenReport?: () => void;
 }
@@ -92,6 +96,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   bfCode,
   bfNameTr,
   pack,
+  station,
   onBack,
   onOpenReport,
 }) => {
@@ -144,7 +149,9 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         dbAttachments,
         lastQId,
       ] = await Promise.all([
-        getAllAnswers(projectId, bfCode),
+        station
+          ? getOtStationAnswers(projectId, station.id)
+          : getAllAnswers(projectId, bfCode),
         getCustomAnswers(projectId, bfCode),
         getCustomQuestions(projectId, bfCode),
         getQuestionFollowups(projectId, bfCode),
@@ -178,19 +185,20 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       const adaptedCustom = dbCustomQuestions.map((cq, idx) =>
         adaptCustomQuestionToQuestion(cq, pack.questions.length + idx + 1)
       );
-      const allQuestions = [...canonicalVisible, ...adaptedCustom];
+      const allInitial = [...canonicalVisible, ...adaptedCustom];
 
       // Kaldığı yerden devam (Resume)
       if (lastQId) {
-        const idx = allQuestions.findIndex((q) => q.id === lastQId);
+        const idx = allInitial.findIndex((q) => q.id === lastQId);
         if (idx >= 0) setCurrentIndex(idx);
       }
     } catch (err) {
       console.error("Sorular ve cevaplar yüklenemedi:", err);
+      setSaveStatus("error");
     } finally {
       setIsLoading(false);
     }
-  }, [projectId, bfCode, pack.questions]);
+  }, [projectId, bfCode, pack.questions, station]);
 
   useEffect(() => {
     loadData();
@@ -257,6 +265,16 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         setSaveStatus("saving");
         if (isCustom) {
           await saveCustomAnswer(projectId, bfCode, qId, data);
+        } else if (station) {
+          await saveOtStationAnswer(
+            projectId,
+            station.id,
+            qId,
+            data,
+            bfCode,
+            pack.meta.pack_id,
+            pack.meta.version
+          );
         } else {
           await saveAnswer(
             projectId,
@@ -278,7 +296,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         setSaveStatus("error");
       }
     },
-    [projectId, bfCode, pack.meta, progress.answered, progress.total]
+    [projectId, bfCode, pack.meta, progress.answered, progress.total, station]
   );
 
   // ── Autosave Tetikleyici ────────────────────────────────────────────────
@@ -682,6 +700,27 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
               <Layers size={14} />
               <span>Sorular ({visibleQuestions.length})</span>
             </button>
+
+            {station && (
+              <span
+                style={{
+                  backgroundColor: "#eff6ff",
+                  color: "#1e40af",
+                  padding: "2px 8px",
+                  borderRadius: "6px",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  border: "1px solid #bfdbfe",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  whiteSpace: "nowrap",
+                }}
+                title={`İstasyon: [${station.station_code}] ${station.station_name}`}
+              >
+                [{station.station_code}] {station.station_name}
+              </span>
+            )}
           </div>
 
           {/* Orta: Süreç Adı & Soru X / Y */}

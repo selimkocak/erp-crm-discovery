@@ -334,6 +334,29 @@ export interface ReportScheduleSummary {
   };
 }
 
+export interface ReportOtStation {
+  id: string;
+  stationCode: string;
+  stationName: string;
+  areaName: string | null;
+  lineName: string | null;
+  stationType: string | null;
+  machineName: string | null;
+  machineManufacturer: string | null;
+  machineModel: string | null;
+  plcOrController: string | null;
+  operatorCount: number | null;
+  status: string;
+}
+
+export interface ReportOtStationsSummary {
+  totalStations: number;
+  activeStations: number;
+  areaCount: number;
+  lineCount: number;
+  stations: ReportOtStation[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -344,6 +367,7 @@ export interface ReportModel {
   attachments?: ReportAttachmentItem[];
   governance?: ReportGovernanceModel;
   scheduleSummary?: ReportScheduleSummary;
+  otStationsSummary?: ReportOtStationsSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

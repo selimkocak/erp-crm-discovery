@@ -277,7 +277,7 @@ async function runTests(): Promise<void> {
     console.log("\n--- 6. .erpcrm Yedekleme, Geri Yükleme ve Çoğaltma ---");
     const backupData = await exportProjectBackup(projId1);
     assert(backupData.buffer.byteLength > 0, "S11: Proje yedeği başarıyla dışa aktarıldı.");
-    assert(backupData.manifest.schemaVersion === 13, "S11: Manifest schemaVersion = 13.");
+    assert(backupData.manifest.schemaVersion >= 13, "S11: Manifest schemaVersion >= 13.");
 
     const restoreResult = await restoreProjectBackup(backupData.buffer);
     assert(restoreResult.success, "S12: Yedekten geri yükleme başarılı.");

@@ -616,6 +616,98 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             </section>
           )}
 
+          {/* ── Bölüm 3.2: Saha İstasyonları ve Makine Envanteri (FAZ-62B) ── */}
+          {report.otStationsSummary && report.otStationsSummary.totalStations > 0 && (
+            <section id="sec-ot-stations" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">BÖLÜM 3.2</span>
+                <h2 className="report-section__title">Saha İstasyonları ve Makine Envanteri (OT/IT)</h2>
+              </div>
+
+              {/* OT Stations Overview Box */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                <h3 className="report-summary-box__title">İstasyon Dağılım Özeti</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "1rem", marginTop: "0.75rem" }}>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>TOPLAM İSTASYON</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--color-primary, #1e3a8a)" }}>
+                      {report.otStationsSummary.totalStations} Adet
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>AKTİF İSTASYON</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "#15803d" }}>
+                      {report.otStationsSummary.activeStations} Adet
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>ÜRETİM ALANI SAYISI</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700 }}>
+                      {report.otStationsSummary.areaCount} Alan
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>ÜRETİM HATTI SAYISI</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700 }}>
+                      {report.otStationsSummary.lineCount} Hat
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stations Table */}
+              <div className="report-table-card">
+                <table className="report-table report-table--striped">
+                  <thead>
+                    <tr>
+                      <th style={{ width: "16%" }}>İstasyon Kodu</th>
+                      <th style={{ width: "22%" }}>İstasyon Adı</th>
+                      <th style={{ width: "18%" }}>Alan / Hat</th>
+                      <th style={{ width: "24%" }}>Makine & Model</th>
+                      <th style={{ width: "12%" }}>PLC / Kontrolcü</th>
+                      <th style={{ width: "8%" }}>Durum</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.otStationsSummary.stations.map((st) => (
+                      <tr key={st.id}>
+                        <td>
+                          <span className="font-bold text-mono" style={{ color: "var(--color-primary, #1e3a8a)" }}>
+                            {st.stationCode}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="font-bold">{st.stationName}</div>
+                          {st.stationType && <span className="text-xs text-muted">{st.stationType}</span>}
+                        </td>
+                        <td>
+                          <div style={{ fontSize: "0.875rem" }}>{st.areaName || "—"}</div>
+                          {st.lineName && <span className="text-xs text-muted">{st.lineName}</span>}
+                        </td>
+                        <td>
+                          <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>{st.machineName || "—"}</div>
+                          {(st.machineManufacturer || st.machineModel) && (
+                            <span className="text-xs text-muted">
+                              {[st.machineManufacturer, st.machineModel].filter(Boolean).join(" ")}
+                            </span>
+                          )}
+                        </td>
+                        <td>
+                          <span style={{ fontSize: "0.8125rem" }}>{st.plcOrController || "—"}</span>
+                        </td>
+                        <td>
+                          <span className={`badge ${st.status === "Aktif" ? "badge--on-track" : "badge--neutral"}`}>
+                            {st.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
           {/* ── Bölüm 4: İş Fonksiyonları Detay Analizi ─────────────────── */}
           <section id="sec-functions" className="report-section">
             <div className="report-section__header">

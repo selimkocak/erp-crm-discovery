@@ -42,6 +42,9 @@ import type {
   AttachmentSummaryStats,
   ProjectBusinessFunction,
   ScheduleDates,
+  OtStation,
+  StationStatus,
+  OtStationsSummaryStats,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -2039,6 +2042,284 @@ export async function getAttachmentSummaryStats(
   };
 }
 
+// ---------------------------------------------------------------
+// FAZ-62B: OT İstasyon Profili ve Tekrarlayan İstasyon Akışı
+// ---------------------------------------------------------------
+
+/**
+ * Projeye ait tüm OT istasyonlarını sıralı olarak döndürür.
+ */
+export async function getOtStations(projectId: string): Promise<OtStation[]> {
+  const db = await getDb();
+  return db.select<OtStation[]>(
+    `SELECT * FROM ot_stations
+     WHERE project_id = $1
+     ORDER BY sort_order ASC, created_at ASC`,
+    [projectId]
+  );
+}
+
+/**
+ * Tek bir OT istasyonunu ID ile getirir.
+ */
+export async function getOtStationById(stationId: string): Promise<OtStation | null> {
+  const db = await getDb();
+  const rows = await db.select<OtStation[]>(
+    `SELECT * FROM ot_stations WHERE id = $1 LIMIT 1`,
+    [stationId]
+  );
+  return rows[0] || null;
+}
+
+/**
+ * Yeni bir OT istasyonu oluşturur.
+ * Proje içinde station_code benzersizliğini garanti eder.
+ */
+export async function createOtStation(
+  station: Omit<OtStation, "id" | "created_at" | "updated_at">
+): Promise<OtStation> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  const id = generateId("ots");
+
+  // station_code benzersizlik denetimi
+  const cleanCode = station.station_code.trim();
+  const existing = await db.select<OtStation[]>(
+    `SELECT id FROM ot_stations WHERE project_id = $1 AND station_code = $2 LIMIT 1`,
+    [station.project_id, cleanCode]
+  );
+
+  if (existing.length > 0) {
+    throw new Error(`Bu istasyon kodu projede zaten mevcuttur: ${cleanCode}`);
+  }
+
+  await db.execute(
+    `INSERT INTO ot_stations
+       (id, project_id, area_name, line_name, station_code, station_name, station_type, machine_name, machine_manufacturer, machine_model, plc_or_controller, operator_count, status, sort_order, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $15)`,
+    [
+      id,
+      station.project_id,
+      station.area_name || null,
+      station.line_name || null,
+      cleanCode,
+      station.station_name.trim(),
+      station.station_type || null,
+      station.machine_name || null,
+      station.machine_manufacturer || null,
+      station.machine_model || null,
+      station.plc_or_controller || null,
+      station.operator_count ?? 1,
+      station.status || "active",
+      station.sort_order ?? 0,
+      now,
+    ]
+  );
+
+  const created = await getOtStationById(id);
+  if (!created) {
+    throw new Error("İstasyon oluşturulamadı.");
+  }
+  return created;
+}
+
+/**
+ * Mevcut bir OT istasyonunu günceller.
+ */
+export async function updateOtStation(
+  stationId: string,
+  updates: Partial<OtStation>
+): Promise<void> {
+  const db = await getDb();
+  const existing = await getOtStationById(stationId);
+  if (!existing) {
+    throw new Error(`Güncellenecek istasyon bulunamadı: ${stationId}`);
+  }
+
+  if (updates.station_code && updates.station_code.trim() !== existing.station_code) {
+    const cleanCode = updates.station_code.trim();
+    const dup = await db.select<OtStation[]>(
+      `SELECT id FROM ot_stations WHERE project_id = $1 AND station_code = $2 AND id != $3 LIMIT 1`,
+      [existing.project_id, cleanCode, stationId]
+    );
+    if (dup.length > 0) {
+      throw new Error(`Bu istasyon kodu projede zaten mevcuttur: ${cleanCode}`);
+    }
+  }
+
+  const now = new Date().toISOString();
+  const merged: OtStation = {
+    ...existing,
+    ...updates,
+    updated_at: now,
+  };
+
+  await db.execute(
+    `UPDATE ot_stations
+     SET area_name = $1,
+         line_name = $2,
+         station_code = $3,
+         station_name = $4,
+         station_type = $5,
+         machine_name = $6,
+         machine_manufacturer = $7,
+         machine_model = $8,
+         plc_or_controller = $9,
+         operator_count = $10,
+         status = $11,
+         sort_order = $12,
+         updated_at = $13
+     WHERE id = $14`,
+    [
+      merged.area_name || null,
+      merged.line_name || null,
+      merged.station_code.trim(),
+      merged.station_name.trim(),
+      merged.station_type || null,
+      merged.machine_name || null,
+      merged.machine_manufacturer || null,
+      merged.machine_model || null,
+      merged.plc_or_controller || null,
+      merged.operator_count ?? 1,
+      merged.status,
+      merged.sort_order ?? 0,
+      now,
+      stationId,
+    ]
+  );
+}
+
+/**
+ * OT istasyonunun durumunu değiştirir (active / passive).
+ */
+export async function toggleOtStationStatus(
+  stationId: string,
+  status: StationStatus
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  await db.execute(
+    `UPDATE ot_stations SET status = $1, updated_at = $2 WHERE id = $3`,
+    [status, now, stationId]
+  );
+}
+
+/**
+ * OT istasyonunu ve ona bağlı tüm istasyon cevaplarını siler.
+ */
+export async function deleteOtStation(stationId: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM ot_stations WHERE id = $1`, [stationId]);
+}
+
+/**
+ * Belirli bir istasyona ait tüm cevapları Map olarak çeker.
+ */
+export async function getOtStationAnswers(
+  projectId: string,
+  stationId: string
+): Promise<Map<string, AnswerData>> {
+  const db = await getDb();
+  const rows = await db.select<{ question_id: string; answer_data: string }[]>(
+    `SELECT question_id, answer_data FROM ot_station_answers
+     WHERE project_id = $1 AND station_id = $2`,
+    [projectId, stationId]
+  );
+  const map = new Map<string, AnswerData>();
+  for (const row of rows) {
+    try {
+      const parsed = JSON.parse(row.answer_data) as AnswerData;
+      map.set(row.question_id, parsed);
+    } catch {
+      // Hatalı JSON yutulur
+    }
+  }
+  return map;
+}
+
+/**
+ * Tek bir istasyon cevabını okur.
+ */
+export async function getOtStationAnswer(
+  projectId: string,
+  stationId: string,
+  questionId: string
+): Promise<AnswerData | null> {
+  const db = await getDb();
+  const rows = await db.select<{ answer_data: string }[]>(
+    `SELECT answer_data FROM ot_station_answers
+     WHERE project_id = $1 AND station_id = $2 AND question_id = $3
+     LIMIT 1`,
+    [projectId, stationId, questionId]
+  );
+  if (rows.length === 0) return null;
+  try {
+    return JSON.parse(rows[0].answer_data) as AnswerData;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * İstasyon bazlı cevap kaydeder (UPSERT).
+ */
+export async function saveOtStationAnswer(
+  projectId: string,
+  stationId: string,
+  questionId: string,
+  answerData: AnswerData,
+  bfCode = "OT_INDUSTRIAL_DATA",
+  packId = "tr.ot_industrial_data.core",
+  packVersion = "0.1.0"
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  const id = generateId("otsa");
+  const answerJson = JSON.stringify(answerData);
+
+  await db.execute(
+    `INSERT INTO ot_station_answers
+       (id, project_id, station_id, business_function_code, question_pack_id, question_pack_version, question_id, answer_data, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)
+     ON CONFLICT(project_id, station_id, question_id)
+     DO UPDATE SET
+       answer_data = $8,
+       question_pack_version = $6,
+       updated_at = $9`,
+    [id, projectId, stationId, bfCode, packId, packVersion, questionId, answerJson, now]
+  );
+}
+
+/**
+ * Projenin OT istasyonları istatistiklerini hesaplar.
+ */
+export async function getOtStationsSummary(
+  projectId: string
+): Promise<OtStationsSummaryStats> {
+  const db = await getDb();
+  const stations = await db.select<OtStation[]>(
+    `SELECT * FROM ot_stations WHERE project_id = $1`,
+    [projectId]
+  );
+
+  const totalStations = stations.length;
+  const activeStations = stations.filter((s) => s.status === "active").length;
+  const passiveStations = totalStations - activeStations;
+
+  const areas = new Set(
+    stations.map((s) => s.area_name?.trim()).filter((a): a is string => Boolean(a))
+  );
+  const lines = new Set(
+    stations.map((s) => s.line_name?.trim()).filter((l): l is string => Boolean(l))
+  );
+
+  return {
+    totalStations,
+    activeStations,
+    passiveStations,
+    areaCount: areas.size,
+    lineCount: lines.size,
+  };
+}
+
 export * from './governanceClient';
-
-

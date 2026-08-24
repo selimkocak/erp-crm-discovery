@@ -32,9 +32,11 @@ import {
   updateProjectStatus,
   updateProjectSchedule,
   updateProjectFunctionSchedule,
+  getOtStations,
 } from "../db/client";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
+import { OtStationsSection } from "../components/OtStationsSection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
@@ -57,7 +59,7 @@ import {
   type ScheduleDates,
 } from "../models/scheduleStatus";
 import type { QuestionPack } from "../engine/types";
-import type { FunctionStatus, ProjectDetailData, EnrichedProjectFunction } from "../types";
+import type { FunctionStatus, ProjectDetailData, EnrichedProjectFunction, OtStation } from "../types";
 
 
 interface ProjectDetailViewProps {
@@ -108,17 +110,23 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [packLoadingCode, setPackLoadingCode] = useState<string | null>(null);
   const [packError, setPackError] = useState<string | null>(null);
   const [isViewingReport, setIsViewingReport] = useState<boolean>(false);
+  const [stations, setStations] = useState<OtStation[]>([]);
+  const [activeStation, setActiveStation] = useState<OtStation | null>(null);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const detail = await getProjectDetail(projectId);
+      const [detail, otSt] = await Promise.all([
+        getProjectDetail(projectId),
+        getOtStations(projectId),
+      ]);
       if (!detail) {
         setError("Analiz projesi bulunamadı.");
       } else {
         setData(detail);
       }
+      setStations(otSt || []);
     } catch (err: any) {
       console.error("Proje detayı yüklenirken hata:", err);
       setError(err?.message || "Proje verisi yüklenemedi.");
@@ -185,9 +193,19 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
     }
   };
 
+  const handleOpenStationQuestions = async (station: OtStation) => {
+    setActiveStation(station);
+    const otFn = activeFunctions.find((f) => f.code === "OT_INDUSTRIAL_DATA");
+    await handleStartAnalysis(
+      "OT_INDUSTRIAL_DATA",
+      otFn?.name_tr || "Saha Veri Toplama ve Endüstriyel Veri Keşfi"
+    );
+  };
+
   const handleCloseQuestionScreen = () => {
     setActiveBfCode(null);
     setActivePack(null);
+    setActiveStation(null);
     loadData(); // status'ları yenile
   };
 
@@ -310,13 +328,10 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
   if (error || !data) {
     return (
-      <div className="card" style={{ textAlign: "center", padding: "3rem" }}>
-        <AlertCircle size={40} style={{ color: "var(--danger)", margin: "0 auto 1rem" }} />
-        <h3>Hata Oluştu</h3>
-        <p style={{ color: "var(--text-muted)", marginBottom: "1.5rem" }}>{error || "Kayıt bulunamadı."}</p>
-        <button className="btn btn-secondary" onClick={onBack}>
-          <ArrowLeft size={16} />
-          Ana Sayfaya Dön
+      <div className="empty-state">
+        <p>{error || "Proje bulunamadı."}</p>
+        <button className="button button--secondary" onClick={onBack}>
+          Geri Dön
         </button>
       </div>
     );
@@ -350,6 +365,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         bfCode={activeBfCode}
         bfNameTr={activeBfName}
         pack={activePack}
+        station={activeStation}
         onBack={handleCloseQuestionScreen}
         onOpenReport={() => {
           handleCloseQuestionScreen();
@@ -1104,6 +1120,20 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
               </tbody>
             </table>
           </div>
+
+          {/* OT İstasyonları ve Makine Envanteri (FAZ-62B) */}
+          {activeFunctions.some((f) => f.code === "OT_INDUSTRIAL_DATA") && (
+            <OtStationsSection
+              projectId={projectId}
+              stations={stations}
+              onReloadStations={async () => {
+                const otSt = await getOtStations(projectId);
+                setStations(otSt || []);
+              }}
+              onOpenStationQuestions={handleOpenStationQuestions}
+              showToast={showToast}
+            />
+          )}
         </div>
       ) : (
         /* Governance Dashboard View Mode */

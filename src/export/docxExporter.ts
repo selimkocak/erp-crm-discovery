@@ -589,6 +589,68 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     );
   }
 
+  // ── Section 3.2: Saha İstasyonları ve Makine Envanteri (FAZ-62B) ─────────
+  if (report.otStationsSummary && report.otStationsSummary.totalStations > 0) {
+    const otSummary = report.otStationsSummary;
+
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "3.2 Saha İstasyonları ve Makine Envanteri (OT/IT)",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 100, after: 100 },
+        children: [
+          new TextRun({
+            text: `Toplam ${otSummary.totalStations} istasyon (${otSummary.activeStations} aktif), ${otSummary.areaCount} üretim alanı ve ${otSummary.lineCount} üretim hattında yapılandırılmıştır.`,
+            size: 20,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    const stationHeaderRow = new TableRow({
+      tableHeader: true,
+      children: [
+        createTableCell("İstasyon Kodu", { isHeader: true, widthPercent: 20 }),
+        createTableCell("İstasyon Adı", { isHeader: true, widthPercent: 25 }),
+        createTableCell("Alan / Hat", { isHeader: true, widthPercent: 25 }),
+        createTableCell("Makine & PLC", { isHeader: true, widthPercent: 20 }),
+        createTableCell("Durum", { isHeader: true, widthPercent: 10 }),
+      ],
+    });
+
+    const stationDataRows: TableRow[] = otSummary.stations.map(
+      (st) =>
+        new TableRow({
+          children: [
+            createTableCell(st.stationCode, { bold: true, widthPercent: 20 }),
+            createTableCell(st.stationName, { widthPercent: 25 }),
+            createTableCell([st.areaName, st.lineName].filter(Boolean).join(" / ") || "—", { widthPercent: 25 }),
+            createTableCell([st.machineName, st.plcOrController].filter(Boolean).join(" | ") || "—", { widthPercent: 20 }),
+            createTableCell(st.status, { widthPercent: 10 }),
+          ],
+        })
+    );
+
+    docChildren.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [stationHeaderRow, ...stationDataRows],
+      })
+    );
+  }
+
   // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   docChildren.push(
     new Paragraph({

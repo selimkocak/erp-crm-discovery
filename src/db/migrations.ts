@@ -28,6 +28,12 @@ export async function detectLegacyBaselineVersion(db: Database): Promise<number>
     return 0; // Temiz / Boş veritabanı
   }
 
+  // v14: ot_stations tablosu
+  const otTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='ot_stations'"
+  );
+  if (otTables.length > 0) return 14;
+
   // v13: analysis_projects.planned_start_date kolonu
   const projCols = await db.select<{ name: string }[]>(
     "PRAGMA table_info(analysis_projects)"

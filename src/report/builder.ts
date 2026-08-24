@@ -24,6 +24,7 @@ import {
   getGovernanceLimits,
   getGovernanceSodRisks,
   getGovernanceAttachments,
+  getOtStations,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -54,6 +55,7 @@ import type {
   ReportAttachmentItem,
   ReportScheduleItem,
   ReportScheduleSummary,
+  ReportOtStationsSummary,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -86,6 +88,7 @@ export async function buildReportModel(
     govLimits,
     govSodRisks,
     govAttachments,
+    otStations,
   ] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
@@ -102,6 +105,7 @@ export async function buildReportModel(
     getGovernanceLimits(projectId),
     getGovernanceSodRisks(projectId),
     getGovernanceAttachments(projectId),
+    getOtStations(projectId),
   ]);
 
 
@@ -705,6 +709,38 @@ export async function buildReportModel(
     stats: scheduleStats,
   };
 
+  // OT İstasyonları Özeti (FAZ-62B)
+  let otStationsSummary: ReportOtStationsSummary | undefined = undefined;
+  if (otStations && otStations.length > 0) {
+    const activeCount = otStations.filter((s) => s.status === "active").length;
+    const areas = new Set(
+      otStations.map((s) => s.area_name?.trim()).filter((a): a is string => Boolean(a))
+    );
+    const lines = new Set(
+      otStations.map((s) => s.line_name?.trim()).filter((l): l is string => Boolean(l))
+    );
+    otStationsSummary = {
+      totalStations: otStations.length,
+      activeStations: activeCount,
+      areaCount: areas.size,
+      lineCount: lines.size,
+      stations: otStations.map((s) => ({
+        id: s.id,
+        stationCode: s.station_code,
+        stationName: s.station_name,
+        areaName: s.area_name || null,
+        lineName: s.line_name || null,
+        stationType: s.station_type || null,
+        machineName: s.machine_name || null,
+        machineManufacturer: s.machine_manufacturer || null,
+        machineModel: s.machine_model || null,
+        plcOrController: s.plc_or_controller || null,
+        operatorCount: s.operator_count ?? null,
+        status: s.status === "active" ? "Aktif" : "Pasif",
+      })),
+    };
+  }
+
   return {
     metadata,
     profile,
@@ -715,6 +751,7 @@ export async function buildReportModel(
     attachments: reportAttachments,
     governance: reportGovernance,
     scheduleSummary,
+    otStationsSummary,
     globalFindings,
     globalRequirements,
     globalRisks,

@@ -387,12 +387,12 @@ async function runTests() {
   // -------------------------------------------------------------------------
   console.log("\n--- TEST 7: .erpcrm Yedekleme, Geri Yükleme ve Çoğaltma ---");
 
-  assert(BACKUP_CURRENT_SCHEMA_VERSION === 13, "BACKUP_CURRENT_SCHEMA_VERSION = 13.");
+  assert(BACKUP_CURRENT_SCHEMA_VERSION >= 13, "BACKUP_CURRENT_SCHEMA_VERSION >= 13.");
 
   // Export
   const backupArchive = await exportProjectBackup(demoResult.projectId);
   assert(backupArchive.buffer.byteLength > 0, "Yedek arşivi başarıyla paketlendi.");
-  assert(backupArchive.manifest.schemaVersion === 13, "Manifest schemaVersion = 13.");
+  assert(backupArchive.manifest.schemaVersion >= 13, "Manifest schemaVersion >= 13.");
 
   // Direct Restore from backup archive buffer
   const directRestore = await restoreProjectBackup(backupArchive.buffer, {

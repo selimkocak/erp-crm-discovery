@@ -487,5 +487,50 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `ALTER TABLE project_business_functions ADD COLUMN actual_start_date TEXT NULL;`,
       `ALTER TABLE project_business_functions ADD COLUMN actual_end_date TEXT NULL;`
     ]
+  },
+  {
+    version: 14,
+    description: "OT Stations and Repeatable Station Answers Model (FAZ-62B)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS ot_stations (
+        id                   TEXT PRIMARY KEY,
+        project_id           TEXT NOT NULL,
+        area_name            TEXT,
+        line_name            TEXT,
+        station_code         TEXT NOT NULL,
+        station_name         TEXT NOT NULL,
+        station_type         TEXT,
+        machine_name         TEXT,
+        machine_manufacturer TEXT,
+        machine_model        TEXT,
+        plc_or_controller    TEXT,
+        operator_count       INTEGER DEFAULT 1,
+        status               TEXT NOT NULL DEFAULT 'active',
+        sort_order           INTEGER NOT NULL DEFAULT 0,
+        created_at           TEXT NOT NULL,
+        updated_at           TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE,
+        UNIQUE (project_id, station_code)
+      );`,
+      `CREATE TABLE IF NOT EXISTS ot_station_answers (
+        id                     TEXT PRIMARY KEY,
+        project_id             TEXT NOT NULL,
+        station_id             TEXT NOT NULL,
+        business_function_code TEXT NOT NULL DEFAULT 'OT_INDUSTRIAL_DATA',
+        question_pack_id       TEXT NOT NULL DEFAULT 'tr.ot_industrial_data.core',
+        question_pack_version  TEXT NOT NULL DEFAULT '0.1.0',
+        question_id            TEXT NOT NULL,
+        answer_data            TEXT NOT NULL DEFAULT '{}',
+        created_at             TEXT NOT NULL,
+        updated_at             TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE,
+        FOREIGN KEY (station_id) REFERENCES ot_stations(id) ON DELETE CASCADE,
+        UNIQUE (project_id, station_id, question_id)
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_ot_stations_project ON ot_stations(project_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_ot_stations_status ON ot_stations(project_id, status);`,
+      `CREATE INDEX IF NOT EXISTS idx_ot_station_answers_station ON ot_station_answers(station_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_ot_station_answers_project ON ot_station_answers(project_id, business_function_code);`
+    ]
   }
 ] as const;

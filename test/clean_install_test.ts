@@ -146,6 +146,8 @@ for (const expected of [
   "governance_sod_risks",
   "governance_attachments",
   "project_scope_changes",
+  "ot_stations",
+  "ot_station_answers",
 ]) {
   assert(tableNames.includes(expected), `Tablo mevcut: ${expected}`);
 }
@@ -155,7 +157,7 @@ console.log("\n=== T3: Canonical Business Function Seed ===");
 
 const bfCount = (
   db1.prepare("SELECT COUNT(*) as c FROM business_functions").get() as { c: number }
-).c;
+  ).c;
 assert(bfCount === INITIAL_BUSINESS_FUNCTIONS.length, `Toplam ${INITIAL_BUSINESS_FUNCTIONS.length} fonksiyon seed edildi (gerçek: ${bfCount})`);
 
 // ─── TEST 4: SALES Canonical Code ───────────────────────────────────────────
@@ -203,7 +205,7 @@ const tableCount2 = (
     .prepare("SELECT COUNT(*) as c FROM sqlite_master WHERE type='table'")
     .get() as { c: number }
 ).c;
-assert(tableCount2 === 25, `Tablo sayısı değişmedi: 25 (gerçek: ${tableCount2})`);
+assert(tableCount2 === 27, `Tablo sayısı değişmedi: 27 (gerçek: ${tableCount2})`);
 
 const pscTable2 = db2
   .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='project_scope_changes'")

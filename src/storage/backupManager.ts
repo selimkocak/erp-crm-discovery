@@ -31,7 +31,7 @@ import type {
 } from "../types/backup";
 
 export const BACKUP_FORMAT_VERSION = "1.1.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 13;
+export const BACKUP_CURRENT_SCHEMA_VERSION = 14;
 export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
@@ -248,6 +248,17 @@ export async function exportProjectBackup(
     [projectId]
   );
 
+  // 7. OT İstasyonları ve İstasyon Cevapları (FAZ-62B)
+  const otStations = await db.select<any[]>(
+    "SELECT * FROM ot_stations WHERE project_id = $1 ORDER BY sort_order ASC, created_at ASC",
+    [projectId]
+  );
+
+  const otStationAnswers = await db.select<any[]>(
+    "SELECT * FROM ot_station_answers WHERE project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
   const projectData: ProjectBackupData = {
     project,
     company,
@@ -273,13 +284,15 @@ export async function exportProjectBackup(
     governanceSodRisks,
     governanceAttachments,
     scopeChanges,
+    otStations,
+    otStationAnswers,
   };
 
   const enc = new TextEncoder();
   const projectDataBytes = enc.encode(JSON.stringify(projectData, null, 2));
   const dataChecksum = await computeSha256Hex(projectDataBytes);
 
-  // 7. Fiziksel Ek Dosyaları Oku ve Checksum'larını Hesapla
+  // 8. Fiziksel Ek Dosyaları Oku ve Checksum'larını Hesapla
   const archiveFiles: ArchiveFileEntry[] = [];
   const checksums: Record<string, string> = {
     "project-data.json": dataChecksum,
@@ -305,7 +318,7 @@ export async function exportProjectBackup(
     checksums[archivePath] = await computeSha256Hex(fileBytes);
   }
 
-  // 8. Manifest Dosyasını Oluştur
+  // 9. Manifest Dosyasını Oluştur
   const recordCounts: BackupRecordCounts = {
     businessFunctions: businessFunctions.length,
     answers: answers.length,
@@ -327,6 +340,8 @@ export async function exportProjectBackup(
     questionAttachments: questionAttachments.length,
     governanceAttachments: governanceAttachments.length,
     scopeChanges: scopeChanges.length,
+    otStations: otStations.length,
+    otStationAnswers: otStationAnswers.length,
   };
 
   const manifest: BackupManifest = {
@@ -1219,6 +1234,58 @@ export async function restoreProjectBackup(
       );
     }
 
+    // Y. ot_stations & ot_station_answers (FAZ-62B)
+    const stationIdMap = new Map<string, string>();
+    for (const st of projectData.otStations || []) {
+      const newStId = generateId("ots");
+      stationIdMap.set(st.id, newStId);
+      await db.execute(
+        `INSERT INTO ot_stations
+           (id, project_id, area_name, line_name, station_code, station_name, station_type, machine_name, machine_manufacturer, machine_model, plc_or_controller, operator_count, status, sort_order, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+        [
+          newStId,
+          newProjectId,
+          st.area_name || null,
+          st.line_name || null,
+          st.station_code,
+          st.station_name,
+          st.station_type || null,
+          st.machine_name || null,
+          st.machine_manufacturer || null,
+          st.machine_model || null,
+          st.plc_or_controller || null,
+          st.operator_count ?? 1,
+          st.status || "active",
+          st.sort_order ?? 0,
+          st.created_at || now,
+          st.updated_at || now,
+        ]
+      );
+    }
+
+    for (const stAns of projectData.otStationAnswers || []) {
+      const newStAnsId = generateId("otsa");
+      const mappedStationId = stationIdMap.get(stAns.station_id) || stAns.station_id;
+      await db.execute(
+        `INSERT INTO ot_station_answers
+           (id, project_id, station_id, business_function_code, question_pack_id, question_pack_version, question_id, answer_data, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          newStAnsId,
+          newProjectId,
+          mappedStationId,
+          stAns.business_function_code || "OT_INDUSTRIAL_DATA",
+          stAns.question_pack_id || "tr.ot_industrial_data.core",
+          stAns.question_pack_version || "0.1.0",
+          stAns.question_id,
+          typeof stAns.answer_data === "string" ? stAns.answer_data : JSON.stringify(stAns.answer_data),
+          stAns.created_at || now,
+          stAns.updated_at || now,
+        ]
+      );
+    }
+
     // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
     const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
@@ -1301,6 +1368,7 @@ export async function duplicateProject(
     projectData.followups = [];
     projectData.questionAttachments = [];
     projectData.governanceAttachments = [];
+    projectData.otStationAnswers = [];
 
     // Proje gerçekleşen tarihlerini sıfırla (planlananlar korunur)
     if (projectData.project) {
@@ -1361,6 +1429,8 @@ export async function duplicateProject(
       questionAttachments: options.copyAnswersAndAttachments ? exportData.manifest.recordCounts.questionAttachments : 0,
       governanceAttachments: options.copyAnswersAndAttachments ? exportData.manifest.recordCounts.governanceAttachments : 0,
       scopeChanges: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.scopeChanges || 0) : 0,
+      otStations: exportData.manifest.recordCounts.otStations || 0,
+      otStationAnswers: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.otStationAnswers || 0) : 0,
     },
   };
 

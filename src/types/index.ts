@@ -388,6 +388,47 @@ export interface AttachmentSummaryStats {
   totalAttachmentSizeBytes: number;
 }
 
+export type StationStatus = 'active' | 'passive';
+
+export interface OtStation {
+  id: string;
+  project_id: string;
+  area_name?: string | null;
+  line_name?: string | null;
+  station_code: string;
+  station_name: string;
+  station_type?: string | null;
+  machine_name?: string | null;
+  machine_manufacturer?: string | null;
+  machine_model?: string | null;
+  plc_or_controller?: string | null;
+  operator_count?: number | null;
+  status: StationStatus;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OtStationAnswer {
+  id: string;
+  project_id: string;
+  station_id: string;
+  business_function_code: string;
+  question_pack_id: string;
+  question_pack_version: string;
+  question_id: string;
+  answer_data: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OtStationsSummaryStats {
+  totalStations: number;
+  activeStations: number;
+  passiveStations: number;
+  areaCount: number;
+  lineCount: number;
+}
+
 export * from './governance';
 export * from './backup';
-

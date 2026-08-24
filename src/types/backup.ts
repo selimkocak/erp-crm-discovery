@@ -24,6 +24,8 @@ export interface BackupRecordCounts {
   governanceAttachments: number;
   questionAttachments: number;
   scopeChanges?: number;
+  otStations?: number;
+  otStationAnswers?: number;
 }
 
 export interface BackupManifest {
@@ -34,7 +36,7 @@ export interface BackupManifest {
   projectId?: string;
   projectName: string;
   companyName: string;
-  schemaVersion: number; // 11 | 12
+  schemaVersion: number; // 11 | 12 | 13 | 14
   recordCounts: BackupRecordCounts;
   attachmentCount: number;
   dataChecksum: string; // SHA-256 of project-data.json
@@ -65,6 +67,8 @@ export interface ProjectBackupData {
   governanceSodRisks: Record<string, any>[];
   governanceAttachments: Record<string, any>[];
   scopeChanges?: Record<string, any>[];
+  otStations?: Record<string, any>[];
+  otStationAnswers?: Record<string, any>[];
 }
 
 export interface BackupInspectionResult {

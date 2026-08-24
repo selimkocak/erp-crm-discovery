@@ -293,6 +293,37 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY = (doc as any).lastAutoTable.finalY + 8;
   }
 
+  // ── Section 3.2: Saha İstasyonları ve Makine Envanteri (FAZ-62B) ─────────
+  if (report.otStationsSummary && report.otStationsSummary.totalStations > 0) {
+    const otSummary = report.otStationsSummary;
+    checkPageBreak(35);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("3.2 Saha İstasyonları ve Makine Envanteri (OT/IT)", marginX, currentY);
+    currentY += 6;
+
+    const stationTableBody: string[][] = otSummary.stations.map((st) => [
+      st.stationCode,
+      st.stationName,
+      [st.areaName, st.lineName].filter(Boolean).join(" / ") || "—",
+      [st.machineName, st.plcOrController].filter(Boolean).join(" | ") || "—",
+      st.status,
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      head: [["İstasyon Kodu", "İstasyon Adı", "Alan / Hat", "Makine & PLC", "Durum"]],
+      body: stationTableBody,
+      theme: "striped",
+      styles: { font: PDF_FONT_FAMILY, fontSize: 8 },
+      headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8 },
+      bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 8, cellPadding: 2 },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 8;
+  }
+
   // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   checkPageBreak(35);
   doc.setFont(PDF_FONT_FAMILY, "bold");
