@@ -380,7 +380,7 @@ async function runTests() {
   assert(reportModel.scheduleSummary?.functionSchedules.length === 19, "19 fonksiyonun rapor takvim kaydı mevcut.");
   assert(reportModel.scheduleSummary?.stats.completedOnTime! >= 6, "Zamanında tamamlanan fonksiyon istatistiği üretildi.");
   assert(reportModel.scheduleSummary?.stats.completedLate! >= 1, "Gecikmeli tamamlanan fonksiyon istatistiği üretildi.");
-  assert(reportModel.scheduleSummary?.stats.planned! >= 1, "Planlanmış fonksiyon istatistiği üretildi.");
+  assert(reportModel.scheduleSummary?.stats.onTrack! >= 1, "Yolunda giden fonksiyon istatistiği üretildi.");
 
   // -------------------------------------------------------------------------
   // TEST 7: Yedekleme, Geri Yükleme ve Çoğaltma (.erpcrm)
