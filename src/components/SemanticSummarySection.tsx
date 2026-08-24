@@ -39,6 +39,7 @@ import {
 } from "../db/client";
 import { SemanticModal } from "./SemanticModal";
 import { BUSINESS_FUNCTION_REGISTRY } from "../generated/businessFunctions";
+import { getStatusMeta } from "../models/statusDictionary";
 
 interface SemanticSummarySectionProps {
   projectId: string;
@@ -125,7 +126,6 @@ export const SemanticSummarySection: React.FC<SemanticSummarySectionProps> = ({
       loadAllSemanticData();
     } catch (err) {
       console.error("Silme hatası:", err);
-      alert("Kayıt silinirken bir hata oluştu.");
     }
   };
 
@@ -181,40 +181,9 @@ export const SemanticSummarySection: React.FC<SemanticSummarySectionProps> = ({
     }
   };
 
-  const getStatusBadge = (type: SemanticRecordType, s: string) => {
-    if (type === "finding") {
-      switch (s) {
-        case "open":
-          return <span className="badge badge--outline-warning">Açık</span>;
-        case "confirmed":
-          return <span className="badge badge--primary">Teyit Edildi</span>;
-        case "resolved":
-          return <span className="badge badge--success">Çözüldü</span>;
-      }
-    } else if (type === "requirement") {
-      switch (s) {
-        case "draft":
-          return <span className="badge badge--outline-secondary">Taslak</span>;
-        case "confirmed":
-          return <span className="badge badge--success">Kapsamda</span>;
-        case "out_of_scope":
-          return <span className="badge badge--outline-danger">Kapsam Dışı</span>;
-        case "implemented":
-          return <span className="badge badge--info">Karşılandı</span>;
-      }
-    } else if (type === "risk") {
-      switch (s) {
-        case "open":
-          return <span className="badge badge--danger">Açık Risk</span>;
-        case "mitigated":
-          return <span className="badge badge--info">Önlem Alındı</span>;
-        case "accepted":
-          return <span className="badge badge--warning">Kabul Edildi</span>;
-        case "closed":
-          return <span className="badge badge--success">Kapatıldı</span>;
-      }
-    }
-    return null;
+  const getStatusBadge = (type: SemanticRecordType, rawStatus: string) => {
+    const meta = getStatusMeta(type, rawStatus);
+    return <span className={`badge ${meta.badgeClass}`}>{meta.label}</span>;
   };
 
   return (

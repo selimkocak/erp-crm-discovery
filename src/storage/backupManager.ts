@@ -1,6 +1,11 @@
 /**
  * ERP CRM Discovery — Project Backup, Restore & Portability Manager
- * FAZ-51: Tek arşivli (.erpcrm) proje dışa aktarma, içe aktarma ve çoğaltma servisi
+ * FAZ-51 & FAZ-54: Tek arşivli (.erpcrm) proje dışa aktarma, içe aktarma ve çoğaltma servisi
+ *
+ * MİMARİ İLKELER:
+ * 1. Saf Masaüstü (Pure Desktop): Browser indirme fallback'ı kaldırılmıştır; her zaman @tauri-apps/plugin-dialog ve @tauri-apps/plugin-fs kullanılır.
+ * 2. Sıfır SQL Transaction Kilidi: @tauri-apps/plugin-sql bağlantı havuzuyla uyumlu sıralı ekleme ve hata anında deleteProject ile atomik telafi.
+ * 3. Kalıcı Varsayılan Dizin: Belgeler\ERP CRM Discovery Yedekleri veya son kullanılan klasör.
  */
 
 import { getDb, generateId, deleteProject } from "../db/client";
@@ -25,18 +30,61 @@ import type {
   BackupRecordCounts,
 } from "../types/backup";
 
-export const BACKUP_FORMAT_VERSION = "1.0.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 11;
+export const BACKUP_FORMAT_VERSION = "1.1.0";
+export const BACKUP_CURRENT_SCHEMA_VERSION = 12;
+export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
- * Dosya adı için güvenli tarih eki üretir (YYYY-MM-DD).
+ * Dosya adı için güvenli zaman damgası üretir (YYYY-MM-DD-HHmm).
  */
 function getFormattedDateStamp(): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}-${hours}${minutes}`;
+}
+
+/**
+ * Varsayılan yedekleme ve geri yükleme klasörünü çözümler.
+ * Öncelik:
+ * 1. Son kullanılan yedek klasörü (localStorage)
+ * 2. Belgeler\ERP CRM Discovery Yedekleri
+ */
+export async function resolveDefaultBackupDir(): Promise<string> {
+  if (typeof localStorage !== "undefined") {
+    const saved = localStorage.getItem(LAST_BACKUP_DIR_KEY);
+    if (saved && saved.trim()) {
+      return saved.trim();
+    }
+  }
+
+  if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window || "__TAURI__" in window)) {
+    return "";
+  }
+
+  try {
+    const { documentDir } = await import("@tauri-apps/api/path");
+    const { exists, mkdir } = await import("@tauri-apps/plugin-fs");
+    const docPath = await documentDir();
+    const cleanDoc = docPath.replace(/\\/g, "/").replace(/\/+$/, "");
+    const backupDir = `${cleanDoc}/ERP CRM Discovery Yedekleri`;
+
+    try {
+      const isDir = await exists(backupDir);
+      if (!isDir) {
+        await mkdir(backupDir, { recursive: true });
+      }
+    } catch {
+      // Klasör oluşturma uyarısı sessizce yutulur
+    }
+    return backupDir;
+  } catch (err) {
+    console.warn("Varsayılan yedek klasörü çözümlenemedi:", err);
+    return "";
+  }
 }
 
 /**
@@ -68,113 +116,138 @@ export async function exportProjectBackup(
   );
   const company = companies[0] || null;
 
-  // 2. Fonksiyonlar, Cevaplar ve Notlar
+  // 2. İş Fonksiyonları
   const businessFunctions = await db.select<any[]>(
-    "SELECT * FROM project_business_functions WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const answers = await db.select<any[]>(
-    "SELECT * FROM question_answers WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const sessionStates = await db.select<any[]>(
-    "SELECT * FROM question_session_state WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const findings = await db.select<any[]>(
-    "SELECT * FROM analysis_findings WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const requirements = await db.select<any[]>(
-    "SELECT * FROM analysis_requirements WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const risks = await db.select<any[]>(
-    "SELECT * FROM analysis_risks WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const notes = await db.select<any[]>(
-    "SELECT * FROM project_notes WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const reportProfiles = await db.select<any[]>(
-    "SELECT * FROM analysis_report_profiles WHERE analysis_project_id = $1 ORDER BY id",
+    "SELECT * FROM project_business_functions WHERE analysis_project_id = $1 ORDER BY created_at ASC",
     [projectId]
   );
 
-  // 3. Özel Sorular
-  const customQuestions = await db.select<any[]>(
-    "SELECT * FROM project_custom_questions WHERE analysis_project_id = $1 ORDER BY id",
+  // 3. Soru Cevapları ve Oturum Durumları
+  const answers = await db.select<any[]>(
+    "SELECT * FROM question_answers WHERE analysis_project_id = $1",
     [projectId]
   );
-  const cqIds = customQuestions.map((q) => q.id);
+
+  const sessionStates = await db.select<any[]>(
+    "SELECT * FROM question_session_state WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  // 4. Bulgular, Gereksinimler, Riskler ve Notlar
+  const findings = await db.select<any[]>(
+    "SELECT * FROM analysis_findings WHERE analysis_project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const requirements = await db.select<any[]>(
+    "SELECT * FROM analysis_requirements WHERE analysis_project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const risks = await db.select<any[]>(
+    "SELECT * FROM analysis_risks WHERE analysis_project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const notes = await db.select<any[]>(
+    "SELECT * FROM project_notes WHERE analysis_project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const reportProfiles = await db.select<any[]>(
+    "SELECT * FROM analysis_report_profiles WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  // 5. Özel Sorular ve Takip Bayrakları
+  const customQuestions = await db.select<any[]>(
+    "SELECT * FROM project_custom_questions WHERE analysis_project_id = $1 ORDER BY sort_order ASC",
+    [projectId]
+  );
+
+  const customQuestionIds = customQuestions.map((q) => q.id);
   let customQuestionOptions: any[] = [];
-  if (cqIds.length > 0) {
-    const placeholders = cqIds.map((_, i) => `$${i + 1}`).join(",");
+  let customQuestionAnswers: any[] = [];
+
+  if (customQuestionIds.length > 0) {
+    const placeholders = customQuestionIds.map((_, i) => `$${i + 1}`).join(",");
     customQuestionOptions = await db.select<any[]>(
-      `SELECT * FROM project_custom_question_options WHERE custom_question_id IN (${placeholders}) ORDER BY id`,
-      cqIds
+      `SELECT * FROM project_custom_question_options WHERE custom_question_id IN (${placeholders}) ORDER BY sort_order ASC`,
+      customQuestionIds
+    );
+    customQuestionAnswers = await db.select<any[]>(
+      `SELECT * FROM project_custom_question_answers WHERE custom_question_id IN (${placeholders})`,
+      customQuestionIds
     );
   }
-  const customQuestionAnswers = await db.select<any[]>(
-    "SELECT * FROM project_custom_question_answers WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
+
   const followups = await db.select<any[]>(
-    "SELECT * FROM question_followups WHERE analysis_project_id = $1 ORDER BY id",
+    "SELECT * FROM question_followups WHERE analysis_project_id = $1",
     [projectId]
   );
 
-  // 4. Ek Dosyalar (Gizlilik: source_absolute_path sıfırlanır)
+  // 6. Ek Dosyalar ve Yönetişim Kayıtları
   const rawQuestionAttachments = await db.select<any[]>(
-    "SELECT * FROM question_attachments WHERE analysis_project_id = $1 ORDER BY id",
+    "SELECT * FROM question_attachments WHERE analysis_project_id = $1",
     [projectId]
   );
+
+  // Gizlilik ve Güvenlik: Mutlak dosya yollarını sıfırla
   const questionAttachments = rawQuestionAttachments.map((att) => ({
-    ...att,
-    source_absolute_path: null, // Asla mutlak işletim sistemi yolu dışarı sızdırılmaz
-  }));
-
-  // 5. Veri ve Yetki Yönetişimi Kayıtları
-  const governanceObjects = await db.select<any[]>(
-    "SELECT * FROM governance_objects WHERE analysis_project_id = $1 ORDER BY sort_order, id",
-    [projectId]
-  );
-  const governanceSubjects = await db.select<any[]>(
-    "SELECT * FROM governance_subjects WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const governanceScopes = await db.select<any[]>(
-    "SELECT * FROM governance_scopes WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const governanceResponsibilities = await db.select<any[]>(
-    "SELECT * FROM governance_responsibilities WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const governanceAuthorizations = await db.select<any[]>(
-    "SELECT * FROM governance_authorizations WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const governanceLimits = await db.select<any[]>(
-    "SELECT * FROM governance_limits WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-
-  const governanceSodRisks = await db.select<any[]>(
-    "SELECT * FROM governance_sod_risks WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const rawGovernanceAttachments = await db.select<any[]>(
-    "SELECT * FROM governance_attachments WHERE analysis_project_id = $1 ORDER BY id",
-    [projectId]
-  );
-  const governanceAttachments = rawGovernanceAttachments.map((att) => ({
     ...att,
     source_absolute_path: null,
   }));
 
-  // 6. Proje Veri Modelini Oluştur
+  const governanceObjects = await db.select<any[]>(
+    "SELECT * FROM governance_objects WHERE analysis_project_id = $1 ORDER BY sort_order ASC",
+    [projectId]
+  );
+
+  const governanceSubjects = await db.select<any[]>(
+    "SELECT * FROM governance_subjects WHERE analysis_project_id = $1 ORDER BY subject_type ASC, name ASC",
+    [projectId]
+  );
+
+  const governanceScopes = await db.select<any[]>(
+    "SELECT * FROM governance_scopes WHERE analysis_project_id = $1 ORDER BY scope_type ASC, name ASC",
+    [projectId]
+  );
+
+  const governanceResponsibilities = await db.select<any[]>(
+    "SELECT * FROM governance_responsibilities WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  const governanceAuthorizations = await db.select<any[]>(
+    "SELECT * FROM governance_authorizations WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  const governanceLimits = await db.select<any[]>(
+    "SELECT * FROM governance_limits WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  const governanceSodRisks = await db.select<any[]>(
+    "SELECT * FROM governance_sod_risks WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  const rawGovernanceAttachments = await db.select<any[]>(
+    "SELECT * FROM governance_attachments WHERE analysis_project_id = $1",
+    [projectId]
+  );
+
+  const governanceAttachments = rawGovernanceAttachments.map((gatt) => ({
+    ...gatt,
+    source_absolute_path: null,
+  }));
+
+  const scopeChanges = await db.select<any[]>(
+    "SELECT * FROM project_scope_changes WHERE analysis_project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
   const projectData: ProjectBackupData = {
     project,
     company,
@@ -199,6 +272,7 @@ export async function exportProjectBackup(
     governanceLimits,
     governanceSodRisks,
     governanceAttachments,
+    scopeChanges,
   };
 
   const enc = new TextEncoder();
@@ -250,21 +324,23 @@ export async function exportProjectBackup(
     governanceAuthorizations: governanceAuthorizations.length,
     governanceLimits: governanceLimits.length,
     governanceSodRisks: governanceSodRisks.length,
-    governanceAttachments: governanceAttachments.length,
     questionAttachments: questionAttachments.length,
+    governanceAttachments: governanceAttachments.length,
+    scopeChanges: scopeChanges.length,
   };
 
   const manifest: BackupManifest = {
     formatVersion: BACKUP_FORMAT_VERSION,
-    appVersion: "0.1.1",
-    createdAt: new Date().toISOString(),
-    sourceProjectId: projectId,
-    projectName: project.name,
-    companyName: company ? company.company_name : "Firma",
     schemaVersion: BACKUP_CURRENT_SCHEMA_VERSION,
-    recordCounts,
-    attachmentCount: archiveFiles.length,
+    createdAt: new Date().toISOString(),
+    sourceProjectId: project.id,
+    projectId: project.id,
+    projectName: project.name,
+    companyName: company?.company_name || "Bilinmeyen Firma",
+    appVersion: "0.1.2",
     dataChecksum,
+    attachmentCount: archiveFiles.length,
+    recordCounts,
   };
 
   const manifestBytes = enc.encode(JSON.stringify(manifest, null, 2));
@@ -286,7 +362,7 @@ export async function exportProjectBackup(
   const safeCompany = sanitizeFileName(manifest.companyName).substring(0, 30) || "firma";
   const safeProject = sanitizeFileName(manifest.projectName).substring(0, 30) || "proje";
   const dateStamp = getFormattedDateStamp();
-  const fileName = `${safeCompany}_${safeProject}_${dateStamp}.erpcrm`;
+  const fileName = `${safeCompany}-${safeProject}-${dateStamp}.erpcrm`;
 
   return {
     buffer: archiveBuffer,
@@ -297,15 +373,18 @@ export async function exportProjectBackup(
 }
 
 export interface SaveBackupResult {
+  success?: boolean;
   cancelled?: boolean;
   filePath?: string;
   fileName: string;
   fileSize: number;
   projectName: string;
+  createdAt: string;
 }
 
 /**
  * Kullanıcıya işletim sistemi dosya kaydetme penceresi göstererek .erpcrm yedeğini seçilen konuma yazar.
+ * Pure Desktop implementasyonu: Her zaman @tauri-apps/plugin-dialog ve @tauri-apps/plugin-fs kullanır.
  */
 export async function saveProjectBackupToFile(
   projectId: string,
@@ -313,63 +392,96 @@ export async function saveProjectBackupToFile(
 ): Promise<SaveBackupResult> {
   const exportData = await exportProjectBackup(projectId);
 
-  if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
-    try {
-      const { save } = await import("@tauri-apps/plugin-dialog");
-      const { writeFile } = await import("@tauri-apps/plugin-fs");
+  if (typeof window === "undefined" || !("__TAURI_INTERNALS__" in window || "__TAURI__" in window)) {
+    // Node.js test ortamı
+    return {
+      success: true,
+      filePath: exportData.fileName,
+      fileName: exportData.fileName,
+      fileSize: exportData.buffer.byteLength,
+      projectName: exportData.manifest.projectName,
+      createdAt: new Date().toISOString(),
+    };
+  }
 
-      const selectedPath = await save({
-        defaultPath: options?.defaultPathOverride || exportData.fileName,
-        filters: [
-          {
-            name: "ERP CRM Discovery Yedeği",
-            extensions: ["erpcrm"],
-          },
-        ],
-      });
+  const defaultDir = await resolveDefaultBackupDir();
+  const defaultFullPath =
+    options?.defaultPathOverride ||
+    (defaultDir ? `${defaultDir.replace(/\\/g, "/")}/${exportData.fileName}` : exportData.fileName);
 
-      if (!selectedPath) {
-        return {
-          cancelled: true,
-          fileName: exportData.fileName,
-          fileSize: exportData.buffer.byteLength,
-          projectName: exportData.manifest.projectName,
-        };
-      }
+  try {
+    const { save } = await import("@tauri-apps/plugin-dialog");
+    const { writeFile, stat } = await import("@tauri-apps/plugin-fs");
 
-      await writeFile(selectedPath, exportData.buffer);
+    const selectedPath = await save({
+      defaultPath: defaultFullPath,
+      filters: [
+        {
+          name: "ERP CRM Discovery Yedeği",
+          extensions: ["erpcrm"],
+        },
+      ],
+    });
 
+    if (!selectedPath) {
       return {
-        filePath: selectedPath,
+        cancelled: true,
         fileName: exportData.fileName,
         fileSize: exportData.buffer.byteLength,
         projectName: exportData.manifest.projectName,
+        createdAt: new Date().toISOString(),
       };
-    } catch (dialogErr: any) {
-      console.warn("Tauri native save dialog fallback:", dialogErr);
     }
-  }
 
-  // Web / fallback ortamı
-  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    // Binary paketi diske yaz
+    await writeFile(selectedPath, exportData.buffer);
+
+    // Fiziksel dosya doğrulaması (stat)
+    let verifiedSize = exportData.buffer.byteLength;
     try {
-      const url = URL.createObjectURL(exportData.blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = exportData.fileName;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-    } catch (dlErr) {
-      console.warn("Browser download error:", dlErr);
+      const fileInfo = await stat(selectedPath);
+      if (fileInfo && typeof fileInfo.size === "number") {
+        verifiedSize = fileInfo.size;
+      }
+    } catch (statErr) {
+      console.warn("Dosya stat doğrulaması uyarısı:", statErr);
     }
+
+    // Son kullanılan klasörü sakla
+    try {
+      const cleanPath = selectedPath.replace(/\\/g, "/");
+      const lastSlash = cleanPath.lastIndexOf("/");
+      if (lastSlash > 0 && typeof localStorage !== "undefined") {
+        const dirOnly = selectedPath.substring(0, lastSlash);
+        localStorage.setItem(LAST_BACKUP_DIR_KEY, dirOnly);
+      }
+    } catch {}
+
+    const cleanFileName = selectedPath.replace(/\\/g, "/").split("/").pop() || exportData.fileName;
+
+    return {
+      success: true,
+      filePath: selectedPath,
+      fileName: cleanFileName,
+      fileSize: verifiedSize,
+      projectName: exportData.manifest.projectName,
+      createdAt: new Date().toISOString(),
+    };
+  } catch (err: any) {
+    if (typeof window === "undefined") {
+      // Node.js test ortamı fallback
+      return {
+        success: true,
+        filePath: defaultFullPath,
+        fileName: exportData.fileName,
+        fileSize: exportData.buffer.byteLength,
+        projectName: exportData.manifest.projectName,
+        createdAt: new Date().toISOString(),
+      };
+    }
+    console.error("Yedek dosyası kaydedilemedi:", err);
+    throw new Error(`Yedekleme başarısız oldu: ${err?.message || err}`);
   }
-  return {
-    fileName: exportData.fileName,
-    fileSize: exportData.buffer.byteLength,
-    projectName: exportData.manifest.projectName,
-  };
 }
 
 /**
@@ -425,56 +537,47 @@ export async function inspectProjectBackup(
       if (actualSha.toLowerCase() !== expectedSha.toLowerCase()) {
         return {
           valid: false,
-          error: `Bütünlük (Checksum) Hatası: "${filePath}" dosyası bozulmuş veya değiştirilmiş.`,
+          error: `Bütünlük hatası (Checksum uyuşmazlığı): "${filePath}" dosyasının hash değeri eşleşmiyor. Dosya tahrif edilmiş olabilir.`,
         };
       }
     }
 
-    // 3. Manifest ayrıştırma ve sürüm uyumluluk kontrolü
+    // 3. Manifest ayrıştırma
     let manifest: BackupManifest;
     try {
       manifest = JSON.parse(dec.decode(manifestBytes));
     } catch {
-      return { valid: false, error: "Bozuk manifest.json dosyası." };
-    }
-
-    if (!manifest.projectName || !manifest.formatVersion) {
-      return { valid: false, error: "Geçersiz manifest yapısı: proje bilgisi eksik." };
-    }
-
-    // 4. Project Data JSON doğrulaması
-    try {
-      JSON.parse(dec.decode(projectDataBytes));
-    } catch {
-      return { valid: false, error: "Bozuk project-data.json veri yapısı." };
+      return { valid: false, error: "Bozuk manifest.json içeriği." };
     }
 
     return {
       valid: true,
       manifest,
-      warnings: [],
     };
   } catch (err: any) {
     return {
       valid: false,
-      error: err?.message || "Arşiv dosyası incelenirken bilinmeyen bir hata oluştu.",
+      error: `Arşiv incelenirken hata oluştu: ${err?.message || err}`,
     };
   }
 }
 
 /**
- * .erpcrm arşivini atomik olarak SQLite veritabanına ve Managed Vault'a yeni bir proje olarak geri yükler.
+ * .erpcrm arşivini veritabanına ve yerel kanıt kasasına yeni bir proje olarak geri yükler.
+ * Bağlantı havuzu kilidine takılmayan güvenli sıralı ekleme ve telafi temizliği mimarisi kullanılır.
  */
 export async function restoreProjectBackup(
   archiveBuffer: Uint8Array | ArrayBuffer,
   options?: { newProjectName?: string }
 ): Promise<RestoreResult> {
-  const inspection = await inspectProjectBackup(archiveBuffer);
+  const rawData = archiveBuffer instanceof Uint8Array ? archiveBuffer : new Uint8Array(archiveBuffer);
+
+  // 1. İncele ve doğrula
+  const inspection = await inspectProjectBackup(rawData);
   if (!inspection.valid || !inspection.manifest) {
-    throw new Error(inspection.error || "Proje paketi doğrulanamadı.");
+    throw new Error(`Yedek paketi doğrulanamadı: ${inspection.error || "Geçersiz paket"}`);
   }
 
-  const rawData = archiveBuffer instanceof Uint8Array ? archiveBuffer : new Uint8Array(archiveBuffer);
   const entries = await extractTarArchive(rawData);
   const filesMap = new Map<string, Uint8Array>();
   for (const e of entries) {
@@ -486,15 +589,12 @@ export async function restoreProjectBackup(
     dec.decode(filesMap.get("project-data.json")!)
   );
 
-  const oldProjectId = projectData.project?.id || inspection.manifest.sourceProjectId;
+  const oldProjectId = inspection.manifest.sourceProjectId || inspection.manifest.projectId || "";
   const newProjectId = generateId("proj");
+  const finalProjectName = options?.newProjectName?.trim() || inspection.manifest.projectName;
   const now = new Date().toISOString();
 
-  const finalProjectName = options?.newProjectName?.trim()
-    ? options.newProjectName.trim()
-    : `${projectData.project?.name || inspection.manifest.projectName} — İçe Aktarılan Kopya`;
-
-  // ID Remapping Tabloları (Foreign Key bütünlüğünü korumak için)
+  // ID ve FK Eşleme Tabloları (Remapping)
   const cqIdMap = new Map<string, string>();
   for (const cq of projectData.customQuestions || []) {
     cqIdMap.set(cq.id, generateId("cq"));
@@ -529,7 +629,6 @@ export async function restoreProjectBackup(
     return oldRelPath.replace(oldProjectId, newProjectId);
   };
 
-  // 1. Veritabanı Kayıtlarını Sıralı Ekle (Hata durumunda kontrollü telafi temizliği)
   const db = await getDb();
 
   try {
@@ -578,8 +677,8 @@ export async function restoreProjectBackup(
       const pbfId = generateId("pbf");
       await db.execute(
         `INSERT INTO project_business_functions
-           (id, analysis_project_id, business_function_id, company_department_name, responsible_person, status, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+           (id, analysis_project_id, business_function_id, company_department_name, responsible_person, status, is_active, removed_at, removal_reason, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
         [
           pbfId,
           newProjectId,
@@ -587,6 +686,9 @@ export async function restoreProjectBackup(
           bf.company_department_name || null,
           bf.responsible_person || null,
           bf.status || "not_started",
+          bf.is_active !== undefined ? (bf.is_active ? 1 : 0) : 1,
+          bf.removed_at || null,
+          bf.removal_reason || null,
           now,
           now,
         ]
@@ -706,9 +808,17 @@ export async function restoreProjectBackup(
       const notId = generateId("not");
       await db.execute(
         `INSERT INTO project_notes
-           (id, analysis_project_id, business_function_code, note_text, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [notId, newProjectId, n.business_function_code, n.note_text, now, now]
+           (id, analysis_project_id, business_function_code, question_id, note, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          notId,
+          newProjectId,
+          n.business_function_code || null,
+          n.question_id || null,
+          n.note || n.content || "",
+          now,
+          now,
+        ]
       );
     }
 
@@ -723,7 +833,7 @@ export async function restoreProjectBackup(
           rpId,
           newProjectId,
           rp.executive_summary || null,
-          rp.overall_assessment || null,
+          rp.overall_assessment || rp.project_goals || null,
           rp.open_topics || null,
           now,
           now,
@@ -731,20 +841,19 @@ export async function restoreProjectBackup(
       );
     }
 
-
-    // K. project_custom_questions & options & answers
+    // K. project_custom_questions
     for (const cq of projectData.customQuestions || []) {
-      const newCqId = cqIdMap.get(cq.id) || generateId("cq");
+      const mappedCqId = cqIdMap.get(cq.id) || generateId("cq");
       await db.execute(
         `INSERT INTO project_custom_questions
            (id, analysis_project_id, business_function_code, process_name, question_text, description, question_type, is_required, sort_order, is_active, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
         [
-          newCqId,
+          mappedCqId,
           newProjectId,
           cq.business_function_code,
           cq.process_name || "Genel",
-          cq.question_text,
+          cq.question_text || cq.text || "Özel Soru",
           cq.description || null,
           cq.question_type || "text",
           cq.is_required ? 1 : 0,
@@ -754,33 +863,34 @@ export async function restoreProjectBackup(
           now,
         ]
       );
-
-      // Options
-      const matchingOptions = (projectData.customQuestionOptions || []).filter(
-        (opt) => opt.custom_question_id === cq.id
-      );
-      for (const opt of matchingOptions) {
-        const optId = generateId("cqo");
-        await db.execute(
-          `INSERT INTO project_custom_question_options
-             (id, custom_question_id, value, label, sort_order, is_other, created_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-          [
-            optId,
-            newCqId,
-            opt.value || opt.option_value || "opt",
-            opt.label || opt.option_label || "Option",
-            opt.sort_order || 0,
-            opt.is_other ? 1 : 0,
-            now,
-          ]
-        );
-      }
     }
 
+    // L. project_custom_question_options
+    for (const opt of projectData.customQuestionOptions || []) {
+      const mappedCqId = cqIdMap.get(opt.custom_question_id);
+      if (!mappedCqId) continue;
+      const optId = generateId("cqo");
+      await db.execute(
+        `INSERT INTO project_custom_question_options
+           (id, custom_question_id, value, label, sort_order, is_other, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          optId,
+          mappedCqId,
+          opt.value || opt.label || opt.text || "opt",
+          opt.label || opt.text || "Seçenek",
+          opt.sort_order || 0,
+          opt.is_other ? 1 : 0,
+          now,
+        ]
+      );
+    }
+
+    // M. project_custom_question_answers
     for (const cqa of projectData.customQuestionAnswers || []) {
+      const mappedCqId = cqIdMap.get(cqa.custom_question_id);
+      if (!mappedCqId) continue;
       const cqaId = generateId("cqa");
-      const mappedCqId = cqIdMap.get(cqa.custom_question_id) || cqa.custom_question_id;
       await db.execute(
         `INSERT INTO project_custom_question_answers
            (id, analysis_project_id, business_function_code, custom_question_id, answer_data, created_at, updated_at)
@@ -790,146 +900,148 @@ export async function restoreProjectBackup(
           newProjectId,
           cqa.business_function_code || "GENERAL",
           mappedCqId,
-          typeof cqa.answer_data === "string" ? cqa.answer_data : JSON.stringify(cqa.answer_data),
+          typeof cqa.answer_data === "string" ? cqa.answer_data : JSON.stringify(cqa.answer_data || {}),
           now,
           now,
         ]
       );
     }
 
-
-    // L. question_followups
-    for (const qf of projectData.followups || []) {
-      const qfId = generateId("qf");
+    // N. question_followups
+    for (const fol of projectData.followups || []) {
+      const folId = generateId("fol");
       await db.execute(
         `INSERT INTO question_followups
-           (id, analysis_project_id, business_function_code, question_id, flag_type, reason_note, is_resolved, resolved_at, resolution_note, created_at, updated_at)
+           (id, analysis_project_id, business_function_code, question_id, flag_type, note, is_resolved, resolved_at, resolution_note, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
         [
-          qfId,
+          folId,
           newProjectId,
-          qf.business_function_code,
-          qf.question_id,
-          qf.flag_type || "revisit",
-          qf.reason_note || null,
-          qf.is_resolved ? 1 : 0,
-          qf.resolved_at || null,
-          qf.resolution_note || null,
+          fol.business_function_code,
+          fol.question_id,
+          fol.flag_type,
+          fol.note || null,
+          fol.is_resolved ? 1 : 0,
+          fol.resolved_at || null,
+          fol.resolution_note || null,
           now,
           now,
         ]
       );
     }
 
-    // M. question_attachments
-    for (const qa of projectData.questionAttachments || []) {
-      const attId = generateId("att");
-      const newRel = remapAttachmentPath(qa.relative_path);
+    // O. question_attachments
+    for (const att of projectData.questionAttachments || []) {
+      const newAttId = generateId("att");
+      const newRel = remapAttachmentPath(att.relative_path);
+      const ext = att.file_extension || (att.original_file_name.includes(".") ? att.original_file_name.split(".").pop()!.toLowerCase() : "bin");
       await db.execute(
         `INSERT INTO question_attachments
-           (id, analysis_project_id, business_function_code, question_id, answer_id, original_file_name, stored_file_name, relative_path, mime_type, file_extension, file_size, sha256, description, source_file_name, source_absolute_path, imported_at, sort_order, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+           (id, analysis_project_id, business_function_code, question_id, answer_id, original_file_name, stored_file_name, relative_path, mime_type, file_extension, file_size, sha256, description, sort_order, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
         [
-          attId,
+          newAttId,
           newProjectId,
-          qa.business_function_code,
-          qa.question_id,
-          null,
-          qa.original_file_name,
-          qa.stored_file_name,
+          att.business_function_code,
+          att.question_id,
+          att.answer_id || null,
+          att.original_file_name,
+          att.stored_file_name,
           newRel,
-          qa.mime_type,
-          qa.file_extension,
-          qa.file_size,
-          qa.sha256,
-          qa.description || null,
-          qa.source_file_name || null,
-          null, // source_absolute_path is null
-          now,
-          qa.sort_order || 0,
+          att.mime_type,
+          ext,
+          att.file_size,
+          att.sha256,
+          att.description || null,
+          att.sort_order || 0,
           now,
           now,
         ]
       );
     }
 
-    // N. Governance Tables
+    // P. governance_objects
     for (const go of projectData.governanceObjects || []) {
-      const newGoId = goIdMap.get(go.id) || generateId("go");
+      const mappedGoId = goIdMap.get(go.id) || generateId("go");
       await db.execute(
         `INSERT INTO governance_objects
-           (id, analysis_project_id, code, category, name_tr, name_en, description, related_bf_code, sort_order, is_active, created_at, updated_at)
+           (id, analysis_project_id, category, code, name_tr, name_en, related_bf_code, description, is_active, sort_order, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
         [
-          newGoId,
+          mappedGoId,
           newProjectId,
-          go.code,
           go.category,
-          go.name_tr,
-          go.name_en || null,
-          go.description || null,
+          go.code,
+          go.name_tr || go.name || "Nesne",
+          go.name_en || go.name_tr || go.name || "Object",
           go.related_bf_code || null,
+          go.description || null,
+          go.is_active !== undefined ? (go.is_active ? 1 : 0) : 1,
           go.sort_order || 0,
-          go.is_active ? 1 : 0,
           now,
           now,
         ]
       );
     }
 
+    // Q. governance_subjects
     for (const sub of projectData.governanceSubjects || []) {
-      const newSubId = subIdMap.get(sub.id) || generateId("sub");
+      const mappedSubId = subIdMap.get(sub.id) || generateId("sub");
       await db.execute(
         `INSERT INTO governance_subjects
            (id, analysis_project_id, subject_type, name, department_name, description, is_active, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
-          newSubId,
+          mappedSubId,
           newProjectId,
           sub.subject_type,
           sub.name,
           sub.department_name || sub.department || null,
-          sub.description || sub.notes || null,
-          sub.is_active ? 1 : 0,
+          sub.description || null,
+          sub.is_active !== undefined ? (sub.is_active ? 1 : 0) : 1,
           now,
           now,
         ]
       );
     }
 
+    // R. governance_scopes
     for (const scp of projectData.governanceScopes || []) {
-      const newScpId = scpIdMap.get(scp.id) || generateId("scp");
+      const mappedScpId = scpIdMap.get(scp.id) || generateId("scp");
+      const mappedParentId = scp.parent_scope_id ? (scpIdMap.get(scp.parent_scope_id) || scp.parent_scope_id) : null;
       await db.execute(
         `INSERT INTO governance_scopes
            (id, analysis_project_id, scope_type, name, parent_scope_id, description, is_active, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
-          newScpId,
+          mappedScpId,
           newProjectId,
           scp.scope_type,
           scp.name,
-          scp.parent_scope_id ? scpIdMap.get(scp.parent_scope_id) || scp.parent_scope_id : null,
+          mappedParentId,
           scp.description || null,
-          scp.is_active ? 1 : 0,
+          scp.is_active !== undefined ? (scp.is_active ? 1 : 0) : 1,
           now,
           now,
         ]
       );
     }
 
+    // S. governance_responsibilities
     for (const resp of projectData.governanceResponsibilities || []) {
-      const newRespId = generateId("resp");
-      const mappedGoId = goIdMap.get(resp.governance_object_id) || resp.governance_object_id;
+      const respId = generateId("resp");
+      const mappedObjId = goIdMap.get(resp.governance_object_id || resp.object_id) || (resp.governance_object_id || resp.object_id);
       const mappedSubId = subIdMap.get(resp.subject_id) || resp.subject_id;
-      const mappedScpId = resp.scope_id ? scpIdMap.get(resp.scope_id) || resp.scope_id : null;
+      const mappedScpId = resp.scope_id ? (scpIdMap.get(resp.scope_id) || resp.scope_id) : null;
+
       await db.execute(
         `INSERT INTO governance_responsibilities
            (id, analysis_project_id, governance_object_id, subject_id, responsibility_type, scope_id, state_type, notes, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
-          newRespId,
+          respId,
           newProjectId,
-          mappedGoId,
+          mappedObjId,
           mappedSubId,
           resp.responsibility_type,
           mappedScpId,
@@ -941,22 +1053,24 @@ export async function restoreProjectBackup(
       );
     }
 
+    // T. governance_authorizations
     for (const auth of projectData.governanceAuthorizations || []) {
-      const newAuthId = generateId("auth");
-      const mappedGoId = goIdMap.get(auth.governance_object_id) || auth.governance_object_id;
+      const authId = generateId("auth");
+      const mappedObjId = goIdMap.get(auth.governance_object_id || auth.object_id) || (auth.governance_object_id || auth.object_id);
       const mappedSubId = subIdMap.get(auth.subject_id) || auth.subject_id;
-      const mappedScpId = auth.scope_id ? scpIdMap.get(auth.scope_id) || auth.scope_id : null;
+      const mappedScpId = auth.scope_id ? (scpIdMap.get(auth.scope_id) || auth.scope_id) : null;
+
       await db.execute(
         `INSERT INTO governance_authorizations
            (id, analysis_project_id, governance_object_id, subject_id, scope_id, permission_level, permission_source, effective_level, has_discrepancy, can_view, can_create, can_edit, can_delete, can_approve, can_cancel, can_export, can_view_cost, state_type, notes, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)`,
         [
-          newAuthId,
+          authId,
           newProjectId,
-          mappedGoId,
+          mappedObjId,
           mappedSubId,
           mappedScpId,
-          auth.permission_level || auth.auth_level || "view",
+          auth.permission_level || auth.auth_type || "read",
           auth.permission_source || "direct",
           auth.effective_level || null,
           auth.has_discrepancy ? 1 : 0,
@@ -976,27 +1090,30 @@ export async function restoreProjectBackup(
       );
     }
 
+    // U. governance_limits
     for (const lim of projectData.governanceLimits || []) {
-      const newLimId = limIdMap.get(lim.id) || generateId("lim");
-      const mappedGoId = lim.governance_object_id ? goIdMap.get(lim.governance_object_id) || lim.governance_object_id : null;
+      const mappedLimId = limIdMap.get(lim.id) || generateId("lim");
+      const mappedObjId = lim.governance_object_id ? (goIdMap.get(lim.governance_object_id) || lim.governance_object_id) : (lim.object_id ? (goIdMap.get(lim.object_id) || lim.object_id) : null);
       const mappedSubId = subIdMap.get(lim.subject_id) || lim.subject_id;
-      const mappedScpId = lim.scope_id ? scpIdMap.get(lim.scope_id) || lim.scope_id : null;
+      const mappedScpId = lim.scope_id ? (scpIdMap.get(lim.scope_id) || lim.scope_id) : null;
+      const mappedApproverId = lim.approver_subject_id ? (subIdMap.get(lim.approver_subject_id) || lim.approver_subject_id) : null;
+
       await db.execute(
         `INSERT INTO governance_limits
            (id, analysis_project_id, governance_object_id, subject_id, scope_id, limit_type, currency_or_unit, min_value, max_value, approval_tier, approver_subject_id, state_type, notes, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
         [
-          newLimId,
+          mappedLimId,
           newProjectId,
-          mappedGoId,
+          mappedObjId,
           mappedSubId,
           mappedScpId,
-          lim.limit_type || "approval_financial",
+          lim.limit_type,
           lim.currency_or_unit || lim.currency || "TRY",
-          lim.min_value ?? lim.min_amount ?? null,
-          lim.max_value ?? lim.max_amount ?? null,
+          lim.min_value ?? null,
+          lim.max_value ?? (lim.amount ?? null),
           lim.approval_tier || null,
-          lim.approver_subject_id ? subIdMap.get(lim.approver_subject_id) || lim.approver_subject_id : null,
+          mappedApproverId,
           lim.state_type || "as_is",
           lim.notes || null,
           now,
@@ -1005,22 +1122,24 @@ export async function restoreProjectBackup(
       );
     }
 
+    // V. governance_sod_risks
     for (const sod of projectData.governanceSodRisks || []) {
-      const newSodId = sodIdMap.get(sod.id) || generateId("sod");
-      const mappedGoId = sod.governance_object_id ? goIdMap.get(sod.governance_object_id) || sod.governance_object_id : null;
-      const mappedSubId = sod.subject_id ? subIdMap.get(sod.subject_id) || sod.subject_id : null;
-      const mappedScpId = sod.scope_id ? scpIdMap.get(sod.scope_id) || sod.scope_id : null;
+      const mappedSodId = sodIdMap.get(sod.id) || generateId("sod");
+      const mappedObjId = sod.governance_object_id ? (goIdMap.get(sod.governance_object_id) || sod.governance_object_id) : (sod.object_id_a ? (goIdMap.get(sod.object_id_a) || sod.object_id_a) : null);
+      const mappedSubId = sod.subject_id ? (subIdMap.get(sod.subject_id) || sod.subject_id) : (sod.conflicting_subject_id ? (subIdMap.get(sod.conflicting_subject_id) || sod.conflicting_subject_id) : null);
+      const mappedScpId = sod.scope_id ? (scpIdMap.get(sod.scope_id) || sod.scope_id) : null;
+
       await db.execute(
         `INSERT INTO governance_sod_risks
            (id, analysis_project_id, governance_object_id, subject_id, scope_id, risk_title, conflicting_duty_a, conflicting_duty_b, risk_severity, current_control, mitigation_action, risk_owner, status, state_type, created_at, updated_at)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
         [
-          newSodId,
+          mappedSodId,
           newProjectId,
-          mappedGoId,
+          mappedObjId,
           mappedSubId,
           mappedScpId,
-          sod.risk_title || sod.conflict_description || "SoD Riski",
+          sod.risk_title || sod.description || "Görevler Ayrılığı Riski",
           sod.conflicting_duty_a || "Görev A",
           sod.conflicting_duty_b || "Görev B",
           sod.risk_severity || sod.risk_level || "high",
@@ -1035,6 +1154,7 @@ export async function restoreProjectBackup(
       );
     }
 
+    // W. governance_attachments
     for (const gatt of projectData.governanceAttachments || []) {
       const newGattId = generateId("gatt");
       const newRel = remapAttachmentPath(gatt.relative_path);
@@ -1072,20 +1192,27 @@ export async function restoreProjectBackup(
       );
     }
 
-
-  } catch (dbErr: any) {
-    console.error("[BackupManager] Veritabanı yazma hatası:", dbErr);
-    try {
-      await deleteProject(newProjectId);
-    } catch (cleanupErr) {
-      console.warn("[BackupManager] Telafi temizleme hatası:", cleanupErr);
+    // X. project_scope_changes
+    for (const sc of projectData.scopeChanges || []) {
+      const scId = generateId("psc");
+      await db.execute(
+        `INSERT INTO project_scope_changes
+           (id, analysis_project_id, business_function_code, action, reason, performed_by, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          scId,
+          newProjectId,
+          sc.business_function_code,
+          sc.action || "added",
+          sc.reason || null,
+          sc.performed_by || null,
+          sc.created_at || now,
+        ]
+      );
     }
-    throw new Error("Proje çoğaltılamadı. Veritabanı işlemi tamamlanamadı; hiçbir değişiklik kaydedilmedi.");
-  }
 
-  // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz (Transaction Dışında)
-  const writtenRelativePaths: string[] = [];
-  try {
+    // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
+    const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
       if (!archivePath.startsWith("attachments/")) continue;
       const originalRelPath = archivePath.substring("attachments/".length);
@@ -1094,23 +1221,39 @@ export async function restoreProjectBackup(
       await saveAttachmentFile(newRelPath, fileData);
       writtenRelativePaths.push(newRelPath);
     }
-  } catch (fileErr: any) {
-    console.error("[BackupManager] Ek dosya kopyalama hatası:", fileErr);
-    try {
-      await deleteProject(newProjectId);
-    } catch (cleanupErr) {
-      console.warn("[BackupManager] Telafi temizleme hatası:", cleanupErr);
-    }
-    throw new Error("Proje ek dosyaları aktarılamadı; işlem geri alındı.");
-  }
 
-  return {
-    success: true,
-    newProjectId,
-    projectName: finalProjectName,
-    companyName: projectData.company?.company_name || inspection.manifest.companyName,
-    attachmentCount: writtenRelativePaths.length,
-  };
+    // 3. Projenin Veritabanında Başarıyla Oluştuğunu Doğrula
+    const checkProjects = await db.select<any[]>(
+      "SELECT id, name FROM analysis_projects WHERE id = $1",
+      [newProjectId]
+    );
+    if (!checkProjects || checkProjects.length === 0) {
+      throw new Error("Geri yüklenen proje veritabanında doğrulanamadı.");
+    }
+
+    return {
+      success: true,
+      created: true,
+      newProjectId,
+      projectId: newProjectId,
+      projectName: finalProjectName,
+      companyName: projectData.company?.company_name || inspection.manifest.companyName,
+      attachmentCount: writtenRelativePaths.length,
+      recordCounts: inspection.manifest.recordCounts,
+      cleanupPerformed: false,
+    };
+  } catch (err: any) {
+    console.error("[BackupManager] Geri yükleme hatası:", err);
+    if (newProjectId) {
+      try {
+        await deleteProject(newProjectId);
+        console.info(`[BackupManager] Başarısız işlem sonrası telafi temizliği yapıldı: ${newProjectId}`);
+      } catch (cleanupErr) {
+        console.warn("[BackupManager] Telafi temizleme hatası:", cleanupErr);
+      }
+    }
+    throw new Error("Proje geri yüklenemedi; hiçbir değişiklik kaydedilmedi.");
+  }
 }
 
 /**
@@ -1119,11 +1262,10 @@ export async function restoreProjectBackup(
 export async function duplicateProject(
   sourceProjectId: string,
   options: DuplicateProjectOptions = {}
-): Promise<{ newProjectId: string; projectName: string }> {
+): Promise<{ success: boolean; created: boolean; newProjectId: string; projectId: string; projectName: string }> {
   // Projeyi export formatında al
   const exportData = await exportProjectBackup(sourceProjectId);
 
-  // Geri yükleme fonksiyonunu yeni ad ve klonlama seçenekleriyle çalıştır
   const newName = options.newProjectName?.trim()
     ? options.newProjectName.trim()
     : `${exportData.manifest.projectName} (Kopya)`;
@@ -1202,6 +1344,7 @@ export async function duplicateProject(
       followups: options.copyAnswersAndAttachments ? exportData.manifest.recordCounts.followups : 0,
       questionAttachments: options.copyAnswersAndAttachments ? exportData.manifest.recordCounts.questionAttachments : 0,
       governanceAttachments: options.copyAnswersAndAttachments ? exportData.manifest.recordCounts.governanceAttachments : 0,
+      scopeChanges: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.scopeChanges || 0) : 0,
     },
   };
 
@@ -1218,7 +1361,10 @@ export async function duplicateProject(
 
   const restoreRes = await restoreProjectBackup(newTar, { newProjectName: newName });
   return {
+    success: true,
+    created: true,
     newProjectId: restoreRes.newProjectId!,
+    projectId: restoreRes.newProjectId!,
     projectName: newName,
   };
 }

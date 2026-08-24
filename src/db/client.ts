@@ -21,6 +21,11 @@ import type {
   FunctionStatus,
   ProjectDetailData,
   ProjectListItem,
+  ProjectStatus,
+  ProjectScopeChange,
+  ScopeChangeAction,
+  FunctionDataCounts,
+  UpdateProjectDetailsPayload,
   Finding,
   Requirement,
   Risk,
@@ -35,6 +40,7 @@ import type {
   QuestionAttachment,
   CreateQuestionAttachmentPayload,
   AttachmentSummaryStats,
+  ProjectBusinessFunction,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -102,11 +108,26 @@ export async function getProjects(): Promise<ProjectListItem[]> {
       p.updated_at,
       COALESCE(c.company_name, 'İsimsiz Firma') as company_name,
       c.city,
-      (SELECT COUNT(*) FROM project_business_functions pbf WHERE pbf.analysis_project_id = p.id) as selected_function_count
+      (SELECT COUNT(*) FROM project_business_functions pbf WHERE pbf.analysis_project_id = p.id AND (pbf.is_active IS NULL OR pbf.is_active = 1)) as selected_function_count
     FROM analysis_projects p
     LEFT JOIN company_profiles c ON c.analysis_project_id = p.id
     ORDER BY p.updated_at DESC
   `);
+}
+
+// ---------------------------------------------------------------
+// 1.1 Proje Durumunu Güncelle (Aktif / Pasif)
+// ---------------------------------------------------------------
+export async function updateProjectStatus(
+  projectId: string,
+  status: ProjectStatus
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  await db.execute(
+    `UPDATE analysis_projects SET status = $1, updated_at = $2 WHERE id = $3`,
+    [status, now, projectId]
+  );
 }
 
 // ---------------------------------------------------------------
@@ -165,8 +186,8 @@ export async function createProject(payload: CreateProjectPayload): Promise<stri
     const pbfId = generateId("pbf");
     await db.execute(
       `INSERT INTO project_business_functions
-       (id, analysis_project_id, business_function_id, status, created_at, updated_at)
-       VALUES ($1, $2, $3, 'not_started', $4, $4)`,
+       (id, analysis_project_id, business_function_id, status, is_active, created_at, updated_at)
+       VALUES ($1, $2, $3, 'not_started', 1, $4, $4)`,
       [pbfId, projectId, bfId, now]
     );
   }
@@ -209,6 +230,9 @@ export async function getProjectDetail(projectId: string): Promise<ProjectDetail
        pbf.company_department_name,
        pbf.responsible_person,
        pbf.status,
+       COALESCE(pbf.is_active, 1) as is_active,
+       pbf.removed_at,
+       pbf.removal_reason,
        pbf.created_at,
        pbf.updated_at,
        bf.code,
@@ -272,30 +296,28 @@ export async function updateCompanyProfile(
 // ---------------------------------------------------------------
 export async function updateProjectDetails(
   projectId: string,
-  payload: {
-    projectName?: string;
-    company: {
-      company_name?: string;
-      trade_name?: string | null;
-      tax_number?: string | null;
-      city?: string | null;
-      country?: string;
-      employee_count?: string | null;
-      business_sector?: string | null;
-      has_branches?: "yes" | "no" | null;
-      branch_count?: number | null;
-      notes?: string | null;
-    };
-  }
+  payload: UpdateProjectDetailsPayload
 ): Promise<void> {
   const db = await getDb();
   const now = new Date().toISOString();
 
-  // 1. Proje adı güncellenmişse analysis_projects tablosunu güncelle
+  // 1. Proje adı / durumu güncellenmişse analysis_projects tablosunu güncelle
   if (payload.projectName && payload.projectName.trim()) {
+    if (payload.status) {
+      await db.execute(
+        `UPDATE analysis_projects SET name = $1, status = $2, updated_at = $3 WHERE id = $4`,
+        [payload.projectName.trim(), payload.status, now, projectId]
+      );
+    } else {
+      await db.execute(
+        `UPDATE analysis_projects SET name = $1, updated_at = $2 WHERE id = $3`,
+        [payload.projectName.trim(), now, projectId]
+      );
+    }
+  } else if (payload.status) {
     await db.execute(
-      `UPDATE analysis_projects SET name = $1, updated_at = $2 WHERE id = $3`,
-      [payload.projectName.trim(), now, projectId]
+      `UPDATE analysis_projects SET status = $1, updated_at = $2 WHERE id = $3`,
+      [payload.status, now, projectId]
     );
   } else {
     await db.execute(
@@ -333,6 +355,206 @@ export async function updateProjectDetails(
       now,
       projectId,
     ]
+  );
+}
+
+// ---------------------------------------------------------------
+// 4.3 Kapsam Yönetimi: İş Fonksiyonu Ekle / Yeniden Etkinleştir
+// ---------------------------------------------------------------
+export async function addOrReactivateProjectFunction(
+  projectId: string,
+  bfCode: string,
+  performedBy?: string
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  // 1. business_functions tablosundan ID'yi bul
+  const bfs = await db.select<{ id: string; code: string }[]>(
+    "SELECT id, code FROM business_functions WHERE code = $1",
+    [bfCode]
+  );
+  if (bfs.length === 0) {
+    throw new Error(`İş fonksiyonu bulunamadı: ${bfCode}`);
+  }
+  const bfId = bfs[0].id;
+
+  // 2. Mevcut project_business_functions kaydı var mı?
+  const existing = await db.select<ProjectBusinessFunction[]>(
+    "SELECT * FROM project_business_functions WHERE analysis_project_id = $1 AND business_function_id = $2",
+    [projectId, bfId]
+  );
+
+  let action: ScopeChangeAction = "added";
+  if (existing.length > 0) {
+    action = "reactivated";
+    await db.execute(
+      `UPDATE project_business_functions
+       SET is_active = 1, removed_at = NULL, removal_reason = NULL, updated_at = $1
+       WHERE id = $2`,
+      [now, existing[0].id]
+    );
+  } else {
+    const pbfId = generateId("pbf");
+    await db.execute(
+      `INSERT INTO project_business_functions
+         (id, analysis_project_id, business_function_id, status, is_active, created_at, updated_at)
+       VALUES ($1, $2, $3, 'not_started', 1, $4, $4)`,
+      [pbfId, projectId, bfId, now]
+    );
+  }
+
+  // 3. Geçmişe kaydet
+  const pscId = generateId("psc");
+  await db.execute(
+    `INSERT INTO project_scope_changes
+       (id, analysis_project_id, business_function_code, action, reason, performed_by, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+    [pscId, projectId, bfCode, action, null, performedBy || null, now]
+  );
+
+  // 4. Proje son güncellenme tarihini güncelle
+  await db.execute("UPDATE analysis_projects SET updated_at = $1 WHERE id = $2", [now, projectId]);
+}
+
+// ---------------------------------------------------------------
+// 4.4 Kapsam Yönetimi: İş Fonksiyonunu Kapsam Dışına Al (Soft Remove)
+// ---------------------------------------------------------------
+export async function deactivateProjectFunction(
+  projectId: string,
+  bfCode: string,
+  reason?: string,
+  performedBy?: string
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  const bfs = await db.select<{ id: string; code: string }[]>(
+    "SELECT id, code FROM business_functions WHERE code = $1",
+    [bfCode]
+  );
+  if (bfs.length === 0) {
+    throw new Error(`İş fonksiyonu bulunamadı: ${bfCode}`);
+  }
+  const bfId = bfs[0].id;
+
+  await db.execute(
+    `UPDATE project_business_functions
+     SET is_active = 0, removed_at = $1, removal_reason = $2, updated_at = $3
+     WHERE analysis_project_id = $4 AND business_function_id = $5`,
+    [now, reason?.trim() || null, now, projectId, bfId]
+  );
+
+  const pscId = generateId("psc");
+  await db.execute(
+    `INSERT INTO project_scope_changes
+       (id, analysis_project_id, business_function_code, action, reason, performed_by, created_at)
+     VALUES ($1, $2, $3, 'removed', $4, $5, $6)`,
+    [pscId, projectId, bfCode, reason?.trim() || null, performedBy || null, now]
+  );
+
+  await db.execute("UPDATE analysis_projects SET updated_at = $1 WHERE id = $2", [now, projectId]);
+}
+
+// ---------------------------------------------------------------
+// 4.5 Kapsam Yönetimi: Fonksiyona Bağlı Çalışma Verisi Sayıları
+// ---------------------------------------------------------------
+export async function getFunctionDataCounts(
+  projectId: string,
+  bfCode: string
+): Promise<FunctionDataCounts> {
+  const db = await getDb();
+  const [
+    ans,
+    fnd,
+    req,
+    rsk,
+    not,
+    cqs,
+    cqa,
+    fol,
+    att,
+    gov,
+  ] = await Promise.all([
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM question_answers WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM analysis_findings WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM analysis_requirements WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM analysis_risks WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM project_notes WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM project_custom_questions WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM project_custom_question_answers WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM question_followups WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM question_attachments WHERE analysis_project_id = $1 AND business_function_code = $2",
+      [projectId, bfCode]
+    ),
+    db.select<{ count: number }[]>(
+      "SELECT COUNT(*) as count FROM governance_objects WHERE analysis_project_id = $1 AND related_bf_code = $2",
+      [projectId, bfCode]
+    ),
+  ]);
+
+  const answers = ans[0]?.count ?? 0;
+  const findings = fnd[0]?.count ?? 0;
+  const requirements = req[0]?.count ?? 0;
+  const risks = rsk[0]?.count ?? 0;
+  const notes = not[0]?.count ?? 0;
+  const customQuestions = cqs[0]?.count ?? 0;
+  const customAnswers = cqa[0]?.count ?? 0;
+  const followups = fol[0]?.count ?? 0;
+  const attachments = att[0]?.count ?? 0;
+  const governanceObjects = gov[0]?.count ?? 0;
+  const total =
+    answers + findings + requirements + risks + notes + customQuestions + customAnswers + followups + attachments + governanceObjects;
+
+  return {
+    businessFunctionCode: bfCode,
+    answers,
+    findings,
+    requirements,
+    risks,
+    notes,
+    customQuestions,
+    customAnswers,
+    followups,
+    attachments,
+    governanceObjects,
+    total,
+  };
+}
+
+// ---------------------------------------------------------------
+// 4.6 Kapsam Yönetimi: Değişiklik Geçmişi
+// ---------------------------------------------------------------
+export async function getProjectScopeChanges(projectId: string): Promise<ProjectScopeChange[]> {
+  const db = await getDb();
+  return db.select<ProjectScopeChange[]>(
+    "SELECT * FROM project_scope_changes WHERE analysis_project_id = $1 ORDER BY created_at DESC",
+    [projectId]
   );
 }
 
@@ -879,7 +1101,7 @@ export async function getSemanticSummaryCounts(
     db.select<{ total: number; open: number }[]>(
       `SELECT
          COUNT(*) as total,
-         SUM(CASE WHEN status = 'open' THEN 1 ELSE 0 END) as open
+         SUM(CASE WHEN LOWER(TRIM(status)) IN ('open', 'acik', 'açık', 'active', 'aktif', 'open_risk', 'pending') OR status IS NULL THEN 1 ELSE 0 END) as open
        FROM analysis_risks WHERE analysis_project_id = $1`,
       [projectId]
     ),

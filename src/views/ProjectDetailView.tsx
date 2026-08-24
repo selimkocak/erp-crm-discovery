@@ -21,9 +21,10 @@ import {
   Copy,
   Trash2,
   Info,
+  Layers,
   X as XIcon,
 } from "lucide-react";
-import { getProjectDetail, updateProjectBusinessFunction, deleteProject } from "../db/client";
+import { getProjectDetail, updateProjectBusinessFunction, deleteProject, updateProjectStatus } from "../db/client";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { QuestionScreen } from "../views/QuestionScreen";
@@ -36,6 +37,7 @@ import {
   DuplicateProjectModal,
   BackupSuccessModal,
 } from "../components/ProjectBackupModals";
+import { ProjectScopeModal } from "../components/modals/ProjectScopeModal";
 import type { QuestionPack } from "../engine/types";
 import type { FunctionStatus, ProjectDetailData } from "../types";
 
@@ -62,8 +64,11 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
   // Backup & Operations state
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [restoreInitialPath, setRestoreInitialPath] = useState<string | null>(null);
   const [isDuplicateOpen, setIsDuplicateOpen] = useState(false);
+  const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "info" | "error"; message: string } | null>(null);
 
@@ -237,9 +242,33 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   }
 
   const { project, company, functions } = data;
-  const completedCount = functions.filter((f) => f.status === "completed").length;
-  const inProgressCount = functions.filter((f) => f.status === "in_progress").length;
-  const notStartedCount = functions.filter((f) => f.status === "not_started").length;
+  const activeFunctions = functions.filter((f) => f.is_active === 1 || f.is_active === undefined);
+  const completedCount = activeFunctions.filter((f) => f.status === "completed").length;
+  const inProgressCount = activeFunctions.filter((f) => f.status === "in_progress").length;
+  const notStartedCount = activeFunctions.filter((f) => f.status === "not_started").length;
+
+  const handleToggleProjectStatus = async () => {
+    if (isUpdatingStatus || !data) return;
+    const currentStatus = data.project.status || "active";
+    const newStatus = currentStatus === "active" ? "passive" : "active";
+    const actionText = newStatus === "passive" ? "pasife almak" : "aktifleştirmek";
+
+    if (!window.confirm(`"${data.project.name}" projesini ${actionText} istediğinizden emin misiniz?`)) {
+      return;
+    }
+
+    try {
+      setIsUpdatingStatus(true);
+      await updateProjectStatus(projectId, newStatus);
+      showToast("success", `Proje durumu "${newStatus === "active" ? "Aktif" : "Pasif"}" olarak güncellendi.`);
+      await loadData();
+    } catch (err: any) {
+      console.error("Proje durumu güncellenirken hata:", err);
+      showToast("error", err?.message || "Proje durumu güncellenemedi.");
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
 
   // ReportPreviewView modu
   if (isViewingReport) {
@@ -359,6 +388,16 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           </button>
 
           <button
+            type="button"
+            className={`btn ${project.status === "passive" ? "btn--start" : "btn-secondary"} btn--sm`}
+            onClick={handleToggleProjectStatus}
+            disabled={isUpdatingStatus}
+            title={project.status === "passive" ? "Projeyi Aktif Yap" : "Projeyi Pasife Al"}
+          >
+            {project.status === "passive" ? "Aktif Yap" : "Pasife Al"}
+          </button>
+
+          <button
             className="btn btn-secondary btn--sm"
             style={{ color: "var(--danger)" }}
             onClick={handleDeleteProject}
@@ -369,22 +408,75 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           </button>
 
           <SaveStatusIndicator status={saveStatus} lastSavedAt={lastSavedAt} />
-          <span className="badge badge-completed">
-            {project.status.toUpperCase()}
+          <span className={`badge ${project.status === "passive" ? "badge--secondary" : "badge-completed"}`}>
+            {project.status === "passive" ? "PASİF" : "AKTİF"}
           </span>
         </div>
       </div>
 
+      {/* Passive Project Warning Banner */}
+      {project.status === "passive" && (
+        <div
+          style={{
+            backgroundColor: "var(--bg-surface-subtle, #f8fafc)",
+            border: "1px solid var(--border-color, #cbd5e1)",
+            borderRadius: "var(--radius-md, 6px)",
+            padding: "0.875rem 1.25rem",
+            marginBottom: "1.25rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <Clock size={20} style={{ color: "var(--text-muted)" }} />
+            <div>
+              <strong style={{ display: "block", fontSize: "0.95rem" }}>Bu analiz projesi şu anda PASİF durumdadır</strong>
+              <span style={{ fontSize: "0.825rem", color: "var(--text-muted)" }}>
+                Pasif projeler arşiv amaçlı tutulur. Soru cevaplamak veya kapsamı değiştirmek için projeyi aktif duruma getirin.
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn btn--start btn--sm"
+            onClick={handleToggleProjectStatus}
+            disabled={isUpdatingStatus}
+          >
+            Projeyi Aktif Yap
+          </button>
+        </div>
+      )}
+
       {/* Modals */}
+      <ProjectScopeModal
+        isOpen={isScopeModalOpen}
+        projectId={projectId}
+        projectName={project.name}
+        onClose={() => setIsScopeModalOpen(false)}
+        onScopeUpdated={() => loadData()}
+        isProjectPassive={project.status === "passive"}
+      />
+
       <BackupSuccessModal
         isOpen={!!backupSuccessResult}
         onClose={() => setBackupSuccessResult(null)}
+        onRestoreBackup={(filePath) => {
+          setBackupSuccessResult(null);
+          setRestoreInitialPath(filePath);
+          setIsRestoreOpen(true);
+        }}
         result={backupSuccessResult}
       />
 
       <RestoreProjectModal
         isOpen={isRestoreOpen}
-        onClose={() => setIsRestoreOpen(false)}
+        initialFilePath={restoreInitialPath}
+        onClose={() => {
+          setIsRestoreOpen(false);
+          setRestoreInitialPath(null);
+        }}
         onOpenProject={onOpenProject}
         onSuccess={(msg, newId) => {
           showToast("success", msg);
@@ -544,7 +636,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           onClick={() => setViewMode("process")}
         >
           <FileText size={16} />
-          <span>Süreç Analizi ({functions.length} Fonksiyon)</span>
+          <span>Süreç Analizi ({activeFunctions.length} Fonksiyon)</span>
         </button>
         <button
           type="button"
@@ -564,12 +656,21 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             <div>
               <h3 style={{ fontSize: "1.125rem", fontWeight: 700 }}>Analiz Kapsamındaki İş Fonksiyonları</h3>
               <p style={{ fontSize: "0.8125rem", color: "var(--text-muted)" }}>
-                Toplam {functions.length} iş fonksiyonu seçilmiştir. Departman eşleştirmelerini ve sorumlu kişileri güncelleyebilirsiniz.
+                Toplam {activeFunctions.length} iş fonksiyonu seçilmiştir. Departman eşleştirmelerini ve sorumlu kişileri güncelleyebilirsiniz.
               </p>
             </div>
 
-            {/* Quick Stats Badges */}
-            <div style={{ display: "flex", gap: "0.5rem" }}>
+            {/* Actions & Quick Stats Badges */}
+            <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+              <button
+                type="button"
+                className="btn btn-secondary btn--sm"
+                onClick={() => setIsScopeModalOpen(true)}
+                title="İş fonksiyonlarını ekle veya kapsam dışına al"
+              >
+                <Layers size={14} />
+                <span>Kapsamı Düzenle</span>
+              </button>
               <span className="badge badge-not-started">
                 <CircleDot size={12} /> {notStartedCount} Başlanmadı
               </span>
@@ -601,7 +702,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                 </tr>
               </thead>
               <tbody>
-                {functions.map((fn) => (
+                {activeFunctions.map((fn) => (
                   <tr key={fn.id}>
                     <td>
                       <div>

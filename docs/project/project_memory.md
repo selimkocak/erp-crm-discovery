@@ -138,7 +138,16 @@ Git HEAD: 213d7bc (main = origin/main)
 - v0.2.0 Teknik Borç Notu: `inventory` ve `invoicing` arasındaki `INV-` öneki çakışması (runtime SQLite composite key ile güvende; v0.2.0'da INVC- önekine migration ile taşınacak)
 
 ======================================================================
-4. KRİTİK APİ, TEST VE ÇALIŞTIRMA NOTLARI
+4. FAZ-51..54.2 TAŞINABİLİRLİK, YEDEKLEME VE HOTFIX MİMARİSİ
+======================================================================
+- Taşınabilir Format (.erpcrm): Sıfır bağımlılıklı POSIX USTAR + GZIP arşiv motoru (`src/storage/tarArchive.ts`). 23 SQLite tablosu, manifest.json, project-data.json, checksums.json ve Managed Vault kanıt dosyaları.
+- Sıfır SQL Transaction Kilidi: `@tauri-apps/plugin-sql` bağlantı havuzundan (SqlitePool) ötürü frontend'de `BEGIN`/`ROLLBACK` kullanılmaz; sıralı `INSERT` ve hata anında `deleteProject(newProjectId)` telafi temizliği uygulanır.
+- Saf Masaüstü Save/Open: Browser download (Blob URL, `<a download>`) tamamen söküldü; `@tauri-apps/plugin-dialog` ve `@tauri-apps/plugin-fs` kullanılır. Varsayılan klasör: `Belgeler/ERP CRM Discovery Yedekleri` ve `localStorage['erp_crm_last_backup_directory']`.
+- CI/CD Optimizasyonu (FAZ-52): Windows NSIS ve macOS DMG derlemeleri yalnızca `v*` release taglerinde çalışır.
+- Harici Bağlantılar (FAZ-53): Hakkında modalı ve dış bağlantılar `@tauri-apps/plugin-opener` ile açılır.
+
+======================================================================
+5. KRİTİK APİ, TEST VE ÇALIŞTIRMA NOTLARI
 ======================================================================
 - Test Çalıştırma Standardı: Testler doğrudan `npm exec -- tsx <test_path>` veya `npm test` ile çalıştırılmalıdır (Global paket veya PATH bağımlılığı yoktur).
 - Open Handle / SQLite WAL Notu: `better-sqlite3` kullanılan testlerde açık kalan veritabanı bağlantıları (`db.close()`) Node event loop'unu askıda tutabilir; testlerde db lifecycle yönetimine dikkat edilmelidir.
@@ -149,10 +158,11 @@ Git HEAD: 213d7bc (main = origin/main)
 - Branching & Progress engine: Map<string, AnswerData> kullanılır
 
 ======================================================================
-5. TEMEL DOĞRULAMA KOMUTLARI
+6. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
 - Tüm Testler (59 Test Suite, 1.800+ Test): npm test
 - Windows Test Paritesi (59 Test Suite): npm run test:windows
+- FAZ-51/54 Proje Yedekleme & Geri Yükleme Testi: npm exec -- tsx test/faz51_project_backup_restore_test.ts
 - Geliştirici Atfı & Hakkında Kabul Testi: npm exec -- tsx test/attribution_and_about_test.ts
 - Mevcut Proje Düzenleme Kabul Testi: npm exec -- tsx test/project_profile_edit_test.ts
 - Sektör ve Şube Doğrulama Testi: npm exec -- tsx test/company_profile_sector_and_branch_test.ts

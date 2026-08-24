@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckSquare, Square, Building, Briefcase } from "lucide-react";
 import { getMasterBusinessFunctions, createProject, getProjectDetail, updateProjectDetails } from "../db/client";
 import { hasQuestionPack } from "../engine/loader";
-import type { BusinessFunction, CreateProjectPayload } from "../types";
+import type { BusinessFunction, CreateProjectPayload, ProjectStatus } from "../types";
 
 interface NewProjectViewProps {
   editProjectId?: string | null;
@@ -22,6 +22,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
   // Form Fields
   const [projectName, setProjectName] = useState<string>("");
+  const [projectStatus, setProjectStatus] = useState<ProjectStatus>("active");
   const [companyName, setCompanyName] = useState<string>("");
   const [tradeName, setTradeName] = useState<string>("");
   const [taxNumber, setTaxNumber] = useState<string>("");
@@ -49,6 +50,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
           const detail = await getProjectDetail(editProjectId);
           if (detail) {
             setProjectName(detail.project.name || "");
+            setProjectStatus((detail.project.status as ProjectStatus) || "active");
             setCompanyName(detail.company.company_name || "");
             setTradeName(detail.company.trade_name || "");
             setTaxNumber(detail.company.tax_number || "");
@@ -99,6 +101,7 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
       await updateProjectDetails(editProjectId!, {
         projectName: projectName.trim(),
+        status: projectStatus,
         company: {
           company_name: companyName.trim(),
           trade_name: tradeName.trim() || null,
@@ -328,6 +331,21 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
               required
             />
           </div>
+
+          {isEditMode && (
+            <div className="form-group">
+              <label htmlFor="projectStatus">Proje Durumu</label>
+              <select
+                id="projectStatus"
+                className="form-control"
+                value={projectStatus}
+                onChange={(e) => setProjectStatus(e.target.value as "active" | "passive")}
+              >
+                <option value="active">Aktif (Analiz ve veri girişine açık)</option>
+                <option value="passive">Pasif (Arşiv amaçlı, salt-okunur)</option>
+              </select>
+            </div>
+          )}
 
           <div className="form-row">
             <div className="form-group">

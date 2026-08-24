@@ -1,4 +1,4 @@
-export type ProjectStatus = 'draft' | 'active' | 'completed';
+export type ProjectStatus = 'active' | 'passive' | 'draft' | 'completed';
 export type FunctionStatus = 'not_started' | 'in_progress' | 'completed';
 
 export interface AnalysisProject {
@@ -43,6 +43,9 @@ export interface ProjectBusinessFunction {
   company_department_name?: string;
   responsible_person?: string;
   status: FunctionStatus;
+  is_active?: number;
+  removed_at?: string | null;
+  removal_reason?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -64,12 +67,42 @@ export interface EnrichedProjectFunction extends ProjectBusinessFunction {
   name_en: string;
   category: string;
   sort_order: number;
+  is_active?: number;
+  removed_at?: string | null;
+  removal_reason?: string | null;
 }
 
 export interface ProjectDetailData {
   project: AnalysisProject;
   company: CompanyProfile;
   functions: EnrichedProjectFunction[];
+}
+
+export type ScopeChangeAction = 'added' | 'removed' | 'reactivated';
+
+export interface ProjectScopeChange {
+  id: string;
+  analysis_project_id: string;
+  business_function_code: string;
+  action: ScopeChangeAction;
+  reason?: string | null;
+  performed_by?: string | null;
+  created_at: string;
+}
+
+export interface FunctionDataCounts {
+  businessFunctionCode: string;
+  answers: number;
+  findings: number;
+  requirements: number;
+  risks: number;
+  notes: number;
+  customQuestions: number;
+  customAnswers: number;
+  followups: number;
+  attachments: number;
+  governanceObjects: number;
+  total: number;
 }
 
 export interface CreateProjectPayload {
@@ -104,6 +137,7 @@ export interface UpdateCompanyProfilePayload {
 
 export interface UpdateProjectDetailsPayload {
   projectName?: string;
+  status?: ProjectStatus;
   company: UpdateCompanyProfilePayload;
 }
 

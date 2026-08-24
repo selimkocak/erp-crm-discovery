@@ -23,16 +23,18 @@ export interface BackupRecordCounts {
   governanceSodRisks: number;
   governanceAttachments: number;
   questionAttachments: number;
+  scopeChanges?: number;
 }
 
 export interface BackupManifest {
-  formatVersion: string; // e.g. "1.0.0"
-  appVersion: string; // e.g. "0.1.1"
+  formatVersion: string; // e.g. "1.0.0" | "1.1.0"
+  appVersion: string; // e.g. "0.1.1" | "0.1.2"
   createdAt: string; // ISO 8601
   sourceProjectId: string;
+  projectId?: string;
   projectName: string;
   companyName: string;
-  schemaVersion: number; // 11
+  schemaVersion: number; // 11 | 12
   recordCounts: BackupRecordCounts;
   attachmentCount: number;
   dataChecksum: string; // SHA-256 of project-data.json
@@ -62,6 +64,7 @@ export interface ProjectBackupData {
   governanceLimits: Record<string, any>[];
   governanceSodRisks: Record<string, any>[];
   governanceAttachments: Record<string, any>[];
+  scopeChanges?: Record<string, any>[];
 }
 
 export interface BackupInspectionResult {
@@ -73,10 +76,15 @@ export interface BackupInspectionResult {
 
 export interface RestoreResult {
   success: boolean;
+  created?: boolean;
   newProjectId?: string;
+  projectId?: string;
   projectName?: string;
   companyName?: string;
   attachmentCount?: number;
+  recordCounts?: BackupRecordCounts;
+  cleanupPerformed?: boolean;
+  errorCode?: string;
   error?: string;
 }
 

@@ -36,11 +36,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onEditProject,
 }) => {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "passive">("all");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   // Backup & Operations state
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
+  const [restoreInitialPath, setRestoreInitialPath] = useState<string | null>(null);
   const [duplicateTarget, setDuplicateTarget] = useState<{ id: string; name: string } | null>(null);
   const [exportingProjectId, setExportingProjectId] = useState<string | null>(null);
   const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
@@ -70,6 +72,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
   useEffect(() => {
     loadProjects();
   }, []);
+
+  const activeCount = projects.filter((p) => (p.status || "active") === "active").length;
+  const passiveCount = projects.filter((p) => p.status === "passive").length;
+
+  const filteredProjects = projects.filter((p) => {
+    if (statusFilter === "active") return (p.status || "active") === "active";
+    if (statusFilter === "passive") return p.status === "passive";
+    return true;
+  });
 
   const handleExport = async (projId: string) => {
     setExportingProjectId(projId);
@@ -169,6 +180,32 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </div>
 
+      {/* Status Filter Tabs */}
+      {projects.length > 0 && (
+        <div className="semantic-filter-bar" style={{ marginBottom: "1rem" }}>
+          <div className="semantic-tabs">
+            <button
+              className={`semantic-tab ${statusFilter === "all" ? "semantic-tab--active" : ""}`}
+              onClick={() => setStatusFilter("all")}
+            >
+              Tümü ({projects.length})
+            </button>
+            <button
+              className={`semantic-tab ${statusFilter === "active" ? "semantic-tab--active" : ""}`}
+              onClick={() => setStatusFilter("active")}
+            >
+              Aktif Projeler ({activeCount})
+            </button>
+            <button
+              className={`semantic-tab ${statusFilter === "passive" ? "semantic-tab--active" : ""}`}
+              onClick={() => setStatusFilter("passive")}
+            >
+              Pasif Projeler ({passiveCount})
+            </button>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div
           style={{
@@ -212,6 +249,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </button>
           </div>
         </div>
+      ) : filteredProjects.length === 0 ? (
+        <div className="empty-state" style={{ padding: "2rem" }}>
+          <p style={{ color: "var(--text-muted)", margin: 0 }}>
+            {statusFilter === "active" ? "Aktif durumda proje bulunmuyor." : "Pasif durumda proje bulunmuyor."}
+          </p>
+        </div>
       ) : (
         <div className="table-container">
           <table className="custom-table">
@@ -219,6 +262,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <tr>
                 <th>Firma Adı</th>
                 <th>Proje / Analiz Adı</th>
+                <th>Durum</th>
                 <th>Lokasyon</th>
                 <th>Kapsam</th>
                 <th>Son Güncelleme</th>
@@ -226,76 +270,86 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </tr>
             </thead>
             <tbody>
-              {projects.map((proj) => (
-                <tr key={proj.id}>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <Building2 size={16} style={{ color: "var(--primary)" }} />
-                      <strong style={{ color: "var(--text-primary)" }}>{proj.company_name}</strong>
-                    </div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 500 }}>{proj.name}</span>
-                  </td>
-                  <td>
-                    <span style={{ color: "var(--text-muted)" }}>
-                      {proj.city ? proj.city : "—"}
-                    </span>
-                  </td>
-                  <td>
-                    <span className="badge badge-not-started">
-                      {proj.selected_function_count} Fonksiyon
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", color: "var(--text-muted)", fontSize: "0.8rem" }}>
-                      <Calendar size={14} />
-                      {formatDate(proj.updated_at)}
-                    </div>
-                  </td>
-                  <td style={{ textAlign: "right" }}>
-                    <div style={{ display: "inline-flex", gap: "0.375rem" }}>
-                      <button
-                        className="btn btn-secondary btn--sm"
-                        title="Projeyi Yedekle (.erpcrm)"
-                        disabled={exportingProjectId === proj.id}
-                        onClick={() => handleExport(proj.id)}
-                      >
-                        <Download size={14} />
-                      </button>
-                      <button
-                        className="btn btn-secondary btn--sm"
-                        title="Projeyi Çoğalt"
-                        onClick={() => setDuplicateTarget({ id: proj.id, name: proj.name })}
-                      >
-                        <Copy size={14} />
-                      </button>
-                      <button
-                        className="btn btn-secondary btn--sm"
-                        title="Firma Bilgilerini Düzenle"
-                        onClick={() => onEditProject(proj.id)}
-                      >
-                        <Pencil size={14} />
-                        Düzenle
-                      </button>
-                      <button
-                        className="btn btn--continue btn--sm"
-                        onClick={() => onOpenProject(proj.id)}
-                      >
-                        <FolderOpen size={14} />
-                        Aç
-                      </button>
-                      <button
-                        className="btn btn-danger-ghost btn--danger btn--sm"
-                        title="Analizi Sil"
-                        onClick={() => handleDelete(proj.id, proj.name)}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filteredProjects.map((proj) => {
+                const isPassive = proj.status === "passive";
+                return (
+                  <tr key={proj.id} style={{ opacity: isPassive ? 0.85 : 1 }}>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                        <Building2 size={16} style={{ color: "var(--primary)" }} />
+                        <strong style={{ color: "var(--text-primary)" }}>{proj.company_name}</strong>
+                      </div>
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 500 }}>{proj.name}</span>
+                    </td>
+                    <td>
+                      {isPassive ? (
+                        <span className="badge badge--secondary">Pasif</span>
+                      ) : (
+                        <span className="badge badge--success">Aktif</span>
+                      )}
+                    </td>
+                    <td>
+                      <span style={{ color: "var(--text-muted)" }}>
+                        {proj.city ? proj.city : "—"}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="badge badge-not-started">
+                        {proj.selected_function_count} Fonksiyon
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+                        <Calendar size={14} />
+                        {formatDate(proj.updated_at)}
+                      </div>
+                    </td>
+                    <td style={{ textAlign: "right" }}>
+                      <div style={{ display: "inline-flex", gap: "0.375rem" }}>
+                        <button
+                          className="btn btn-secondary btn--sm"
+                          title="Projeyi Yedekle (.erpcrm)"
+                          disabled={exportingProjectId === proj.id}
+                          onClick={() => handleExport(proj.id)}
+                        >
+                          <Download size={14} />
+                        </button>
+                        <button
+                          className="btn btn-secondary btn--sm"
+                          title="Projeyi Çoğalt"
+                          onClick={() => setDuplicateTarget({ id: proj.id, name: proj.name })}
+                        >
+                          <Copy size={14} />
+                        </button>
+                        <button
+                          className="btn btn-secondary btn--sm"
+                          title="Firma Bilgilerini Düzenle"
+                          onClick={() => onEditProject(proj.id)}
+                        >
+                          <Pencil size={14} />
+                          Düzenle
+                        </button>
+                        <button
+                          className="btn btn--continue btn--sm"
+                          onClick={() => onOpenProject(proj.id)}
+                        >
+                          <FolderOpen size={14} />
+                          Aç
+                        </button>
+                        <button
+                          className="btn btn-danger-ghost btn--danger btn--sm"
+                          title="Analizi Sil"
+                          onClick={() => handleDelete(proj.id, proj.name)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -305,13 +359,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <BackupSuccessModal
         isOpen={!!backupSuccessResult}
         onClose={() => setBackupSuccessResult(null)}
+        onRestoreBackup={(filePath) => {
+          setBackupSuccessResult(null);
+          setRestoreInitialPath(filePath);
+          setIsRestoreOpen(true);
+        }}
         result={backupSuccessResult}
       />
 
       {/* Restore Modal */}
       <RestoreProjectModal
         isOpen={isRestoreOpen}
-        onClose={() => setIsRestoreOpen(false)}
+        initialFilePath={restoreInitialPath}
+        onClose={() => {
+          setIsRestoreOpen(false);
+          setRestoreInitialPath(null);
+        }}
         onOpenProject={onOpenProject}
         onSuccess={(msg, newId) => {
           showToast("success", msg);

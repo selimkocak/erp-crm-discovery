@@ -452,6 +452,26 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_gov_sod_project ON governance_sod_risks(analysis_project_id);`,
       `CREATE INDEX IF NOT EXISTS idx_gov_att_entity ON governance_attachments(analysis_project_id, entity_type, entity_id);`
     ]
+  },
+  {
+    version: 12,
+    description: "Project Scope Revision, Lifecycle and Reversible Function Management (FAZ-55)",
+    sql: [
+      `ALTER TABLE project_business_functions ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1;`,
+      `ALTER TABLE project_business_functions ADD COLUMN removed_at DATETIME;`,
+      `ALTER TABLE project_business_functions ADD COLUMN removal_reason TEXT;`,
+      `CREATE TABLE IF NOT EXISTS project_scope_changes (
+        id                     TEXT PRIMARY KEY,
+        analysis_project_id    TEXT NOT NULL,
+        business_function_code TEXT NOT NULL,
+        action                 TEXT NOT NULL,
+        reason                 TEXT,
+        performed_by           TEXT,
+        created_at             TEXT NOT NULL,
+        FOREIGN KEY (analysis_project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_psc_project ON project_scope_changes(analysis_project_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_pbf_is_active ON project_business_functions(analysis_project_id, is_active);`
+    ]
   }
 ] as const;
-

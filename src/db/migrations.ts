@@ -28,6 +28,12 @@ export async function detectLegacyBaselineVersion(db: Database): Promise<number>
     return 0; // Temiz / Boş veritabanı
   }
 
+  // v12: project_scope_changes tablosu
+  const pscTables = await db.select<{ name: string }[]>(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='project_scope_changes'"
+  );
+  if (pscTables.length > 0) return 12;
+
   // v11: governance_objects tablosu
   const govTables = await db.select<{ name: string }[]>(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='governance_objects'"
@@ -75,8 +81,8 @@ export async function detectLegacyBaselineVersion(db: Database): Promise<number>
 }
 
 /**
- * Migration tanımlarını atomik transaction blokları içerisinde çalıştırır ve
- * schema_migrations tablosuna kaydeder.
+ * Migration tanımlarını sırayla çalıştırır ve schema_migrations tablosuna kaydeder.
+ * SqlitePool kilitlenmelerini önlemek için manuel transaction komutu kullanılmaz.
  */
 export async function runMigrations(db: Database): Promise<void> {
   // 1. schema_migrations tablosunu oluştur
@@ -110,14 +116,13 @@ export async function runMigrations(db: Database): Promise<void> {
     }
   }
 
-  // 4. Henüz uygulanmamış migration'ları transaction içinde sırayla çalıştır
+  // 4. Henüz uygulanmamış migration'ları sırayla çalıştır
   for (const migration of MIGRATION_DEFINITIONS) {
     if (appliedVersions.has(migration.version)) {
       continue;
     }
 
     try {
-      await db.execute("BEGIN TRANSACTION;");
       for (const sqlStatement of migration.sql) {
         const trimmed = sqlStatement.trim();
         if (trimmed.length > 0) {
@@ -128,14 +133,8 @@ export async function runMigrations(db: Database): Promise<void> {
         "INSERT INTO schema_migrations (version, name, applied_at) VALUES ($1, $2, CURRENT_TIMESTAMP);",
         [migration.version, migration.description]
       );
-      await db.execute("COMMIT;");
       appliedVersions.add(migration.version);
     } catch (err) {
-      try {
-        await db.execute("ROLLBACK;");
-      } catch {
-        // Rollback error if already rolled back
-      }
       throw new Error(`[Migration Error] Migration v${migration.version} (${migration.description}) failed: ${err instanceof Error ? err.message : String(err)}`);
     }
   }

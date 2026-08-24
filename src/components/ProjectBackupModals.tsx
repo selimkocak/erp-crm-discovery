@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Upload,
   Copy,
@@ -6,41 +6,27 @@ import {
   CheckCircle2,
   FolderOpen,
   ArrowRight,
+  RefreshCw,
   X,
 } from "lucide-react";
 import {
   inspectProjectBackup,
   restoreProjectBackup,
   duplicateProject,
+  resolveDefaultBackupDir,
   type SaveBackupResult,
 } from "../storage/backupManager";
 import type { BackupInspectionResult } from "../types/backup";
 
 /**
- * Tarayıcı ve masaüstünde blob indirme yardımcısı (fallback)
- */
-export function triggerFileDownload(blob: Blob, fileName: string): void {
-  if (typeof window === "undefined" || typeof document === "undefined") {
-    return;
-  }
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
-}
-
-/**
- * Yedekleme Başarı Modalı (Görünür dosya adı, konum ve Klasörde Göster)
+ * Yedekleme Başarı Modalı (Görünür dosya adı, tam yol, boyut ve Klasörde Göster / Yedeği Geri Yükle)
  */
 export const BackupSuccessModal: React.FC<{
   isOpen: boolean;
   onClose: () => void;
+  onRestoreBackup?: (filePath: string) => void;
   result: SaveBackupResult | null;
-}> = ({ isOpen, onClose, result }) => {
+}> = ({ isOpen, onClose, onRestoreBackup, result }) => {
   if (!isOpen || !result) return null;
 
   const handleReveal = async () => {
@@ -64,6 +50,22 @@ export const BackupSuccessModal: React.FC<{
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
+  const formatCreatedTime = (isoString?: string): string => {
+    try {
+      const d = isoString ? new Date(isoString) : new Date();
+      return d.toLocaleDateString("tr-TR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    } catch {
+      return isoString || "—";
+    }
+  };
+
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
       <div
@@ -72,7 +74,7 @@ export const BackupSuccessModal: React.FC<{
         role="dialog"
         aria-modal="true"
         aria-labelledby="backup-success-title"
-        style={{ maxWidth: "560px" }}
+        style={{ maxWidth: "580px" }}
       >
         <div className="modal-header">
           <div className="modal-header__title" style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
@@ -100,7 +102,7 @@ export const BackupSuccessModal: React.FC<{
               fontSize: "0.85rem",
               display: "flex",
               flexDirection: "column",
-              gap: "0.6rem",
+              gap: "0.75rem",
             }}
           >
             <div>
@@ -110,11 +112,11 @@ export const BackupSuccessModal: React.FC<{
 
             {result.filePath && (
               <div>
-                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Kaydedilen Konum:</span>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Kaydedilen Tam Konum:</span>
                 <code
                   style={{
                     display: "block",
-                    padding: "0.4rem 0.6rem",
+                    padding: "0.5rem 0.75rem",
                     background: "var(--bg-card, #ffffff)",
                     border: "1px solid var(--border-subtle, #e2e8f0)",
                     borderRadius: "4px",
@@ -122,6 +124,7 @@ export const BackupSuccessModal: React.FC<{
                     wordBreak: "break-all",
                     fontSize: "0.8rem",
                     fontFamily: "monospace",
+                    marginTop: "0.25rem",
                   }}
                 >
                   {result.filePath}
@@ -129,24 +132,48 @@ export const BackupSuccessModal: React.FC<{
               </div>
             )}
 
-            <div>
-              <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Paket Boyutu:</span>
-              <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{formatFileSize(result.fileSize)}</span>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem" }}>
+              <div>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Paket Boyutu:</span>
+                <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{formatFileSize(result.fileSize)}</span>
+              </div>
+              <div>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem" }}>Oluşturulma Zamanı:</span>
+                <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{formatCreatedTime(result.createdAt)}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+        <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem", flexWrap: "wrap" }}>
           {result.filePath && (
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleReveal}
-              style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
-            >
-              <FolderOpen size={16} />
-              Klasörde Göster
-            </button>
+            <>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={handleReveal}
+                style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+              >
+                <FolderOpen size={16} />
+                Klasörde Göster
+              </button>
+
+              {onRestoreBackup && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    const path = result.filePath!;
+                    onClose();
+                    onRestoreBackup(path);
+                  }}
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}
+                >
+                  <RefreshCw size={16} />
+                  Yedeği Geri Yükle
+                </button>
+              )}
+            </>
           )}
           <button type="button" className="btn btn--save" onClick={onClose}>
             Tamam
@@ -162,11 +189,12 @@ export const BackupSuccessModal: React.FC<{
  */
 export const RestoreProjectModal: React.FC<{
   isOpen: boolean;
+  initialFilePath?: string | null;
   onClose: () => void;
   onSuccess: (message: string, newProjectId?: string) => void;
   onError: (errorMessage: string) => void;
   onOpenProject?: (newProjectId: string) => void;
-}> = ({ isOpen, onClose, onSuccess, onError, onOpenProject }) => {
+}> = ({ isOpen, initialFilePath, onClose, onSuccess, onError, onOpenProject }) => {
   const [fileBuffer, setFileBuffer] = useState<ArrayBuffer | null>(null);
   const [selectedFileName, setSelectedFileName] = useState<string>("");
   const [inspection, setInspection] = useState<BackupInspectionResult | null>(null);
@@ -176,50 +204,79 @@ export const RestoreProjectModal: React.FC<{
   const [restoredResult, setRestoredResult] = useState<{ newProjectId: string; projectName: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // initialFilePath sağlandıysa otomatik yükle
+  useEffect(() => {
+    if (isOpen && initialFilePath) {
+      loadFileFromPath(initialFilePath);
+    }
+  }, [isOpen, initialFilePath]);
+
+  const loadFileFromPath = async (filePath: string) => {
+    setIsInspecting(true);
+    setInspection(null);
+    try {
+      const { readFile } = await import("@tauri-apps/plugin-fs");
+      const bytes = await readFile(filePath);
+      const fileName = filePath.replace(/\\/g, "/").split("/").pop() || "yedek.erpcrm";
+      setSelectedFileName(fileName);
+      setFileBuffer(bytes.buffer);
+
+      const res = await inspectProjectBackup(bytes);
+      setInspection(res);
+      if (res.valid && res.manifest) {
+        setCustomProjectName(`${res.manifest.projectName} (Geri Yüklenen)`);
+      } else {
+        onError(res.error || "Paket bütünlüğü doğrulanamadı.");
+      }
+    } catch (err: any) {
+      onError(`Dosya okunurken hata: ${err?.message || err}`);
+    } finally {
+      setIsInspecting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const handleSelectFile = async () => {
-    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
-      try {
-        const { open } = await import("@tauri-apps/plugin-dialog");
-        const { readFile } = await import("@tauri-apps/plugin-fs");
+    try {
+      const defaultDir = await resolveDefaultBackupDir();
+      const { open } = await import("@tauri-apps/plugin-dialog");
+      const { readFile } = await import("@tauri-apps/plugin-fs");
 
-        const selected = await open({
-          multiple: false,
-          filters: [
-            {
-              name: "ERP CRM Discovery Yedeği",
-              extensions: ["erpcrm"],
-            },
-          ],
-        });
+      const selected = await open({
+        defaultPath: defaultDir || undefined,
+        multiple: false,
+        filters: [
+          {
+            name: "ERP CRM Discovery Yedeği",
+            extensions: ["erpcrm"],
+          },
+        ],
+      });
 
-        if (!selected || typeof selected !== "string") return;
+      if (!selected || typeof selected !== "string") return;
 
-        setIsInspecting(true);
-        setInspection(null);
+      setIsInspecting(true);
+      setInspection(null);
 
-        const bytes = await readFile(selected);
-        const fileName = selected.replace(/\\/g, "/").split("/").pop() || "yedek.erpcrm";
-        setSelectedFileName(fileName);
-        setFileBuffer(bytes.buffer);
+      const bytes = await readFile(selected);
+      const fileName = selected.replace(/\\/g, "/").split("/").pop() || "yedek.erpcrm";
+      setSelectedFileName(fileName);
+      setFileBuffer(bytes.buffer);
 
-        const res = await inspectProjectBackup(bytes);
-        setInspection(res);
-        if (res.valid && res.manifest) {
-          setCustomProjectName(`${res.manifest.projectName} (Geri Yüklenen)`);
-        } else {
-          onError(res.error || "Paket bütünlüğü doğrulanamadı.");
-        }
-        return;
-      } catch (nativeErr) {
-        console.warn("Tauri native open fallback:", nativeErr);
-      } finally {
-        setIsInspecting(false);
+      const res = await inspectProjectBackup(bytes);
+      setInspection(res);
+      if (res.valid && res.manifest) {
+        setCustomProjectName(`${res.manifest.projectName} (Geri Yüklenen)`);
+      } else {
+        onError(res.error || "Paket bütünlüğü doğrulanamadı.");
       }
+    } catch (nativeErr: any) {
+      console.warn("Tauri native open fallback:", nativeErr);
+      fileInputRef.current?.click();
+    } finally {
+      setIsInspecting(false);
     }
-
-    fileInputRef.current?.click();
   };
 
   const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,7 +310,7 @@ export const RestoreProjectModal: React.FC<{
   };
 
   const handleRestore = async () => {
-    if (!fileBuffer || !inspection?.valid) return;
+    if (!fileBuffer || !inspection?.valid || isRestoring) return;
 
     setIsRestoring(true);
     try {
@@ -305,7 +362,7 @@ export const RestoreProjectModal: React.FC<{
               Yedekten Proje Geri Yükle
             </h3>
           </div>
-          <button type="button" className="modal-close-btn" onClick={handleClose} aria-label="Kapat">
+          <button type="button" className="modal-close-btn" onClick={handleClose} aria-label="Kapat" disabled={isRestoring}>
             <X size={18} />
           </button>
         </div>
