@@ -177,20 +177,21 @@ async function testFreshInstallAndIdempotency(): Promise<void> {
   try {
     await runTransactionalMigrations(adapter);
 
+    const totalExpected = MIGRATION_DEFINITIONS.length;
     const migrations = await adapter.select<{ version: number; name: string }[]>(
       "SELECT version, name FROM schema_migrations ORDER BY version ASC"
     );
-    assert(migrations.length === 11, `Temiz kurulumda 11 migration kaydedildi (Mevcut: ${migrations.length})`);
-    assert(migrations[0].version === 1 && migrations[10].version === 11, "v1'den v11'e eksiksiz sıralı uygulandı");
+    assert(migrations.length === totalExpected, `Temiz kurulumda ${totalExpected} migration kaydedildi (Mevcut: ${migrations.length})`);
+    assert(migrations[0].version === 1 && migrations[migrations.length - 1].version === totalExpected, `v1'den v${totalExpected}'e eksiksiz sıralı uygulandı`);
 
     const tableCount = await adapter.select<{ c: number }[]>("SELECT COUNT(*) as c FROM sqlite_master WHERE type='table'");
-    assert(tableCount[0].c >= 24, `Tüm tablolar başarıyla oluşturuldu (Mevcut: ${tableCount[0].c})`);
+    assert(tableCount[0].c >= 25, `Tüm tablolar başarıyla oluşturuldu (Mevcut: ${tableCount[0].c})`);
 
     // İkinci çalıştırma (İdempotency)
     console.log("\n--- 2. İkinci Çalıştırma (Idempotency) Testi ---");
     await runTransactionalMigrations(adapter);
     const postMigrations = await adapter.select<{ version: number }[]>("SELECT version FROM schema_migrations");
-    assert(postMigrations.length === 11, "İkinci çalıştırmada migration sayısı değişmedi (11 korundu)");
+    assert(postMigrations.length === totalExpected, `İkinci çalıştırmada migration sayısı değişmedi (${totalExpected} korundu)`);
 
   } finally {
     adapter.close();
@@ -221,8 +222,9 @@ async function testLegacyV10BaselineUpgrade(): Promise<void> {
     // 2. Transactional runner'ı çalıştır
     await runTransactionalMigrations(adapter);
 
+    const totalExpected = MIGRATION_DEFINITIONS.length;
     const migrations = await adapter.select<{ version: number }[]>("SELECT version FROM schema_migrations ORDER BY version ASC");
-    assert(migrations.length === 11, `Eski v10 DB baseline tespit edilerek v11'e yükseltildi (11 migration mevcut)`);
+    assert(migrations.length === totalExpected, `Eski v10 DB baseline tespit edilerek v${totalExpected}'e yükseltildi (${totalExpected} migration mevcut)`);
 
     const legacyProject = await adapter.select<{ name: string }[]>("SELECT name FROM analysis_projects WHERE id='proj-legacy'");
     assert(legacyProject[0].name === "Eski Proje", "Mevcut kullanıcı projesi veri kaybı olmadan korundu");
@@ -242,15 +244,17 @@ async function testSyntheticFailureAndRollback(): Promise<void> {
   const adapter = new SqliteDbAdapter(tempDb);
 
   try {
-    // v1..v11 tanımlarına ek olarak hatalı v12 ekle
+    const totalExpected = MIGRATION_DEFINITIONS.length;
+    const nextVersion = totalExpected + 1;
+    // Mevcut tanımlara ek olarak hatalı migration ekle
     const failingMigrations = [
       ...MIGRATION_DEFINITIONS,
       {
-        version: 12,
-        description: "Bozuk Sentetik Migration",
+        version: nextVersion,
+        description: `Bozuk Sentetik Migration v${nextVersion}`,
         sql: [
-          `CREATE TABLE test_table_v12 (id TEXT PRIMARY KEY);`,
-          `INSERT INTO test_table_v12 (id) VALUES ('row-1');`,
+          `CREATE TABLE test_table_v${nextVersion} (id TEXT PRIMARY KEY);`,
+          `INSERT INTO test_table_v${nextVersion} (id) VALUES ('row-1');`,
           `INSERT INTO non_existing_table_will_fail (id) VALUES ('fail');`, // HATA
         ],
       },
@@ -261,17 +265,17 @@ async function testSyntheticFailureAndRollback(): Promise<void> {
       await runTransactionalMigrations(adapter, failingMigrations as any);
     } catch (err: any) {
       threw = true;
-      assert(err.message.includes("Migration v12 failed"), "Bozuk migration fail-fast hatası üretti");
+      assert(err.message.includes(`Migration v${nextVersion} failed`), "Bozuk migration fail-fast hatası üretti");
     }
 
     assert(threw, "Migration hatası sessizce yutulmadı, yukarı fırlatıldı");
 
     // Doğrulamalar
     const migrations = await adapter.select<{ version: number }[]>("SELECT version FROM schema_migrations ORDER BY version ASC");
-    assert(migrations.length === 11, "Başarısız olan v12 schema_migrations tablosuna YAZILMADI (11 kaldı)");
+    assert(migrations.length === totalExpected, `Başarısız olan v${nextVersion} schema_migrations tablosuna YAZILMADI (${totalExpected} kaldı)`);
 
-    const tableV12 = await adapter.select<{ name: string }[]>("SELECT name FROM sqlite_master WHERE type='table' AND name='test_table_v12'");
-    assert(tableV12.length === 0, "Transaction rollback sayesinde v12 tabloları GERİ ALINDI (0 tablo)");
+    const tableVNext = await adapter.select<{ name: string }[]>(`SELECT name FROM sqlite_master WHERE type='table' AND name='test_table_v${nextVersion}'`);
+    assert(tableVNext.length === 0, `Transaction rollback sayesinde v${nextVersion} tabloları GERİ ALINDI (0 tablo)`);
 
   } finally {
     adapter.close();
