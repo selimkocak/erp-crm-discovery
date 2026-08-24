@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.3] - 2026-08-24
+
+### Added
+* **Açık Proje Durum Aksiyonları:** Ana liste (`HomeView`) ve Proje Detay (`ProjectDetailView`) ekranlarına belirgin `[Pasife Al]` ve `[Aktifleştir]` durum değiştirme butonları ile onay pencereleri (`ProjectDeactivateModal`) eklendi.
+* **Pasif Proje Veri Koruması ve Uyarı Bandı:** Pasif duruma alınan projelerde soru düzenleme, modül analizi ve yönetişim değişiklikleri kilitlendi; proje detayında açık durum bildirim bandı entegre edildi.
+* **Sentetik İmalat Pilot Veri Seti (Marmara Endüstriyel Sistemler A.Ş.):** Bursa lokasyonlu, 350 çalışanlı, kesikli üretim (makine & endüstriyel otomasyon imalatı) yapan kurumsal aktör için %100 sentetik, gerçekçi ve etik pilot veri seti hazırlandı (`src/demo/manufacturingPilot.ts`).
+* **Kapsamlı Pilot Külliyatı:** 19 kanonik iş fonksiyonu, 94 detaylı örnek soru cevabı, semantik kayıtlar (18 bulgu, 18 gereksinim, 8 risk, 6 proje notu, 6 açık takip bayrağı), 5 yönetişim nesnesi, yetki/sorumluluk matrisi ve SoD riskleri.
+* **Tek Tıkla Örnek Üretim Projesi Oluşturma:** Ana sayfadan doğrudan sentetik pilot projeyi yükleyen kullanıcı dostu onay modalı (`CreateDemoProjectModal`) ve tekrarlı oluşturmalarda benzersiz adlandırma (`(1)`, `(2)`) desteği sağlandı.
+
+---
+
 ## [0.1.2] - 2026-08-24
 
 ### Added
