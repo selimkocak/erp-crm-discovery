@@ -214,8 +214,8 @@ const {
 } = await import('../src/generated/questionPacks.js');
 
 // 1. Pack ID listesi ve mevcudiyet
-assert(AVAILABLE_PACK_IDS.length === 34, `Tam 34 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
-assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 34, `Tam 34 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
+assert(AVAILABLE_PACK_IDS.length === 35, `Tam 35 adet kanonik soru paketi kayıtlı (Bulunan: ${AVAILABLE_PACK_IDS.length})`);
+assert(AVAILABLE_BUSINESS_FUNCTION_CODES.length === 35, `Tam 35 adet iş fonksiyonu için soru paketi mevcut (Bulunan: ${AVAILABLE_BUSINESS_FUNCTION_CODES.length})`);
 
 // 2. Tüm 34 paket için hasQuestionPack() === true ve loadQuestionPack() ok === true paritesi
 for (const bfCode of AVAILABLE_BUSINESS_FUNCTION_CODES) {

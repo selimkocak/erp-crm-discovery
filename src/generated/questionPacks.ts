@@ -26,6 +26,7 @@ import tr_maintenance_corePack from "../../question-packs/tr/maintenance/core.js
 import tr_management_corePack from "../../question-packs/tr/management/core.json";
 import tr_marketing_corePack from "../../question-packs/tr/marketing/core.json";
 import tr_master_data_management_corePack from "../../question-packs/tr/master_data_management/core.json";
+import tr_ot_industrial_data_corePack from "../../question-packs/tr/ot_industrial_data/core.json";
 import tr_payroll_corePack from "../../question-packs/tr/payroll/core.json";
 import tr_procurement_corePack from "../../question-packs/tr/procurement/core.json";
 import tr_production_planning_corePack from "../../question-packs/tr/production_planning/core.json";
@@ -65,6 +66,7 @@ export const CANONICAL_QUESTION_PACKS: Readonly<Record<string, QuestionPack>> = 
   "tr.management.core": tr_management_corePack as unknown as QuestionPack,
   "tr.marketing.core": tr_marketing_corePack as unknown as QuestionPack,
   "tr.master_data_management.core": tr_master_data_management_corePack as unknown as QuestionPack,
+  "tr.ot_industrial_data.core": tr_ot_industrial_data_corePack as unknown as QuestionPack,
   "tr.payroll.core": tr_payroll_corePack as unknown as QuestionPack,
   "tr.procurement.core": tr_procurement_corePack as unknown as QuestionPack,
   "tr.production_planning.core": tr_production_planning_corePack as unknown as QuestionPack,
@@ -105,6 +107,7 @@ export const CANONICAL_CODE_TO_PACK_ID: Readonly<Record<string, string>> = {
   "MANAGEMENT": "tr.management.core",
   "MARKETING": "tr.marketing.core",
   "MASTER_DATA_MANAGEMENT": "tr.master_data_management.core",
+  "OT_INDUSTRIAL_DATA": "tr.ot_industrial_data.core",
   "PAYROLL": "tr.payroll.core",
   "PROCUREMENT": "tr.procurement.core",
   "PRODUCTION_PLANNING": "tr.production_planning.core",
@@ -158,6 +161,13 @@ export const CANONICAL_CODE_TO_PACK_ID: Readonly<Record<string, string>> = {
   "EGITIM_VE_GELISIM": "tr.training.core", // Alias
   "LEARNING_DEVELOPMENT": "tr.training.core", // Alias
   "L_AND_D": "tr.training.core", // Alias
+  "OT_DATA": "tr.ot_industrial_data.core", // OT_INDUSTRIAL_DATA için alias
+  "OT_DISCOVERY": "tr.ot_industrial_data.core", // Alias
+  "ENDUSTRIYEL_VERI": "tr.ot_industrial_data.core", // Türkçe alias
+  "SAHA_VERI_TOPLAMA": "tr.ot_industrial_data.core", // Türkçe alias
+  "OT_IT_DISCOVERY": "tr.ot_industrial_data.core", // Alias
+  "OT_VERI": "tr.ot_industrial_data.core", // Legacy alias
+  "FIELD_DATA": "tr.ot_industrial_data.core", // Alias
 } as const;
 
 /**
@@ -184,6 +194,7 @@ export const CANONICAL_PACK_ID_TO_CODE: Readonly<Record<string, string>> = {
   "tr.management.core": "MANAGEMENT",
   "tr.marketing.core": "MARKETING",
   "tr.master_data_management.core": "MASTER_DATA_MANAGEMENT",
+  "tr.ot_industrial_data.core": "OT_INDUSTRIAL_DATA",
   "tr.payroll.core": "PAYROLL",
   "tr.procurement.core": "PROCUREMENT",
   "tr.production_planning.core": "PRODUCTION_PLANNING",
@@ -224,6 +235,7 @@ export const AVAILABLE_PACK_IDS: readonly string[] = [
   "tr.management.core",
   "tr.marketing.core",
   "tr.master_data_management.core",
+  "tr.ot_industrial_data.core",
   "tr.payroll.core",
   "tr.procurement.core",
   "tr.production_planning.core",
@@ -264,6 +276,7 @@ export const AVAILABLE_BUSINESS_FUNCTION_CODES: readonly string[] = [
   "MANAGEMENT",
   "MARKETING",
   "MASTER_DATA_MANAGEMENT",
+  "OT_INDUSTRIAL_DATA",
   "PAYROLL",
   "PROCUREMENT",
   "PRODUCTION_PLANNING",

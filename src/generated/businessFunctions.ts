@@ -346,6 +346,16 @@ export const BUSINESS_FUNCTION_REGISTRY: readonly BusinessFunctionEntry[] = [
     category_en: "Accounting & Finance",
     sort_order: 33,
     is_active: true,
+  },
+  {
+    code: "OT_INDUSTRIAL_DATA",
+    legacy_code: "OT_VERI",
+    name_tr: "Saha Veri Toplama ve Endüstriyel Veri (OT/IT)",
+    name_en: "Field Data Collection & Industrial OT/IT",
+    category_tr: "Üretim",
+    category_en: "Production",
+    sort_order: 34,
+    is_active: true,
   }
 ] as const;
 
@@ -383,6 +393,7 @@ export const CANONICAL_BUSINESS_FUNCTION_CODES: readonly string[] = [
   "REPORTING_ANALYTICS",
   "COSTING",
   "E_TRANSFORMATION",
+  "OT_INDUSTRIAL_DATA",
 ] as const;
 
 export const CANONICAL_BUSINESS_FUNCTION_CODE_SET = new Set<string>(

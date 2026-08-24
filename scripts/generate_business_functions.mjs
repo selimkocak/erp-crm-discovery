@@ -36,8 +36,8 @@ if (!Array.isArray(entries)) {
 }
 
 // ── Validations ──
-if (entries.length !== 33) {
-  console.error(`[generate] FAIL: Expected exactly 33 business functions, found ${entries.length}`);
+if (entries.length !== 34) {
+  console.error(`[generate] FAIL: Expected exactly 34 business functions, found ${entries.length}`);
   process.exit(1);
 }
 
@@ -259,6 +259,13 @@ ${packDefinitions.map((p) => `  ${JSON.stringify(p.businessFunctionCode)}: ${JSO
   "EGITIM_VE_GELISIM": "tr.training.core", // Alias
   "LEARNING_DEVELOPMENT": "tr.training.core", // Alias
   "L_AND_D": "tr.training.core", // Alias
+  "OT_DATA": "tr.ot_industrial_data.core", // OT_INDUSTRIAL_DATA için alias
+  "OT_DISCOVERY": "tr.ot_industrial_data.core", // Alias
+  "ENDUSTRIYEL_VERI": "tr.ot_industrial_data.core", // Türkçe alias
+  "SAHA_VERI_TOPLAMA": "tr.ot_industrial_data.core", // Türkçe alias
+  "OT_IT_DISCOVERY": "tr.ot_industrial_data.core", // Alias
+  "OT_VERI": "tr.ot_industrial_data.core", // Legacy alias
+  "FIELD_DATA": "tr.ot_industrial_data.core", // Alias
 } as const;
 
 /**

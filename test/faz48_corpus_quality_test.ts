@@ -35,11 +35,11 @@ async function runCorpusQualityTests(): Promise<void> {
 
   // 1. Kapsam ve Sayı Doğrulaması
   console.log("--- 1. Külliyat Hacmi ve Kapsam ---");
-  assert(audit.totalPacks === 34, `34 kanonik soru paketi taranıyor (Mevcut: ${audit.totalPacks})`);
-  assert(audit.totalQuestions === 1492, `1.492 kanonik soru taranıyor (Mevcut: ${audit.totalQuestions})`);
-  assert(audit.requiredQuestions === 792, `792 zorunlu soru mevcut (Mevcut: ${audit.requiredQuestions})`);
-  assert(audit.optionalQuestions === 700, `700 opsiyonel soru mevcut (Mevcut: ${audit.optionalQuestions})`);
-  assert(audit.branchingQuestions === 213, `213 koşullu soru mevcut (Mevcut: ${audit.branchingQuestions})`);
+  assert(audit.totalPacks === 35, `35 kanonik soru paketi taranıyor (Mevcut: ${audit.totalPacks})`);
+  assert(audit.totalQuestions === 1550, `1.550 kanonik soru taranıyor (Mevcut: ${audit.totalQuestions})`);
+  assert(audit.requiredQuestions === 831, `831 zorunlu soru mevcut (Mevcut: ${audit.requiredQuestions})`);
+  assert(audit.optionalQuestions === 719, `719 opsiyonel soru mevcut (Mevcut: ${audit.optionalQuestions})`);
+  assert(audit.branchingQuestions === 222, `222 koşullu soru mevcut (Mevcut: ${audit.branchingQuestions})`);
 
   // 2. Kimlik ve Bileşik Anahtar Bütünlüğü
   console.log("\n--- 2. Kimlik ve Anahtar Bütünlüğü ---");

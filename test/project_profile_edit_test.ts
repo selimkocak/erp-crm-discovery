@@ -340,12 +340,12 @@ async function runTests(): Promise<void> {
   // --- T06: Question Packs & Module Catalog Invariant ---
   console.log("\n--- T06: Soru Paketleri ve Modül İzolasyonu ---");
   const packs = Object.values(CANONICAL_QUESTION_PACKS);
-  assert(packs.length === 34, `34 soru paketi korundu (Bulunan: ${packs.length})`);
+  assert(packs.length === 35, `35 soru paketi korundu (Bulunan: ${packs.length})`);
   let totalQuestions = 0;
   for (const pack of packs) {
     totalQuestions += (pack as any).questions.length;
   }
-  assert(totalQuestions === 1492, `1.492 soru külliyatı korundu (Bulunan: ${totalQuestions})`);
+  assert(totalQuestions === 1550, `1.550 soru külliyatı korundu (Bulunan: ${totalQuestions})`);
 
   console.log("\n=======================================================");
   console.log(`SONUÇ: ${passCount} Geçti, ${failCount} Başarısız`);

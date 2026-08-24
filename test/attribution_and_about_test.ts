@@ -335,12 +335,12 @@ async function runTests(): Promise<void> {
   // T08: Offline-First & AI-Free Integrity
   console.log("\n--- T08: Çevrimdışı (Offline-First) ve AI-Free İlkeleri Doğrulaması ---");
   const packList = Object.values(CANONICAL_QUESTION_PACKS);
-  assert(packList.length === 34, `34 kanonik soru paketi korunuyor (mevcut: ${packList.length})`);
+  assert(packList.length === 35, `35 kanonik soru paketi korunuyor (mevcut: ${packList.length})`);
   let totalQuestions = 0;
   for (const pack of packList) {
     totalQuestions += pack.questions.length;
   }
-  assert(totalQuestions === 1492, `1.492 soru külliyatı bozulmadan korunuyor (mevcut: ${totalQuestions})`);
+  assert(totalQuestions === 1550, `1.550 soru külliyatı bozulmadan korunuyor (mevcut: ${totalQuestions})`);
 
   console.log("\n=======================================================");
   console.log(`Test Sonuçları: ${passCount} Geçti, ${failCount} Başarısız`);

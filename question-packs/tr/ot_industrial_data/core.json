@@ -1,0 +1,1698 @@
+{
+  "meta": {
+    "pack_id": "tr.ot_industrial_data.core",
+    "version": "0.1.0",
+    "schema_version": "1",
+    "language": "tr",
+    "business_function_code": "OT_INDUSTRIAL_DATA",
+    "name": "Saha Veri Toplama ve Endüstriyel Veri Keşfi Ön Analizi",
+    "description": "Fabrika, hat, istasyon, makine, sensör, PLC, kalite cihazı, alarm, enerji ve veri gereksinimlerinin iş hedefinden başlayarak amaca yönelik keşfi (Purpose-Driven Industrial Data Discovery)."
+  },
+  "questions": [
+    {
+      "id": "OTD-001",
+      "order": 1,
+      "process": "OT genel profil",
+      "question": "Fabrikanızdaki üretim ve operasyonel teknoloji (OT) ortamının genel olgunluk düzeyi ve dijitalleşme vizyonu nedir?",
+      "description": "Tesis genelindeki otomasyon, veri toplama ve dijital izleme seviyesinin mevcut durumunu belirler.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "manuel_ve_kagit_uzerinden_yurutulen_klasik_uretim",
+          "label": "Makineler bağımsız çalışır, üretim ve duruş kayıtları operatörler tarafından kâğıt/form ile tutulur"
+        },
+        {
+          "value": "kismi_plc_ve_bagimsiz_sayac_ekranlari_mevcut",
+          "label": "Makinelerde PLC ve yerel paneller vardır ancak merkezi ağ bağlantısı ve otomatik veri toplama yoktur"
+        },
+        {
+          "value": "merkezi_scada_dcs_ve_izleme_ekranlari_aktif",
+          "label": "Tesis genelinde SCADA/DCS altyapısı mevcuttur; hatlar ve istasyonlar merkezi operatör odasından anlık izlenir"
+        },
+        {
+          "value": "mes_ve_otomasyon_entegre_ileri_seviye_ot_altyapisi",
+          "label": "OT katmanı MES ve ERP ile entegre çalışır; otomatik reçete indirme, anlık OEE ve izlenebilirlik aktiftir"
+        },
+        {
+          "value": "diger_ot_olgunluk",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-002",
+      "order": 2,
+      "process": "OT genel profil",
+      "question": "Saha veri toplama projesindeki birincil iş hedefiniz ve çözmek istediğiniz temel kurumsal darboğaz nedir?",
+      "description": "Saha verisi toplama amacının (Purpose-Driven) netleştirilmesi; ERP'ye gereksiz ham telemetri akışını engellemek için iş hedefi belirlenir.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "gercek_zamanli_uretim_miktari_ve_sayac_dogrulugu",
+          "label": "Gerçek zamanlı üretim miktarı, çevrim süreleri ve vardiya sonu fiilî çıktıların doğru tespiti"
+        },
+        {
+          "value": "durus_kayiplari_ve_oee_performans_takibi",
+          "label": "Hat duruşlarının, mikro duruşların ve hız kayıplarının anlık tespiti ve OEE analizi"
+        },
+        {
+          "value": "enerji_ve_kaynak_tuketim_optimizasyonu",
+          "label": "İstasyon/hat bazında enerji, buhar, basınçlı hava ve hammadde tüketimlerinin anlık ölçümü"
+        },
+        {
+          "value": "kalite_parametreleri_ve_fire_hurda_izlenebilirligi",
+          "label": "Ölçüm cihazı entegrasyonu, proses tolerans denetimi ve fire/hurda kök neden analizi"
+        },
+        {
+          "value": "kestirimci_bakim_ve_makine_sagligi_izleme",
+          "label": "Kritik motor ve rulmanların titreşim/sıcaklık takibi ile plansız duruşların önlenmesi"
+        },
+        {
+          "value": "diger_is_hedefi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-003",
+      "order": 3,
+      "process": "OT genel profil",
+      "question": "Saha verilerinin yönetimi ve OT/IT koordinasyonundan kurumunuzda hangi birim veya roller sorumludur?",
+      "description": "OT (Otomasyon, Bakım) ile IT (Bilgi İşlem, Yazılım) arasındaki sorumluluk paylaşımı ve veri sahipliği.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "otomasyon_ve_elektrik_bakim_ekibi",
+          "label": "Otomasyon / Elektrik Elektronik Bakım Departmanı (PLC, sensör, pano ve saha ağı yönetimi)"
+        },
+        {
+          "value": "uretim_ve_endustri_muhendisligi",
+          "label": "Üretim ve Endüstri Mühendisliği (İş etüdü, çevrim süresi ve standart zaman tanımları)"
+        },
+        {
+          "value": "bilgi_teknolojileri_ve_sistem_yonetimi",
+          "label": "Bilgi Teknolojileri (BT/IT) Departmanı (Sunucu, kurumsal ağ, siber güvenlik ve veritabanı)"
+        },
+        {
+          "value": "kalite_guvence_ve_laboratuvar",
+          "label": "Kalite Güvence ve Laboratuvar (Ölçüm cihazları, kalibrasyon ve test sonuçları)"
+        },
+        {
+          "value": "diger_sorumlu_ekip",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-004",
+      "order": 4,
+      "process": "Fabrika, üretim alanı ve hat yapısı",
+      "question": "Üretim tesisinizin fiziksel yerleşim ve üretim alanı (Plant / Area / Line) hiyerarşisi nasıl yapılandırılmıştır?",
+      "description": "Tesis içindeki fabrika, atölye, ana hat, besleme hattı ve fason alanların organizasyonel yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tek_kampuste_tek_fabrika_ve_dogrusal_surekli_hatlar",
+          "label": "Tek bir fabrika sahası altında birbirini takip eden doğrusal/akış tipi üretim hatları"
+        },
+        {
+          "value": "coklu_bina_atolye_ve_bagimsiz_hucre_tipi_uretim",
+          "label": "Farklı binalar veya atölyelerde çalışan bağımsız iş hücreleri (Cellular Manufacturing)"
+        },
+        {
+          "value": "kesikli_ve_proses_tipi_hibrit_fabrika_yapisi",
+          "label": "Kimyasal/proses hazırlık fazı ile montaj/şekillendirme kesikli fazının bir arada olduğu hibrit yapı"
+        },
+        {
+          "value": "cok_lokasyonlu_ve_cografi_olarak_dagitik_tesisler",
+          "label": "Farklı şehirlerde veya sanayi bölgelerinde bulunan çoklu fabrika ve depo yerleşkeleri"
+        },
+        {
+          "value": "diger_yerlesim_yapisi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-005",
+      "order": 5,
+      "process": "Fabrika, üretim alanı ve hat yapısı",
+      "question": "Tesis genelinde kaç ana üretim hattı veya ana proses alanı bulunmaktadır?",
+      "description": "Veri toplama kapsamına alınacak toplam hat ve alan büyüklüğü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "1_3_arasi_ana_hat",
+          "label": "1 - 3 arası ana hat (Kompakt / odaklı üretim alanı)"
+        },
+        {
+          "value": "4_10_arasi_ana_hat",
+          "label": "4 - 10 arası ana hat (Orta ölçekli fabrika yapısı)"
+        },
+        {
+          "value": "11_25_arasi_ana_hat",
+          "label": "11 - 25 arası ana hat (Büyük ölçekli çok hatlı fabrika)"
+        },
+        {
+          "value": "25_uzeri_hat_ve_coklu_hol",
+          "label": "25'ten fazla hat ve çoklu üretim holü (Geniş entegre sanayi kompleksi)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-006",
+      "order": 6,
+      "process": "Fabrika, üretim alanı ve hat yapısı",
+      "question": "Üretim hatları arasındaki malzeme akışı ve hatlar arası yarı mamul tampon (buffer) alanları nasıl izlenmektedir?",
+      "description": "Hatlar arası darboğazların ve ara stok beklemelerinin tespiti.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "tampon_alanlar_sistemik_olarak_izlenmemektedir",
+          "label": "Hat aralarındaki yarı mamuller görsel/manuel yönetilir, anlık stok takip edilmez"
+        },
+        {
+          "value": "kasa_koli_barkod_okutma_ile_manuel_izlenmektedir",
+          "label": "Hat çıkışında ve girişinde el terminali ile barkod okutularak transfer kaydı açılır"
+        },
+        {
+          "value": "otomatik_konveyor_ve_sensorler_ile_anlik_izlenmektedir",
+          "label": "Konveyör üzerindeki fotosel, RFID veya tartım sensörleri ile ara tampon seviyesi otomatik okunur"
+        },
+        {
+          "value": "diger_tampon_izleme",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-007",
+      "order": 7,
+      "process": "İstasyon profili",
+      "question": "Üretim hatlarında yer alan tipik istasyon/makine çeşitliliği ve yapısı nasıldır?",
+      "description": "İstasyonların homojen veya heterojen makine parkı niteliği.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "standart_ve_tek_tip_makine_parki",
+          "label": "Benzer marka/model CNC, enjeksiyon veya preslerden oluşan homojen makine grubu"
+        },
+        {
+          "value": "farkli_nesil_ve_markalardan_olusan_heterojen_park",
+          "label": "Eski mekanik preslerden modern CNC ve robotik hücrelere kadar farklı yaş ve teknolojide heterojen yapı"
+        },
+        {
+          "value": "agir_proses_firin_reaktor_ve_surekli_hat_istasyonlari",
+          "label": "Fırın, reaktör, ekstrüder, kazan gibi sürekli proses parametrelerine sahip istasyonlar"
+        },
+        {
+          "value": "agirlikli_manuel_montaj_ve_el_aleti_istasyonlari",
+          "label": "Operatörün el aletleri ve montaj masalarında çalıştığı manuel istasyonlar"
+        },
+        {
+          "value": "diger_istasyon_cesitliligi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-008",
+      "order": 8,
+      "process": "İstasyon profili",
+      "question": "Tipik bir kritik üretim istasyonunda anlık olarak hangi durum sinyalleri üretilmektedir?",
+      "description": "İstasyonun operasyonel durumunun (Running, Idle, Fault, Setup vb.) tespiti.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "calisiyor_uretimde_sinyali",
+          "label": "Çalışıyor / Üretimde (Run / Executing) sinyali"
+        },
+        {
+          "value": "hazir_beklemede_idle_sinyali",
+          "label": "Hazır / Malzeme Bekliyor / Boşta (Idle / Standby) sinyali"
+        },
+        {
+          "value": "ariza_alarm_durus_sinyali",
+          "label": "Arıza / Alarm / Hata Duruşu (Alarm / Breakdown) sinyali"
+        },
+        {
+          "value": "ayar_kalip_degisimi_setup_sinyali",
+          "label": "Kalıp Değişimi / Ayar / Hazırlık (Setup / Changeover) sinyali"
+        },
+        {
+          "value": "bakim_temizlik_sinyali",
+          "label": "Planlı Bakım / Otonom Temizlik (Maintenance / Cleaning) sinyali"
+        },
+        {
+          "value": "diger_istasyon_sinyali",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-009",
+      "order": 9,
+      "process": "İstasyon profili",
+      "question": "İstasyonlardaki ışıklı ikaz kolonları (Andon kulesi / Tower Light) ve sinyal lambaları nasıl yönetilmektedir?",
+      "description": "Yeşil, Sarı, Kırmızı, Mavi Andon lambalarının dijitalleştirilme durumu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "yalnizca_gorsel_saha_uyarisi_olarak_kullanilir",
+          "label": "Lambalar sadece operatör ve formenin görmesi içindir; dijital kayıt veya log tutulmaz"
+        },
+        {
+          "value": "lamba_voltajindan_role_veya_optokuplor_ile_sinyal_alinabilir",
+          "label": "Andon lambalarına paralel röle veya kablosuz smart-socket eklenerek durum izlenebilir"
+        },
+        {
+          "value": "plc_uzerinden_dijital_olarak_merkezi_sisteme_aktarilir",
+          "label": "Lamba durumları PLC'de tag olarak tanımlıdır ve merkezi SCADA/MES'e anlık akar"
+        },
+        {
+          "value": "andon_kulesi_kullanilmamaktadir",
+          "label": "Makinelerde ışıklı ikaz kulesi bulunmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-010",
+      "order": 10,
+      "process": "Üretim amacı ve karar ihtiyacı",
+      "question": "Toplanan saha verisi ile hangi yönetimsel kararların tetiklenmesi hedeflenmektedir?",
+      "description": "Veri toplamanın sonucunda üretilecek somut iş aksiyonları.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "is_emri_kapanisi_ve_gerceklesen_maliyet_hesabi",
+          "label": "İş emrinin fiilî bitirilmesi, teyit (confirmation) verilmesi ve standart-fiilî maliyet farkı analizi"
+        },
+        {
+          "value": "dinamik_cizelgeleme_ve_hat_dengeleme",
+          "label": "Geciken iş emirlerinde planın dinamik güncellenmesi ve hat yükünün yeniden dengelenmesi"
+        },
+        {
+          "value": "otomatik_bakim_is_emri_acma",
+          "label": "Çalışma saati veya arıza sinyali eşik değerini aştığında CMMS/ERP'de otomatik bakım emri açılması"
+        },
+        {
+          "value": "hammadde_besleme_ve_kanban_tetikleme",
+          "label": "Hat başı malzeme azaldığında depoya otomatik ikmal (replenishment / Andon) çağrısı düşmesi"
+        },
+        {
+          "value": "diger_yonetim_karari",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-011",
+      "order": 11,
+      "process": "Üretim amacı ve karar ihtiyacı",
+      "question": "Üretim yönetimi için en kritik OEE ve performans metriği hedefiniz nedir?",
+      "description": "Kullanılabilirlik, Performans ve Kalite oranlarının önceliklendirilmesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "kullanilabilirlik_odakli_durus_minimizasyonu",
+          "label": "Kullanılabilirlik (Availability): Arıza, kalıp değişimi ve malzeme bekleme sürelerini düşürmek"
+        },
+        {
+          "value": "performans_odakli_cevrim_hizi_artisi",
+          "label": "Performans (Performance): İdeal çevrim süresine yaklaşmak, mikro duruş ve hız kayıplarını engellemek"
+        },
+        {
+          "value": "kalite_odakli_ilk_seferde_dogru_orani",
+          "label": "Kalite (Quality): İlk seferde doğru üretme oranını (FTQ) artırmak ve hurdayı sıfıra yaklaştırmak"
+        },
+        {
+          "value": "dengeli_tam_oee_skorlamasi",
+          "label": "Tüm hatlar için Kullanılabilirlik × Performans × Kalite bileşik OEE skorunu uçtan uca yönetmek"
+        }
+      ]
+    },
+    {
+      "id": "OTD-012",
+      "order": 12,
+      "process": "Üretim amacı ve karar ihtiyacı",
+      "question": "Saha veri toplama projesinde 'her veriyi toplayalım' yerine 'karar için gerekli amaca yönelik veri' prensibi uygulanmış mıdır?",
+      "description": "Veri kirliliğini ve ERP/veritabanı şişmesini önleyen mimari prensip denetimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "amaca_yonelik_filtreli_veri_toplama_kurali_benimsenmistir",
+          "label": "Evet; yalnızca somut bir karar, aksiyon veya rapor üreten anlamlı business event'ler toplanacaktır"
+        },
+        {
+          "value": "butun_verileri_toplayalim_yaklasimi_filtresiz_risk_tasir",
+          "label": "Hayır; sahadaki tüm PLC değişkenlerinin doğrudan ERP veritabanına yazılması düşünülmektedir (Yüksek Risk)"
+        },
+        {
+          "value": "henuz_veri_kriteri_belirlenmemistir",
+          "label": "Hangi verilerin gerekli olduğu henüz analiz edilmemiştir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-013",
+      "order": 13,
+      "process": "Girdiler ve malzeme tüketimi",
+      "question": "İstasyonlarda tüketilen hammadde, yardımcı madde ve bileşenlerin takibi nasıl yapılmaktadır?",
+      "description": "Silo, tank, rulo, palet seviyesinde malzeme tüketiminin sahadan ölçümü.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "teorik_recete_uzerinden_ters_kayit_backflush",
+          "label": "Fiilî ölçüm yapılmaz; üretilen mamul adedine göre reçeteden otomatik düşülür (Backflush)"
+        },
+        {
+          "value": "silo_tank_seviye_ve_debi_sensorleri_ile_otomatik",
+          "label": "Silo/tanklardaki seviye sensörleri, yük hücreleri (load cell) veya debimetreler ile anlık ölçülür"
+        },
+        {
+          "value": "operator_tarafindan_lot_parti_barkodu_okutularak",
+          "label": "Operatör istasyona malzeme yüklerken hammadde lot/parti barkodunu okutur ve miktar girer"
+        },
+        {
+          "value": "tartim_ve_dozajlama_sistemi_entegre",
+          "label": "Otomatik dozajlama ve tartım sistemi PLC üzerinden fiilî tüketim miktarını net kaydeder"
+        },
+        {
+          "value": "diger_malzeme_takibi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-014",
+      "order": 14,
+      "process": "Girdiler ve malzeme tüketimi",
+      "question": "Silo, tank veya kritik hammadde stoklarında minimum seviye eşik uyarısı ve otomatik ikmal (replenishment) mekanizması var mıdır?",
+      "description": "Silo/tank seviye sensörleri seçildiğinde açılan eşik ve sipariş tetikleme akışı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-013",
+        "operator": "equals",
+        "value": "silo_tank_seviye_ve_debi_sensorleri_ile_otomatik"
+      },
+      "options": [
+        {
+          "value": "plc_esik_sinyali_ile_satinalma_ve_depoya_otomatik_uyari",
+          "label": "Seviye kritik eşiğin altına indiğinde PLC alarm üretir ve ERP/WMS'te otomatik ikmal talebi açılır"
+        },
+        {
+          "value": "yalnizca_saha_panosunda_gorsel_seviye_gostergesi",
+          "label": "Seviye sadece saha panosunda analog/dijital gösterilir, sisteme otomatik sinyal iletilmez"
+        },
+        {
+          "value": "vardiya_basinda_manuel_kontrol_edilir",
+          "label": "Vardiya başında operatör tarafından görsel olarak kontrol edilir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-015",
+      "order": 15,
+      "process": "Girdiler ve malzeme tüketimi",
+      "question": "Hammadde değişkenliği (nem, yoğunluk, viskozite vb.) reçete veya makine çalışma parametrelerini etkiliyor mu?",
+      "description": "Girdi kalitesine göre proses parametresi düzeltme ihtiyacı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "evet_sensor_veya_laboratuvar_olcumune_gore_parametre_ayarlanir",
+          "label": "Evet; parti bazında nem/viskozite ölçülerek makine sıcaklık veya hız parametreleri revize edilir"
+        },
+        {
+          "value": "hayir_hammadde_standarttir_parametre_degismez",
+          "label": "Hayır; hammadde homojendir, standart reçete parametreleri uygulanır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-016",
+      "order": 16,
+      "process": "Çıktılar, üretim miktarı ve fire",
+      "question": "Üretim çıktısı ve parça adetleri sahadan nasıl sayılmakta ve doğrulanmaktadır?",
+      "description": "Üretim sayacının donanımsal ve mantıksal kaynağı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "plc_ve_sensor_uzerinden_otomatik_cevrim_sayaci",
+          "label": "Makinadaki enkoder, fotosel, endüktif sensör veya PLC çevrim tamamlandı sinyali ile otomatik"
+        },
+        {
+          "value": "cikis_konveyoru_vizyon_kamera_veya_tartim_sayaci",
+          "label": "Hat sonundaki kamera/vizyon sistemi veya otomatik tartım konveyörü üzerinden"
+        },
+        {
+          "value": "koli_palet_etiketleme_aninda_barkod_okutma",
+          "label": "Paketleme veya kolileme aşamasında operatörün etiket basıp okutması ile"
+        },
+        {
+          "value": "vardiya_sonu_manuel_sayim_ve_form_girisi",
+          "label": "Vardiya bitiminde manuel sayılıp kâğıt forma veya ERP ekranına elle girilerek"
+        },
+        {
+          "value": "diger_sayac_yontemi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-017",
+      "order": 17,
+      "process": "Çıktılar, üretim miktarı ve fire",
+      "question": "Üretim miktarı sayacında çoklu kalıp, çok gözlü baskı (cavity) veya takım vuruş katsayısı nasıl yönetilir?",
+      "description": "Bir makine vuruşunda birden fazla ürün çıkması durumunun matematiksel çarpanı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-016",
+        "operator": "equals",
+        "value": "plc_ve_sensor_uzerinden_otomatik_cevrim_sayaci"
+      },
+      "options": [
+        {
+          "value": "aktif_kalip_koduna_gore_carpan_otomatik_hesaplanir",
+          "label": "Kalıp/reçete kodundan kalıp göz sayısı (örneğin 8 göz) okunarak vuruş sayısı ile çarpılır"
+        },
+        {
+          "value": "plc_icinde_sabit_carpan_kullanilir",
+          "label": "PLC içinde sabit katsayı vardır, kalıp değiştikçe PLC programından güncellenir"
+        },
+        {
+          "value": "her_vurus_tek_urun_uretir_carpan_birebirdir",
+          "label": "Makineler tek gözlüdür, 1 sinyal = 1 ürün eşleşmesi geçerlidir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-018",
+      "order": 18,
+      "process": "Çıktılar, üretim miktarı ve fire",
+      "question": "Üretim sırasında oluşan fire, hurda ve yeniden işleme (rework) miktarları nasıl ayrıştırılmaktadır?",
+      "description": "Fire adetlerinin ve neden kodlarının sahadan toplanması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "operator_panelinden_hurda_butonu_ve_neden_kodu_secimi",
+          "label": "Operatör HMI/dokunmatik ekrandan hurda butonuna basarak neden kodunu seçer"
+        },
+        {
+          "value": "otomatik_red_istasyonu_ve_reject_sensörü_sayaci",
+          "label": "Otomatik kontrol istasyonunda tolerans dışı ürün ayrıştırma pistonu (reject) sayacı ile"
+        },
+        {
+          "value": "kalite_kontrol_tarafindan_manuel_hurda_tutanagi",
+          "label": "Kalite kontrolcü tarafından parti bazında manuel tutanak tutularak sisteme girilir"
+        },
+        {
+          "value": "fire_ve_hurda_anlik_ayristirilmamaktadir",
+          "label": "Fire anlık ayrıştırılmaz, dönem sonu hammadde-mamul mutabakatında genel fark olarak çıkar"
+        },
+        {
+          "value": "diger_fire_takibi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-019",
+      "order": 19,
+      "process": "Enerji",
+      "question": "Tesisinizde elektrik, doğalgaz, su, buhar ve basınçlı hava tüketimleri hangi seviyede ölçülmektedir?",
+      "description": "Enerji izleme granülaritesi ve enerji analizörü altyapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "yalnizca_ana_giris_ve_dagitim_trafo_sayaclari",
+          "label": "Yalnızca tesis ana giriş elektrik sayacı ve ana doğalgaz/su fatura sayaçları okunur"
+        },
+        {
+          "value": "bolum_ve_hat_panolari_seviyesinde_enerji_analizorleri",
+          "label": "Ana üretim holleri ve hat bazlı tali panolarda Modbus/Ethernet enerji analizörleri mevcuttur"
+        },
+        {
+          "value": "makine_ve_istasyon_bazinda_alt_olcum_submetering",
+          "label": "Her kritik makine ve fırında bağımsız enerji analizörü ve debimetre ile bireysel tüketim ölçülür"
+        },
+        {
+          "value": "enerji_sayaclari_dijital_olarak_okunmamaktadir",
+          "label": "Sayaçlar mekaniktir veya dijital merkezi izleme altyapısı bulunmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-020",
+      "order": 20,
+      "process": "Enerji",
+      "question": "Enerji ve kaynak tüketim verileri hangi sıklıkta toplanmakta ve hangi yönetim kararına girdi sağlamaktadır?",
+      "description": "Enerji verisinin karar desteği: Birim ürün başına enerji maliyeti, tepe güç (peak demand) veya kaçak tespiti.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-019",
+        "operator": "equals",
+        "value": "makine_ve_istasyon_bazinda_alt_olcum_submetering"
+      },
+      "options": [
+        {
+          "value": "is_emri_ve_urun_basina_gercek_enerji_maliyeti_hesabi",
+          "label": "İş emri bazında ürün başına fiilî kWh ve enerji maliyeti yüklenmesi"
+        },
+        {
+          "value": "tepe_guc_ve_reaktif_ceza_asimi_onleme",
+          "label": "Sözleşme tepe gücü aşımını ve reaktif ceza riskini önlemek için anlık yük atma"
+        },
+        {
+          "value": "basincli_hava_ve_gaz_kacaklarinin_anlik_tespiti",
+          "label": "Duruş anında tüketim devam ediyorsa basınçlı hava/gaz kaçağı alarmı üretilmesi"
+        },
+        {
+          "value": "karbon_ayak_izi_ve_surdurulebilirlik_raporlamasi",
+          "label": "ISO 50001 ve kurumsal sürdürülebilirlik/karbon ayak izi hesaplamaları"
+        }
+      ]
+    },
+    {
+      "id": "OTD-021",
+      "order": 21,
+      "process": "Enerji",
+      "question": "Enerji analizörleri ve debimetreler hangi haberleşme protokolleri üzerinden merkezi sisteme bağlanmaktadır?",
+      "description": "Enerji sayaçlarının fiziksel ve mantıksal iletişim altyapısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "modbus_rtu_rs485_seri_hat",
+          "label": "Modbus RTU (RS-485 papatya dizilimi - Daisy Chain)"
+        },
+        {
+          "value": "modbus_tcp_veya_ethernet_ip_uzerinden_ip_ag",
+          "label": "Modbus TCP veya Ethernet/IP üzerinden yerel IP ağı"
+        },
+        {
+          "value": "lorawan_veya_kablosuz_iot_sensor_agi",
+          "label": "LoRaWAN, Zigbee veya kablosuz endüstriyel IoT ağı"
+        },
+        {
+          "value": "pulse_sayici_dijital_girisler_uzerinden",
+          "label": "Sayaç pulse (darbe) çıkışlarının PLC dijital girişine bağlanmasıyla"
+        }
+      ]
+    },
+    {
+      "id": "OTD-022",
+      "order": 22,
+      "process": "Operatör ve manuel veri girişi",
+      "question": "İstasyonlarda operatörlerin veri girişi, iş emri seçimi veya duruş bildirimi yapabileceği donanım arayüzleri nelerdir?",
+      "description": "Saha operatör etkileşim cihazları ve HMI altyapısı.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "endustriyel_panel_pc_veya_dokunmatik_hmi",
+          "label": "Hat başında sabit endüstriyel Panel PC veya makineye entegre dokunmatik HMI"
+        },
+        {
+          "value": "mobil_el_terminali_veya_endustriyel_tablet",
+          "label": "Mobil el terminali, barkod okuyuculu PDA veya dayanıklı (rugged) tablet"
+        },
+        {
+          "value": "kablolu_kablosuz_2d_karekod_barkod_okuyucu",
+          "label": "İstasyona bağlı el tipi kablolu/Bluetooth 1D/2D barkod ve karekod tabancası"
+        },
+        {
+          "value": "buton_kutusu_ve_fiziksel_secici_anahtarlar",
+          "label": "Fiziksel buton kutusu (Duruş, Çağrı, Arıza butonları)"
+        },
+        {
+          "value": "herhangi_bir_operator_arayuzu_bulunmamaktadir",
+          "label": "İstasyonlarda operatör arayüzü yoktur, operatörler veri girmez"
+        }
+      ]
+    },
+    {
+      "id": "OTD-023",
+      "order": 23,
+      "process": "Operatör ve manuel veri girişi",
+      "question": "Operatörlerin makine başında vardiya başlangıcı, mola ve iş emri başlatma kimlik doğrulaması nasıl yapılmaktadır?",
+      "description": "Operatör login ve yetkilendirme mekanizması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "personel_rfid_kart_veya_manyetik_yaka_karti_okutma",
+          "label": "Personel RFID yaka kartı / NFC kart okutularak hızlı giriş yapılır"
+        },
+        {
+          "value": "dokunmatik_ekrandan_sicil_no_ve_sifre_girisi",
+          "label": "Ekranda açılan klavyeden sicil numarası ve PIN/şifre girilerek"
+        },
+        {
+          "value": "is_emri_barkodu_okutuldugunda_otomatik_atanir",
+          "label": "İş emri kâğıdındaki barkod okutulur, o hattın sorumlu operatörü otomatik atanır"
+        },
+        {
+          "value": "kisi_bazli_giris_yapilmaz_istasyon_ortak_kullanilir",
+          "label": "Kişi bazlı oturum açılmaz; istasyon genel operatör hesabıyla sürekli açıktır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-024",
+      "order": 24,
+      "process": "Operatör ve manuel veri girişi",
+      "question": "Makineler durduğunda operatörün duruş nedenini seçmesi zorunlu tutulmakta mıdır?",
+      "description": "Duruş sınıflandırma disiplini ve operatör teyit akışı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "esik_sureyi_asan_her_durusta_ekran_kilitlenir_neden_zorunludur",
+          "label": "Evet; örneğin 2 dakikayı aşan duruşta ekran kilitlenir, neden seçilmeden üretime devam edilemez"
+        },
+        {
+          "value": "durus_nedeni_secimi_serbesttir_zorlama_yoktur",
+          "label": "Duruş nedeni ekranı açılır ancak seçim zorunlu değildir, operatör boş geçebilir"
+        },
+        {
+          "value": "durus_nedenleri_vardiya_sonunda_toplu_olarak_girilir",
+          "label": "Anlık neden girilmez; vardiya amiri vardiya sonunda duruşları tahminî olarak doldurur"
+        },
+        {
+          "value": "durus_nedeni_takibi_yapilmamaktadir",
+          "label": "Duruş nedenleri kayıt altına alınmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-025",
+      "order": 25,
+      "process": "Kalite ve laboratuvar cihazları",
+      "question": "Üretim ve kalite kontrol süreçlerinde dijital ölçüm veya laboratuvar test cihazları kullanılmakta mıdır?",
+      "description": "CMM, profil projektör, spektrometre, sertlik ölçme, çekme-kopma ve dijital kumpas varlığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "cmm_spektrometre_ve_dijital_test_cihazlari_aktif_kullanilir",
+          "label": "Evet; CMM, 3D tarayıcı, spektrometre, sertlik ölçüm cihazları ve dijital ölçüm istasyonları vardır"
+        },
+        {
+          "value": "yalnizca_manuel_kumpas_mikrometre_ve_mastarlar_vardir",
+          "label": "Yalnızca mekanik/dijital el kumpasları, mikrometreler ve geçe-geçmeze mastarları kullanılır"
+        },
+        {
+          "value": "laboratuvar_testleri_tamamen_dis_kaynaktan_alinir",
+          "label": "Tesis içinde cihaz yoktur, numuneler akredite dış laboratuvarlara gönderilir"
+        },
+        {
+          "value": "kalite_olcum_cihazi_kullanilmamaktadir",
+          "label": "Özel bir kalite ölçüm cihazı kullanılmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-026",
+      "order": 26,
+      "process": "Kalite ve laboratuvar cihazları",
+      "question": "Ölçüm cihazlarının (CMM, Spektrometre, Terazi vb.) test ve muayene sonuçları sisteme nasıl aktarılmaktadır?",
+      "description": "Ölçüm cihazları varlığında veri aktarım yöntemi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-025",
+        "operator": "equals",
+        "value": "cmm_spektrometre_ve_dijital_test_cihazlari_aktif_kullanilir"
+      },
+      "options": [
+        {
+          "value": "cihaz_yazilimi_otomatik_olarak_pdf_csv_veya_excel_dosyasi_uretir",
+          "label": "Cihaz yazılımı yerel klasöre otomatik PDF, CSV veya Excel raporu kaydeder"
+        },
+        {
+          "value": "rs232_usb_veya_tcp_ip_uzerinden_anlik_veri_aktarir",
+          "label": "Cihaz RS-232, USB sanal COM veya TCP soket üzerinden ölçülen değerleri anlık iletir"
+        },
+        {
+          "value": "operator_ekrandaki_degeri_okuyup_erp_kalite_ekranina_elle_yazar",
+          "label": "Operatör cihaz ekranındaki değeri okuyup kalite kontrol formuna veya ERP'ye elle yazar"
+        },
+        {
+          "value": "sonuclar_yalnizca_cihazin_kendi_bilgisayarinda_saklanir",
+          "label": "Sonuçlar yalnızca cihazın lokal diskinde arşivlenir, kurumsal ağa aktarılmaz"
+        }
+      ]
+    },
+    {
+      "id": "OTD-027",
+      "order": 27,
+      "process": "Kalite ve laboratuvar cihazları",
+      "question": "Ölçüm sonucunda tolerans dışı (FAIL / Red) bir değer çıktığında sistem nasıl bir otomatik aksiyon üretmelidir?",
+      "description": "Kalite hatasında hattı durdurma, karantina etiketi veya bildirim akışı.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ilgili_istasyona_kilit_sinyali_gonderilip_uretim_durdurulmali",
+          "label": "İstasyona PLC kilit sinyali gönderilerek tolerans aşımında yeni ürün işlenmesi engellenmeli"
+        },
+        {
+          "value": "otomatik_karantina_etiketi_basilmali_ve_stok_bloke_edilmeli",
+          "label": "ERP/WMS'te parça veya lot durumu anında 'Karantina / Bloke' statüsüne çekilmeli"
+        },
+        {
+          "value": "kalite_yoneticisine_ve_vardiya_amirine_anlik_bildirim_gitmeli",
+          "label": "Kalite mühendisi ve hat liderine e-posta / SMS / push bildirim iletilmeli"
+        },
+        {
+          "value": "otomatik_aksiyon_gerekmez_operator_manuel_yonetir",
+          "label": "Sistemik aksiyon gerekmez, operatör karantina alanına parçayı elle ayırır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-028",
+      "order": 28,
+      "process": "Makine sağlığı ve bakım",
+      "question": "Makinelerdeki kritik mekanik aksamların (motor, redüktör, mil, rulman) sağlık durumu nasıl izlenmektedir?",
+      "description": "Kestirimci bakım ve durum izleme (Condition Monitoring) altyapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "titresim_sicaklik_ve_akım_sensorleri_ile_anlik_telemetri",
+          "label": "Titreşim, sıcaklık ve akım sensörleri ile anlık izlenir, anomali eşiklerinde uyarı verilir"
+        },
+        {
+          "value": "periyodik_bakim_ekibinin_manuel_vibrasyon_ve_termal_olcumu",
+          "label": "Bakım ekibi periyodik turlarda el tipi termal kamera ve vibrasyon cihazı ile ölçüm yapar"
+        },
+        {
+          "value": "yalnizca_calisma_saati_ve_vurus_sayacina_gore_bakim",
+          "label": "Sensör takibi yoktur; makinenin çalışma saati veya çevrim adedine göre planlı bakım yapılır"
+        },
+        {
+          "value": "reaktif_yaklasim_ariza_yaptikca_bakim_onarim_yapilir",
+          "label": "Makineler bozulana kadar çalıştırılır, arıza oluştuğunda müdahale edilir (Run-to-failure)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-029",
+      "order": 29,
+      "process": "Makine sağlığı ve bakım",
+      "question": "Makinelerden toplanan çalışma saati, çevrim sayısı veya arıza sinyalleri Bakım Yönetim Sistemi (CMMS/ERP) ile entegre midir?",
+      "description": "Bakım iş emri açma ve sayaç entegrasyonu.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-028",
+        "operator": "equals",
+        "value": "titresim_sicaklik_ve_akım_sensorleri_ile_anlik_telemetri"
+      },
+      "options": [
+        {
+          "value": "otomatik_sayac_ve_ariza_tetiklemeli_bakim_is_emri",
+          "label": "Evet; çalışma saati veya anomali tespit edildiğinde CMMS'te otomatik bakım emri açılır"
+        },
+        {
+          "value": "veriler_otomasyon_ekraninda_kalir_bakim_emri_manuel_acilir",
+          "label": "Veriler SCADA'da izlenir ancak bakım emri sistemden bağımsız olarak manuel açılır"
+        },
+        {
+          "value": "cmms_yazilimi_kullanilmamaktadir",
+          "label": "Kurumumuzda dijital bir CMMS/Bakım yazılımı bulunmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-030",
+      "order": 30,
+      "process": "Makine sağlığı ve bakım",
+      "question": "Kritik kalıp, bıçak, elektrot ve takımların aşınma ömrü (tool life) nasıl izlenmektedir?",
+      "description": "Takım ömrü ve bileme/değiştirme çevrim takibi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "vurus_ve_baski_sayisi_uzerinden_otomatik_omur_sayaci",
+          "label": "Kalıp/takım RFID veya kodu ile eşlenir, PLC vuruş sayısı üzerinden kalan ömür izlenir"
+        },
+        {
+          "value": "kalip_ve_takim_bakim_kartlari_uzerinden_manuel_takip",
+          "label": "Kalıphane tarafından fiziksel bakım kartları ve Excel tabloları ile takip edilir"
+        },
+        {
+          "value": "parcada_capak_veya_olcu_bozulunca_degistirilir",
+          "label": "Ömür takibi yapılmaz; parçada çapak veya kalite bozulması görülünce müdahale edilir"
+        },
+        {
+          "value": "takim_ve_kalip_kullanilmayan_proses",
+          "label": "Üretim sürecimizde kalıp/bıçak aşınma ömrü takibi gerekmemektedir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-031",
+      "order": 31,
+      "process": "Alarm ve aksiyon",
+      "question": "Makineler ve SCADA sistemleri tarafından üretilen arıza ve alarmlar nasıl sınıflandırılmaktadır?",
+      "description": "ISA-18.2 standartlarına göre kritik, majör ve minör alarm hiyerarşisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "isa182_uyumlu_onceliklendirilmis_ve_filtrelenmis_alarm_hiyerarsisi",
+          "label": "Alarmlar Kritik (Durduran), Majör (Hız düşüren) ve Bilgilendirme olarak önceliklendirilmiştir"
+        },
+        {
+          "value": "tum_alarmlar_ayni_seviyede_ve_onceliksiz_gorunur",
+          "label": "Tüm alarmlar aynı listede akar, öncelik veya filtreleme ayrımı yoktur (Alarm Yorgunluğu Riski)"
+        },
+        {
+          "value": "yalnizca_makine_ekraninda_anlik_gosterilir_kayit_tutulmaz",
+          "label": "Alarm yalnızca o an HMI ekranda yanıp söner, geçmiş kayıt (log) tutulmaz"
+        },
+        {
+          "value": "alarm_yonetimi_mevcut_degildir",
+          "label": "Makinelerde yapılandırılmış bir alarm sistemi bulunmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-032",
+      "order": 32,
+      "process": "Alarm ve aksiyon",
+      "question": "Üretilen her kritik alarm için tanımlı bir sorumlu, müdahale süresi (SLA) ve beklenen aksiyon var mıdır?",
+      "description": "Alarm yönetiminde 'Alarm = Aksiyon' prensibi denetimi.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-031",
+        "operator": "equals",
+        "value": "isa182_uyumlu_onceliklendirilmis_ve_filtrelenmis_alarm_hiyerarsisi"
+      },
+      "options": [
+        {
+          "value": "her_alarm_icin_sorumlu_rol_sla_ve_standart_operasyon_proseduru_sop_vardir",
+          "label": "Evet; kritik alarmlarda kimin ne kadar sürede ne yapacağı (SOP) tanımlıdır ve eskalasyon çalışır"
+        },
+        {
+          "value": "sorumlular_bellidir_fakat_olculen_bir_sla_veya_otomatik_eskalasyon_yoktur",
+          "label": "Sorumlu ekipler bilinir ancak kayıtlı bir SLA hedefi veya eskalasyon mekanizması yoktur"
+        },
+        {
+          "value": "alarmlar_icin_onceden_tanimli_bir_aksiyon_plani_yoktur",
+          "label": "Alarmlar anlık duruma göre operatör veya teknisyenin inisiyatifiyle çözülür"
+        }
+      ]
+    },
+    {
+      "id": "OTD-033",
+      "order": 33,
+      "process": "Alarm ve aksiyon",
+      "question": "Tekrarlayan alarmlar ve kronik duruşlar için kök neden analizi (RCA / Pareto) yapılmakta mıdır?",
+      "description": "Alarm verilerinin sürekli iyileştirme ve problem çözme süreçlerinde kullanımı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "duzenli_pareto_ve_kok_neden_analizi_ile_kronik_arizalar_cozulur",
+          "label": "Evet; haftalık/aylık en çok duruş üreten ilk 10 arıza için kök neden ve 5 Neden analizi yapılır"
+        },
+        {
+          "value": "yalnizca_buyuk_yangin_ve_felaket_tipi_duruslarda_analiz_yapilir",
+          "label": "Yalnızca çok uzun süren veya hammadde zayiatına yol açan büyük duruşlarda inceleme yapılır"
+        },
+        {
+          "value": "kok_neden_analizi_yapilmamaktadir",
+          "label": "Duruşlar çözüldükten sonra geriye dönük kök neden analizi yapılmaz"
+        }
+      ]
+    },
+    {
+      "id": "OTD-034",
+      "order": 34,
+      "process": "İş güvenliği / safety sınırı",
+      "question": "Makinelerdeki acil stop (E-Stop), ışık bariyeri, kapı switch'i ve safety röle sinyalleri nasıl ele alınmaktadır?",
+      "description": "Safety sinyallerinin veri toplama sınırları (ERP asla safety kontrolü yapamaz, yalnızca olay kaydeder).",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "safety_tamamen_donanimsal_bagimsizdir_yalnizca_durum_sinyali_okunur",
+          "label": "İş güvenliği sertifikalı Safety PLC/röle ile bağımsızdır; sistem yalnızca 'E-Stop Basıldı' durumunu salt-okunur loglar"
+        },
+        {
+          "value": "safety_sinyalleri_herhangi_bir_merkezi_agda_izlenmemektedir",
+          "label": "Safety devresi sadece makineyi fiziksel olarak durdurur, ağa veya yazılıma sinyal iletilmez"
+        },
+        {
+          "value": "yazilimsal_olarak_makineyi_uzaktan_durdurma_veya_baslatma_istegi_vardir",
+          "label": "Yazılım üzerinden makineye uzaktan start/stop verme isteği vardır (Kritik Güvenlik Riski - Standart Dışı)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-035",
+      "order": 35,
+      "process": "İş güvenliği / safety sınırı",
+      "question": "İş güvenliği (Safety) ve çevre sağlığı (SEÇ / İSG) ihlallerinin loglanması hangi gereksinim için gereklidir?",
+      "description": "Safety loglarının yasal uyum ve iş kazası araştırma kayıtları.",
+      "answer_type": "multiple_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-034",
+        "operator": "equals",
+        "value": "safety_tamamen_donanimsal_bagimsizdir_yalnizca_durum_sinyali_okunur"
+      },
+      "options": [
+        {
+          "value": "is_kazasi_ve_ramak_kala_olaylarinin_geriye_donuk_kronolojisi",
+          "label": "İş kazası veya ramak kala anında kapı açılma ve emniyet kilidi zaman damgalı kronolojisi"
+        },
+        {
+          "value": "isg_mevzuati_ve_iso45001_denetim_izlenebilirligi",
+          "label": "İSG mevzuatı, CE makine direktifi ve ISO 45001 denetimlerinde kanıt sunumu"
+        },
+        {
+          "value": "operatorlerin_emniyet_bariyerini_devre_disi_birakma_girisimleri",
+          "label": "Emniyet switch'lerinin köprülenmesi veya bypass edilmesi girişimlerinin tespiti"
+        }
+      ]
+    },
+    {
+      "id": "OTD-036",
+      "order": 36,
+      "process": "İş güvenliği / safety sınırı",
+      "question": "ERP/CRM Discovery ve üst katman yazılımların iş güvenliği kararlarını yönetemeyeceği ilkesi onaylanmış mıdır?",
+      "description": "Ürün felsefesi: Üst katman analiz araçları safety kritik kontrol mekanizması olamaz.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "ilke_tam_anlamiyla_kabul_edilmis_ve_sinirlar_cizilmistir",
+          "label": "Evet; insan hayatı ve fiziksel güvenlik yalnızca yerel donanımsal safety devresine aittir; üst katman sadece salt-okunur raporlar"
+        },
+        {
+          "value": "bu_sinir_henuz_netlestirilmemistir",
+          "label": "Bu sorumluluk sınırı henüz yönetim ve mühendislik ekipleri arasında netleştirilmemiştir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-037",
+      "order": 37,
+      "process": "PLC, controller ve sensör altyapısı",
+      "question": "Fabrikanızdaki makinelerde ağırlıklı olarak hangi marka ve tip PLC / Kontrolörler bulunmaktadır?",
+      "description": "Saha haberleşme sürücüleri (drivers) ve gateway gereksinimlerinin belirlenmesi.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "siemens_s7_1200_1500_300_400",
+          "label": "Siemens (S7-1200, S7-1500, S7-300, S7-400, Logo)"
+        },
+        {
+          "value": "omron_nj_nx_cj_cp_serisi",
+          "label": "Omron (NJ, NX, CJ1/CJ2, CP1L/CP1E serileri)"
+        },
+        {
+          "value": "schneider_electric_modicon_m_serisi",
+          "label": "Schneider Electric (Modicon M221, M241, M251, M580)"
+        },
+        {
+          "value": "mitsubishi_electric_melsec_fx_q_i_r",
+          "label": "Mitsubishi Electric (MELSEC FX, Q, iQ-R, iQ-F)"
+        },
+        {
+          "value": "beckhoff_twincat_veya_codesys_tabanli_ipc",
+          "label": "Beckhoff (TwinCAT 2/3) veya CODESYS tabanlı Endüstriyel PC / Kontrolörler"
+        },
+        {
+          "value": "rockwell_allen_bradley_controllogix_compactlogix",
+          "label": "Rockwell Automation / Allen-Bradley (ControlLogix, CompactLogix, MicroLogix)"
+        },
+        {
+          "value": "yerli_veya_uzakdogu_ekonomik_plc_gmt_delta_fateco",
+          "label": "Ekonomik / Yerli PLC'ler (GMTCNT, Delta, Fatek, Xinje vb.)"
+        },
+        {
+          "value": "diger_kontrolor_ailesi",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-038",
+      "order": 38,
+      "process": "PLC, controller ve sensör altyapısı",
+      "question": "PLC ve makineler ile veri alışverişinde hangi endüstriyel haberleşme protokolleri kullanılabilir durumdadır?",
+      "description": "Protokol desteği ve açık standartlar.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "opc_ua_acik_endustriyel_haberlesme_standardi",
+          "label": "OPC-UA (Open Platform Communications Unified Architecture - Gömülü veya Harici Sunucu)"
+        },
+        {
+          "value": "modbus_tcp_veya_modbus_rtu",
+          "label": "Modbus TCP (Ethernet portu) veya Modbus RTU (RS-485 / RS-232)"
+        },
+        {
+          "value": "siemens_s7_comm_veya_profinet",
+          "label": "Siemens S7comm (Port 102) veya Profinet"
+        },
+        {
+          "value": "ethernet_ip_veya_cip_protokolu",
+          "label": "EtherNet/IP veya CIP (Common Industrial Protocol)"
+        },
+        {
+          "value": "mqtt_veya_sparkplug_b_iot_protokolu",
+          "label": "MQTT veya Sparkplug B (Hafif IoT mesajlaşma protokolü)"
+        },
+        {
+          "value": "protokol_destegi_yok_yalnizca_kuru_kontak_ve_role",
+          "label": "Protokol desteği yoktur; yalnızca kuru kontak röle ve analog voltaj çıkışları alınabilir"
+        },
+        {
+          "value": "diger_protokol",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    },
+    {
+      "id": "OTD-039",
+      "order": 39,
+      "process": "PLC, controller ve sensör altyapısı",
+      "question": "PLC yazılımlarının kaynak kodlarına (program bloklarına) ve değişken (tag) listelerine erişim yetkiniz var mıdır?",
+      "description": "PLC şifre koruması ve OEM makine üreticisi kısıtlamaları.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tum_plc_programlari_ve_sifreleri_sirketimiz_bunyesindedir",
+          "label": "Evet; tüm PLC projeleri, sembol tabloları ve şifreler şirketimiz otomasyon ekibindedir"
+        },
+        {
+          "value": "bazi_kritik_ithal_makineler_oem_tarafindan_sifrelenmistir",
+          "label": "Kısmen; yerli makineler açık ancak yabancı OEM makinelerin PLC blokları şifrelidir"
+        },
+        {
+          "value": "plc_programlarina_erisim_yoktur_oem_kod_paylasmamaktadir",
+          "label": "Hayır; makine üreticileri PLC şifrelerini vermemekte ve program değişikliğine izin vermemektedir"
+        },
+        {
+          "value": "bilinmiyor_arastirilacak",
+          "label": "PLC erişim ve şifre durumları henüz bilinmemektedir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-040",
+      "order": 40,
+      "process": "Legacy makine ve retrofit seçenekleri",
+      "question": "Eski nesil (legacy), PLC'si olmayan veya şifreli makineler için hangi retrofit (dijitalleştirme) yaklaşımı planlanmaktadır?",
+      "description": "Akıllı olmayan eski makinelere veri toplama aparatı ekleme stratejisi.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "harici_sensor_ve_mini_io_modulu_ile_harici_kutu_ekleme",
+          "label": "Makine panosuna dokunmadan akım trafosu, optik sensör ve mini I/O gateway ekleme"
+        },
+        {
+          "value": "pano_revizyonu_ile_yeni_plc_ve_ekran_takilmasi",
+          "label": "Makine elektrik panosunun tamamen yenilenerek yeni nesil PLC ve HMI ile modernize edilmesi"
+        },
+        {
+          "value": "yalnizca_operator_paneli_uzerinden_manuel_veri_toplama",
+          "label": "Makineden otomatik sinyal almayıp operatörün tablet/el terminaliyle giriş yapması"
+        },
+        {
+          "value": "legacy_makinelerin_otomatik_kapsam_disi_birakilmasi",
+          "label": "Eski makinelerin veri toplama kapsamı dışında tutulması (Retrofit maliyetini üstlenmeme)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-041",
+      "order": 41,
+      "process": "Legacy makine ve retrofit seçenekleri",
+      "question": "Retrofit edilecek makinelerin garanti durumu veya CE sertifikasyon engeli bulunmakta mıdır?",
+      "description": "Makineye fiziksel müdahalede üretici garantisi ve güvenlik riskleri.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "makineler_eski_olup_garanti_ve_hukuki_engel_yoktur",
+          "label": "Makineler garanti süresini tamamlamıştır; panoya müdahale için herhangi bir hukuki engel yoktur"
+        },
+        {
+          "value": "garantisi_devam_eden_makineler_icin_oem_onayi_veya_harici_sensor_sarttir",
+          "label": "Garanti kapsamındaki makinelerde yalnızca temassız (non-invasive) harici sensörler kullanılabilir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-042",
+      "order": 42,
+      "process": "Legacy makine ve retrofit seçenekleri",
+      "question": "CNC, lazer kesim veya abkant pres makinelerinde üretici protokolü (Fanuc Focas, Heidenhain, Siemens Sinumerik vb.) mevcut mudur?",
+      "description": "Takım tezgahlarına özel kontrolör API desteği.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "fanuc_focas_sinumerik_veya_heidenhain_ethernet_baglantisi_aktif",
+          "label": "Evet; CNC tezgahlarında Ethernet portu ve Fanuc Focas / Sinumerik / Heidenhain veri okuma aktiftir"
+        },
+        {
+          "value": "cnc_tezgahlarinda_yalnizca_rs232_dnc_portu_vardir",
+          "label": "Yalnızca G-code yüklemek için RS-232 / DNC seri portu mevcuttur"
+        },
+        {
+          "value": "cnc_veya_takim_tezgahi_bulunmamaktadir",
+          "label": "Tesisimizde CNC veya takım tezgahı kullanılmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-043",
+      "order": 43,
+      "process": "Veri frekansı ve veri hacmi",
+      "question": "Toplanacak telemetri ve üretim verilerinin gerekli örnekleme (sampling) frekansı nedir?",
+      "description": "Milisaniye, saniye veya dakika bazlı veri toplama ihtiyacının tespiti.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "olay_bazli_event_driven_parca_bittiginde_ve_durusta",
+          "label": "Olay Bazlı (Event-Driven): Yalnızca parça bittiğinde, duruş başladığında/bittiğinde veya alarmda"
+        },
+        {
+          "value": "saniye_veya_dakika_bazli_periyodik_telemetri",
+          "label": "Periyodik (1 sn - 1 dk): Sıcaklık, basınç, enerji ve hız değerlerinin düzenli aralıklarla okunması"
+        },
+        {
+          "value": "yuksek_frekansli_milisaniye_titresim_ve_hizli_ornekleme",
+          "label": "Yüksek Hızlı (10 ms - 100 ms): Titreşim analizi veya milisaniyelik kalite eğrisi (Historian ihtiyacı)"
+        },
+        {
+          "value": "vardiya_veya_saat_bazli_toplu_ozet_verisi",
+          "label": "Düşük Frekanslı: Yalnızca saatlik veya vardiya sonu kümülatif toplamlar"
+        }
+      ]
+    },
+    {
+      "id": "OTD-044",
+      "order": 44,
+      "process": "Veri frekansı ve veri hacmi",
+      "question": "Tesis genelinde toplanacak anlık veri noktası (tag / variable) sayısı ve tahminî veri hacmi nedir?",
+      "description": "Ağ bant genişliği ve depolama boyutu planlaması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "medium",
+      "options": [
+        {
+          "value": "50_etiket_alti_temel_durum_ve_sayaclar",
+          "label": "50 etiket altı: Yalnızca kritik makinelerin Çalışıyor/Durdu ve Sayaç sinyalleri"
+        },
+        {
+          "value": "50_500_arasi_etiket_orta_olcek_hat_izleme",
+          "label": "50 - 500 etiket: Hatlar, duruş kodları, enerji sayaçları ve temel proses değerleri"
+        },
+        {
+          "value": "500_5000_arasi_etiket_genis_otomasyon_ve_telemetri",
+          "label": "500 - 5.000 etiket: Tüm istasyonlar, sıcaklık/basınç telemetrisi ve alarm logları"
+        },
+        {
+          "value": "5000_uzeri_etiket_buyuk_endustriyel_veri_havuzu",
+          "label": "5.000'den fazla etiket: Tesis geneli binlerce I/O, historian ve yüksek hızlı telemetri"
+        }
+      ]
+    },
+    {
+      "id": "OTD-045",
+      "order": 45,
+      "process": "Veri frekansı ve veri hacmi",
+      "question": "Yüksek frekanslı verilerin saklanması için özel bir Endüstriyel Zaman Serisi Veritabanı (Historian) düşünülmekte midir?",
+      "description": "ERP veritabanı ile Historian veritabanının ayrıştırılması.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "ayrik_historian_influxdb_timescale_veya_osisoft_kullanilacak",
+          "label": "Evet; ham zaman serisi verileri InfluxDB/Timescale/Historian'da saklanacak, ERP'ye sadece özet aktarılacak"
+        },
+        {
+          "value": "historian_kullanilmayacak_yalnizca_olay_bazli_ozet_kaydedilecek",
+          "label": "Historian gerekmez; sistem yalnızca parça sayısı ve duruş gibi iş olaylarını ilişkisel veritabanına yazacak"
+        },
+        {
+          "value": "tum_ham_verilerin_erp_iliskisel_veritabanina_yazilmasi_planlanmaktadir",
+          "label": "Tüm milisaniyelik telemetrinin doğrudan ERP veritabanına yazılması düşünülmektedir (Performans Riski)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-046",
+      "order": 46,
+      "process": "Edge, gateway ve network",
+      "question": "Fabrika sahasındaki OT (Operasyonel Teknoloji) ağı ile kurumsal IT (Ofis) ağı arasındaki mimari nasıldır?",
+      "description": "Purdue Modeli Seviye 0-3 ağ izolasyonu ve güvenlik duvarı (DMZ) yapısı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "guvenlik_duvari_dmz_ve_ayrik_vlan_mimarisi_kullanilmaktadir",
+          "label": "OT ve IT ağları güvenlik duvarı (Firewall), DMZ ve ayrı VLAN'lar ile birbirinden izole edilmiştir"
+        },
+        {
+          "value": "ot_ve_it_ayni_yerel_agda_flat_network_calismaktadir",
+          "label": "Tüm makineler, ofis bilgisayarları ve sunucular aynı yerel ağdadır (Flat Network - Güvenlik Riski)"
+        },
+        {
+          "value": "ot_agi_tamamen_izoledir_hicbir_dis_baglanti_veya_ofis_agi_yoktur",
+          "label": "Saha ağı tamamen kapalıdır (Air-Gapped); internet veya ofis ağına hiçbir fiziksel bağlantı yoktur"
+        },
+        {
+          "value": "saha_agi_altyapisi_henuz_kurulmamistir",
+          "label": "Makineler arasında kurulu bir endüstriyel Ethernet ağı bulunmamaktadır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-047",
+      "order": 47,
+      "process": "Edge, gateway ve network",
+      "question": "Saha ağında makine başı veri toplama ve ön işleme için Endüstriyel Edge Gateway (IoT Ağ Geçidi) cihazları kullanılacak mıdır?",
+      "description": "Edge cihazların yerel filtreleme, tamponlama (buffering) ve protokol dönüşüm rolü.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "condition": {
+        "question_id": "OTD-046",
+        "operator": "equals",
+        "value": "guvenlik_duvari_dmz_ve_ayrik_vlan_mimarisi_kullanilmaktadir"
+      },
+      "options": [
+        {
+          "value": "din_ray_tipi_endustriyel_edge_gatewayler_kullanilacaktir",
+          "label": "Evet; DIN-ray tipi fansız endüstriyel PC/Gateway (Node-RED, MQTT, OPC-UA) kullanılacaktır"
+        },
+        {
+          "value": "merkezi_sunucu_dogrudan_plc_ip_adreslerine_erisecektir",
+          "label": "Hayır; merkezi sunucu güvenlik duvarı üzerinden doğrudan PLC IP adreslerine bağlanacaktır"
+        },
+        {
+          "value": "cloud_gateway_uzerinden_veri_aktarilacaktir",
+          "label": "Bulut tabanlı IoT gateway cihazları kullanılacaktır"
+        }
+      ]
+    },
+    {
+      "id": "OTD-048",
+      "order": 48,
+      "process": "Edge, gateway ve network",
+      "question": "Ağ kesintisi veya sunucu erişim problemi yaşandığında saha verilerinin kaybolmaması için yerel veri tamponlama (buffering) var mıdır?",
+      "description": "Store-and-forward mimarisi ile veri sürekliliği garantisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "edge_cihazlar_veya_plc_yerel_diskinde_tamponlama_yapar",
+          "label": "Evet; ağ koptuğunda veriler yerel hafızada/SD kartta tutulur, bağlantı gelince kaldığı yerden aktarılır (Store & Forward)"
+        },
+        {
+          "value": "tamponlama_yoktur_ag_koptugunda_o_andaki_veriler_kaybolur",
+          "label": "Hayır; bağlantı koptuğunda anlık telemetri ve sinyaller kaybolur, geriye dönük tamamlanamaz"
+        },
+        {
+          "value": "bilinmiyor",
+          "label": "Tamponlama yeteneği bilinmemektedir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-049",
+      "order": 49,
+      "process": "ERP/MES/QMS/CMMS/WMS entegrasyon ihtiyacı",
+      "question": "Toplanan saha verilerinin hangi kurumsal yönetim sistemlerine aktarılması gerekmektedir?",
+      "description": "Hedef entegrasyon sistemlerinin belirlenmesi.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "erp_kurumsal_kaynak_planlama",
+          "label": "ERP (Kurumsal Kaynak Planlama - Üretim teyitleri, stok hareketleri, fiilî maliyet)"
+        },
+        {
+          "value": "mes_uretim_yurutme_sistemi",
+          "label": "MES (Üretim Yürütme Sistemi - Anlık iş emri takibi, detaylı OEE, reçete yönetimi)"
+        },
+        {
+          "value": "cmms_bakim_yonetim_sistemi",
+          "label": "CMMS (Bakım Yönetim Sistemi - Çalışma saati sayaçları ve otomatik arıza iş emri)"
+        },
+        {
+          "value": "qms_kalite_yonetim_sistemi",
+          "label": "QMS (Kalite Yönetim Sistemi - İstatistiksel Proses Kontrol - SPC, muayene raporları)"
+        },
+        {
+          "value": "wms_depo_yonetim_sistemi",
+          "label": "WMS (Depo Yönetim Sistemi - Hat başı malzeme ikmali ve mamul girişleri)"
+        },
+        {
+          "value": "bi_is_zekasi_ve_yonetici_dashboard",
+          "label": "BI & Raporlama (Power BI, Grafana vb. yönetici panelleri)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-050",
+      "order": 50,
+      "process": "ERP/MES/QMS/CMMS/WMS entegrasyon ihtiyacı",
+      "question": "Saha veri katmanı ile ERP/MES arasındaki veri aktarım mimarisi nasıl kurgulanacaktır?",
+      "description": "REST API, Message Queue, Webhook veya Staging Tablosu entegrasyon yöntemi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "rest_api_veya_webhooks_uzerinden_olay_gonderimi",
+          "label": "REST API / Webhook çağrıları ile olay bazlı (JSON formatında) anlık servis entegrasyonu"
+        },
+        {
+          "value": "mesaj_kuyrugu_kafka_rabbitmq_mqtt_araciligiyla",
+          "label": "Kurumsal Mesaj Kuyruğu (Apache Kafka, RabbitMQ, MQTT Broker) üzerinden asenkron aktarım"
+        },
+        {
+          "value": "ortak_ara_veritabani_staging_tablolari_ile",
+          "label": "Ortak SQL ara veritabanı (Staging Tables) üzerinden periyodik okuma/yazma"
+        },
+        {
+          "value": "dosya_transferi_csv_excel_xml_ftp_klasor_izleme",
+          "label": "Paylaşılan klasöre bırakılan CSV/Excel/XML dosyalarının periyodik taranması"
+        }
+      ]
+    },
+    {
+      "id": "OTD-051",
+      "order": 51,
+      "process": "ERP/MES/QMS/CMMS/WMS entegrasyon ihtiyacı",
+      "question": "Dosya tabanlı (PDF/CSV/Excel) test veya ölçüm çıktısı üreten cihazlar için otomatik dosya işleme (ingestion) ihtiyacı var mıdır?",
+      "description": "Ölçüm cihazı veya kalite laboratuvarı dosya tarama ihtiyacı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "medium",
+      "condition": {
+        "question_id": "OTD-050",
+        "operator": "equals",
+        "value": "dosya_transferi_csv_excel_xml_ftp_klasor_izleme"
+      },
+      "options": [
+        {
+          "value": "klasor_izleyen_servis_dosyayi_okuyup_is_emriyle_esler",
+          "label": "Evet; klasöre düşen dosya arka plan servisi ile otomatik parse edilir ve ilgili iş emrine bağlanır"
+        },
+        {
+          "value": "kullanici_dosyayi_manuel_olarak_sisteme_yukler",
+          "label": "Otomatik izleme gerekmez; kullanıcı dosyayı ilgili iş emrinin ekler alanına elle yükler"
+        }
+      ]
+    },
+    {
+      "id": "OTD-052",
+      "order": 52,
+      "process": "ERP/MES/QMS/CMMS/WMS entegrasyon ihtiyacı",
+      "question": "ERP/MES sisteminden sahaya çift yönlü veri aktarımı (Reçete, Set-point veya Hız parametresi indirme) planlanmakta mıdır?",
+      "description": "ERP'den makineye parametre yükleme (Recipe Download) gereksinimi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "yalnizca_sahadan_yukari_tek_yonlu_veri_toplama",
+          "label": "Yalnızca tek yönlü (Sahadan ERP'ye); ERP makinelerin parametrelerine asla doğrudan müdahale etmez"
+        },
+        {
+          "value": "is_emri_secilince_onayli_recete_parametreleri_plcye_indirilir",
+          "label": "Çift yönlü; iş emri başlayınca ERP'de onaylı sıcaklık, hız, gramaj reçetesi PLC'ye otomatik indirilir"
+        },
+        {
+          "value": "recete_indirme_yalnizca_operator_onayi_ile_yapilir",
+          "label": "Reçete parametreleri ekrana gelir fakat operatörün fiziksel onayı olmadan makineye yüklenmez"
+        }
+      ]
+    },
+    {
+      "id": "OTD-053",
+      "order": 53,
+      "process": "İş değeri ve önceliklendirme",
+      "question": "Saha veri toplama projesinin yatırım geri dönüşünde (ROI) en yüksek finansal getiri beklenen alan neresidir?",
+      "description": "Projenin iş değeri odaklılığı.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "hat_duruslarinin_azalmasi_ve_kapasite_artisi",
+          "label": "Plansız duruşların azaltılması ve mevcut makinelerden %5-%15 daha fazla üretim çıktısı alınması"
+        },
+        {
+          "value": "fire_hurda_ve_hammadde_israfinin_azalmasi",
+          "label": "Tolerans dışı üretimin erken tespiti ile hammadde firesi ve müşteri iadelerinin düşürülmesi"
+        },
+        {
+          "value": "enerji_ve_yardimci_tesis_maliyet_tasarrufu",
+          "label": "Tepe güç yönetimi ve gereksiz enerji tüketimlerinin engellenmesi ile fatura tasarrufu"
+        },
+        {
+          "value": "manuel_kagit_form_ve_veri_giris_isciliginin_ortadan_kalkmasi",
+          "label": "Operatör ve formenlerin form doldurma yükünün kalkması ve anlık şeffaf raporlama"
+        }
+      ]
+    },
+    {
+      "id": "OTD-054",
+      "order": 54,
+      "process": "İş değeri ve önceliklendirme",
+      "question": "Saha veri toplama projesinde en yüksek teknik veya operasyonel risk faktörü olarak ne görülmektedir?",
+      "description": "Proje risk haritası ve engeller.",
+      "answer_type": "multiple_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "oem_makine_ureticilerinin_protokol_ve_sifre_vermemesi",
+          "label": "Eski/ithal makinelerde üreticinin PLC şifresi vermemesi ve arayüz kısıtlamaları"
+        },
+        {
+          "value": "operatorlerin_veri_girisi_ve_yeni_arayuzlere_direnci",
+          "label": "Saha operatörlerinin duruş nedeni seçmeye veya tablet kullanmaya direnç göstermesi"
+        },
+        {
+          "value": "ot_ve_it_ekipleri_arasindaki_yetki_ve_guvenlik_uyusmazligi",
+          "label": "Ağ güvenliği ve firewall yetkilendirmelerinde OT ile IT ekipleri arasındaki koordinasyon eksikliği"
+        },
+        {
+          "value": "veri_kirliligi_ve_anlamsiz_sensor_alarmlarinin_sistemi_bogmasi",
+          "label": "Amacı belirlenmemiş aşırı veri toplanması ve alarm yorgunluğu nedeniyle sistemin terk edilmesi"
+        }
+      ]
+    },
+    {
+      "id": "OTD-055",
+      "order": 55,
+      "process": "İş değeri ve önceliklendirme",
+      "question": "Saha veri toplama uygulamasının devreye alınması için planlanan pilot faz yaklaşımı nedir?",
+      "description": "Aşamalı devreye alma ve risk minimizasyonu stratejisi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "tek_bir_darbogaz_pilot_hatta_baslayip_dogrulandiktan_sonra_yayginlastirma",
+          "label": "Önce 1 pilot hatta uçtan uca devreye alıp iş değerini kanıtlamak, ardından diğer hatlara yaymak"
+        },
+        {
+          "value": "yalnizca_enerji_sayaclari_ile_hizli_baslangic_yapilmasi",
+          "label": "Üretime dokunmadan önce fabrika enerji sayaçları ile hızlı ve düşük riskli pilot yapmak"
+        },
+        {
+          "value": "tum_tesisin_ayni_anda_buyuk_patlama_big_bang_ile_gecisi",
+          "label": "Tüm hat ve makineleri aynı anda devreye almak (Yüksek Operasyonel Risk)"
+        }
+      ]
+    },
+    {
+      "id": "OTD-056",
+      "order": 56,
+      "process": "İş değeri ve önceliklendirme",
+      "question": "Saha verilerinin toplanmasında çevrimdışı (offline-first) çalışma ve yerel veri güvenliği güvencesi şart mıdır?",
+      "description": "Verilerin harici buluta aktarılmadan şirket yerelinde kalması ilkesi.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "kesinlikle_sarttir_fabrika_verileri_asla_harici_buluta_cikamaz",
+          "label": "Evet; üretim reçeteleri, hızlar ve telemetri verileri %100 yerel (on-premise / offline) kalmalıdır"
+        },
+        {
+          "value": "guvenli_hibrit_bulut_veya_onayli_bulut_sunuculari_kullanilabilir",
+          "label": "Kurumsal onaylı özel bulut (Private Cloud) altyapısı kullanılabilir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-057",
+      "order": 57,
+      "process": "İş değeri ve önceliklendirme",
+      "question": "Toplanan her bir veri alanı için 'Bu veriye şirketimizin gerçekten ihtiyacı var mı ve bir aksiyon üretiyor mu?' sorusu doğrulanmış mıdır?",
+      "description": "Veri israfını ve gereksiz mimari maliyetleri engelleyen nihai iş doğrulama sorusu.",
+      "answer_type": "single_choice",
+      "required": true,
+      "criticality": "critical",
+      "options": [
+        {
+          "value": "evet_tum_veri_alanlari_is_hedefi_ve_aksiyon_karsiligi_ile_onaylanmistir",
+          "label": "Evet; her veri noktasının kim tarafından tüketileceği ve hangi kararı üreteceği netleştirilmiştir"
+        },
+        {
+          "value": "bazi_veriler_yalnizca_meraktan_veya_kolay_toplandigi_icin_eklenmistir",
+          "label": "Kısmen; bazı veriler ileride lazım olabilir düşüncesiyle eklenmiştir (Gereksiz Yük Riski)"
+        },
+        {
+          "value": "henuz_veri_amaci_birebir_sorgulanmamistir",
+          "label": "Veri gereksinim listesi henüz iş hedefleriyle eşleştirilmemiştir"
+        }
+      ]
+    },
+    {
+      "id": "OTD-058",
+      "order": 58,
+      "process": "İş değeri ve önceliklendirme",
+      "question": "Saha Veri Keşfi analizi tamamlandığında yönetim kuruluna sunulacak nihai OT yol haritası için öncelikli beklentiniz nedir?",
+      "description": "Ön analizin kapanış hedefi ve karar çıktısı.",
+      "answer_type": "single_choice",
+      "required": false,
+      "criticality": "high",
+      "options": [
+        {
+          "value": "makine_envanteri_protokol_matrisi_ve_asamali_butce_plani",
+          "label": "Makinelerin bağlantı olgunluk matrisi, protokol gereksinimleri ve aşamalı yatırım bütçe planı"
+        },
+        {
+          "value": "pilot_hat_secimi_ve_hizli_kazanim_quick_win_yol_haritasi",
+          "label": "En yüksek geri dönüşü sağlayacak pilot hat seçimi ve 3 aylık hızlı kazanım (Quick Win) yol haritası"
+        },
+        {
+          "value": "erp_mes_entegrasyon_mimarisi_ve_guvenlik_standartlari_rehberi",
+          "label": "OT/IT güvenlik izolasyon standartları ve ERP/MES entegrasyon arayüz teknik şartnamesi"
+        },
+        {
+          "value": "diger_nihai_beklenti",
+          "label": "Diğer",
+          "is_other": true,
+          "allow_note": true
+        }
+      ]
+    }
+  ]
+}
