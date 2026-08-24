@@ -358,9 +358,9 @@ async function runTests() {
   const it = fnMap.get("INFORMATION_TECHNOLOGY");
   assert(it?.actual_end_date === "2026-09-18" && it?.planned_end_date === "2026-09-15", "INFORMATION_TECHNOLOGY gecikmeli tamamlandı.");
 
-  // Dalga 5: HUMAN_RESOURCES (not_started)
+  // Dalga 5: HUMAN_RESOURCES (in_progress)
   const hr = fnMap.get("HUMAN_RESOURCES");
-  assert(hr?.status === "not_started" && hr?.actual_start_date === null, "HUMAN_RESOURCES not_started durumunda.");
+  assert(hr?.status === "in_progress" && hr?.actual_start_date === null, "HUMAN_RESOURCES in_progress durumunda.");
 
   // 94 cevabın sağlam kaldığını doğrula
   const ansCount = await adapter.select<{ c: number }[]>(
@@ -380,7 +380,7 @@ async function runTests() {
   assert(reportModel.scheduleSummary?.functionSchedules.length === 19, "19 fonksiyonun rapor takvim kaydı mevcut.");
   assert(reportModel.scheduleSummary?.stats.completedOnTime! >= 6, "Zamanında tamamlanan fonksiyon istatistiği üretildi.");
   assert(reportModel.scheduleSummary?.stats.completedLate! >= 1, "Gecikmeli tamamlanan fonksiyon istatistiği üretildi.");
-  assert(reportModel.scheduleSummary?.stats.notStarted! >= 1, "Başlanmamış fonksiyon istatistiği üretildi.");
+  assert(reportModel.scheduleSummary?.stats.planned! >= 1, "Planlanmış fonksiyon istatistiği üretildi.");
 
   // -------------------------------------------------------------------------
   // TEST 7: Yedekleme, Geri Yükleme ve Çoğaltma (.erpcrm)
@@ -444,6 +444,8 @@ async function runTests() {
 
   if (failCount > 0) {
     process.exit(1);
+  } else {
+    process.exit(0);
   }
 }
 

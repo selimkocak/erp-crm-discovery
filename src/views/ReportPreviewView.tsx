@@ -134,6 +134,11 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case "active":
+        return <span className="badge badge--success">Aktif</span>;
+      case "passive":
+      case "inactive":
+        return <span className="badge badge--secondary">Pasif</span>;
       case "completed":
         return <span className="badge badge-completed">Tamamlandı</span>;
       case "in_progress":

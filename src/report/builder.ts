@@ -28,8 +28,12 @@ import {
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
-import { calculateProgress } from "../engine/progress";
-import { formatAnswer } from "./formatters";
+import {
+  formatAnswer,
+  isValidAnswer,
+  formatEmployeeCount,
+  getTurkishAccusativeSuffix,
+} from "./formatters";
 import { resolveAttachmentFileUrl } from "../storage/attachmentLinks";
 import { calculateScheduleStatus, formatDateRangeSummary } from "../models/scheduleStatus";
 import type {
@@ -114,7 +118,8 @@ export async function buildReportModel(
     })
   );
 
-  const { project, company, functions } = detailData;
+  const { project, company, functions: allFunctions } = detailData;
+  const functions = allFunctions.filter((f) => f.is_active !== 0);
 
   // 2. Format Metadata
   const now = new Date();
@@ -219,12 +224,16 @@ export async function buildReportModel(
         fnFollowupsMap.set(fol.question_id, fol);
       }
     }
-    const progress = loadedPack
-      ? calculateProgress(visibleQuestions, answersMap, fnFollowupsMap)
-      : { answered: 0, total: 0, percentage: 0 };
 
-    totalQuestionsCount += progress.total;
-    answeredQuestionsCount += progress.answered;
+    // Central Question & Answer Counter (FAZ-58.3)
+    const fnAnsweredCount = visibleQuestions.filter((q) => isValidAnswer(answersMap.get(q.id))).length;
+    const fnTotalCount = loadedPack ? visibleQuestions.filter((q) => q.required).length : 0;
+    const fnProgressPercentage = fnTotalCount > 0
+      ? Math.round((fnAnsweredCount / fnTotalCount) * 100)
+      : (fnAnsweredCount > 0 ? 100 : 0);
+
+    totalQuestionsCount += fnTotalCount;
+    answeredQuestionsCount += fnAnsweredCount;
 
     // Scope Item
     reportScope.push({
@@ -236,9 +245,9 @@ export async function buildReportModel(
       responsiblePerson: fn.responsible_person || null,
       status: fn.status,
       hasPack: !!loadedPack,
-      progressPercentage: progress.percentage,
-      answeredCount: progress.answered,
-      totalQuestionCount: progress.total,
+      progressPercentage: fnProgressPercentage,
+      answeredCount: fnAnsweredCount,
+      totalQuestionCount: fnTotalCount,
     });
 
     // Semantic items for this function
@@ -390,9 +399,9 @@ export async function buildReportModel(
         status: fn.status,
         packId: loadedPack?.meta.pack_id || null,
         packVersion: loadedPack?.meta.version || null,
-        progressPercentage: progress.percentage,
-        answeredCount: progress.answered,
-        totalQuestionCount: progress.total,
+        progressPercentage: fnProgressPercentage,
+        answeredCount: fnAnsweredCount,
+        totalQuestionCount: fnTotalCount,
         processes: reportProcesses,
         findings: fnFindings,
         requirements: fnRequirements,
@@ -508,29 +517,40 @@ export async function buildReportModel(
     };
   });
 
+  const progressPercent =
+    totalQuestionsCount > 0
+      ? Math.round((answeredQuestionsCount / totalQuestionsCount) * 100)
+      : 0;
+
   const summaryStats: ReportSummaryStats = {
     totalFunctions: functions.length,
+    activeFunctionCount: functions.length,
     completedFunctions,
+    completedFunctionCount: completedFunctions,
     inProgressFunctions,
+    inProgressFunctionCount: inProgressFunctions,
     notStartedFunctions,
+    notStartedFunctionCount: notStartedFunctions,
     totalFindings: findings.length,
+    findingCount: findings.length,
     totalRequirements: requirements.length,
+    requirementCount: requirements.length,
     openRisks,
+    openRiskCount: openRisks,
     totalRisks: risks.length,
+    totalRiskCount: risks.length,
     totalNotes: notes.length,
     answeredQuestions: answeredQuestionsCount,
+    answeredQuestionCount: answeredQuestionsCount,
     totalQuestions: totalQuestionsCount,
+    totalQuestionCount: totalQuestionsCount,
+    questionProgressPercent: progressPercent,
     openFollowupCount: dbFollowups.length,
     revisitCount,
     criticalFollowupCount,
     totalAttachmentCount: dbAttachments.length,
     totalAttachmentSizeBytes: dbAttachments.reduce((sum, a) => sum + (a.file_size || 0), 0),
   };
-
-  const progressPercent =
-    totalQuestionsCount > 0
-      ? Math.round((answeredQuestionsCount / totalQuestionsCount) * 100)
-      : 0;
 
   // Honest project-wide scope metrics (FAZ-10)
   const selectedFunctionCount = functions.length;
@@ -551,7 +571,8 @@ export async function buildReportModel(
   let draftLabel = "FİNAL RAPOR";
   if (!isComplete) {
     if (completedFunctionCount > 0) {
-      draftLabel = `ARA RAPOR — ${selectedFunctionCount} iş fonksiyonundan ${completedFunctionCount}'i tamamlandı (Soru İlerlemesi: %${progressPercent})`;
+      const suffix = getTurkishAccusativeSuffix(completedFunctionCount);
+      draftLabel = `ARA RAPOR — ${selectedFunctionCount} iş fonksiyonundan ${completedFunctionCount}’${suffix} tamamlandı (Soru İlerlemesi: %${progressPercent})`;
     } else {
       draftLabel = `ARA RAPOR — Analiz devam ediyor (%${progressPercent})`;
     }
@@ -582,7 +603,7 @@ export async function buildReportModel(
     taxNumber: company.tax_number || null,
     city: company.city || null,
     country: company.country || "Türkiye",
-    employeeCount: company.employee_count || null,
+    employeeCount: formatEmployeeCount(company.employee_count),
     businessSector: company.business_sector || null,
     hasBranches: company.has_branches || null,
     branchCount: company.branch_count ?? null,

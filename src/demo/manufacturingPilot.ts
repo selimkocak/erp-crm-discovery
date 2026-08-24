@@ -27,6 +27,16 @@ export interface CreateManufacturingDemoResult {
   answerCount: number;
 }
 
+export const MANUFACTURING_PILOT_METADATA = {
+  functionCount: 19,
+  answerCount: 94,
+  findingCount: 7,
+  requirementCount: 7,
+  totalRiskCount: 5,
+  openRiskCount: 3,
+  noteCount: 6,
+} as const;
+
 /**
  * 19 aktif iş fonksiyonu için kanonik soru külliyatına %100 uyumlu 94 geçerli sentetik cevap üretir.
  */
@@ -255,7 +265,7 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
       { code: "MAINTENANCE", status: "in_progress", dept: "Bakım", resp: "Bakım Şefi", planned_start_date: "2026-10-29", planned_end_date: "2026-11-12", actual_start_date: "2026-10-29", actual_end_date: null },
 
       // 5. Dalga — İnsan Kaynakları, BT ve E-Dönüşüm
-      { code: "HUMAN_RESOURCES", status: "not_started", dept: "İnsan Kaynakları", resp: "İnsan Kaynakları Müdürü", planned_start_date: "2026-11-05", planned_end_date: "2026-11-19", actual_start_date: null, actual_end_date: null },
+      { code: "HUMAN_RESOURCES", status: "in_progress", dept: "İnsan Kaynakları", resp: "İnsan Kaynakları Müdürü", planned_start_date: "2026-11-05", planned_end_date: "2026-11-19", actual_start_date: null, actual_end_date: null },
       { code: "INFORMATION_TECHNOLOGY", status: "completed", dept: "Bilgi Teknolojileri", resp: "BT Yöneticisi", planned_start_date: "2026-09-01", planned_end_date: "2026-09-15", actual_start_date: "2026-09-01", actual_end_date: "2026-09-18" },
       { code: "DOCUMENT_MANAGEMENT", status: "in_progress", dept: "Genel Müdürlük", resp: "BT Yöneticisi", planned_start_date: "2026-11-01", planned_end_date: "2026-11-15", actual_start_date: "2026-11-01", actual_end_date: null },
       { code: "E_TRANSFORMATION", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü", planned_start_date: "2026-09-15", planned_end_date: "2026-09-30", actual_start_date: "2026-09-15", actual_end_date: "2026-09-30" },

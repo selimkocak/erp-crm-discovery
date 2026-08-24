@@ -229,16 +229,27 @@ export interface ReportProfile {
 
 export interface ReportSummaryStats {
   totalFunctions: number;
+  activeFunctionCount: number;
   completedFunctions: number;
+  completedFunctionCount: number;
   inProgressFunctions: number;
+  inProgressFunctionCount: number;
   notStartedFunctions: number;
+  notStartedFunctionCount: number;
   totalFindings: number;
+  findingCount: number;
   totalRequirements: number;
+  requirementCount: number;
   openRisks: number;
+  openRiskCount: number;
   totalRisks: number;
+  totalRiskCount: number;
   totalNotes: number;
   answeredQuestions: number;
+  answeredQuestionCount: number;
   totalQuestions: number;
+  totalQuestionCount: number;
+  questionProgressPercent: number;
   openFollowupCount?: number;
   revisitCount?: number;
   criticalFollowupCount?: number;

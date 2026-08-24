@@ -5,6 +5,7 @@
 
 import React, { useEffect } from "react";
 import { X, Sparkles, Building2, ShieldCheck } from "lucide-react";
+import { MANUFACTURING_PILOT_METADATA } from "../../demo/manufacturingPilot";
 
 interface CreateDemoProjectModalProps {
   isOpen: boolean;
@@ -101,9 +102,9 @@ export const CreateDemoProjectModal: React.FC<CreateDemoProjectModalProps> = ({
                 Örnek Proje İçeriği:
               </span>
               <ul style={{ margin: 0, paddingLeft: "1.25rem", fontSize: "0.8125rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
-                <li><strong>16+ Aktif İş Fonksiyonu</strong> (Satış, Satınalma, Depo, Üretim Planlama, Kalite, Bakım, Muhasebe...)</li>
-                <li><strong>80+ Gerçekçi Saha Soru Cevabı</strong> (BOM revizyonu, mükerrer stok kartı, plansız bakım senaryoları)</li>
-                <li><strong>Semantik Analiz:</strong> 6+ Bulgu, 6+ Gereksinim, 4+ Risk, 6+ Proje Notu</li>
+                <li><strong>{MANUFACTURING_PILOT_METADATA.functionCount} Aktif İş Fonksiyonu</strong> (Satış, Satınalma, Depo, Üretim Planlama, Kalite, Bakım, Muhasebe...)</li>
+                <li><strong>{MANUFACTURING_PILOT_METADATA.answerCount} Kanonik Saha Soru Cevabı</strong> (BOM revizyonu, mükerrer stok kartı, plansız bakım senaryoları)</li>
+                <li><strong>Semantik Analiz:</strong> {MANUFACTURING_PILOT_METADATA.findingCount} Bulgu, {MANUFACTURING_PILOT_METADATA.requirementCount} Gereksinim, {MANUFACTURING_PILOT_METADATA.totalRiskCount} Risk ({MANUFACTURING_PILOT_METADATA.openRiskCount} Açık), {MANUFACTURING_PILOT_METADATA.noteCount} Proje Notu</li>
                 <li><strong>Yönetişim & Yetki Matrisi:</strong> Veri sahiplikleri, 4+ yetki kaydı (sapmalarla), 2 onay limiti, 2 SoD riski</li>
               </ul>
             </div>

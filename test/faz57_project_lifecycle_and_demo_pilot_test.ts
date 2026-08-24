@@ -25,13 +25,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
-
-let Database: any = null;
-try {
-  Database = (await import("better-sqlite3")).default;
-} catch {
-  // optional
-}
+import Database from "better-sqlite3";
 
 import { MIGRATION_DEFINITIONS } from "../src/db/migrationDefinitions";
 import { INITIAL_BUSINESS_FUNCTIONS } from "../src/db/seedData";

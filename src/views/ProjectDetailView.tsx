@@ -38,6 +38,7 @@ import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
+import { formatEmployeeCount } from "../report/formatters";
 import { loadQuestionPack, getPackIdForFunction, hasQuestionPack } from "../engine/loader";
 import { saveProjectBackupToFile, type SaveBackupResult } from "../storage/backupManager";
 import {
@@ -670,7 +671,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
                 <Users size={14} style={{ color: "var(--text-muted)" }} />
-                <span>{company.employee_count}</span>
+                <span>{formatEmployeeCount(company.employee_count)}</span>
               </div>
             </div>
           )}

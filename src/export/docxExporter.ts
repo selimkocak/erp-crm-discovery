@@ -25,6 +25,7 @@ import {
   PageNumber,
 } from "docx";
 import { formatStatusLabel, type ReportModel } from "../report/types";
+import { formatProjectStatus } from "../report/formatters";
 import { resolveAttachmentFileUrlFromRelative } from "../storage/attachmentLinks";
 
 // Design Tokens (Word Hex)
@@ -253,7 +254,7 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         new TableRow({
           children: [
             createTableCell("Analiz Durumu:", { bold: true, widthPercent: 20 }),
-            createTableCell((metadata.projectStatus || "in_progress").toUpperCase(), { widthPercent: 30 }),
+            createTableCell(formatProjectStatus(metadata.projectStatus), { widthPercent: 30 }),
             createTableCell("İş Fonksiyonları:", { bold: true, widthPercent: 20 }),
             createTableCell(`${summaryStats.totalFunctions} Fonksiyon (${summaryStats.completedFunctions} Tamamlandı)`, { widthPercent: 30 }),
           ],

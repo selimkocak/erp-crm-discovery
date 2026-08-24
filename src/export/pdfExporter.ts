@@ -10,6 +10,7 @@
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { formatStatusLabel, type ReportModel } from "../report/types";
+import { formatProjectStatus } from "../report/formatters";
 import { registerPdfFonts, PDF_FONT_FAMILY } from "./fonts/fontBundle";
 import { resolveAttachmentFileUrlFromRelative } from "../storage/attachmentLinks";
 
@@ -53,7 +54,7 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   doc.setFont(PDF_FONT_FAMILY, "normal");
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139); // Slate 500
-  doc.text(`${company.companyName} • ${metadata.generatedAt} • ${(metadata.projectStatus || "in_progress").toUpperCase()}`, pageWidth / 2, currentY, { align: "center" });
+  doc.text(`${company.companyName} • ${metadata.generatedAt} • ${formatProjectStatus(metadata.projectStatus)}`, pageWidth / 2, currentY, { align: "center" });
   currentY += 7;
 
   if (!metadata.isComplete) {
