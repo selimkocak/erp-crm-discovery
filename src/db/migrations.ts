@@ -139,20 +139,19 @@ export async function runMigrations(db: Database): Promise<void> {
     }
   }
 
-  // 5. Başlangıç iş fonksiyonlarını tohumla (idempotent ON CONFLICT)
-  const existing = await db.select<{ count: number }[]>(
-    "SELECT count(*) as count FROM business_functions"
-  );
-
-  if (existing.length === 0 || existing[0].count === 0) {
-    for (const bf of INITIAL_BUSINESS_FUNCTIONS) {
-      const id = `bf_${bf.code.toLowerCase()}`;
-      await db.execute(
-        `INSERT INTO business_functions (id, code, name_tr, name_en, category, sort_order, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6, 1)
-         ON CONFLICT(code) DO NOTHING`,
-        [id, bf.code, bf.name_tr, bf.name_en, bf.category, bf.sort_order]
-      );
-    }
+  // 5. Başlangıç iş fonksiyonlarını tohumla / senkronize et (idempotent ON CONFLICT)
+  for (const bf of INITIAL_BUSINESS_FUNCTIONS) {
+    const id = `bf_${bf.code.toLowerCase()}`;
+    await db.execute(
+      `INSERT INTO business_functions (id, code, name_tr, name_en, category, sort_order, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6, 1)
+       ON CONFLICT(code) DO UPDATE SET
+         name_tr = excluded.name_tr,
+         name_en = excluded.name_en,
+         category = excluded.category,
+         sort_order = excluded.sort_order,
+         is_active = excluded.is_active`,
+      [id, bf.code, bf.name_tr, bf.name_en, bf.category, bf.sort_order]
+    );
   }
 }

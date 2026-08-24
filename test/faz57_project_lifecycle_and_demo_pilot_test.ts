@@ -34,6 +34,7 @@ try {
 }
 
 import { MIGRATION_DEFINITIONS } from "../src/db/migrationDefinitions";
+import { INITIAL_BUSINESS_FUNCTIONS } from "../src/db/seedData";
 import { BUSINESS_FUNCTION_REGISTRY } from "../src/generated/businessFunctions";
 import {
   setDbInstanceForTesting,
@@ -150,21 +151,19 @@ async function runAllMigrations(mockDb: any): Promise<void> {
     }
   }
 
-  // Seed business functions
-  for (const bf of BUSINESS_FUNCTION_REGISTRY) {
+  // Seed business functions (using production INITIAL_BUSINESS_FUNCTIONS)
+  for (const bf of INITIAL_BUSINESS_FUNCTIONS) {
     const id = `bf_${bf.code.toLowerCase()}`;
     await mockDb.execute(
-      `INSERT OR IGNORE INTO business_functions (id, code, name_tr, name_en, category, sort_order, is_active)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [
-        id,
-        bf.code,
-        bf.name_tr,
-        bf.name_en,
-        bf.category_tr,
-        bf.sort_order,
-        bf.is_active ? 1 : 0,
-      ]
+      `INSERT INTO business_functions (id, code, name_tr, name_en, category, sort_order, is_active)
+       VALUES ($1, $2, $3, $4, $5, $6, 1)
+       ON CONFLICT(code) DO UPDATE SET
+         name_tr = excluded.name_tr,
+         name_en = excluded.name_en,
+         category = excluded.category,
+         sort_order = excluded.sort_order,
+         is_active = excluded.is_active`,
+      [id, bf.code, bf.name_tr, bf.name_en, bf.category, bf.sort_order]
     );
   }
 }
@@ -363,8 +362,31 @@ async function runTests() {
     const fkCheck = mockDb.raw.pragma("foreign_key_check");
     assert(fkCheck.length === 0, `PRAGMA foreign_key_check sonucu 0 satır: ${fkCheck.length} ihlal`);
 
-    // 94 cevabın bf_code değerleri seçili 19 fonksiyon içinde
+    // PRAGMA foreign_key_list(project_business_functions) incelemesi
+    const fkList = mockDb.raw.pragma("foreign_key_list(project_business_functions)");
+    console.log("  [DEBUG] PRAGMA foreign_key_list(project_business_functions):", JSON.stringify(fkList));
+    assert(fkList.length === 2, `project_business_functions tablosunda tam 2 foreign key tanımlı (Gerçek: ${fkList.length})`);
+
+    // Ebeveyn 1: analysis_projects parent mevcut mu?
+    const projCheck = await mockDb.select<any[]>(`SELECT id, name FROM analysis_projects WHERE id = $1`, [demoId]);
+    assert(projCheck.length === 1, `Ebeveyn analysis_projects kaydı mevcut: ID=${projCheck[0]?.id}, Ad=${projCheck[0]?.name}`);
+
+    // Ebeveyn 2: 19 business_functions master kaydı mevcut mu?
     const activeBfCodes = new Set(demoFunctions.map((f: any) => f.code));
+    assert(activeBfCodes.size === 19, `Demo projede 19 benzersiz fonksiyon kodu seçili (Gerçek: ${activeBfCodes.size})`);
+
+    const masterRows = await mockDb.select<any[]>(`SELECT id, code FROM business_functions WHERE is_active = 1`);
+    const masterCodeMap = new Map(masterRows.map((r: any) => [r.code, r.id]));
+    const missingMaster = Array.from(activeBfCodes).filter((code) => !masterCodeMap.has(code));
+    assert(missingMaster.length === 0, `19 aktif fonksiyonun tamamı business_functions master tablosunda mevcut (Eksik: ${missingMaster.join(",") || "yok"})`);
+
+    // İlişki: 19 project_business_functions kaydı doğru ebeveynlerle bağlı mı?
+    const pbfRows = await mockDb.select<any[]>(`SELECT * FROM project_business_functions WHERE analysis_project_id = $1`, [demoId]);
+    assert(pbfRows.length === 19, `Tam 19 project_business_functions ilişki kaydı mevcut (Gerçek: ${pbfRows.length})`);
+    const invalidPbfFk = pbfRows.filter((pbf: any) => !masterRows.some((m: any) => m.id === pbf.business_function_id));
+    assert(invalidPbfFk.length === 0, `19 project_business_functions kaydının tümü geçerli business_function_id'ye sahip (Geçersiz: ${invalidPbfFk.length})`);
+
+    // 94 cevabın bf_code değerleri seçili 19 fonksiyon içinde
     const invalidAnswers = demoAnswers.filter((a: any) => !activeBfCodes.has(a.business_function_code));
     assert(invalidAnswers.length === 0, `94 cevabın tümünün business_function_code değerleri seçili 19 fonksiyon içinde (Geçersiz: ${invalidAnswers.length})`);
 

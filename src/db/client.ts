@@ -181,18 +181,107 @@ export async function createProject(payload: CreateProjectPayload): Promise<stri
     ]
   );
 
-  // 3. Seçilen iş fonksiyonları
-  for (const bfId of payload.selectedFunctionIds) {
-    const pbfId = generateId("pbf");
-    await db.execute(
-      `INSERT INTO project_business_functions
-       (id, analysis_project_id, business_function_id, status, is_active, created_at, updated_at)
-       VALUES ($1, $2, $3, 'not_started', 1, $4, $4)`,
-      [pbfId, projectId, bfId, now]
-    );
+  // 3. Seçilen iş fonksiyonları (Kanonik Atama Servisi)
+  if (payload.selectedFunctionIds && payload.selectedFunctionIds.length > 0) {
+    await assignBusinessFunctionsToProject(projectId, payload.selectedFunctionIds);
   }
 
   return projectId;
+}
+
+// ---------------------------------------------------------------
+// 3.1 Kanonik Proje - İş Fonksiyonu Atama Servisi
+// ---------------------------------------------------------------
+export interface AssignBusinessFunctionInput {
+  id?: string;
+  code?: string;
+  status?: string;
+  dept?: string;
+  resp?: string;
+}
+
+/**
+ * Projeye iş fonksiyonlarını bağlayan TEK KANONİK SERVİS.
+ * Hem normal proje oluşturma (createProject) hem de demo projeler (createManufacturingDemoProject)
+ * aynı servis üzerinden bağlanır.
+ *
+ * Doğrulamalar:
+ * 1. analysis_projects ebeveyn kaydının varlığı (SELECT id FROM analysis_projects WHERE id = $1)
+ * 2. business_functions master kaydının varlığı (SELECT id, code FROM business_functions WHERE is_active = 1)
+ * 3. Bulunamayan herhangi bir fonksiyon kodu için INSERT öncesinde açık ve açıklayıcı hata fırlatma.
+ */
+export async function assignBusinessFunctionsToProject(
+  projectId: string,
+  functions: (string | AssignBusinessFunctionInput)[]
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  // 1. Ebeveyn Proje Kaydı Kontrolü (Parent Check 1)
+  const projRows = await db.select<{ id: string }[]>(
+    "SELECT id FROM analysis_projects WHERE id = $1",
+    [projectId]
+  );
+  if (projRows.length === 0) {
+    throw new Error(
+      `Kanonik Atama Hatası: '${projectId}' kimlikli analiz projesi veritabanında bulunamadı.`
+    );
+  }
+
+  // 2. Master İş Fonksiyonları Ebeveyn Kaydı Kontrolü (Parent Check 2)
+  const masterFunctions = await db.select<
+    { id: string; code: string; name_tr: string }[]
+  >("SELECT id, code, name_tr FROM business_functions WHERE is_active = 1");
+
+  const masterIdMap = new Map<string, { id: string; code: string }>();
+  const masterCodeMap = new Map<string, { id: string; code: string }>();
+  for (const mf of masterFunctions) {
+    masterIdMap.set(mf.id, mf);
+    masterCodeMap.set(mf.code, mf);
+  }
+
+  for (const item of functions) {
+    let resolvedMaster: { id: string; code: string } | undefined;
+    let status = "not_started";
+    let dept: string | null = null;
+    let resp: string | null = null;
+    let requestedIdentifier = "";
+
+    if (typeof item === "string") {
+      requestedIdentifier = item;
+      resolvedMaster = masterIdMap.get(item) || masterCodeMap.get(item);
+    } else {
+      requestedIdentifier = item.code || item.id || "unknown";
+      if (item.id && masterIdMap.has(item.id)) {
+        resolvedMaster = masterIdMap.get(item.id);
+      } else if (item.code && masterCodeMap.has(item.code)) {
+        resolvedMaster = masterCodeMap.get(item.code);
+      }
+      if (item.status) status = item.status;
+      if (item.dept) dept = item.dept;
+      if (item.resp) resp = item.resp;
+    }
+
+    if (!resolvedMaster) {
+      console.error("[assignBusinessFunctionsToProject] Ebeveyn master fonksiyon bulunamadı:", {
+        projectId,
+        requestedIdentifier,
+        item,
+        availableCodes: Array.from(masterCodeMap.keys()),
+      });
+      throw new Error(
+        `Kanonik Fonksiyon Atama Hatası: '${requestedIdentifier}' iş fonksiyonu master 'business_functions' tablosunda bulunamadı.`
+      );
+    }
+
+    const pbfId = generateId("pbf");
+    await db.execute(
+      `INSERT INTO project_business_functions
+       (id, analysis_project_id, business_function_id, status, is_active, company_department_name, responsible_person, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, 1, $5, $6, $7, $7)`,
+      [pbfId, projectId, resolvedMaster.id, status, dept, resp, now]
+    );
+  }
 }
 
 // ---------------------------------------------------------------

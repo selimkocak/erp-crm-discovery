@@ -6,7 +6,7 @@
  * Gerçek şirket, şahıs, vergi no, telefon, e-posta veya Tuna Ofis verisi İÇERMEZ.
  */
 
-import { getDb, generateId, deleteProject } from "../db/client";
+import { getDb, generateId, deleteProject, assignBusinessFunctionsToProject } from "../db/client";
 import {
   seedDefaultGovernanceObjects,
   getGovernanceObjects,
@@ -91,6 +91,15 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
       [projectId, projectName, now]
     );
 
+    // Ebeveyn proje kaydının oluşturulduğunu anında doğrula
+    const parentProjCheck = await db.select<{ id: string }[]>(
+      "SELECT id FROM analysis_projects WHERE id = $1",
+      [projectId]
+    );
+    if (parentProjCheck.length === 0) {
+      throw new Error(`Demo Proje Ebeveyn Hatası: '${projectId}' kaydı oluşturulamadı.`);
+    }
+
     // 2. STAGE: company_profile
     currentStage = "company_profile";
     const companyProfileId = generateId("comp_demo");
@@ -117,7 +126,7 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
       ]
     );
 
-    // 3. STAGE: project_business_functions (19 Aktif Fonksiyon)
+    // 3. STAGE: project_business_functions (19 Aktif Fonksiyon — Kanonik Servis)
     currentStage = "project_business_functions";
     const businessFunctions = [
       { code: "SALES", status: "completed", dept: "Satış ve Pazarlama", resp: "Satış Müdürü" },
@@ -141,37 +150,10 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
       { code: "E_TRANSFORMATION", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü" },
     ];
 
-    // Master business_functions tablosundan gerçek ID'leri çek
-    const masterFunctions = await db.select<{ id: string; code: string }[]>(
-      "SELECT id, code FROM business_functions WHERE is_active = 1"
-    );
-    const masterFunctionMap = new Map<string, string>();
-    for (const mf of masterFunctions) {
-      masterFunctionMap.set(mf.code, mf.id);
-    }
+    currentKey = `functions=${businessFunctions.map((bf) => bf.code).join(",")}`;
+    await assignBusinessFunctionsToProject(projectId, businessFunctions);
 
     const activeFunctionCodes = new Set(businessFunctions.map((b) => b.code));
-
-    for (let i = 0; i < businessFunctions.length; i++) {
-      const bf = businessFunctions[i];
-      currentKey = `bf_code=${bf.code}`;
-      const masterId = masterFunctionMap.get(bf.code) || `bf_${bf.code.toLowerCase()}`;
-
-      await db.execute(
-        `INSERT INTO project_business_functions
-         (id, analysis_project_id, business_function_id, is_active, status, company_department_name, responsible_person, created_at, updated_at)
-         VALUES ($1, $2, $3, 1, $4, $5, $6, $7, $7)`,
-        [
-          generateId("pbf"),
-          projectId,
-          masterId,
-          bf.status,
-          bf.dept,
-          bf.resp,
-          now,
-        ]
-      );
-    }
 
   // 4. Saha Soru Cevapları (92 Gerçekçi Cevap)
   const answersData: {
