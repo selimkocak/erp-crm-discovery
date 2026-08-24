@@ -145,6 +145,7 @@ for (const expected of [
   "governance_limits",
   "governance_sod_risks",
   "governance_attachments",
+  "project_scope_changes",
 ]) {
   assert(tableNames.includes(expected), `Tablo mevcut: ${expected}`);
 }
@@ -202,7 +203,12 @@ const tableCount2 = (
     .prepare("SELECT COUNT(*) as c FROM sqlite_master WHERE type='table'")
     .get() as { c: number }
 ).c;
-assert(tableCount2 === 24, `Tablo sayısı değişmedi: 24 (gerçek: ${tableCount2})`);
+assert(tableCount2 === 25, `Tablo sayısı değişmedi: 25 (gerçek: ${tableCount2})`);
+
+const pscTable2 = db2
+  .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='project_scope_changes'")
+  .get();
+assert(pscTable2 !== undefined, "project_scope_changes tablosu ikinci startuptan sonra mevcut");
 
 
 // ─── TEST 7: Sales Answer Persistence ───────────────────────────────────────
