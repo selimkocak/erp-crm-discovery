@@ -188,8 +188,8 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
     currentKey = `project_id=${projectId}, name=${projectName}`;
 
     await db.execute(
-      `INSERT INTO analysis_projects (id, name, status, created_at, updated_at)
-       VALUES ($1, $2, 'active', $3, $3)`,
+      `INSERT INTO analysis_projects (id, name, status, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at)
+       VALUES ($1, $2, 'active', '2026-09-01', '2026-11-24', '2026-09-01', NULL, $3, $3)`,
       [projectId, projectName, now]
     );
 
@@ -228,28 +228,37 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
       ]
     );
 
-    // 3. STAGE: project_business_functions (19 Aktif Fonksiyon — Kanonik Servis)
+    // 3. STAGE: project_business_functions (19 Aktif Fonksiyon — 5 Dalgalı Takvim Modeli)
     currentStage = "project_business_functions";
     const businessFunctions = [
-      { code: "SALES", status: "completed", dept: "Satış ve Pazarlama", resp: "Satış Müdürü" },
-      { code: "CRM", status: "in_progress", dept: "Müşteri Hizmetleri", resp: "Satış Müdürü" },
-      { code: "PROPOSALS", status: "in_progress", dept: "Proje Mühendisliği", resp: "Satış Müdürü" },
-      { code: "PROCUREMENT", status: "completed", dept: "Satınalma", resp: "Satınalma Müdürü" },
-      { code: "SUPPLIER_MANAGEMENT", status: "in_progress", dept: "Satınalma", resp: "Satınalma Müdürü" },
-      { code: "WAREHOUSE", status: "completed", dept: "Hammadde Deposu", resp: "Depo Sorumlusu" },
-      { code: "INVENTORY", status: "completed", dept: "Hammadde Deposu", resp: "Depo Sorumlusu" },
-      { code: "PRODUCTION_PLANNING", status: "in_progress", dept: "Üretim Planlama", resp: "Planlama Sorumlusu" },
-      { code: "WORK_ORDERS", status: "in_progress", dept: "Üretim", resp: "Üretim Müdürü" },
-      { code: "QUALITY", status: "in_progress", dept: "Kalite Güvence", resp: "Kalite Müdürü" },
-      { code: "MAINTENANCE", status: "in_progress", dept: "Bakım", resp: "Bakım Şefi" },
-      { code: "ACCOUNTING", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü" },
-      { code: "TREASURY", status: "in_progress", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü" },
-      { code: "HUMAN_RESOURCES", status: "in_progress", dept: "İnsan Kaynakları", resp: "İnsan Kaynakları Müdürü" },
-      { code: "INFORMATION_TECHNOLOGY", status: "completed", dept: "Bilgi Teknolojileri", resp: "BT Yöneticisi" },
-      { code: "LOGISTICS", status: "completed", dept: "Lojistik ve Sevkiyat", resp: "Lojistik Müdürü" },
-      { code: "INVOICING", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü" },
-      { code: "DOCUMENT_MANAGEMENT", status: "in_progress", dept: "Genel Müdürlük", resp: "BT Yöneticisi" },
-      { code: "E_TRANSFORMATION", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü" },
+      // 1. Dalga — Yönetim ve Finans
+      { code: "ACCOUNTING", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü", planned_start_date: "2026-09-01", planned_end_date: "2026-09-15", actual_start_date: "2026-09-01", actual_end_date: "2026-09-14" },
+      { code: "INVOICING", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü", planned_start_date: "2026-09-01", planned_end_date: "2026-09-15", actual_start_date: "2026-09-02", actual_end_date: "2026-09-15" },
+      { code: "TREASURY", status: "in_progress", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü", planned_start_date: "2026-09-08", planned_end_date: "2026-09-22", actual_start_date: "2026-09-08", actual_end_date: null },
+
+      // 2. Dalga — Satış, CRM ve Satınalma
+      { code: "SALES", status: "completed", dept: "Satış ve Pazarlama", resp: "Satış Müdürü", planned_start_date: "2026-09-15", planned_end_date: "2026-09-29", actual_start_date: "2026-09-15", actual_end_date: "2026-09-28" },
+      { code: "PROCUREMENT", status: "completed", dept: "Satınalma", resp: "Satınalma Müdürü", planned_start_date: "2026-09-15", planned_end_date: "2026-09-29", actual_start_date: "2026-09-15", actual_end_date: "2026-09-29" },
+      { code: "CRM", status: "in_progress", dept: "Müşteri Hizmetleri", resp: "Satış Müdürü", planned_start_date: "2026-09-22", planned_end_date: "2026-10-06", actual_start_date: "2026-09-22", actual_end_date: null },
+      { code: "PROPOSALS", status: "in_progress", dept: "Proje Mühendisliği", resp: "Satış Müdürü", planned_start_date: "2026-09-22", planned_end_date: "2026-10-06", actual_start_date: "2026-09-25", actual_end_date: null },
+      { code: "SUPPLIER_MANAGEMENT", status: "in_progress", dept: "Satınalma", resp: "Satınalma Müdürü", planned_start_date: "2026-09-22", planned_end_date: "2026-10-06", actual_start_date: "2026-09-22", actual_end_date: null },
+
+      // 3. Dalga — Stok, Depo ve Lojistik
+      { code: "INVENTORY", status: "completed", dept: "Hammadde Deposu", resp: "Depo Sorumlusu", planned_start_date: "2026-10-01", planned_end_date: "2026-10-15", actual_start_date: "2026-10-01", actual_end_date: "2026-10-15" },
+      { code: "WAREHOUSE", status: "completed", dept: "Hammadde Deposu", resp: "Depo Sorumlusu", planned_start_date: "2026-10-01", planned_end_date: "2026-10-15", actual_start_date: "2026-10-01", actual_end_date: "2026-10-15" },
+      { code: "LOGISTICS", status: "completed", dept: "Lojistik ve Sevkiyat", resp: "Lojistik Müdürü", planned_start_date: "2026-10-08", planned_end_date: "2026-10-22", actual_start_date: "2026-10-08", actual_end_date: "2026-10-22" },
+
+      // 4. Dalga — Üretim, Planlama, Kalite ve Bakım
+      { code: "PRODUCTION_PLANNING", status: "in_progress", dept: "Üretim Planlama", resp: "Planlama Sorumlusu", planned_start_date: "2026-10-15", planned_end_date: "2026-10-29", actual_start_date: "2026-10-15", actual_end_date: null },
+      { code: "WORK_ORDERS", status: "in_progress", dept: "Üretim", resp: "Üretim Müdürü", planned_start_date: "2026-10-22", planned_end_date: "2026-11-05", actual_start_date: "2026-10-22", actual_end_date: null },
+      { code: "QUALITY", status: "in_progress", dept: "Kalite Güvence", resp: "Kalite Müdürü", planned_start_date: "2026-10-22", planned_end_date: "2026-11-05", actual_start_date: "2026-10-22", actual_end_date: null },
+      { code: "MAINTENANCE", status: "in_progress", dept: "Bakım", resp: "Bakım Şefi", planned_start_date: "2026-10-29", planned_end_date: "2026-11-12", actual_start_date: "2026-10-29", actual_end_date: null },
+
+      // 5. Dalga — İnsan Kaynakları, BT ve E-Dönüşüm
+      { code: "HUMAN_RESOURCES", status: "not_started", dept: "İnsan Kaynakları", resp: "İnsan Kaynakları Müdürü", planned_start_date: "2026-11-05", planned_end_date: "2026-11-19", actual_start_date: null, actual_end_date: null },
+      { code: "INFORMATION_TECHNOLOGY", status: "completed", dept: "Bilgi Teknolojileri", resp: "BT Yöneticisi", planned_start_date: "2026-09-01", planned_end_date: "2026-09-15", actual_start_date: "2026-09-01", actual_end_date: "2026-09-18" },
+      { code: "DOCUMENT_MANAGEMENT", status: "in_progress", dept: "Genel Müdürlük", resp: "BT Yöneticisi", planned_start_date: "2026-11-01", planned_end_date: "2026-11-15", actual_start_date: "2026-11-01", actual_end_date: null },
+      { code: "E_TRANSFORMATION", status: "completed", dept: "Muhasebe ve Finans", resp: "Mali İşler Müdürü", planned_start_date: "2026-09-15", planned_end_date: "2026-09-30", actual_start_date: "2026-09-15", actual_end_date: "2026-09-30" },
     ];
 
     currentKey = `functions=${businessFunctions.map((bf) => bf.code).join(",")}`;

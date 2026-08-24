@@ -478,6 +478,116 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     new Paragraph({ spacing: { after: 200 } })
   );
 
+  // ── Section 3.1: Proje Takvimi & Zaman Planı (FAZ-59) ────────────────────
+  if (report.scheduleSummary) {
+    const sched = report.scheduleSummary;
+
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "3.1 Proje Takvimi & İş Fonksiyonu Zaman Planı",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 180, after: 80 },
+        children: [
+          new TextRun({
+            text: "Genel Proje Takvimi",
+            bold: true,
+            size: 22,
+            color: COLOR_DARK,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    const projSchedRows: TableRow[] = [
+      new TableRow({
+        children: [
+          createTableCell("Planlanan Tarih Aralığı", { bold: true, widthPercent: 30 }),
+          createTableCell(sched.projectSchedule.plannedRangeSummary || "—", { widthPercent: 70 }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          createTableCell("Gerçekleşen Tarih Aralığı", { bold: true, widthPercent: 30 }),
+          createTableCell(sched.projectSchedule.actualRangeSummary || "—", { widthPercent: 70 }),
+        ],
+      }),
+      new TableRow({
+        children: [
+          createTableCell("Takvim Durumu", { bold: true, widthPercent: 30 }),
+          createTableCell(`${sched.projectSchedule.scheduleStatusLabel} (${sched.projectSchedule.delaySummary})`, { widthPercent: 70 }),
+        ],
+      }),
+    ];
+
+    docChildren.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: projSchedRows,
+      }),
+      new Paragraph({ spacing: { after: 150 } }),
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 180, after: 80 },
+        children: [
+          new TextRun({
+            text: "İş Fonksiyonları Zaman Çizelgesi",
+            bold: true,
+            size: 22,
+            color: COLOR_DARK,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    const funcSchedRows: TableRow[] = [
+      new TableRow({
+        children: [
+          createTableCell("İş Fonksiyonu", { isHeader: true, widthPercent: 24 }),
+          createTableCell("Süreç Durumu", { isHeader: true, widthPercent: 16 }),
+          createTableCell("Planlanan Tarih", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Gerçekleşen Tarih", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Takvim Durumu", { isHeader: true, widthPercent: 20 }),
+        ],
+      }),
+    ];
+
+    for (const fs of sched.functionSchedules) {
+      funcSchedRows.push(
+        new TableRow({
+          children: [
+            createTableCell(fs.nameTr, { bold: true }),
+            createTableCell(formatStatusLabel(fs.processStatus)),
+            createTableCell(fs.plannedRangeSummary || "—"),
+            createTableCell(fs.actualRangeSummary || "—"),
+            createTableCell(`${fs.scheduleStatusLabel} (${fs.delaySummary || "—"})`),
+          ],
+        })
+      );
+    }
+
+    docChildren.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: funcSchedRows,
+      }),
+      new Paragraph({ spacing: { after: 200 } })
+    );
+  }
+
   // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   docChildren.push(
     new Paragraph({

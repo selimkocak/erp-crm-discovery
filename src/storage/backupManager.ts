@@ -31,7 +31,7 @@ import type {
 } from "../types/backup";
 
 export const BACKUP_FORMAT_VERSION = "1.1.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 12;
+export const BACKUP_CURRENT_SCHEMA_VERSION = 13;
 export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
@@ -634,12 +634,16 @@ export async function restoreProjectBackup(
   try {
     // A. analysis_projects
     await db.execute(
-      `INSERT INTO analysis_projects (id, name, status, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, $5)`,
+      `INSERT INTO analysis_projects (id, name, status, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         newProjectId,
         finalProjectName,
         projectData.project?.status || "active",
+        projectData.project?.planned_start_date || null,
+        projectData.project?.planned_end_date || null,
+        projectData.project?.actual_start_date || null,
+        projectData.project?.actual_end_date || null,
         now,
         now,
       ]
@@ -677,8 +681,8 @@ export async function restoreProjectBackup(
       const pbfId = generateId("pbf");
       await db.execute(
         `INSERT INTO project_business_functions
-           (id, analysis_project_id, business_function_id, company_department_name, responsible_person, status, is_active, removed_at, removal_reason, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+           (id, analysis_project_id, business_function_id, company_department_name, responsible_person, status, is_active, removed_at, removal_reason, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
         [
           pbfId,
           newProjectId,
@@ -689,6 +693,10 @@ export async function restoreProjectBackup(
           bf.is_active !== undefined ? (bf.is_active ? 1 : 0) : 1,
           bf.removed_at || null,
           bf.removal_reason || null,
+          bf.planned_start_date || null,
+          bf.planned_end_date || null,
+          bf.actual_start_date || null,
+          bf.actual_end_date || null,
           now,
           now,
         ]
@@ -910,10 +918,11 @@ export async function restoreProjectBackup(
     // N. question_followups
     for (const fol of projectData.followups || []) {
       const folId = generateId("fol");
+      const status = fol.status || (fol.is_resolved ? "resolved" : "open");
       await db.execute(
         `INSERT INTO question_followups
-           (id, analysis_project_id, business_function_code, question_id, flag_type, note, is_resolved, resolved_at, resolution_note, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+           (id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at, resolved_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           folId,
           newProjectId,
@@ -921,11 +930,10 @@ export async function restoreProjectBackup(
           fol.question_id,
           fol.flag_type,
           fol.note || null,
-          fol.is_resolved ? 1 : 0,
+          status,
+          now,
+          now,
           fol.resolved_at || null,
-          fol.resolution_note || null,
-          now,
-          now,
         ]
       );
     }
@@ -1294,10 +1302,18 @@ export async function duplicateProject(
     projectData.questionAttachments = [];
     projectData.governanceAttachments = [];
 
-    // Fonksiyon durumlarını "not_started" yap
+    // Proje gerçekleşen tarihlerini sıfırla (planlananlar korunur)
+    if (projectData.project) {
+      projectData.project.actual_start_date = null;
+      projectData.project.actual_end_date = null;
+    }
+
+    // Fonksiyon durumlarını "not_started" yap ve gerçekleşen tarihleri sıfırla (planlananlar korunur)
     projectData.businessFunctions = (projectData.businessFunctions || []).map((bf) => ({
       ...bf,
       status: "not_started",
+      actual_start_date: null,
+      actual_end_date: null,
     }));
 
     // Ek dosyaları arşivden temizle

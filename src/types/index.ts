@@ -1,10 +1,20 @@
 export type ProjectStatus = 'active' | 'passive' | 'draft' | 'completed';
 export type FunctionStatus = 'not_started' | 'in_progress' | 'completed';
 
+export type {
+  ScheduleStatus,
+  ScheduleDates,
+  ScheduleStatusResult,
+} from "../models/scheduleStatus";
+
 export interface AnalysisProject {
   id: string;
   name: string;
   status: ProjectStatus;
+  planned_start_date?: string | null;
+  planned_end_date?: string | null;
+  actual_start_date?: string | null;
+  actual_end_date?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -46,6 +56,10 @@ export interface ProjectBusinessFunction {
   is_active?: number;
   removed_at?: string | null;
   removal_reason?: string | null;
+  planned_start_date?: string | null;
+  planned_end_date?: string | null;
+  actual_start_date?: string | null;
+  actual_end_date?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -54,6 +68,10 @@ export interface ProjectListItem {
   id: string;
   name: string;
   status: ProjectStatus;
+  planned_start_date?: string | null;
+  planned_end_date?: string | null;
+  actual_start_date?: string | null;
+  actual_end_date?: string | null;
   created_at: string;
   updated_at: string;
   company_name: string;
@@ -107,6 +125,10 @@ export interface FunctionDataCounts {
 
 export interface CreateProjectPayload {
   projectName: string;
+  planned_start_date?: string | null;
+  planned_end_date?: string | null;
+  actual_start_date?: string | null;
+  actual_end_date?: string | null;
   company: {
     company_name: string;
     trade_name?: string;
@@ -138,6 +160,10 @@ export interface UpdateCompanyProfilePayload {
 export interface UpdateProjectDetailsPayload {
   projectName?: string;
   status?: ProjectStatus;
+  planned_start_date?: string | null;
+  planned_end_date?: string | null;
+  actual_start_date?: string | null;
+  actual_end_date?: string | null;
   company: UpdateCompanyProfilePayload;
 }
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckSquare, Square, Building, Briefcase } from "lucide-react";
 import { getMasterBusinessFunctions, createProject, getProjectDetail, updateProjectDetails } from "../db/client";
 import { hasQuestionPack } from "../engine/loader";
+import { validateScheduleDates } from "../models/scheduleStatus";
 import type { BusinessFunction, CreateProjectPayload, ProjectStatus } from "../types";
 
 interface NewProjectViewProps {
@@ -34,6 +35,12 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
   const [branchCount, setBranchCount] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
 
+  // Schedule Fields (FAZ-59)
+  const [plannedStartDate, setPlannedStartDate] = useState<string>("");
+  const [plannedEndDate, setPlannedEndDate] = useState<string>("");
+  const [actualStartDate, setActualStartDate] = useState<string>("");
+  const [actualEndDate, setActualEndDate] = useState<string>("");
+
   // Functions Selection
   const [allFunctions, setAllFunctions] = useState<BusinessFunction[]>([]);
   const [selectedFunctionIds, setSelectedFunctionIds] = useState<string[]>([]);
@@ -61,6 +68,10 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
             setHasBranches((detail.company.has_branches as any) || "");
             setBranchCount(detail.company.branch_count != null ? String(detail.company.branch_count) : "");
             setNotes(detail.company.notes || "");
+            setPlannedStartDate(detail.project.planned_start_date || "");
+            setPlannedEndDate(detail.project.planned_end_date || "");
+            setActualStartDate(detail.project.actual_start_date || "");
+            setActualEndDate(detail.project.actual_end_date || "");
           }
         } else {
           const data = await getMasterBusinessFunctions();
@@ -88,6 +99,17 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
       return;
     }
 
+    const scheduleValidation = validateScheduleDates({
+      plannedStartDate: plannedStartDate || null,
+      plannedEndDate: plannedEndDate || null,
+      actualStartDate: actualStartDate || null,
+      actualEndDate: actualEndDate || null,
+    });
+    if (!scheduleValidation.valid) {
+      setErrorMessage(scheduleValidation.error || "Geçersiz takvim tarih aralığı.");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setErrorMessage(null);
@@ -102,6 +124,10 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
       await updateProjectDetails(editProjectId!, {
         projectName: projectName.trim(),
         status: projectStatus,
+        planned_start_date: plannedStartDate.trim() || null,
+        planned_end_date: plannedEndDate.trim() || null,
+        actual_start_date: actualStartDate.trim() || null,
+        actual_end_date: actualEndDate.trim() || null,
         company: {
           company_name: companyName.trim(),
           trade_name: tradeName.trim() || null,
@@ -138,6 +164,16 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
     }
     if (!companyName.trim()) {
       setErrorMessage("Lütfen firma adını belirtin.");
+      return;
+    }
+    const scheduleValidation = validateScheduleDates({
+      plannedStartDate: plannedStartDate || null,
+      plannedEndDate: plannedEndDate || null,
+      actualStartDate: actualStartDate || null,
+      actualEndDate: actualEndDate || null,
+    });
+    if (!scheduleValidation.valid) {
+      setErrorMessage(scheduleValidation.error || "Geçersiz takvim tarih aralığı.");
       return;
     }
     setErrorMessage(null);
@@ -177,6 +213,10 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
 
       const payload: CreateProjectPayload = {
         projectName: projectName.trim(),
+        planned_start_date: plannedStartDate.trim() || null,
+        planned_end_date: plannedEndDate.trim() || null,
+        actual_start_date: actualStartDate.trim() || null,
+        actual_end_date: actualEndDate.trim() || null,
         company: {
           company_name: companyName.trim(),
           trade_name: tradeName.trim() || undefined,
@@ -534,6 +574,57 @@ export const NewProjectView: React.FC<NewProjectViewProps> = ({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
+          </div>
+
+          {/* Proje Takvimi Bölümü (FAZ-59) */}
+          <div style={{ marginTop: "1.25rem", padding: "1rem", borderRadius: "8px", background: "var(--bg-secondary, #f8fafc)", border: "1px solid var(--border-color, #e2e8f0)" }}>
+            <h4 style={{ fontSize: "0.9375rem", fontWeight: 700, margin: "0 0 0.75rem", color: "var(--text-main)" }}>
+              Proje Takvimi (Opsiyonel)
+            </h4>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="plannedStartDate">Planlanan Başlangıç</label>
+                <input
+                  id="plannedStartDate"
+                  type="date"
+                  className="form-control"
+                  value={plannedStartDate}
+                  onChange={(e) => setPlannedStartDate(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="plannedEndDate">Planlanan Bitiş</label>
+                <input
+                  id="plannedEndDate"
+                  type="date"
+                  className="form-control"
+                  value={plannedEndDate}
+                  onChange={(e) => setPlannedEndDate(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="actualStartDate">Gerçekleşen Başlangıç</label>
+                <input
+                  id="actualStartDate"
+                  type="date"
+                  className="form-control"
+                  value={actualStartDate}
+                  onChange={(e) => setActualStartDate(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="actualEndDate">Gerçekleşen Bitiş</label>
+                <input
+                  id="actualEndDate"
+                  type="date"
+                  className="form-control"
+                  value={actualEndDate}
+                  onChange={(e) => setActualEndDate(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1.5rem" }}>

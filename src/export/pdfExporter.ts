@@ -240,6 +240,58 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
   });
   currentY = (doc as any).lastAutoTable.finalY + 8;
 
+  // ── Section 3.1: Proje Takvimi & Zaman Planı (FAZ-59) ────────────────────
+  if (report.scheduleSummary) {
+    const sched = report.scheduleSummary;
+    checkPageBreak(35);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("3.1 Proje Takvimi & İş Fonksiyonu Zaman Planı", marginX, currentY);
+    currentY += 6;
+
+    // Project overview table
+    const projSchedBody: string[][] = [
+      ["Planlanan Tarih Aralığı", sched.projectSchedule.plannedRangeSummary || "—"],
+      ["Gerçekleşen Tarih Aralığı", sched.projectSchedule.actualRangeSummary || "—"],
+      ["Takvim Durumu", `${sched.projectSchedule.scheduleStatusLabel} (${sched.projectSchedule.delaySummary})`],
+    ];
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      head: [["Proje Takvim Parametresi", "Değer"]],
+      body: projSchedBody,
+      theme: "plain",
+      styles: { font: PDF_FONT_FAMILY, fontSize: 8.5 },
+      headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8.5 },
+      bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 8.5, cellPadding: 2.5 },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 5;
+
+    // Function schedules table
+    const funcSchedBody: string[][] = sched.functionSchedules.map((fs) => [
+      fs.nameTr,
+      formatStatusLabel(fs.processStatus),
+      fs.plannedRangeSummary || "—",
+      fs.actualRangeSummary || "—",
+      fs.scheduleStatusLabel,
+      fs.delaySummary || "—",
+    ]);
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      head: [["İş Fonksiyonu", "Süreç Durumu", "Planlanan Tarih", "Gerçekleşen Tarih", "Takvim Durumu", "Sapma / Kalan"]],
+      body: funcSchedBody,
+      theme: "striped",
+      styles: { font: PDF_FONT_FAMILY, fontSize: 8 },
+      headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8 },
+      bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 8, cellPadding: 2 },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 8;
+  }
+
   // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   checkPageBreak(35);
   doc.setFont(PDF_FONT_FAMILY, "bold");

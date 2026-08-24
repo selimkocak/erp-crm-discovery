@@ -41,6 +41,7 @@ import type {
   CreateQuestionAttachmentPayload,
   AttachmentSummaryStats,
   ProjectBusinessFunction,
+  ScheduleDates,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -104,6 +105,10 @@ export async function getProjects(): Promise<ProjectListItem[]> {
       p.id,
       p.name,
       p.status,
+      p.planned_start_date,
+      p.planned_end_date,
+      p.actual_start_date,
+      p.actual_end_date,
       p.created_at,
       p.updated_at,
       COALESCE(c.company_name, 'İsimsiz Firma') as company_name,
@@ -154,16 +159,25 @@ export async function createProject(payload: CreateProjectPayload): Promise<stri
 
   // 1. Proje kaydı
   await db.execute(
-    `INSERT INTO analysis_projects (id, name, status, created_at, updated_at)
-     VALUES ($1, $2, 'active', $3, $3)`,
-    [projectId, payload.projectName, now]
+    `INSERT INTO analysis_projects (id, name, status, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at)
+     VALUES ($1, $2, 'active', $3, $4, $5, $6, $7, $8)`,
+    [
+      projectId,
+      payload.projectName,
+      payload.planned_start_date ?? null,
+      payload.planned_end_date ?? null,
+      payload.actual_start_date ?? null,
+      payload.actual_end_date ?? null,
+      now,
+      now,
+    ]
   );
 
   // 2. Firma profili
   await db.execute(
     `INSERT INTO company_profiles
      (id, analysis_project_id, company_name, trade_name, tax_number, city, country, employee_count, business_sector, has_branches, branch_count, notes, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
     [
       companyProfileId,
       projectId,
@@ -177,6 +191,7 @@ export async function createProject(payload: CreateProjectPayload): Promise<stri
       payload.company.has_branches ?? null,
       payload.company.branch_count ?? null,
       payload.company.notes ?? null,
+      now,
       now,
     ]
   );
@@ -198,6 +213,14 @@ export interface AssignBusinessFunctionInput {
   status?: string;
   dept?: string;
   resp?: string;
+  plannedStartDate?: string | null;
+  planned_start_date?: string | null;
+  plannedEndDate?: string | null;
+  planned_end_date?: string | null;
+  actualStartDate?: string | null;
+  actual_start_date?: string | null;
+  actualEndDate?: string | null;
+  actual_end_date?: string | null;
 }
 
 /**
@@ -245,6 +268,10 @@ export async function assignBusinessFunctionsToProject(
     let status = "not_started";
     let dept: string | null = null;
     let resp: string | null = null;
+    let plannedStart: string | null = null;
+    let plannedEnd: string | null = null;
+    let actualStart: string | null = null;
+    let actualEnd: string | null = null;
     let requestedIdentifier = "";
 
     if (typeof item === "string") {
@@ -260,6 +287,14 @@ export async function assignBusinessFunctionsToProject(
       if (item.status) status = item.status;
       if (item.dept) dept = item.dept;
       if (item.resp) resp = item.resp;
+      if (item.plannedStartDate !== undefined) plannedStart = item.plannedStartDate;
+      if (item.planned_start_date !== undefined) plannedStart = item.planned_start_date;
+      if (item.plannedEndDate !== undefined) plannedEnd = item.plannedEndDate;
+      if (item.planned_end_date !== undefined) plannedEnd = item.planned_end_date;
+      if (item.actualStartDate !== undefined) actualStart = item.actualStartDate;
+      if (item.actual_start_date !== undefined) actualStart = item.actual_start_date;
+      if (item.actualEndDate !== undefined) actualEnd = item.actualEndDate;
+      if (item.actual_end_date !== undefined) actualEnd = item.actual_end_date;
     }
 
     if (!resolvedMaster) {
@@ -277,9 +312,9 @@ export async function assignBusinessFunctionsToProject(
     const pbfId = generateId("pbf");
     await db.execute(
       `INSERT INTO project_business_functions
-       (id, analysis_project_id, business_function_id, status, is_active, company_department_name, responsible_person, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, 1, $5, $6, $7, $7)`,
-      [pbfId, projectId, resolvedMaster.id, status, dept, resp, now]
+       (id, analysis_project_id, business_function_id, status, is_active, company_department_name, responsible_person, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at)
+       VALUES ($1, $2, $3, $4, 1, $5, $6, $7, $8, $9, $10, $11, $12)`,
+      [pbfId, projectId, resolvedMaster.id, status, dept, resp, plannedStart, plannedEnd, actualStart, actualEnd, now, now]
     );
   }
 }
@@ -291,7 +326,7 @@ export async function getProjectDetail(projectId: string): Promise<ProjectDetail
   const db = await getDb();
 
   const projects = await db.select<ProjectDetailData["project"][]>(
-    `SELECT id, name, status, created_at, updated_at FROM analysis_projects WHERE id = $1`,
+    `SELECT id, name, status, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at FROM analysis_projects WHERE id = $1`,
     [projectId]
   );
   if (projects.length === 0) return null;
@@ -322,6 +357,10 @@ export async function getProjectDetail(projectId: string): Promise<ProjectDetail
        COALESCE(pbf.is_active, 1) as is_active,
        pbf.removed_at,
        pbf.removal_reason,
+       pbf.planned_start_date,
+       pbf.planned_end_date,
+       pbf.actual_start_date,
+       pbf.actual_end_date,
        pbf.created_at,
        pbf.updated_at,
        bf.code,
@@ -390,8 +429,36 @@ export async function updateProjectDetails(
   const db = await getDb();
   const now = new Date().toISOString();
 
-  // 1. Proje adı / durumu güncellenmişse analysis_projects tablosunu güncelle
-  if (payload.projectName && payload.projectName.trim()) {
+  // 1. Proje adı / durumu / tarihleri güncellenmişse analysis_projects tablosunu güncelle
+  const hasSchedule =
+    payload.planned_start_date !== undefined ||
+    payload.planned_end_date !== undefined ||
+    payload.actual_start_date !== undefined ||
+    payload.actual_end_date !== undefined;
+
+  if (hasSchedule) {
+    await db.execute(
+      `UPDATE analysis_projects
+       SET name = COALESCE($1, name),
+           status = COALESCE($2, status),
+           planned_start_date = $3,
+           planned_end_date = $4,
+           actual_start_date = $5,
+           actual_end_date = $6,
+           updated_at = $7
+       WHERE id = $8`,
+      [
+        payload.projectName?.trim() || null,
+        payload.status || null,
+        payload.planned_start_date ?? null,
+        payload.planned_end_date ?? null,
+        payload.actual_start_date ?? null,
+        payload.actual_end_date ?? null,
+        now,
+        projectId,
+      ]
+    );
+  } else if (payload.projectName && payload.projectName.trim()) {
     if (payload.status) {
       await db.execute(
         `UPDATE analysis_projects SET name = $1, status = $2, updated_at = $3 WHERE id = $4`,
@@ -445,6 +512,145 @@ export async function updateProjectDetails(
       projectId,
     ]
   );
+}
+
+// ---------------------------------------------------------------
+// 4.3 Proje Takvimi Servisleri (FAZ-59)
+// ---------------------------------------------------------------
+export async function updateProjectSchedule(
+  projectId: string,
+  schedule: ScheduleDates
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  const check = await db.select<{ id: string }[]>(
+    "SELECT id FROM analysis_projects WHERE id = $1",
+    [projectId]
+  );
+  if (!check || check.length === 0) {
+    throw new Error(`Proje takvimi güncellenemedi: Proje bulunamadı (${projectId})`);
+  }
+
+  await db.execute(
+    `UPDATE analysis_projects
+     SET planned_start_date = $1,
+         planned_end_date = $2,
+         actual_start_date = $3,
+         actual_end_date = $4,
+         updated_at = $5
+     WHERE id = $6`,
+    [
+      schedule.plannedStartDate ?? null,
+      schedule.plannedEndDate ?? null,
+      schedule.actualStartDate ?? null,
+      schedule.actualEndDate ?? null,
+      now,
+      projectId,
+    ]
+  );
+}
+
+export async function getProjectSchedule(
+  projectId: string
+): Promise<ScheduleDates | null> {
+  const db = await getDb();
+  const rows = await db.select<
+    {
+      planned_start_date: string | null;
+      planned_end_date: string | null;
+      actual_start_date: string | null;
+      actual_end_date: string | null;
+    }[]
+  >(
+    `SELECT planned_start_date, planned_end_date, actual_start_date, actual_end_date
+     FROM analysis_projects
+     WHERE id = $1`,
+    [projectId]
+  );
+  if (!rows || rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    plannedStartDate: r.planned_start_date,
+    plannedEndDate: r.planned_end_date,
+    actualStartDate: r.actual_start_date,
+    actualEndDate: r.actual_end_date,
+  };
+}
+
+export async function updateProjectFunctionSchedule(
+  projectId: string,
+  bfCode: string,
+  schedule: ScheduleDates
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  // Find business_function_id
+  const masterRows = await db.select<{ id: string }[]>(
+    "SELECT id FROM business_functions WHERE code = $1",
+    [bfCode]
+  );
+  if (!masterRows || masterRows.length === 0) {
+    throw new Error(`İş fonksiyonu takvimi güncellenemedi: Master fonksiyon bulunamadı (${bfCode})`);
+  }
+  const bfId = masterRows[0].id;
+
+  const check = await db.select<{ id: string }[]>(
+    "SELECT id FROM project_business_functions WHERE analysis_project_id = $1 AND business_function_id = $2",
+    [projectId, bfId]
+  );
+  if (!check || check.length === 0) {
+    throw new Error(`İş fonksiyonu projeye atanmamış: ${bfCode}`);
+  }
+
+  await db.execute(
+    `UPDATE project_business_functions
+     SET planned_start_date = $1,
+         planned_end_date = $2,
+         actual_start_date = $3,
+         actual_end_date = $4,
+         updated_at = $5
+     WHERE analysis_project_id = $6 AND business_function_id = $7`,
+    [
+      schedule.plannedStartDate ?? null,
+      schedule.plannedEndDate ?? null,
+      schedule.actualStartDate ?? null,
+      schedule.actualEndDate ?? null,
+      now,
+      projectId,
+      bfId,
+    ]
+  );
+}
+
+export async function getProjectFunctionSchedule(
+  projectId: string,
+  bfCode: string
+): Promise<ScheduleDates | null> {
+  const db = await getDb();
+  const rows = await db.select<
+    {
+      planned_start_date: string | null;
+      planned_end_date: string | null;
+      actual_start_date: string | null;
+      actual_end_date: string | null;
+    }[]
+  >(
+    `SELECT pbf.planned_start_date, pbf.planned_end_date, pbf.actual_start_date, pbf.actual_end_date
+     FROM project_business_functions pbf
+     JOIN business_functions bf ON bf.id = pbf.business_function_id
+     WHERE pbf.analysis_project_id = $1 AND bf.code = $2`,
+    [projectId, bfCode]
+  );
+  if (!rows || rows.length === 0) return null;
+  const r = rows[0];
+  return {
+    plannedStartDate: r.planned_start_date,
+    plannedEndDate: r.planned_end_date,
+    actualStartDate: r.actual_start_date,
+    actualEndDate: r.actual_end_date,
+  };
 }
 
 // ---------------------------------------------------------------

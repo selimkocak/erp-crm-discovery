@@ -199,7 +199,7 @@ async function main() {
       "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_psc_project';"
     );
     assert(pscIndex.length > 0, "idx_psc_project indeksi mevcut.");
-    assert(BACKUP_CURRENT_SCHEMA_VERSION === 12, "BACKUP_CURRENT_SCHEMA_VERSION = 12.");
+    assert(BACKUP_CURRENT_SCHEMA_VERSION >= 12, "BACKUP_CURRENT_SCHEMA_VERSION >= 12.");
 
     // -------------------------------------------------------------------------
     // TEST 2: Proje Yaşam Döngüsü (Aktif / Pasif Geçişleri)
@@ -398,7 +398,7 @@ async function main() {
     const exportRes = await exportProjectBackup(projectId);
     assert(exportRes.manifest.recordCounts.scopeChanges !== undefined, "Yedek manifestinde scopeChanges kaydı mevcut.");
     assert((exportRes.manifest.recordCounts.scopeChanges || 0) >= 4, `scopeChanges sayısı >= 4 (Bulunan: ${exportRes.manifest.recordCounts.scopeChanges})`);
-    assert(exportRes.manifest.schemaVersion === 12, "Manifest schemaVersion=12.");
+    assert(exportRes.manifest.schemaVersion >= 12, "Manifest schemaVersion >= 12.");
 
     // Geri yükle
     const restoreRes = await restoreProjectBackup(exportRes.buffer, {

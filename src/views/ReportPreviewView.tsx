@@ -315,6 +315,11 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             <a href="#sec-scope" className="report-toc__link">
               3. Analiz Kapsamı & İlerleme
             </a>
+            {report.scheduleSummary && (
+              <a href="#sec-schedule" className="report-toc__link">
+                3.1 Proje Takvimi & Zaman Planı
+              </a>
+            )}
             <div className="report-toc__group">
               <span className="report-toc__group-title">4. İş Fonksiyonları</span>
               {businessFunctions.map((fn, idx) => (
@@ -531,6 +536,80 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
               </table>
             </div>
           </section>
+
+          {/* ── Bölüm 3.1: Proje Takvimi & Zaman Planı (FAZ-59) ───────── */}
+          {report.scheduleSummary && (
+            <section id="sec-schedule" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">BÖLÜM 3.1</span>
+                <h2 className="report-section__title">Proje Takvimi & İş Fonksiyonu Zaman Planı</h2>
+              </div>
+
+              {/* Project Schedule Overview Card */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                <h3 className="report-summary-box__title" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span>Genel Proje Takvimi</span>
+                  <span className={`badge ${report.scheduleSummary.projectSchedule.scheduleStatusBadgeClass || "badge-completed"}`}>
+                    {report.scheduleSummary.projectSchedule.scheduleStatusLabel}
+                  </span>
+                </h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem", marginTop: "0.75rem" }}>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>PLANLANAN TARİH ARALIĞI</span>
+                    <span style={{ fontSize: "0.9375rem", fontWeight: 600 }}>{report.scheduleSummary.projectSchedule.plannedRangeSummary}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>GERÇEKLEŞEN TARİH ARALIĞI</span>
+                    <span style={{ fontSize: "0.9375rem", fontWeight: 600 }}>{report.scheduleSummary.projectSchedule.actualRangeSummary}</span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>DURUM & SAPMA</span>
+                    <span style={{ fontSize: "0.9375rem", fontWeight: 600 }}>{report.scheduleSummary.projectSchedule.delaySummary}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Function Schedule Table */}
+              <div className="report-table-card">
+                <table className="report-table report-table--striped">
+                  <thead>
+                    <tr>
+                      <th style={{ width: "26%" }}>İş Fonksiyonu</th>
+                      <th style={{ width: "16%" }}>Süreç Durumu</th>
+                      <th style={{ width: "20%" }}>Planlanan Tarih</th>
+                      <th style={{ width: "20%" }}>Gerçekleşen Tarih</th>
+                      <th style={{ width: "18%" }}>Takvim Durumu</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.scheduleSummary.functionSchedules.map((fs) => (
+                      <tr key={fs.code}>
+                        <td>
+                          <div className="font-bold">{fs.nameTr}</div>
+                          <span className="text-muted text-xs">{fs.code}</span>
+                        </td>
+                        <td>{getStatusBadge(fs.processStatus)}</td>
+                        <td>{fs.plannedRangeSummary || "—"}</td>
+                        <td>{fs.actualRangeSummary || "—"}</td>
+                        <td>
+                          <div>
+                            <span className={`badge ${fs.scheduleStatusBadgeClass || "badge--neutral"}`}>
+                              {fs.scheduleStatusLabel}
+                            </span>
+                            {fs.delaySummary && fs.delaySummary !== "Planlanmadı" && fs.delaySummary !== "Zamanında tamamlandı" && (
+                              <span className="text-xs text-muted" style={{ display: "block", marginTop: "2px" }}>
+                                {fs.delaySummary}
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
 
           {/* ── Bölüm 4: İş Fonksiyonları Detay Analizi ─────────────────── */}
           <section id="sec-functions" className="report-section">

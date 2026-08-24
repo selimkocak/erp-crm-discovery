@@ -31,6 +31,7 @@ import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
 import { calculateProgress } from "../engine/progress";
 import { formatAnswer } from "./formatters";
 import { resolveAttachmentFileUrl } from "../storage/attachmentLinks";
+import { calculateScheduleStatus, formatDateRangeSummary } from "../models/scheduleStatus";
 import type {
   ReportModel,
   ReportMetadata,
@@ -47,6 +48,8 @@ import type {
   ReportSummaryStats,
   ReportFollowupItem,
   ReportAttachmentItem,
+  ReportScheduleItem,
+  ReportScheduleSummary,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -613,6 +616,74 @@ export async function buildReportModel(
         }
       : undefined;
 
+  // 12. Schedule Summary Calculation (FAZ-59)
+  const projSchedStatus = calculateScheduleStatus({
+    plannedStartDate: detailData.project.planned_start_date,
+    plannedEndDate: detailData.project.planned_end_date,
+    actualStartDate: detailData.project.actual_start_date,
+    actualEndDate: detailData.project.actual_end_date,
+  });
+
+  const activeFunctions = detailData.functions.filter((f) => f.is_active !== 0);
+  const functionSchedules: ReportScheduleItem[] = activeFunctions.map((f) => {
+    const fStatus = calculateScheduleStatus(
+      {
+        plannedStartDate: f.planned_start_date,
+        plannedEndDate: f.planned_end_date,
+        actualStartDate: f.actual_start_date,
+        actualEndDate: f.actual_end_date,
+      },
+      f.status
+    );
+    return {
+      code: f.code,
+      nameTr: f.name_tr,
+      processStatus: f.status,
+      plannedStartDate: f.planned_start_date || null,
+      plannedEndDate: f.planned_end_date || null,
+      actualStartDate: f.actual_start_date || null,
+      actualEndDate: f.actual_end_date || null,
+      plannedRangeSummary: formatDateRangeSummary(f.planned_start_date, f.planned_end_date),
+      actualRangeSummary: formatDateRangeSummary(f.actual_start_date, f.actual_end_date),
+      scheduleStatus: fStatus.status,
+      scheduleStatusLabel: fStatus.label,
+      scheduleStatusBadgeClass: fStatus.badgeClass,
+      delayDays: fStatus.delayDays,
+      remainingDays: fStatus.remainingDays,
+      delaySummary: fStatus.summaryText,
+    };
+  });
+
+  const scheduleStats = {
+    totalPlanned: functionSchedules.filter((s) => s.scheduleStatus !== "not_planned").length,
+    completedOnTime: functionSchedules.filter((s) => s.scheduleStatus === "completed_on_time").length,
+    completedLate: functionSchedules.filter((s) => s.scheduleStatus === "completed_late").length,
+    onTrack: functionSchedules.filter((s) => s.scheduleStatus === "on_track").length,
+    dueSoon: functionSchedules.filter((s) => s.scheduleStatus === "due_soon").length,
+    overdue: functionSchedules.filter((s) => s.scheduleStatus === "overdue").length,
+    notStarted: functionSchedules.filter((s) => s.scheduleStatus === "not_started" || s.scheduleStatus === "planned").length,
+    notPlanned: functionSchedules.filter((s) => s.scheduleStatus === "not_planned").length,
+  };
+
+  const scheduleSummary: ReportScheduleSummary = {
+    projectSchedule: {
+      plannedStartDate: detailData.project.planned_start_date || null,
+      plannedEndDate: detailData.project.planned_end_date || null,
+      actualStartDate: detailData.project.actual_start_date || null,
+      actualEndDate: detailData.project.actual_end_date || null,
+      plannedRangeSummary: formatDateRangeSummary(detailData.project.planned_start_date, detailData.project.planned_end_date),
+      actualRangeSummary: formatDateRangeSummary(detailData.project.actual_start_date, detailData.project.actual_end_date),
+      scheduleStatus: projSchedStatus.status,
+      scheduleStatusLabel: projSchedStatus.label,
+      scheduleStatusBadgeClass: projSchedStatus.badgeClass,
+      delayDays: projSchedStatus.delayDays,
+      remainingDays: projSchedStatus.remainingDays,
+      delaySummary: projSchedStatus.summaryText,
+    },
+    functionSchedules,
+    stats: scheduleStats,
+  };
+
   return {
     metadata,
     profile,
@@ -622,6 +693,7 @@ export async function buildReportModel(
     followups: reportFollowups,
     attachments: reportAttachments,
     governance: reportGovernance,
+    scheduleSummary,
     globalFindings,
     globalRequirements,
     globalRisks,

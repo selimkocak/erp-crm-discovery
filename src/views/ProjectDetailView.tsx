@@ -25,7 +25,14 @@ import {
   Layers,
   X as XIcon,
 } from "lucide-react";
-import { getProjectDetail, updateProjectBusinessFunction, deleteProject, updateProjectStatus } from "../db/client";
+import {
+  getProjectDetail,
+  updateProjectBusinessFunction,
+  deleteProject,
+  updateProjectStatus,
+  updateProjectSchedule,
+  updateProjectFunctionSchedule,
+} from "../db/client";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { QuestionScreen } from "../views/QuestionScreen";
@@ -40,8 +47,16 @@ import {
 } from "../components/ProjectBackupModals";
 import { ProjectScopeModal } from "../components/modals/ProjectScopeModal";
 import { ProjectDeactivateModal } from "../components/modals/ProjectDeactivateModal";
+import { ProjectScheduleModal } from "../components/modals/ProjectScheduleModal";
+import { FunctionScheduleModal } from "../components/modals/FunctionScheduleModal";
+import {
+  calculateScheduleStatus,
+  getScheduleStatusBadgeMeta,
+  formatDateRangeSummary,
+  type ScheduleDates,
+} from "../models/scheduleStatus";
 import type { QuestionPack } from "../engine/types";
-import type { FunctionStatus, ProjectDetailData } from "../types";
+import type { FunctionStatus, ProjectDetailData, EnrichedProjectFunction } from "../types";
 
 
 interface ProjectDetailViewProps {
@@ -70,6 +85,9 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [isDuplicateOpen, setIsDuplicateOpen] = useState(false);
   const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
   const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
+  const [isProjectScheduleModalOpen, setIsProjectScheduleModalOpen] = useState(false);
+  const [scheduleModalFunction, setScheduleModalFunction] = useState<EnrichedProjectFunction | null>(null);
+  const [scheduleFilter, setScheduleFilter] = useState<string>("all");
   const [isExporting, setIsExporting] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [backupSuccessResult, setBackupSuccessResult] = useState<SaveBackupResult | null>(null);
@@ -105,6 +123,35 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
       setError(err?.message || "Proje verisi yüklenemedi.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSaveProjectSchedule = async (dates: ScheduleDates) => {
+    try {
+      setSaveStatus("saving");
+      await updateProjectSchedule(projectId, dates);
+      setSaveStatus("saved");
+      setLastSavedAt(new Date());
+      showToast("success", "Proje takvimi güncellendi.");
+      await loadData();
+    } catch (err: any) {
+      setSaveStatus("error");
+      showToast("error", err?.message || "Proje takvimi kaydedilemedi.");
+    }
+  };
+
+  const handleSaveFunctionSchedule = async (dates: ScheduleDates) => {
+    if (!scheduleModalFunction) return;
+    try {
+      setSaveStatus("saving");
+      await updateProjectFunctionSchedule(projectId, scheduleModalFunction.code, dates);
+      setSaveStatus("saved");
+      setLastSavedAt(new Date());
+      showToast("success", `${scheduleModalFunction.name_tr} takvimi güncellendi.`);
+      await loadData();
+    } catch (err: any) {
+      setSaveStatus("error");
+      showToast("error", err?.message || "İş fonksiyonu takvimi kaydedilemedi.");
     }
   };
 
@@ -669,6 +716,83 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         )}
       </div>
 
+      {/* Project Schedule Overview Card (FAZ-59) */}
+      {(() => {
+        const projSched = calculateScheduleStatus({
+          plannedStartDate: project.planned_start_date,
+          plannedEndDate: project.planned_end_date,
+          actualStartDate: project.actual_start_date,
+          actualEndDate: project.actual_end_date,
+        });
+        const projBadge = getScheduleStatusBadgeMeta(
+          projSched.status,
+          projSched.delayDays,
+          projSched.remainingDays
+        );
+
+        return (
+          <div className="card" style={{ marginBottom: "1.5rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.875rem" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Calendar size={18} style={{ color: "var(--primary)" }} />
+                <h3 style={{ fontSize: "1rem", fontWeight: 700 }}>Proje Takvimi & Zaman Planı</h3>
+                <span className={`badge ${projBadge.badgeClass}`} style={{ marginLeft: "0.5rem" }}>
+                  {projBadge.label}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="btn btn-secondary btn--sm"
+                onClick={() => setIsProjectScheduleModalOpen(true)}
+                disabled={isPassive}
+                title={isPassive ? "Pasif projede takvim düzenlenemez" : "Proje genel takvimini düzenle"}
+              >
+                <Calendar size={13} />
+                Takvimi Düzenle
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "1rem",
+                fontSize: "0.875rem",
+                background: "var(--bg-secondary, #f8fafc)",
+                padding: "0.875rem 1rem",
+                borderRadius: "8px",
+                border: "1px solid var(--border-color, #e2e8f0)",
+              }}
+            >
+              <div>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem", fontWeight: 600 }}>
+                  PLANLANAN TARİH ARALIĞI
+                </span>
+                <strong style={{ color: "var(--text-primary)" }}>
+                  {formatDateRangeSummary(project.planned_start_date, project.planned_end_date)}
+                </strong>
+              </div>
+              <div>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem", fontWeight: 600 }}>
+                  GERÇEKLEŞEN TARİH ARALIĞI
+                </span>
+                <strong style={{ color: "var(--text-primary)" }}>
+                  {formatDateRangeSummary(project.actual_start_date, project.actual_end_date)}
+                </strong>
+              </div>
+              <div>
+                <span style={{ color: "var(--text-muted)", display: "block", fontSize: "0.75rem", fontWeight: 600 }}>
+                  DURUM & SAPMA
+                </span>
+                <span style={{ fontWeight: 600, color: projSched.delayDays > 0 ? "var(--danger, #dc2626)" : "var(--text-primary)" }}>
+                  {projSched.summaryText}
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* View Mode Tabs (Süreç Analizi & Veri/Yetki Yönetişimi) */}
       <div className="project-view-mode-tabs" style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem" }}>
         <button
@@ -732,6 +856,51 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             </div>
           </div>
 
+          {/* Schedule Status Filter Bar */}
+          <div style={{ display: "flex", gap: "0.5rem", alignItems: "center", marginBottom: "1rem", flexWrap: "wrap" }}>
+            <span className="text-xs text-muted font-bold" style={{ marginRight: "0.25rem" }}>
+              Zaman Planı Filtresi:
+            </span>
+            <button
+              type="button"
+              className={`btn btn--xs ${scheduleFilter === "all" ? "btn-primary" : "btn--outline"}`}
+              onClick={() => setScheduleFilter("all")}
+            >
+              Tümü ({activeFunctions.length})
+            </button>
+            <button
+              type="button"
+              className={`btn btn--xs ${scheduleFilter === "overdue" ? "btn-primary" : "btn--outline"}`}
+              onClick={() => setScheduleFilter("overdue")}
+            >
+              Geciken ({activeFunctions.filter((f) => calculateScheduleStatus({ plannedStartDate: f.planned_start_date, plannedEndDate: f.planned_end_date, actualStartDate: f.actual_start_date, actualEndDate: f.actual_end_date }, f.status).status === "overdue").length})
+            </button>
+            <button
+              type="button"
+              className={`btn btn--xs ${scheduleFilter === "due_soon" ? "btn-primary" : "btn--outline"}`}
+              onClick={() => setScheduleFilter("due_soon")}
+            >
+              Yaklaşan ({activeFunctions.filter((f) => calculateScheduleStatus({ plannedStartDate: f.planned_start_date, plannedEndDate: f.planned_end_date, actualStartDate: f.actual_start_date, actualEndDate: f.actual_end_date }, f.status).status === "due_soon").length})
+            </button>
+            <button
+              type="button"
+              className={`btn btn--xs ${scheduleFilter === "on_track" ? "btn-primary" : "btn--outline"}`}
+              onClick={() => setScheduleFilter("on_track")}
+            >
+              Devam Eden / Zamanında ({activeFunctions.filter((f) => {
+                const st = calculateScheduleStatus({ plannedStartDate: f.planned_start_date, plannedEndDate: f.planned_end_date, actualStartDate: f.actual_start_date, actualEndDate: f.actual_end_date }, f.status).status;
+                return st === "on_track" || st === "completed_on_time";
+              }).length})
+            </button>
+            <button
+              type="button"
+              className={`btn btn--xs ${scheduleFilter === "not_planned" ? "btn-primary" : "btn--outline"}`}
+              onClick={() => setScheduleFilter("not_planned")}
+            >
+              Planlanmamış ({activeFunctions.filter((f) => calculateScheduleStatus({ plannedStartDate: f.planned_start_date, plannedEndDate: f.planned_end_date, actualStartDate: f.actual_start_date, actualEndDate: f.actual_end_date }, f.status).status === "not_planned").length})
+            </button>
+          </div>
+
           <div className="table-container">
             {packError && (
               <div className="pack-error-banner">
@@ -742,16 +911,51 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             <table className="custom-table">
               <thead>
                 <tr>
-                  <th style={{ minWidth: "220px", width: "24%" }}>Standart İş Fonksiyonu</th>
-                  <th style={{ minWidth: "130px", width: "14%" }}>Kategori</th>
-                  <th style={{ minWidth: "190px", width: "22%" }}>Firma İçi Departman Adı</th>
-                  <th style={{ minWidth: "180px", width: "19%" }}>Sorumlu / Görüşülen Kişi</th>
-                  <th style={{ minWidth: "145px", width: "12%" }}>Durum</th>
-                  <th style={{ minWidth: "115px", width: "9%" }}>Analiz</th>
+                  <th style={{ minWidth: "220px", width: "22%" }}>Standart İş Fonksiyonu</th>
+                  <th style={{ minWidth: "110px", width: "12%" }}>Kategori</th>
+                  <th style={{ minWidth: "160px", width: "18%" }}>Firma İçi Departman Adı</th>
+                  <th style={{ minWidth: "150px", width: "16%" }}>Sorumlu Kişi</th>
+                  <th style={{ minWidth: "150px", width: "15%" }}>Zaman Planı</th>
+                  <th style={{ minWidth: "145px", width: "10%" }}>Durum</th>
+                  <th style={{ minWidth: "90px", width: "7%" }}>Analiz</th>
                 </tr>
               </thead>
               <tbody>
-                {activeFunctions.map((fn) => (
+                {activeFunctions
+                  .filter((fn) => {
+                    if (scheduleFilter === "all") return true;
+                    const st = calculateScheduleStatus(
+                      {
+                        plannedStartDate: fn.planned_start_date,
+                        plannedEndDate: fn.planned_end_date,
+                        actualStartDate: fn.actual_start_date,
+                        actualEndDate: fn.actual_end_date,
+                      },
+                      fn.status
+                    ).status;
+                    if (scheduleFilter === "overdue") return st === "overdue";
+                    if (scheduleFilter === "due_soon") return st === "due_soon";
+                    if (scheduleFilter === "on_track") return st === "on_track" || st === "completed_on_time";
+                    if (scheduleFilter === "not_planned") return st === "not_planned";
+                    return true;
+                  })
+                  .map((fn) => {
+                    const fnSched = calculateScheduleStatus(
+                      {
+                        plannedStartDate: fn.planned_start_date,
+                        plannedEndDate: fn.planned_end_date,
+                        actualStartDate: fn.actual_start_date,
+                        actualEndDate: fn.actual_end_date,
+                      },
+                      fn.status
+                    );
+                    const fnBadge = getScheduleStatusBadgeMeta(
+                      fnSched.status,
+                      fnSched.delayDays,
+                      fnSched.remainingDays
+                    );
+
+                    return (
                   <tr key={fn.id}>
                     <td>
                       <div>
@@ -801,6 +1005,28 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                           )
                         }
                       />
+                    </td>
+                    <td>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.25rem" }}>
+                        <div>
+                          <span className={`badge ${fnBadge.badgeClass}`} style={{ fontSize: "0.75rem" }}>
+                            {fnBadge.label}
+                          </span>
+                          <span style={{ display: "block", fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                            {formatDateRangeSummary(fn.planned_start_date, fn.planned_end_date)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn-icon text-xs"
+                          onClick={() => setScheduleModalFunction(fn)}
+                          disabled={isPassive}
+                          title="İş fonksiyonu takvimini düzenle"
+                          style={{ padding: "4px", borderRadius: "4px" }}
+                        >
+                          <Calendar size={13} style={{ color: "var(--primary)" }} />
+                        </button>
+                      </div>
                     </td>
                     <td>
                       <select
@@ -872,7 +1098,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
                       )}
                     </td>
                   </tr>
-                ))}
+                );
+              })}
               </tbody>
             </table>
           </div>
@@ -887,6 +1114,40 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
 
       {/* Semantic Summary Section (Bulgular, Gereksinimler, Riskler, Notlar) */}
       <SemanticSummarySection projectId={projectId} />
+
+      {/* Project Schedule Modal (FAZ-59) */}
+      <ProjectScheduleModal
+        isOpen={isProjectScheduleModalOpen}
+        projectName={project.name}
+        initialDates={{
+          plannedStartDate: project.planned_start_date,
+          plannedEndDate: project.planned_end_date,
+          actualStartDate: project.actual_start_date,
+          actualEndDate: project.actual_end_date,
+        }}
+        onClose={() => setIsProjectScheduleModalOpen(false)}
+        onSave={handleSaveProjectSchedule}
+        isReadOnly={isPassive}
+      />
+
+      {/* Function Schedule Modal (FAZ-59) */}
+      {scheduleModalFunction && (
+        <FunctionScheduleModal
+          isOpen={true}
+          functionName={scheduleModalFunction.name_tr}
+          functionCode={scheduleModalFunction.code}
+          processStatus={scheduleModalFunction.status}
+          initialDates={{
+            plannedStartDate: scheduleModalFunction.planned_start_date,
+            plannedEndDate: scheduleModalFunction.planned_end_date,
+            actualStartDate: scheduleModalFunction.actual_start_date,
+            actualEndDate: scheduleModalFunction.actual_end_date,
+          }}
+          onClose={() => setScheduleModalFunction(null)}
+          onSave={handleSaveFunctionSchedule}
+          isReadOnly={isPassive}
+        />
+      )}
     </div>
   );
 };

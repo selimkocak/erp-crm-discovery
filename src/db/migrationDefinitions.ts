@@ -473,5 +473,19 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_psc_project ON project_scope_changes(analysis_project_id);`,
       `CREATE INDEX IF NOT EXISTS idx_pbf_is_active ON project_business_functions(analysis_project_id, is_active);`
     ]
+  },
+  {
+    version: 13,
+    description: "Project and Function Schedule Planning Model (FAZ-59)",
+    sql: [
+      `ALTER TABLE analysis_projects ADD COLUMN planned_start_date TEXT NULL;`,
+      `ALTER TABLE analysis_projects ADD COLUMN planned_end_date TEXT NULL;`,
+      `ALTER TABLE analysis_projects ADD COLUMN actual_start_date TEXT NULL;`,
+      `ALTER TABLE analysis_projects ADD COLUMN actual_end_date TEXT NULL;`,
+      `ALTER TABLE project_business_functions ADD COLUMN planned_start_date TEXT NULL;`,
+      `ALTER TABLE project_business_functions ADD COLUMN planned_end_date TEXT NULL;`,
+      `ALTER TABLE project_business_functions ADD COLUMN actual_start_date TEXT NULL;`,
+      `ALTER TABLE project_business_functions ADD COLUMN actual_end_date TEXT NULL;`
+    ]
   }
 ] as const;

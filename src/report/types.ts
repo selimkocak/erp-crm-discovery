@@ -275,6 +275,54 @@ export interface ReportGovernanceModel {
   attachments: GovernanceAttachment[];
 }
 
+import type { ScheduleStatus } from "../models/scheduleStatus";
+
+export interface ReportScheduleItem {
+  code: string;
+  nameTr: string;
+  processStatus: string;
+  plannedStartDate: string | null;
+  plannedEndDate: string | null;
+  actualStartDate: string | null;
+  actualEndDate: string | null;
+  plannedRangeSummary: string;
+  actualRangeSummary: string;
+  scheduleStatus: ScheduleStatus;
+  scheduleStatusLabel: string;
+  scheduleStatusBadgeClass: string;
+  delayDays: number;
+  remainingDays: number;
+  delaySummary: string;
+}
+
+export interface ReportScheduleSummary {
+  projectSchedule: {
+    plannedStartDate: string | null;
+    plannedEndDate: string | null;
+    actualStartDate: string | null;
+    actualEndDate: string | null;
+    plannedRangeSummary: string;
+    actualRangeSummary: string;
+    scheduleStatus: ScheduleStatus;
+    scheduleStatusLabel: string;
+    scheduleStatusBadgeClass: string;
+    delayDays: number;
+    remainingDays: number;
+    delaySummary: string;
+  };
+  functionSchedules: ReportScheduleItem[];
+  stats: {
+    totalPlanned: number;
+    completedOnTime: number;
+    completedLate: number;
+    onTrack: number;
+    dueSoon: number;
+    overdue: number;
+    notStarted: number;
+    notPlanned: number;
+  };
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -284,6 +332,7 @@ export interface ReportModel {
   followups?: ReportFollowupItem[];
   attachments?: ReportAttachmentItem[];
   governance?: ReportGovernanceModel;
+  scheduleSummary?: ReportScheduleSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

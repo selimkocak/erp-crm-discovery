@@ -28,6 +28,13 @@ export async function detectLegacyBaselineVersion(db: Database): Promise<number>
     return 0; // Temiz / Boş veritabanı
   }
 
+  // v13: analysis_projects.planned_start_date kolonu
+  const projCols = await db.select<{ name: string }[]>(
+    "PRAGMA table_info(analysis_projects)"
+  );
+  const projColNames = new Set(projCols.map((c) => c.name));
+  if (projColNames.has("planned_start_date")) return 13;
+
   // v12: project_scope_changes tablosu
   const pscTables = await db.select<{ name: string }[]>(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='project_scope_changes'"

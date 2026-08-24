@@ -28,6 +28,11 @@ import {
 import { ProjectDeactivateModal } from "../components/modals/ProjectDeactivateModal";
 import { CreateDemoProjectModal } from "../components/modals/CreateDemoProjectModal";
 import { createManufacturingDemoProject } from "../demo/manufacturingPilot";
+import {
+  calculateScheduleStatus,
+  getScheduleStatusBadgeMeta,
+  formatDateRangeSummary,
+} from "../models/scheduleStatus";
 import type { ProjectListItem } from "../types";
 
 interface HomeViewProps {
@@ -330,6 +335,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <th>Firma Adı</th>
                 <th>Proje / Analiz Adı</th>
                 <th>Durum</th>
+                <th>Takvim</th>
                 <th>Lokasyon</th>
                 <th>Kapsam</th>
                 <th>Son Güncelleme</th>
@@ -356,6 +362,33 @@ export const HomeView: React.FC<HomeViewProps> = ({
                       ) : (
                         <span className="badge badge--success">Aktif</span>
                       )}
+                    </td>
+                    <td>
+                      {(() => {
+                        const sched = calculateScheduleStatus({
+                          plannedStartDate: proj.planned_start_date,
+                          plannedEndDate: proj.planned_end_date,
+                          actualStartDate: proj.actual_start_date,
+                          actualEndDate: proj.actual_end_date,
+                        });
+                        const badge = getScheduleStatusBadgeMeta(
+                          sched.status,
+                          sched.delayDays,
+                          sched.remainingDays
+                        );
+                        return (
+                          <div>
+                            <span className={`badge ${badge.badgeClass}`} style={{ fontSize: "0.75rem" }}>
+                              {badge.label}
+                            </span>
+                            {proj.planned_start_date && (
+                              <span style={{ display: "block", fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                                {formatDateRangeSummary(proj.planned_start_date, proj.planned_end_date)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td>
                       <span style={{ color: "var(--text-muted)" }}>
