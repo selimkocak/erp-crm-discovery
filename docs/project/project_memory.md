@@ -1,100 +1,54 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.0 (Release Candidate 1) | Git Durumu: 34 Paket Tamamlandı + Soru Navigatörü Ek Göstergesi + Semantik Buton Sistemi + Managed Vault Windows Native İkiz Kopya + Sektör/Şube Alanları + Mevcut Proje Firma Bilgilerini Düzenleme (Edit Mode) + Kaynak Yolu Gizlilik Mühürü + Geliştirici Atıf & Hakkında Modalı + Kök Dizin Kütüphaneci Arşiv Düzenlemesi (Temiz Çalışma Ağacı)
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_attribution_and_root_archive_2026_08_23
-Doğrulama Durumu: 59 Test Paketinde 1.800+ Test %100 PASS, npm run build (0 Hata, Vite 1922 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
-Git HEAD: 213d7bc (main = origin/main)
+Mevcut Sürüm: v0.1.4+ | Git Durumu: 34 Soru Paketi (1.492 Soru) + Yönetişim Matrisi (FAZ-46..50) + .erpcrm Taşınabilir Arşiv Motoru (FAZ-51..54.2) + Proje Yaşam Döngüsü & Dinamik Kapsam Revizyonu (FAZ-55) + Sentetik Kesikli Üretim Pilotu Marmara Endüstriyel (FAZ-57/58) + İki Seviyeli Proje & Fonksiyon Takvim Yönetimi (FAZ-59) + Antigravity Geliştirme Ajanı Kontrol Mimarisi (FAZ-60) + Ajan Mimarisi Saha Testi & Takvim Bütünlüğü (FAZ-61) + .gitignore ve Temiz Çalışma Ağacı Mühürü
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz60_faz61_agent_architecture_and_schedule_integrity_2026_08_24
+Doğrulama Durumu: 72 Test Paketinde 1.900+ Test %100 PASS, npm run build (0 Hata, Vite 1945 modül), cargo check (0 Hata), GitHub Actions CI 3/3 Yeşil (Linux, macOS, Windows)
+Git HEAD: 2d4f5d0 (main = origin/main)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
 ======================================================================
 - Temel Konumlandırma: Field-first · Data-first · Analysis-first · Offline-first · Evidence-first · Human-led. Bu proje bir AI uygulaması değildir; AI modeli, tahmin veya otomatik yorum içermez; çekirdek uygulamanın sıfır bulut bağımlılığı vardır.
 - Kabuk: Tauri 2 (Rust) + React 18 + TypeScript + Vite + Vanilla CSS (Design Tokens) + Lucide Icons
-- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 16 Kanonik Tablo, 10 Migrasyon (Tauri plugin-sql)
+- Veritabanı: %100 Offline yerel SQLite (erp_discovery.db), 23 Kanonik Tablo, 13 Migrasyon (Tauri plugin-sql)
 - Soru Motoru: 33 Kanonik Fonksiyon kataloğu, 34 Kanonik Soru Paketi (1.492 Soru, ~800 Zorunlu, 200+ Koşullu Dallanma/Branching), dinamik soru setleri (tekli/çoklu seçim, koşullu dallanma, zorunlu soru doğrulaması, allow_note, is_other)
-- Mevcut Proje Firma Bilgilerini Düzenleme (Project Profile Edit Mode): HomeView ve ProjectDetailView tablolarında `[Düzenle]` (`Pencil` ikonu, `btn btn-secondary btn--sm`); NewProjectView ortak form altyapısında tek adımlı kompakt profil düzenleme modu (11 alan); updateProjectDetails(projectId, payload) fonksiyonu ile analysis_projects ve company_profiles tablolarında atomik UPDATE; cevapların (question_answers), modüllerin (project_business_functions), takip bayraklarının (question_followups), proje notlarının (project_notes), kanıt kasası eklerinin (question_attachments) %100 korunması (test/project_profile_edit_test.ts 40/40 PASS)
-- Firma Profili Sektör ve Şubeli Yapı Alanları: Serbest metin `Sektör / Faaliyet Alanı` (business_sector) ve `Şubeli veya Çok Lokasyonlu Yapı` (has_branches: 'yes' | 'no' | NULL) + `Şube / Lokasyon Sayısı` (branch_count: INTEGER, min 1 pozitif sayı sanitizasyonu); Migration 10 ile DB şeması genişletildi; Rapor Önizleme, DOCX ve PDF çıktılarına koşullu satır entegrasyonu (test/company_profile_sector_and_branch_test.ts 33/33 PASS)
-- Soru Navigatöründe Ek Dosyası Göstergesi & Filtresi: Soru navigatöründe kanıt dosyası ekli soruların yanında `📎` (tekil) veya `📎 N` (çoklu dosya) rozeti; `Ekli (N)` / `data-filter="attachments"` filtre sekmesi; ek dosya adı ve ek açıklamasına göre canlı arama; dinamik ekleme/silme reaktivitesi; bayraklarla (Sarı/Kırmızı) simetrik ve çakışmasız çalışma (`pointer-events: none`, `flex-shrink: 0`)
-- Semantik Kurumsal Buton Renk Sistemi: İşleve göre açıkça ayrışan renk sistemi:
-  · Başlat: Mavi (`#2563eb`, `.button--start`)
-  · Devam: Turkuaz / Teal (`#0f766e`, `.button--continue`)
-  · Rapor Önizleme: Koyu İndigo (`#4f46e5`, `.button--report`)
-  · Kaydet ve Çık / Değişiklikleri Kaydet: Koyu Zümrüt Yeşili (`#15803d` / `#047857`, 5.48:1 WCAG AA, `.button--save`)
-  · Sonraki: Mavi (`.button--next`)
-  · Önceki / Geri: Nötr gri (`.button--back`)
-  · Kritik / Sil: Kırmızı (`.button--danger`)
-- Tek Seçimli Sorularda Seçimi Kaldırma (Clear Selection): Platform bağımsız React mimarisinde (QuestionCard, ChoiceOption) görünür ikincil "Seçimi kaldır" butonu ve Escape klavye dinleyicisi; seçimi selected: [] yaparak soruyu cevapsız duruma döndürme, SQLite kalıcılığı ve ilerleme sayacını anında düşürme; bayraklı zorunlu cevapsız soruda Sonraki ile geçebilme, bayraksızken ilerlemeyi açıklayıcı uyarıyla engelleme; checkbox çoklu seçim bağımsızlığını koruma
-- Semantik Katman: Bulgular (Findings), Gereksinimler (Requirements), Riskler (Risks), Proje Notları (Notes)
-- Takip & Navigasyon: 🟡 Sonra Dön (revisit) & 🔴 Kritik Takip (critical) Bayrakları, Proje Özel Soruları (project_custom_questions), Sol Soru Navigatörü, Autosave & Resumable Analiz
-- Soru Ekranı Üst Bar & Geometrik Simetri: .question-screen-toolbar 3-kolonlu CSS Grid (190px / 240px / auto), buton min-width sınırları (.btn-save-exit 142px zümrüt #047857 WCAG AA 5.48:1, .btn-nav-home 150px, .btn-custom-question 126px, .btn-interim-report 118px), .flag-actions 2-kolon simetrik grid, .active-flag-banner ve .followup-modal-container (560px max / 420px min)
-- Managed Attachment Vault (Yönetilen Kanıt Kasası): Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/ERP CRM Discovery/attachment/{projectId}/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration 8 & 9), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF file:///... hyperlink garantisi
-- `source_absolute_path` Gizlilik & Taşınabilirlik Mühürü: Kullanıcı dosya sistemi mutlak yollarının (`C:\Users\...`, `/home/...`) SQLite veritabanına kaydedilmesi engellendi; INSERT/UPDATE işlemlerinde mutlak yol NULL yapıldı; Migration 9 ile eski kayıtlar temizlendi; sadece relative_path ve SHA-256 saklandı
-- Attachment Hyperlink Mimarisi: openAttachment() → resolveAttachmentAbsolutePath() (relative→appLocalDataDir→backslash native) → invoke("open_attachment_path") → Rust explorer.exe (Windows) / open (macOS) / xdg-open (Linux). DOCX/PDF: resolveAttachmentFileUrlFromRelative() ile async runtime çözümleme. file:///C:/... (RFC-8089, 3 slash). Path traversal: validateRelativePath() + ".." segment normalizasyonu çift katman.
-- Raporlama Motoru (Tek Doğruluk Kaynağı): ReportModel üzerinden Rapor Önizleme, Word (.docx) ve Gömülü Liberation Sans TrueType Unicode PDF (.pdf) üretimi (Türkçe karakter garantili, sıfır ağ bağımlılığı)
-- Dağıtım Paketleri: Windows (x64 NSIS Setup .exe) ve macOS Apple Silicon (aarch64 DMG + .app)
-- Kurulum Rehberleri: docs/guides/installation/ ve artifact ZIP'lerinde WINDOWS_KURULUM_YARDIMI.txt & MACOS_KURULUM_YARDIMI.txt
+- Geliştirme Ajanı Kontrol Mimarisi (FAZ-60):
+  · Antigravity IDE ve Gemini geliştirme ajanları için `.agents/` kanonik kontrol altyapısı kuruldu.
+  · Rol Hiyerarşisi: Selim Koçak (Ürün Sahibi & Nihai Kabul Yetkilisi) → ChatGPT / Tars (Mimar, Kapsam & Kabul Kriteri Üreticisi) → Antigravity IDE (Geliştirme & Yürütme Ortamı) → Gemini Geliştirme Ajanları (İnceleme, Kodlama, Test & Raporlama) → ERP CRM Discovery (Masaüstü Ürün).
+  · Ayrılmış Ajan Rolleri: `ROLE: Investigator` (salt-okunur derin analiz), `ROLE: Implementer` (kanıtlanan hata/faz düzeltme), `ROLE: QA` (hedefli test ve kalite kapısı), `ROLE: Release` (yalnızca kullanıcı açık talimatıyla tag/release).
+  · AI İzolasyonu: AI araçları yalnızca IDE geliştirme yardımcısıdır; `src/` ve `src-tauri/` içinde AI runtime bileşeni veya API çağrısı yer alamaz.
+  · Kök Dizin & ADR-001: Kök `AGENTS.md` → `.agents/agents.md`, 5 iş akışı (`implement-phase`, `diagnose-bug`, `fix-ci`, `verify-release`, `update-memory`), 8 beceri (YAML frontmatter), 6 politika (`change-scope`, `testing-policy`, `ci-recovery-policy`, `git-release-policy`, `user-data-policy`, `communication-policy`), 4 şablon.
+- İki Seviyeli Proje & İş Fonksiyonu Takvim Yönetimi (FAZ-59 & FAZ-61):
+  · Proje Seviyesi: `planned_start_date`, `planned_end_date`, `actual_start_date`, `actual_end_date` (Migration 13).
+  · İş Fonksiyonu Seviyesi: 33 modülün her biri için bağımsız 4 takvim tarihi.
+  · Zero-Timezone / UTC Epoch Güvenliği: `Date.UTC(y, m-1, d)` ve saf matematiksel gün farkı ile yerel saat dilimi kaymalarına karşı tam koruma.
+  · 9 Durumlu Zaman Motoru: `not_planned`, `planned`, `not_started`, `in_progress`, `on_track`, `due_soon`, `overdue`, `completed_on_time`, `completed_late`.
+  · Kapsam İzolasyonu: Kapsam dışı bırakılan modüllerin takvim verileri SQLite'da korunur, aktif takvim istatistiklerine (`scheduleStats`) dahil edilmez.
+  · Çoğaltma Kuralı: Şablon kopyada planlanan tarihler korunur, fiilî tarihler sıfırlanır (`null`); tam kopyada tüm anlık tarihler korunur.
+  · Rapor & Export Paritesi: UI Önizleme, PDF ve Word (DOCX) çıktıları Bölüm 3.1 Proje Takvimi & Zaman Planı altında aynı kanonik `ReportScheduleSummary` modelini tüketir; sıfır `undefined` ve sıfır ham enum garantisi.
+- Sentetik Marmara Endüstriyel Pilot Projesi (FAZ-57/58 & FAZ-61):
+  · 19 Aktif İş Fonksiyonu (9 Tamamlandı, 10 Devam Ediyor, 0 Başlanmadı).
+  · 94 Kanonik Cevap, 427 Zorunlu Soru, %22 İlerleme.
+  · 5 Dalgalı Deterministik Takvim: Proje 01.09.2026 – 24.11.2026 (12 hafta).
+- Taşınabilir Format (.erpcrm): Sıfır bağımlılıklı POSIX USTAR + GZIP arşiv motoru (`src/storage/tarArchive.ts`). 23 SQLite tablosu, manifest.json (Schema Version 13), project-data.json, checksums.json ve Managed Vault kanıt dosyaları.
+- Sıfır SQL Transaction Kilidi: `@tauri-apps/plugin-sql` bağlantı havuzundan (SqlitePool) ötürü frontend'de `BEGIN`/`ROLLBACK` kullanılmaz; sıralı `INSERT` ve hata anında `deleteProject(newProjectId)` telafi temizliği uygulanır.
+- Saf Masaüstü Save/Open: Browser download (Blob URL, `<a download>`) tamamen söküldü; `@tauri-apps/plugin-dialog` ve `@tauri-apps/plugin-fs` kullanılır. Varsayılan klasör: `Belgeler/ERP CRM Discovery Yedekleri` ve `localStorage['erp_crm_last_backup_directory']`.
+- Managed Attachment Vault: Kaynak dosyalardan bağımsız fiziksel ikiz kopyalama ({appLocalDataDir}/ERP CRM Discovery/attachment/{projectId}/{bfCode}/{questionId}/{uuid}_{safeFileName}), SQLite'a yalnızca managed relative_path kaydı (Migration 8 & 9), kaynak dosya silinse dahi kesintisiz erişim, Rapor Önizleme / DOCX / PDF `file:///` hyperlink garantisi (RFC-8089 3-slash).
+- Semantik Kurumsal Buton Renk Sistemi: Başlat (Mavi `#2563eb`), Devam (Teal `#0f766e`), Rapor Önizleme (İndigo `#4f46e5`), Kaydet (Zümrüt `#15803d`/`#047857` WCAG AA 5.48:1), Tehlike (Kırmızı `#dc2626`).
+- Dağıtım Paketleri: Windows (x64 NSIS Setup .exe) ve macOS Apple Silicon (aarch64 DMG + .app) — yalnızca `v*` taglerinde üretilir.
 
 ======================================================================
-2. TAMAMLANAN FAZLAR (FAZ-1 .. FAZ-46 & RC1 STABİLİZASYONU)
+2. TAMAMLANAN FAZLAR
 ======================================================================
-- FAZ-1 / FAZ-2.2: 31/32 Fonksiyon, soru paketi motoru, SQLite tohumlama ve clean install
-- FAZ-3: Semantik analiz katmanı (Bulgu, Gereksinim, Risk, Not)
-- FAZ-4: ReportModel mimarisi & Rapor Önizleme ekranı
-- FAZ-5 / FAZ-5.1: DOCX & PDF motoru, Native Save Dialog & fs:allow-write-file yetkileri, PDF TrueType Unicode font gömme
-- FAZ-6 / FAZ-6.7: Windows ve macOS Apple Silicon CI/CD hatları, Tauri SQL/FS ACL capability'leri
-- FAZ-7: Autosave, question_session_state ile son kalınan soru durumu, "Kaldığın Yerden Devam Et" ve Ara Rapor desteği
-- FAZ-8: Sol Soru Navigatörü (durum filtreleri, tek tıkla doğrudan soruya atlama) & Proje Özel Soruları (project_custom_questions)
-- FAZ-9: Soru Takip Bayrakları (🟡 Sonra Dön / revisit & 🔴 Kritik Takip / critical), Bölüm 5 Açık Konular tablosu, dürüst ilerleme hesabı
-- FAZ-10: Saha Kabulü & Rapor Kalite Sertleştirmesi (Scope Hardening: unstarted boş fonksiyonların detay sayfalarından elenmesi, 4-6 sayfa kompakt rapor)
-- FAZ-11: PROCUREMENT — Satın Alma Soru Paketi (tr.procurement.core v0.1.0, 40 soru, 20 req, 15 süreç)
-- FAZ-12: WAREHOUSE — Depo Yönetimi Soru Paketi (tr.warehouse.core v0.1.0, 38 soru, 19 req, 16 süreç)
-- FAZ-13: INVENTORY — Stok Yönetimi Soru Paketi (tr.inventory.core v0.1.0, 37 soru, 19 req, 16 süreç)
-- FAZ-14: LOGISTICS — Sevkiyat ve Lojistik Soru Paketi (tr.logistics.core v0.1.0, 37 soru, 19 req, 17 süreç)
-- FAZ-15: ACCOUNTING — Muhasebe (Genel) Soru Paketi (tr.accounting.core v0.1.0, 42 soru, 22 req, 19 süreç)
-- FAZ-16: TREASURY — Hazine ve Nakit Yönetimi Soru Paketi (tr.treasury.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-17: BUDGET_REPORTING — Bütçe ve Raporlama Soru Paketi (tr.budget_reporting.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-18: REPORTING_ANALYTICS — Raporlama ve Analitik Soru Paketi (tr.reporting_analytics.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-19: CRM — Müşteri Yönetimi Soru Paketi (tr.crm.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-20: PROPOSALS — Teklif ve Fiyatlandırma Soru Paketi (tr.proposals.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-21: MARKETING — Pazarlama ve Kampanya Soru Paketi (tr.marketing.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-22: SUPPLIER_MANAGEMENT — Tedarikçi Yönetimi Soru Paketi (tr.supplier_management.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-23: QUALITY — Kalite Yönetimi Soru Paketi (tr.quality.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-24: MAINTENANCE — Bakım ve Onarım Soru Paketi (tr.maintenance.core v0.1.0, 42 soru, 22 req, 18 süreç)
-- FAZ-25: PRODUCTION_PLANNING — Üretim Planlama Soru Paketi (tr.production_planning.core v0.1.0, 44 soru, 24 req, 20 süreç)
-- FAZ-26: WORK_ORDERS — İş Emirleri Soru Paketi (tr.work_orders.core v0.1.0, 45 soru, 24 req, 22 süreç)
-- FAZ-27: COSTING — Maliyetlendirme Soru Paketi (tr.costing.core v0.1.0, 45 soru, 24 req, 22 süreç)
-- FAZ-28: ASSET_MANAGEMENT — Varlık Yönetimi Soru Paketi (tr.asset_management.core v0.1.0, 45 soru, 24 req, 24 süreç)
-- FAZ-29: HUMAN_RESOURCES — İnsan Kaynakları Soru Paketi (tr.human_resources.core v0.1.0, 46 soru, 25 req, 25 süreç)
-- FAZ-30: PAYROLL — Bordro ve Maaş Soru Paketi (tr.payroll.core v0.1.0, 47 soru, 26 req, 25 süreç)
-- FAZ-31: LEGAL_COMPLIANCE — Hukuk ve Mevzuat Uyum Soru Paketi (tr.legal_compliance.core v0.1.0, 46 soru, 25 req, 25 süreç)
-- FAZ-32: IT_INFRASTRUCTURE — Bilgi Teknolojileri Altyapısı Soru Paketi (tr.it_infrastructure.core v0.1.0, 47 soru, 26 req, 25 süreç)
-- FAZ-33: Soru Bazlı Kanıt ve Dosya Ekleri (Question Evidence & Attachments), Managed Attachment Vault (Yönetilen Kanıt Kasası), Tıklanabilir DOCX/PDF file:/// Hyperlink'leri, Soru Ekranı Sabit Grid Üst Bar & Simetrik Takip Bayrakları Düzeni
-- FAZ-34: MASTER_DATA_MANAGEMENT — Ana Veri ve Veri Kalitesi Yönetimi Soru Paketi (tr.master_data_management.core v0.1.0, 47 soru, 25 req, 25 süreç, 7 branching, 0 mükerrerlik) ve Tek Seçimli Cevabı Geri Alma (Clear Selection & Escape) kalıcı çözümü
-- FAZ-35: PROJECT_MANAGEMENT — Proje Yönetimi Soru Paketi (tr.project_management.core v0.1.0, 47 soru, 25 req, 25 süreç, 7 branching)
-- FAZ-36: E_TRANSFORMATION — E-Dönüşüm Yönetimi Soru Paketi (33. Kanonik Fonksiyon, tr.e_transformation.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-37: INVOICING — Faturalama ve Gider Yönetimi Soru Paketi (tr.invoicing.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-38: DOCUMENT_MANAGEMENT — Doküman Yönetimi Soru Paketi (tr.document_management.core v0.1.0, 47 soru, 27 req, 25 süreç, 8 branching)
-- FAZ-39: IMPORT — İthalat ve Gümrük Yönetimi Soru Paketi (tr.import.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching, Landed Cost maliyet dağıtımı & GÇB/GTİP takibi)
-- FAZ-40: EXPORT — İhracat ve Dış Ticaret Soru Paketi (tr.export.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-41: ECOMMERCE — E-Ticaret ve Dijital Satış Soru Paketi (tr.ecommerce.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-42: MANAGEMENT — Genel Yönetim ve Kurumsal Yönetişim Soru Paketi (tr.management.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-43: STRATEGY — Stratejik Planlama Soru Paketi (tr.strategy.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-44: TRAINING — Eğitim ve Gelişim Soru Paketi (tr.training.core v0.1.0, 47 soru, 25 req, 25 süreç, 8 branching)
-- FAZ-45 (Soru Navigatörü Ek Göstergesi, Semantik Butonlar & Managed Vault Bütünlüğü):
-  · Soru Navigatöründe Ek Göstergesi (📎 / 📎 N), Ekli Sorular Filtre Sekmesi ve Arama
-  · Kurumsal Semantik Buton Renk Sistemi (Mavi Başlat, Teal Devam, İndigo Rapor, Zümrüt Kaydet)
-  · Windows Managed Attachment Vault Native Rust Motoru & Fiziksel Bütünlük Güvencesi
-  · 34 Paketlik Külliyat Bağımsız Kalite Denetimi & Süreç/Handle Teşhisi
-- FAZ-46 (Firma Profili Düzenleme Modu, Sektör/Şube Alanları & Gizlilik Mühürü):
-  · Mevcut Proje Firma Bilgilerini Düzenleme (HomeView & ProjectDetailView Düzenle aksiyonu, NewProjectView tek adımlı kompakt edit modu, updateProjectDetails ile atomik UPDATE, cevap/kapsam/bayrak/ek %100 veri izolasyonu)
-  · Firma Profili Sektör ve Şubeli Yapı Alanları (business_sector, has_branches, branch_count, Migration 10, DOCX/PDF koşullu render)
-  · `source_absolute_path` Gizlilik & Taşınabilirlik Mühürü (Migration 9 ile mutlak yolların temizlenmesi, SQLite'a yalnızca relative_path kaydı)
-  · 58 Test Paketi %100 PASS (1.800+ test), GitHub Actions 3 Platform (Linux, macOS ARM64, Windows NSIS) Yeşil Mühürleme
-- FAZ-47 (Geliştirici Atfı, Hakkında Modalı & Kök Dizin Kütüphaneci Arşiv Düzenlemesi):
-  · Geliştirici Atfı ve Hakkında Modalı (AboutModal.tsx, Header entegrasyonu, docx/pdf kapanış dipnotları, test/attribution_and_about_test.ts 53/53 PASS, sıfır reklam & sıfır watermark)
-  · Kök Dizin Arşiv Standardı (Kurulum kılavuzları docs/guides/installation/ ve hafıza docs/project/ altına taşındı, CI/CD yolları senkronize edildi, kökte yalnızca 12 standart dosya bırakıldı)
-  · 59 Test Paketi (1.800+ test) %100 PASS, npm run build (1922 modül) 0 hata, cargo check 0 hata, GitHub Actions CI 3/3 Yeşil (Temiz Çalışma Ağacı)
+- FAZ-1..45: 34 Soru Paketi, dinamik motor, semantik katman, attachment vault, DOCX/PDF, buton tasarım sistemi, soru navigatörü ek göstergesi.
+- FAZ-46..50: Veri sahipliği, yetki ve SoD yönetişim matrisi, yönetişim raporu, yönetişim kanıt kasası.
+- FAZ-51..54.2: Taşınabilir .erpcrm yedekleme/geri yükleme motoru, CI/CD tag optimizasyonu, Tauri Opener ve çift tıkla ön inceleme.
+- FAZ-55..56: Proje yaşam döngüsü & dinamik kapsam revizyonu (soft remove, restore, geçmiş kaydı).
+- FAZ-57..58.3: Sentetik kesikli üretim pilotu (Marmara Endüstriyel), foreign key stabilizasyonu, rapor sayaç tutarlılığı (94 kanonik cevap, %22 soru ilerlemesi).
+- FAZ-59: İki seviyeli proje ve modül takvim yönetimi, Migration 13, 9 durumlu zaman motoru, PDF/DOCX/UI takvim entegrasyonu, .erpcrm Schema 13.
+- FAZ-60: Antigravity geliştirme ajanı kontrol mimarisi, `.agents/` kanonik yapısı, rol geçiş sözleşmesi, AI izolasyonu ve ADR-001 kararı.
+- FAZ-61: Ajan mimarisi operasyonel saha testi, takvim bütünlüğü doğrulaması, inline hata standardı, 22 senaryoluk kabul testi ve `.gitignore` mühürlemesi.
 
 ======================================================================
 3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (34 PAKET / 1.492 SORU — %100 TAMAMLANDI)
@@ -134,42 +88,16 @@ Git HEAD: 213d7bc (main = origin/main)
 33. STRATEGY (47 Soru) [Kabul Edildi]
 34. TRAINING (47 Soru) [Kabul Edildi]
 
-- Henüz Paketi Olmayan Kanonik Fonksiyon: 0 (Külliyat %100 tamamlandı)
-- v0.2.0 Teknik Borç Notu: `inventory` ve `invoicing` arasındaki `INV-` öneki çakışması (runtime SQLite composite key ile güvende; v0.2.0'da INVC- önekine migration ile taşınacak)
-
 ======================================================================
-4. FAZ-51..54.2 TAŞINABİLİRLİK, YEDEKLEME VE HOTFIX MİMARİSİ
+4. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
-- Taşınabilir Format (.erpcrm): Sıfır bağımlılıklı POSIX USTAR + GZIP arşiv motoru (`src/storage/tarArchive.ts`). 23 SQLite tablosu, manifest.json, project-data.json, checksums.json ve Managed Vault kanıt dosyaları.
-- Sıfır SQL Transaction Kilidi: `@tauri-apps/plugin-sql` bağlantı havuzundan (SqlitePool) ötürü frontend'de `BEGIN`/`ROLLBACK` kullanılmaz; sıralı `INSERT` ve hata anında `deleteProject(newProjectId)` telafi temizliği uygulanır.
-- Saf Masaüstü Save/Open: Browser download (Blob URL, `<a download>`) tamamen söküldü; `@tauri-apps/plugin-dialog` ve `@tauri-apps/plugin-fs` kullanılır. Varsayılan klasör: `Belgeler/ERP CRM Discovery Yedekleri` ve `localStorage['erp_crm_last_backup_directory']`.
-- CI/CD Optimizasyonu (FAZ-52): Windows NSIS ve macOS DMG derlemeleri yalnızca `v*` release taglerinde çalışır.
-- Harici Bağlantılar (FAZ-53): Hakkında modalı ve dış bağlantılar `@tauri-apps/plugin-opener` ile açılır.
-
-======================================================================
-5. KRİTİK APİ, TEST VE ÇALIŞTIRMA NOTLARI
-======================================================================
-- Test Çalıştırma Standardı: Testler doğrudan `npm exec -- tsx <test_path>` veya `npm test` ile çalıştırılmalıdır (Global paket veya PATH bağımlılığı yoktur).
-- Open Handle / SQLite WAL Notu: `better-sqlite3` kullanılan testlerde açık kalan veritabanı bağlantıları (`db.close()`) Node event loop'unu askıda tutabilir; testlerde db lifecycle yönetimine dikkat edilmelidir.
-- formatAnswer() dönüş tipi: { isAnswered, selectedOptions, textValue, generalNote, summaryText }
-- ReportModel şeması: { metadata, company, profile, scope[], businessFunctions[], followups[], globalFindings[], globalRequirements[], globalRisks[], projectNotes[], summaryStats }
-- buildDocxBuffer(report: ReportModel) / buildPdfBuffer(report: ReportModel) — tek argüman, async
-- PDFParse kullanımı: new PDFParse({ data: pdfBuf }).getText()
-- Branching & Progress engine: Map<string, AnswerData> kullanılır
-
-======================================================================
-6. TEMEL DOĞRULAMA KOMUTLARI
-======================================================================
-- Tüm Testler (59 Test Suite, 1.800+ Test): npm test
-- Windows Test Paritesi (59 Test Suite): npm run test:windows
-- FAZ-51/54 Proje Yedekleme & Geri Yükleme Testi: npm exec -- tsx test/faz51_project_backup_restore_test.ts
-- Geliştirici Atfı & Hakkında Kabul Testi: npm exec -- tsx test/attribution_and_about_test.ts
-- Mevcut Proje Düzenleme Kabul Testi: npm exec -- tsx test/project_profile_edit_test.ts
-- Sektör ve Şube Doğrulama Testi: npm exec -- tsx test/company_profile_sector_and_branch_test.ts
-- Navigatör Ek Göstergesi Testi: npm exec -- tsx test/question_navigator_attachment_indicator_test.ts
-- Windows Managed Vault Bütünlük Testi: npm exec -- tsx test/managed_vault_physical_integrity_test.ts
-- Windows Hyperlink URI Testi: npm exec -- tsx test/windows_attachment_hyperlink_test.ts
-- Semantik Buton Renk Testi: npm exec -- tsx test/ui_button_design_system_test.ts
+- Tüm Testler (72 Test Paketi, 1.900+ Test): npm test
+- Windows Test Paritesi: npm run test:windows
+- FAZ-61 Saha & Takvim Kabul Testi: npm exec -- tsx test/faz61_agent_operational_and_schedule_integrity_test.ts
+- FAZ-60 Ajan Mimarisi Kabul Testi: npm exec -- tsx test/faz60_agent_architecture_test.ts
+- FAZ-59 Takvim Modeli Testi: npm exec -- tsx test/faz59_project_schedule_and_function_timeline_test.ts
+- FAZ-58.3 Rapor Sayaç Tutarlılığı Testi: npm exec -- tsx test/faz58_report_counter_consistency_test.ts
+- FAZ-51 .erpcrm Yedekleme & Geri Yükleme Testi: npm exec -- tsx test/faz51_project_backup_restore_test.ts
 - Registry Yenileme: npm run generate
 - Frontend Üretim Derlemesi: npm run build
 - Backend Rust Derlemesi: cargo check --manifest-path src-tauri/Cargo.toml
