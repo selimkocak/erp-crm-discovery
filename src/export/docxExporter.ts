@@ -1863,14 +1863,221 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     }
   }
 
-  // ── Section 7/6/5: Proje Notları & Açık Konular ───────────────────────────────
+  // ── Section 7: Pilot Saha Kabulü ve Go-Live Hazırlığı (FAZ-66) ──────────
+  if (report.readinessSummary && report.readinessSummary.checklist.length > 0) {
+    const rdnSummary = report.readinessSummary;
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "7. Pilot Saha Kabulü ve Go-Live Hazırlığı",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 100, after: 80 },
+        children: [
+          new TextRun({
+            text: `Genel Keşif Hazırlık Skoru: %${rdnSummary.stats.readinessPercentage} (${rdnSummary.stats.readyCount}/${rdnSummary.stats.applicableChecks} kontrol tamamlandı). Kritik Açık: ${rdnSummary.stats.criticalOpenCount}, Bloke Madde: ${rdnSummary.stats.blockedCount}, Öncelikli Aksiyon: ${rdnSummary.stats.actionRequiredCount}.`,
+            bold: true,
+            size: 20,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({
+            text: `Hazırlık Kriteri: ${rdnSummary.disclaimer}`,
+            italics: true,
+            size: 18,
+            color: COLOR_MUTED,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    // 7.1 Kategori Bazlı Hazırlık Matrisi
+    if (rdnSummary.categories.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "7.1 Kategori Bazlı Hazırlık Matrisi",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const catHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Kategori", { isHeader: true, widthPercent: 28 }),
+          createTableCell("Toplam", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Hazır", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Devam / Bloke", { isHeader: true, widthPercent: 18 }),
+          createTableCell("Kritik Açık", { isHeader: true, widthPercent: 15 }),
+          createTableCell("Hazırlık Oranı", { isHeader: true, widthPercent: 15 }),
+        ],
+      });
+
+      const catRows: TableRow[] = rdnSummary.categories.map((c) => {
+        return new TableRow({
+          children: [
+            createTableCell(`${c.categoryLabel}\n[${c.category}]`, { bold: true }),
+            createTableCell(String(c.totalCount)),
+            createTableCell(String(c.readyCount), { bold: true, color: "15803D" }),
+            createTableCell(`${c.inProgressCount} Devam / ${c.blockedCount} Bloke`),
+            createTableCell(
+              c.criticalOpenCount > 0 ? `${c.criticalOpenCount} Kritik` : "✓ Yok",
+              { bold: c.criticalOpenCount > 0, color: c.criticalOpenCount > 0 ? "B91C1C" : "15803D" }
+            ),
+            createTableCell(`%${c.readinessPercentage}`, { bold: true }),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [catHeaderRow, ...catRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+
+    // 7.2 Kritik Açıklar ve Bloke Maddeler
+    if (rdnSummary.criticalGaps.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: `7.2 Kritik Hazırlık Açıkları & Bloke Maddeler (${rdnSummary.criticalGaps.length})`,
+              bold: true,
+              size: 22,
+              color: "B91C1C",
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const gapHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Kod", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Kategori", { isHeader: true, widthPercent: 18 }),
+          createTableCell("Kontrol Başlığı & Detay", { isHeader: true, widthPercent: 32 }),
+          createTableCell("Durum", { isHeader: true, widthPercent: 14 }),
+          createTableCell("Sorumlu Rol & Aksiyon", { isHeader: true, widthPercent: 24 }),
+        ],
+      });
+
+      const gapRows: TableRow[] = rdnSummary.criticalGaps.map((g) => {
+        return new TableRow({
+          children: [
+            createTableCell(g.checkCode, { bold: true, color: "B91C1C" }),
+            createTableCell(g.categoryLabel),
+            createTableCell(`${g.title}${g.description ? `\n${g.description}` : ""}`),
+            createTableCell(
+              g.statusLabel,
+              {
+                bold: true,
+                bgColor: g.status === "BLOCKED" ? "FEF2F2" : "FFFBEB",
+                color: g.status === "BLOCKED" ? "B91C1C" : "B45309",
+              }
+            ),
+            createTableCell(
+              `Rol: ${g.ownerRole || "—"}${g.actionNote ? `\nAksiyon: ${g.actionNote}` : ""}${g.dueDate ? `\nTermin: ${g.dueDate}` : ""}`
+            ),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [gapHeaderRow, ...gapRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+
+    // 7.3 Öncelikli Aksiyon Planı
+    if (rdnSummary.actions.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "7.3 Öncelikli Aksiyon Planı ve Sorumlu Roller",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const actHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Kod", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Kontrol Başlığı", { isHeader: true, widthPercent: 28 }),
+          createTableCell("Gerekli Aksiyon", { isHeader: true, widthPercent: 30 }),
+          createTableCell("Sorumlu Rol", { isHeader: true, widthPercent: 18 }),
+          createTableCell("Hedef Tarih", { isHeader: true, widthPercent: 12 }),
+        ],
+      });
+
+      const actRows: TableRow[] = rdnSummary.actions.map((act) => {
+        return new TableRow({
+          children: [
+            createTableCell(act.checkCode, { bold: true }),
+            createTableCell(`${act.title}\n[${act.categoryLabel}]`),
+            createTableCell(act.actionNote),
+            createTableCell(act.ownerRole),
+            createTableCell(act.dueDate || "—", { bold: true }),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [actHeaderRow, ...actRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+  }
+
+  // ── Proje Notları & Açık Konular ───────────────────────────────
   docChildren.push(
     new Paragraph({
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 300, after: 120 },
       children: [
         new TextRun({
-          text: "7. Proje Notları & Açık Konular",
+          text: "8. Proje Notları & Açık Konular",
           bold: true,
           size: 28,
           color: COLOR_PRIMARY,

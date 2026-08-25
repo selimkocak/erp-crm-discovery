@@ -21,17 +21,18 @@ import {
   computeSha256Hex,
   type ArchiveFileEntry,
 } from "./tarArchive";
-import type {
-  BackupManifest,
-  ProjectBackupData,
-  BackupInspectionResult,
-  RestoreResult,
-  DuplicateProjectOptions,
-  BackupRecordCounts,
+import {
+  BACKUP_CURRENT_SCHEMA_VERSION,
+  type BackupManifest,
+  type ProjectBackupData,
+  type BackupInspectionResult,
+  type RestoreResult,
+  type DuplicateProjectOptions,
+  type BackupRecordCounts,
 } from "../types/backup";
 
 export const BACKUP_FORMAT_VERSION = "1.1.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 17;
+export { BACKUP_CURRENT_SCHEMA_VERSION };
 export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
@@ -317,6 +318,10 @@ export async function exportProjectBackup(
     "SELECT * FROM evidence_links WHERE project_id = $1 ORDER BY created_at ASC",
     [projectId]
   );
+  const readinessChecks = await db.select<any[]>(
+    "SELECT * FROM readiness_checks WHERE project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
 
   const projectData: ProjectBackupData = {
     project,
@@ -356,6 +361,7 @@ export async function exportProjectBackup(
     dataGovernanceApprovals,
     evidenceItems,
     evidenceLinks,
+    readinessChecks,
   };
 
   const enc = new TextEncoder();
@@ -439,6 +445,7 @@ export async function exportProjectBackup(
     dataGovernanceApprovals: dataGovernanceApprovals.length,
     evidenceItems: evidenceItems.length,
     evidenceLinks: evidenceLinks.length,
+    readinessChecks: readinessChecks.length,
   };
 
   const manifest: BackupManifest = {
@@ -1738,6 +1745,36 @@ export async function restoreProjectBackup(
       );
     }
 
+    // DD. FAZ-66: readiness_checks
+    for (const rc of projectData.readinessChecks || []) {
+      const newRcId = generateId("chk");
+      await db.execute(
+        `INSERT INTO readiness_checks (
+          id, project_id, category, check_code, title, description,
+          status, critical, owner_role, evidence_required, action_required,
+          action_note, due_date, notes, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+        [
+          newRcId,
+          newProjectId,
+          rc.category,
+          rc.check_code,
+          rc.title,
+          rc.description || null,
+          rc.status || "NOT_STARTED",
+          rc.critical ? 1 : 0,
+          rc.owner_role || null,
+          rc.evidence_required ? 1 : 0,
+          rc.action_required ? 1 : 0,
+          rc.action_note || null,
+          rc.due_date || null,
+          rc.notes || null,
+          rc.created_at || now,
+          rc.updated_at || now,
+        ]
+      );
+    }
+
     // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
     const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
@@ -1823,6 +1860,14 @@ export async function duplicateProject(
     projectData.otStationAnswers = [];
     projectData.evidenceItems = [];
     projectData.evidenceLinks = [];
+    projectData.readinessChecks = (projectData.readinessChecks || []).map((rc) => ({
+      ...rc,
+      status: "NOT_STARTED",
+      action_required: 0,
+      action_note: null,
+      due_date: null,
+      notes: null,
+    }));
 
     // Proje gerçekleşen tarihlerini sıfırla (planlananlar korunur)
     if (projectData.project) {
@@ -1896,6 +1941,7 @@ export async function duplicateProject(
       dataGovernanceApprovals: exportData.manifest.recordCounts.dataGovernanceApprovals || 0,
       evidenceItems: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.evidenceItems || 0) : 0,
       evidenceLinks: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.evidenceLinks || 0) : 0,
+      readinessChecks: exportData.manifest.recordCounts.readinessChecks || 0,
     },
   };
 

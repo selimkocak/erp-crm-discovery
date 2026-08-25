@@ -975,7 +975,132 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     }
   }
 
-  // ── Section 7/6/5: Proje Notları & Açık Konular ───────────────────────────────
+  // ── Section 7: Pilot Saha Kabulü ve Go-Live Hazırlığı (FAZ-66) ──────────
+  if (report.readinessSummary && report.readinessSummary.checklist.length > 0) {
+    const rdnSummary = report.readinessSummary;
+    checkPageBreak(30);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("7. Pilot Saha Kabulü ve Go-Live Hazırlığı", marginX, currentY);
+    currentY += 6;
+
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(51, 65, 85);
+    doc.text(
+      `Keşif Hazırlık Skoru: %${rdnSummary.stats.readinessPercentage} (${rdnSummary.stats.readyCount}/${rdnSummary.stats.applicableChecks} kontrol tamamlandı) | Kritik Açık: ${rdnSummary.stats.criticalOpenCount} | Bloke: ${rdnSummary.stats.blockedCount} | Aksiyon: ${rdnSummary.stats.actionRequiredCount}`,
+      marginX,
+      currentY
+    );
+    currentY += 5;
+
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(100, 116, 139);
+    doc.text(
+      `Hazırlık Kriteri: ${rdnSummary.disclaimer}`,
+      marginX,
+      currentY
+    );
+    currentY += 6;
+
+    // 7.1 Kategori Bazlı Hazırlık Matrisi
+    if (rdnSummary.categories.length > 0) {
+      const catRows = rdnSummary.categories.map((c) => [
+        `${c.categoryLabel} [${c.category}]`,
+        `${c.totalCount}`,
+        `${c.readyCount}`,
+        `${c.inProgressCount} Devam / ${c.blockedCount} Bloke`,
+        c.criticalOpenCount > 0 ? `${c.criticalOpenCount} Kritik` : "✓ Yok",
+        `%${c.readinessPercentage}`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Kategori", "Toplam", "Hazır", "Devam / Bloke", "Kritik Açık", "Hazırlık Oranı"]],
+        body: catRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [240, 249, 255], textColor: [3, 105, 161], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 55 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 20 },
+          3: { cellWidth: 35 },
+          4: { cellWidth: 25 },
+          5: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 5;
+    }
+
+    // 7.2 Kritik Açıklar ve Bloke Maddeler
+    if (rdnSummary.criticalGaps.length > 0) {
+      checkPageBreak(25);
+      const gapRows = rdnSummary.criticalGaps.map((g) => [
+        g.checkCode,
+        g.categoryLabel,
+        `${g.title}${g.description ? `\n${g.description}` : ""}`,
+        g.statusLabel,
+        `Rol: ${g.ownerRole || "—"}${g.actionNote ? `\nAksiyon: ${g.actionNote}` : ""}${g.dueDate ? `\nTermin: ${g.dueDate}` : ""}`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [[`Kod`, "Kategori", "⚠️ Kritik Açıklar & Bloke Maddeler", "Durum", "Sorumlu & Aksiyon"]],
+        body: gapRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [254, 242, 242], textColor: [185, 28, 28], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 24 },
+          1: { cellWidth: 32 },
+          2: { cellWidth: 60 },
+          3: { cellWidth: 24 },
+          4: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 5;
+    }
+
+    // 7.3 Öncelikli Aksiyon Planı
+    if (rdnSummary.actions.length > 0) {
+      checkPageBreak(25);
+      const actRows = rdnSummary.actions.map((act) => [
+        act.checkCode,
+        `${act.title} [${act.categoryLabel}]`,
+        act.actionNote,
+        act.ownerRole,
+        act.dueDate || "—",
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Kod", "Kontrol Başlığı", "Gerekli Aksiyon", "Sorumlu Rol", "Hedef Tarih"]],
+        body: actRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [248, 250, 252], textColor: [51, 65, 85], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 24 },
+          1: { cellWidth: 50 },
+          2: { cellWidth: 55 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 5;
+    }
+  }
+
+  // ── Section 8: Proje Notları & Açık Konular ───────────────────────────────
   checkPageBreak(30);
   doc.setFont(PDF_FONT_FAMILY, "bold");
   doc.setFontSize(13);

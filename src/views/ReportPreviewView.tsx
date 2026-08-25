@@ -357,6 +357,17 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 })()}
               </a>
             )}
+            {report.readinessSummary && report.readinessSummary.checklist.length > 0 && (
+              <a href="#sec-readiness" className="report-toc__link">
+                {(() => {
+                  let sectionNum = 4;
+                  if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                  if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                  if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
+                  return `${sectionNum}. Pilot Saha Kabulü & Go-Live Hazırlığı`;
+                })()}
+              </a>
+            )}
             <div className="report-toc__group">
               <span className="report-toc__group-title">
                 {(() => {
@@ -364,6 +375,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                   if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
                   if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
                   if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
+                  if (report.readinessSummary && report.readinessSummary.checklist.length > 0) sectionNum++;
                   return `${sectionNum}. İş Fonksiyonları`;
                 })()}
               </span>
@@ -1896,6 +1908,200 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             </section>
           )}
 
+          {/* ── Bölüm 7: Pilot Saha Kabulü ve Go-Live Hazırlığı (FAZ-66) ── */}
+          {report.readinessSummary && (
+            <section id="sec-readiness" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">
+                  {(() => {
+                    let sectionNum = 4;
+                    if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                    if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                    if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
+                    return `BÖLÜM ${sectionNum}`;
+                  })()}
+                </span>
+                <h2 className="report-section__title">Pilot Saha Kabulü ve Go-Live Hazırlığı</h2>
+              </div>
+
+              {/* Disclaimer Box */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem", background: "var(--color-primary-50, #eff6ff)", borderLeft: "4px solid var(--color-primary-600, #2563eb)" }}>
+                <div style={{ fontSize: "0.8125rem", color: "var(--color-primary-900, #1e3a8a)", lineHeight: 1.5 }}>
+                  <strong>Hazırlık Kriteri:</strong> {report.readinessSummary.disclaimer}
+                </div>
+              </div>
+
+              {/* Readiness KPI Band */}
+              <div className="report-kpi-band" style={{ marginBottom: "1.25rem" }}>
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "var(--color-primary, #1e3a8a)" }}>
+                    %{report.readinessSummary.stats.readinessPercentage}
+                  </span>
+                  <span className="report-kpi-band__label">Genel Hazırlık Skoru</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "#15803d" }}>
+                    {report.readinessSummary.stats.readyCount} / {report.readinessSummary.stats.applicableChecks}
+                  </span>
+                  <span className="report-kpi-band__label">Tamamlanan Kontrol</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.readinessSummary.stats.criticalOpenCount > 0 ? "text-danger" : "#15803d"}`}>
+                    {report.readinessSummary.stats.criticalOpenCount}
+                  </span>
+                  <span className="report-kpi-band__label">Kritik Açık</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.readinessSummary.stats.blockedCount > 0 ? "text-danger" : "text-muted"}`}>
+                    {report.readinessSummary.stats.blockedCount}
+                  </span>
+                  <span className="report-kpi-band__label">Bloke Madde</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "#b45309" }}>
+                    {report.readinessSummary.stats.actionRequiredCount}
+                  </span>
+                  <span className="report-kpi-band__label">Öncelikli Aksiyon</span>
+                </div>
+              </div>
+
+              {/* 7.1 Category Readiness Matrix */}
+              {report.readinessSummary.categories.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">Kategori Bazlı Hazırlık Matrisi</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "25%" }}>Kategori</th>
+                          <th style={{ width: "15%" }}>Toplam Kontrol</th>
+                          <th style={{ width: "15%" }}>Hazır / Tamam</th>
+                          <th style={{ width: "15%" }}>Devam Eden / Bloke</th>
+                          <th style={{ width: "15%" }}>Kritik Açık</th>
+                          <th style={{ width: "15%" }}>Hazırlık Oranı</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.readinessSummary.categories.map((cat) => (
+                          <tr key={cat.category}>
+                            <td>
+                              <strong>{cat.categoryLabel}</strong>
+                              <span className="badge badge--secondary text-xs" style={{ marginLeft: "6px" }}>{cat.category}</span>
+                            </td>
+                            <td>{cat.totalCount}</td>
+                            <td><span className="font-bold text-success">{cat.readyCount}</span></td>
+                            <td>
+                              {cat.inProgressCount > 0 && <span className="badge badge--warning text-xs" style={{ marginRight: "4px" }}>{cat.inProgressCount} Devam</span>}
+                              {cat.blockedCount > 0 && <span className="badge badge--danger text-xs">{cat.blockedCount} Bloke</span>}
+                              {cat.inProgressCount === 0 && cat.blockedCount === 0 && <span className="text-muted text-xs">—</span>}
+                            </td>
+                            <td>
+                              {cat.criticalOpenCount > 0 ? (
+                                <span className="badge badge--danger text-xs">{cat.criticalOpenCount} Kritik</span>
+                              ) : (
+                                <span className="text-success text-xs">✓ Yok</span>
+                              )}
+                            </td>
+                            <td>
+                              <span className={`badge ${cat.readinessPercentage >= 80 ? "badge--success" : cat.readinessPercentage >= 40 ? "badge--warning" : "badge--neutral"}`}>
+                                %{cat.readinessPercentage}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 7.2 Critical Gaps */}
+              {report.readinessSummary.criticalGaps.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem", borderLeft: "4px solid var(--danger, #ef4444)" }}>
+                  <h3 className="report-summary-box__title" style={{ color: "#b91c1c", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span>⚠️ Kritik Hazırlık Açıkları & Bloke Maddeler ({report.readinessSummary.criticalGaps.length})</span>
+                  </h3>
+                  <p className="text-xs text-muted" style={{ marginBottom: "0.75rem" }}>
+                    Bu maddeler kapatılmadan canlıya geçiş (Go-Live) hazırlığı tamamlanmış kabul edilmez.
+                  </p>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "12%" }}>Kod</th>
+                          <th style={{ width: "18%" }}>Kategori</th>
+                          <th style={{ width: "30%" }}>Kontrol Başlığı & Detay</th>
+                          <th style={{ width: "15%" }}>Durum</th>
+                          <th style={{ width: "25%" }}>Sorumlu Rol & Aksiyon</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.readinessSummary.criticalGaps.map((gap) => (
+                          <tr key={gap.id}>
+                            <td><span className="font-bold text-mono text-danger">{gap.checkCode}</span></td>
+                            <td><span className="badge badge--secondary text-xs">{gap.categoryLabel}</span></td>
+                            <td>
+                              <div className="font-bold">{gap.title}</div>
+                              {gap.description && <div className="text-xs text-muted">{gap.description}</div>}
+                            </td>
+                            <td>
+                              <span className={`badge ${gap.status === "BLOCKED" ? "badge--danger" : "badge--warning"}`}>
+                                {gap.statusLabel}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="text-xs font-bold">Rol: {gap.ownerRole || "Belirtilmemiş"}</div>
+                              {gap.actionNote && <div className="text-xs text-danger" style={{ marginTop: "2px" }}>Aksiyon: {gap.actionNote}</div>}
+                              {gap.dueDate && <div className="text-xs text-muted">Termin: {gap.dueDate}</div>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 7.3 Readiness Action Plan */}
+              {report.readinessSummary.actions.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">Öncelikli Aksiyon Planı ve Sorumlu Roller</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "12%" }}>Kod</th>
+                          <th style={{ width: "28%" }}>Kontrol Başlığı</th>
+                          <th style={{ width: "30%" }}>Gerekli Aksiyon</th>
+                          <th style={{ width: "18%" }}>Sorumlu Rol</th>
+                          <th style={{ width: "12%" }}>Hedef Tarih</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.readinessSummary.actions.map((act) => (
+                          <tr key={act.id}>
+                            <td><span className="font-bold text-mono">{act.checkCode}</span></td>
+                            <td>
+                              <div className="font-bold">{act.title}</div>
+                              <span className="badge badge--secondary text-xs">{act.categoryLabel}</span>
+                            </td>
+                            <td><div className="text-xs text-muted">{act.actionNote}</div></td>
+                            <td><span className="badge badge--neutral text-xs">{act.ownerRole}</span></td>
+                            <td><span className="text-xs font-bold">{act.dueDate || "—"}</span></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
           {/* ── Proje Notları & Açık Konular ── */}
           <section id="sec-notes" className="report-section">
             <div className="report-section__header">
@@ -1905,6 +2111,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                   if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
                   if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
                   if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
+                  if (report.readinessSummary && report.readinessSummary.checklist.length > 0) sectionNum++;
                   return `BÖLÜM ${sectionNum}`;
                 })()}
               </span>

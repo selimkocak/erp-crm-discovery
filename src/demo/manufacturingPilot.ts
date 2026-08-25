@@ -6,7 +6,15 @@
  * Gerçek şirket, şahıs, vergi no, telefon, e-posta veya Tuna Ofis verisi İÇERMEZ.
  */
 
-import { getDb, generateId, deleteProject, assignBusinessFunctionsToProject } from "../db/client";
+import {
+  getDb,
+  generateId,
+  deleteProject,
+  assignBusinessFunctionsToProject,
+  seedStarterReadinessChecks,
+  getReadinessChecks,
+  updateReadinessCheck,
+} from "../db/client";
 import { CANONICAL_QUESTION_PACKS, CANONICAL_CODE_TO_PACK_ID } from "../generated/questionPacks";
 import type { AnswerData } from "../engine/types";
 import {
@@ -760,7 +768,42 @@ export async function createManufacturingDemoProject(): Promise<CreateManufactur
       });
     }
 
-    // 14. FOREIGN KEY Bütünlük Denetimi (PRAGMA foreign_key_check)
+    // 14. STAGE: readiness_checks (FAZ-66: Pilot Go-Live Hazırlık Kontrolleri)
+    currentStage = "readiness_checks";
+    currentKey = "seed_readiness_checks";
+    await seedStarterReadinessChecks(projectId);
+
+    const checks = await getReadinessChecks(projectId);
+    for (const c of checks) {
+      if (c.check_code === "CHK-DATA-01" || c.check_code === "CHK-DATA-02") {
+        await updateReadinessCheck(c.id, { status: "READY", notes: "Marmara pilotunda 94 kanonik cevap tamamlanmıştır." });
+      } else if (c.check_code === "CHK-PROC-01") {
+        await updateReadinessCheck(c.id, { status: "READY", notes: "Kesikli montaj ve talaşlı imalat süreç haritaları çıkarılmıştır." });
+      } else if (c.check_code === "CHK-GOV-01") {
+        await updateReadinessCheck(c.id, { status: "READY", notes: "8 temel kurumsal veri varlığı ve sahipleri tanımlanmıştır." });
+      } else if (c.check_code === "CHK-GOV-03") {
+        await updateReadinessCheck(c.id, {
+          status: "BLOCKED",
+          action_required: 1,
+          action_note: "Satınalma açma ve onaylama yetkileri ayrıştırılmalı.",
+          due_date: "2026-10-15",
+          notes: "İç denetim SoD çakışması tespit etti."
+        });
+      } else if (c.check_code === "CHK-OT-01") {
+        await updateReadinessCheck(c.id, { status: "READY", notes: "CNC ve montaj istasyonları envanteri tamamlandı." });
+      } else if (c.check_code === "CHK-REP-01" || c.check_code === "CHK-REP-02") {
+        await updateReadinessCheck(c.id, { status: "READY", notes: "HTML, Word ve PDF paritesi test edildi." });
+      } else if (c.check_code === "CHK-SUP-01") {
+        await updateReadinessCheck(c.id, {
+          status: "IN_PROGRESS",
+          action_required: 1,
+          action_note: "Saha pilotu sonrası aksiyon listesi takip ediliyor.",
+          due_date: "2026-11-01"
+        });
+      }
+    }
+
+    // 15. FOREIGN KEY Bütünlük Denetimi (PRAGMA foreign_key_check)
     try {
       const fkCheck = await db.select<any[]>("PRAGMA foreign_key_check;");
       if (fkCheck && fkCheck.length > 0) {

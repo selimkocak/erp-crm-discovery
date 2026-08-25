@@ -41,6 +41,8 @@ import {
   getEvidenceLinks,
   getEvidenceSummaryStats,
   getUnsupportedCriticalFindings,
+  getReadinessChecks,
+  getReadinessSummary,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -53,6 +55,10 @@ import {
 } from "./formatters";
 import { resolveAttachmentFileUrl } from "../storage/attachmentLinks";
 import { calculateScheduleStatus, formatDateRangeSummary } from "../models/scheduleStatus";
+import {
+  READINESS_CATEGORY_LABELS,
+  READINESS_STATUS_LABELS,
+} from "../types/readiness";
 import type {
   ReportModel,
   ReportMetadata,
@@ -85,6 +91,10 @@ import type {
   ReportEvidenceItem,
   ReportEvidenceCoverageItem,
   ReportUnsupportedCriticalItem,
+  ReportReadinessSummary,
+  ReportReadinessItem,
+  ReportReadinessCategoryStats,
+  ReportReadinessActionItem,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -1162,6 +1172,83 @@ export async function buildReportModel(
     unsupportedCriticalFindings: unsupportedItems,
   };
 
+  // 17. Pilot Field Acceptance & Go-Live Readiness Summary (FAZ-66)
+  let readinessSummary: ReportReadinessSummary | undefined;
+  const readinessRes = await getReadinessSummary(projectId);
+  const rawReadinessChecks = await getReadinessChecks(projectId);
+
+  const reportChecklist: ReportReadinessItem[] = rawReadinessChecks.map((rc) => ({
+    id: rc.id,
+    category: rc.category,
+    categoryLabel: READINESS_CATEGORY_LABELS[rc.category] || rc.category,
+    checkCode: rc.check_code,
+    title: rc.title,
+    description: rc.description || null,
+    status: rc.status,
+    statusLabel: READINESS_STATUS_LABELS[rc.status] || rc.status,
+    critical: rc.critical === 1,
+    ownerRole: rc.owner_role || null,
+    evidenceRequired: rc.evidence_required === 1,
+    actionRequired: rc.action_required === 1,
+    actionNote: rc.action_note || null,
+    dueDate: rc.due_date || null,
+    notes: rc.notes || null,
+  }));
+
+  const reportCriticalGaps: ReportReadinessItem[] = readinessRes.criticalGaps.map((rc) => ({
+    id: rc.id,
+    category: rc.category,
+    categoryLabel: READINESS_CATEGORY_LABELS[rc.category] || rc.category,
+    checkCode: rc.check_code,
+    title: rc.title,
+    description: rc.description || null,
+    status: rc.status,
+    statusLabel: READINESS_STATUS_LABELS[rc.status] || rc.status,
+    critical: rc.critical === 1,
+    ownerRole: rc.owner_role || null,
+    evidenceRequired: rc.evidence_required === 1,
+    actionRequired: rc.action_required === 1,
+    actionNote: rc.action_note || null,
+    dueDate: rc.due_date || null,
+    notes: rc.notes || null,
+  }));
+
+  const reportActions: ReportReadinessActionItem[] = readinessRes.actions.map((act) => ({
+    id: act.id,
+    category: act.category,
+    categoryLabel: act.categoryLabel,
+    checkCode: act.checkCode,
+    title: act.title,
+    actionNote: act.actionNote,
+    ownerRole: act.ownerRole,
+    dueDate: act.dueDate,
+    critical: act.critical,
+    status: act.status,
+    statusLabel: READINESS_STATUS_LABELS[act.status] || act.status,
+  }));
+
+  const reportCatStats: ReportReadinessCategoryStats[] = readinessRes.categories.map((c) => ({
+    category: c.category,
+    categoryLabel: c.categoryLabel,
+    totalCount: c.totalCount,
+    readyCount: c.readyCount,
+    inProgressCount: c.inProgressCount,
+    blockedCount: c.blockedCount,
+    notStartedCount: c.notStartedCount,
+    notApplicableCount: c.notApplicableCount,
+    criticalOpenCount: c.criticalOpenCount,
+    readinessPercentage: c.readinessPercentage,
+  }));
+
+  readinessSummary = {
+    disclaimer: "Bu bölüm uygulama öncesi keşif hazırlığını gösterir; canlıya geçiş onayı değildir.",
+    stats: readinessRes.stats,
+    categories: reportCatStats,
+    checklist: reportChecklist,
+    criticalGaps: reportCriticalGaps,
+    actions: reportActions,
+  };
+
   return {
     metadata,
     profile,
@@ -1177,6 +1264,7 @@ export async function buildReportModel(
     processMapsSummary,
     dataGovernanceSummary,
     evidenceSummary,
+    readinessSummary,
     globalFindings,
     globalRequirements,
     globalRisks,

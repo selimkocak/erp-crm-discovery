@@ -821,5 +821,34 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_evd_links_target ON evidence_links(target_type, target_id);`,
       `CREATE INDEX IF NOT EXISTS idx_evd_links_pnode ON evidence_links(process_node_id);`
     ]
+  },
+  {
+    version: 19,
+    description: "FAZ-66: Pilot saha kabulü ve go-live hazırlık kontrol listesi (readiness_checks)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS readiness_checks (
+        id                TEXT PRIMARY KEY,
+        project_id        TEXT NOT NULL,
+        category          TEXT NOT NULL,
+        check_code        TEXT NOT NULL,
+        title             TEXT NOT NULL,
+        description       TEXT,
+        status            TEXT NOT NULL DEFAULT 'NOT_STARTED',
+        critical          INTEGER NOT NULL DEFAULT 0,
+        owner_role        TEXT,
+        evidence_required INTEGER NOT NULL DEFAULT 0,
+        action_required   INTEGER NOT NULL DEFAULT 0,
+        action_note       TEXT,
+        due_date          TEXT,
+        notes             TEXT,
+        created_at        TEXT NOT NULL,
+        updated_at        TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_readiness_project ON readiness_checks(project_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_readiness_cat ON readiness_checks(project_id, category);`,
+      `CREATE INDEX IF NOT EXISTS idx_readiness_status ON readiness_checks(project_id, status);`,
+      `CREATE INDEX IF NOT EXISTS idx_readiness_critical ON readiness_checks(project_id, critical);`
+    ]
   }
 ] as const;

@@ -4375,4 +4375,665 @@ export async function getUnsupportedCriticalFindings(
   return result;
 }
 
+// ─────────────────────────────────────────────────────────────
+// FAZ-66: Pilot Field Acceptance & Go-Live Readiness Check CRUD
+// ─────────────────────────────────────────────────────────────
+
+import type {
+  ReadinessCheckItem,
+  CreateReadinessCheckPayload,
+  UpdateReadinessCheckPayload,
+  ReadinessCategory,
+  ReadinessSummaryResult,
+  ReadinessSummaryStats,
+  CategoryReadinessStats,
+  ReadinessActionItem,
+} from "../types/readiness";
+import {
+  READINESS_CATEGORY_LABELS,
+} from "../types/readiness";
+
+/**
+ * Projeye ait hazırlık kontrollerini listeler.
+ */
+export async function getReadinessChecks(
+  projectId: string,
+  category?: ReadinessCategory
+): Promise<ReadinessCheckItem[]> {
+  const db = await getDb();
+  if (category) {
+    return await db.select<ReadinessCheckItem[]>(
+      `SELECT * FROM readiness_checks
+       WHERE project_id = $1 AND category = $2
+       ORDER BY critical DESC, check_code ASC`,
+      [projectId, category]
+    );
+  }
+  return await db.select<ReadinessCheckItem[]>(
+    `SELECT * FROM readiness_checks
+     WHERE project_id = $1
+     ORDER BY category ASC, critical DESC, check_code ASC`,
+    [projectId]
+  );
+}
+
+/**
+ * Tek bir hazırlık kontrol kaydını getirir.
+ */
+export async function getReadinessCheckById(id: string): Promise<ReadinessCheckItem | null> {
+  const db = await getDb();
+  const rows = await db.select<ReadinessCheckItem[]>(
+    `SELECT * FROM readiness_checks WHERE id = $1`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+/**
+ * Yeni bir hazırlık kontrolü oluşturur.
+ */
+export async function createReadinessCheck(
+  payload: CreateReadinessCheckPayload
+): Promise<ReadinessCheckItem> {
+  const db = await getDb();
+  const id = generateId("chk");
+  const now = new Date().toISOString();
+
+  const critical = payload.critical === true || payload.critical === 1 ? 1 : 0;
+  const evidenceReq = payload.evidence_required === true || payload.evidence_required === 1 ? 1 : 0;
+  const actionReq = payload.action_required === true || payload.action_required === 1 ? 1 : 0;
+
+  await db.execute(
+    `INSERT INTO readiness_checks (
+      id, project_id, category, check_code, title, description,
+      status, critical, owner_role, evidence_required, action_required,
+      action_note, due_date, notes, created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
+    [
+      id,
+      payload.project_id,
+      payload.category,
+      payload.check_code,
+      payload.title,
+      payload.description || null,
+      payload.status || "NOT_STARTED",
+      critical,
+      payload.owner_role || null,
+      evidenceReq,
+      actionReq,
+      payload.action_note || null,
+      payload.due_date || null,
+      payload.notes || null,
+      now,
+      now,
+    ]
+  );
+
+  return (await getReadinessCheckById(id))!;
+}
+
+/**
+ * Hazırlık kontrol kaydını günceller.
+ */
+export async function updateReadinessCheck(
+  id: string,
+  payload: UpdateReadinessCheckPayload
+): Promise<ReadinessCheckItem | null> {
+  const db = await getDb();
+  const existing = await getReadinessCheckById(id);
+  if (!existing) return null;
+
+  const now = new Date().toISOString();
+  const updates: string[] = [];
+  const params: any[] = [];
+  let paramIdx = 1;
+
+  if (payload.category !== undefined) {
+    updates.push(`category = $${paramIdx++}`);
+    params.push(payload.category);
+  }
+  if (payload.check_code !== undefined) {
+    updates.push(`check_code = $${paramIdx++}`);
+    params.push(payload.check_code);
+  }
+  if (payload.title !== undefined) {
+    updates.push(`title = $${paramIdx++}`);
+    params.push(payload.title);
+  }
+  if (payload.description !== undefined) {
+    updates.push(`description = $${paramIdx++}`);
+    params.push(payload.description);
+  }
+  if (payload.status !== undefined) {
+    updates.push(`status = $${paramIdx++}`);
+    params.push(payload.status);
+  }
+  if (payload.critical !== undefined) {
+    updates.push(`critical = $${paramIdx++}`);
+    params.push(payload.critical === true || payload.critical === 1 ? 1 : 0);
+  }
+  if (payload.owner_role !== undefined) {
+    updates.push(`owner_role = $${paramIdx++}`);
+    params.push(payload.owner_role);
+  }
+  if (payload.evidence_required !== undefined) {
+    updates.push(`evidence_required = $${paramIdx++}`);
+    params.push(payload.evidence_required === true || payload.evidence_required === 1 ? 1 : 0);
+  }
+  if (payload.action_required !== undefined) {
+    updates.push(`action_required = $${paramIdx++}`);
+    params.push(payload.action_required === true || payload.action_required === 1 ? 1 : 0);
+  }
+  if (payload.action_note !== undefined) {
+    updates.push(`action_note = $${paramIdx++}`);
+    params.push(payload.action_note);
+  }
+  if (payload.due_date !== undefined) {
+    updates.push(`due_date = $${paramIdx++}`);
+    params.push(payload.due_date);
+  }
+  if (payload.notes !== undefined) {
+    updates.push(`notes = $${paramIdx++}`);
+    params.push(payload.notes);
+  }
+
+  updates.push(`updated_at = $${paramIdx++}`);
+  params.push(now);
+
+  params.push(id);
+  await db.execute(
+    `UPDATE readiness_checks SET ${updates.join(", ")} WHERE id = $${paramIdx}`,
+    params
+  );
+
+  return await getReadinessCheckById(id);
+}
+
+/**
+ * Hazırlık kontrol kaydını siler.
+ */
+export async function deleteReadinessCheck(id: string): Promise<boolean> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM readiness_checks WHERE id = $1`, [id]);
+  return true;
+}
+
+/**
+ * Projeye ait 24 standart keşif ve go-live hazırlık kontrol maddesini tohumlar.
+ */
+export async function seedStarterReadinessChecks(projectId: string): Promise<number> {
+  const existing = await getReadinessChecks(projectId);
+  if (existing.length > 0) {
+    return 0; // Zaten mevcut
+  }
+
+  const starterItems: CreateReadinessCheckPayload[] = [
+    // DATA (Veri ve Cevap Bütünlüğü)
+    {
+      project_id: projectId,
+      category: "DATA",
+      check_code: "CHK-DATA-01",
+      title: "Zorunlu sorular ve temel süreç cevapları tamamlandı mı?",
+      description: "Analiz kapsamındaki tüm iş fonksiyonlarının zorunlu keşif soruları eksiksiz yanıtlanmış olmalıdır.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "ERP Proje Yöneticisi",
+      evidence_required: 1,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "DATA",
+      check_code: "CHK-DATA-02",
+      title: "Kritik fonksiyon sorularının cevabı eksiksiz girildi mi?",
+      description: "Satış, Muhasebe, Üretim ve Envanter gibi omurga modüllerde açık/boş soru kalmamalıdır.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Fonksiyonel Süreç Danışmanı",
+      evidence_required: 1,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "DATA",
+      check_code: "CHK-DATA-03",
+      title: "Verilen cevaplar arasında iş kuralı ve süreç çelişkisi bulunuyor mu?",
+      description: "Modüller arası çapraz kontrollerde (örn. Stok değerleme yöntemi vs Muhasebe fiş tipi) tutarsızlık olmamalıdır.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "İş Analisti",
+      evidence_required: 0,
+      action_required: 0,
+    },
+
+    // PROCESS (Süreç Haritası ve Sadeliği)
+    {
+      project_id: projectId,
+      category: "PROCESS",
+      check_code: "CHK-PROC-01",
+      title: "Kritik iş süreçlerinin (As-Is / To-Be) haritası çıkarıldı mı?",
+      description: "Siparişten tahsilata, satınalmadan ödemeye ve üretim akışlarına ait süreç adımları modellenmelidir.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Süreç Geliştirme Lideri",
+      evidence_required: 1,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "PROCESS",
+      check_code: "CHK-PROC-02",
+      title: "Yüksek benimseme riski taşıyan süreç adımları belirlendi mi?",
+      description: "Çoklu onay, el değiştirme ve karmaşık adımların son kullanıcı tarafından reddedilme riski değerlendirilmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Değişim Yönetimi Sorumlusu",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "PROCESS",
+      check_code: "CHK-PROC-03",
+      title: "Manuel bypass, mükerrer veri girişi ve gölge sistem riskleri analiz edildi mi?",
+      description: "Excel bağımlılığı, çift kayıt ve sistem dışı kağıt form kullanım noktaları netleştirilmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "İş Süreçleri Müdürü",
+      evidence_required: 0,
+      action_required: 0,
+    },
+
+    // GOVERNANCE (Veri Sahipliği ve Yetkiler)
+    {
+      project_id: projectId,
+      category: "GOVERNANCE",
+      check_code: "CHK-GOV-01",
+      title: "Kritik kurumsal veri varlıklarının iş sahibi (Owner) tanımlandı mı?",
+      description: "Müşteri, Stok, Ürün Ağacı (BOM), Fiyat ve Hesap Planı gibi ana verilerin sahipleri belirlenmelidir.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Veri Yönetişim Lideri",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "GOVERNANCE",
+      check_code: "CHK-GOV-02",
+      title: "Veri sorumlusu (Steward) ve teknik emanetçi (Custodian) rolleri atandı mı?",
+      description: "Veri kalitesi ve veritabanı güvenliği için operasyonel sorumlular netleştirilmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "BT ve Veri Yöneticisi",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "GOVERNANCE",
+      check_code: "CHK-GOV-03",
+      title: "Görevler ayrılığı (SoD) çakışmaları ve onay limitleri incelendi mi?",
+      description: "Satınalma açma + onaylama, fatura kesme + tahsilat gibi kritik çakışmalar denetlenmelidir.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "İç Denetim ve Risk Müdürü",
+      evidence_required: 0,
+      action_required: 0,
+    },
+
+    // OT (Saha İstasyon, Makine ve OT Matrisi)
+    {
+      project_id: projectId,
+      category: "OT",
+      check_code: "CHK-OT-01",
+      title: "Saha istasyon, makine ve hat envanter profilleri eksiksiz çıkarıldı mı?",
+      description: "Üretim sahasındaki kritik istasyonlar, PLC modelleri ve operatör sayıları haritalanmalıdır.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Üretim / OT Sistem Mühendisi",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "OT",
+      check_code: "CHK-OT-02",
+      title: "ERP/MES'e aktarılacak kritik OT veri ve ölçüm gereksinimleri tanımlandı mı?",
+      description: "Üretim adetleri, duruş kodları, enerji tüketimi ve çevrim sürelerinin aktarım mekanizması netleşmelidir.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Otomasyon & ERP Entegratörü",
+      evidence_required: 1,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "OT",
+      check_code: "CHK-OT-03",
+      title: "Alarm, safety PLC sınırları ve kalite ölçüm cihazı entegrasyon yöntemleri biliniyor mu?",
+      description: "Kritik güvenlik alarmları ve Mitutoyo vb. kalite test cihazlarının veri aktarım protokolleri doğrulanmalıdır.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Kalite ve Bakım Müdürü",
+      evidence_required: 0,
+      action_required: 0,
+    },
+
+    // EVIDENCE (Kanıt ve Saha Doğrulama)
+    {
+      project_id: projectId,
+      category: "EVIDENCE",
+      check_code: "CHK-EVD-01",
+      title: "Kritik beyan ve süreç kabullerini destekleyen saha kanıt dosyaları yüklendi mi?",
+      description: "Sözlü beyanların ötesinde fiili form, sayım tutanağı, sözleşme ve ekran görüntüleri bağlanmalıdır.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Saha Baş Denetçisi",
+      evidence_required: 1,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "EVIDENCE",
+      check_code: "CHK-EVD-02",
+      title: "Yüklenen kanıt dosyaları incelendi ve doğrulama durumu (Accepted) onaylandı mı?",
+      description: "Kanıt Kasası'ndaki dosyaların geçerliliği ve güvenilirlik seviyesi denetçi tarafından onaylanmalıdır.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Kalite Güvence Lideri",
+      evidence_required: 1,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "EVIDENCE",
+      check_code: "CHK-EVD-03",
+      title: "Reddedilmiş veya kanıtla desteklenmeyen kritik başlık kalmadı mı?",
+      description: "Desteklenmeyen kritik takip soruları ve kritik veri varlıkları için aksiyon planı oluşturulmalıdır.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Proje Yöneticisi",
+      evidence_required: 1,
+      action_required: 0,
+    },
+
+    // PEOPLE (Kullanıcı ve Rol Hazırlığı)
+    {
+      project_id: projectId,
+      category: "PEOPLE",
+      check_code: "CHK-PPL-01",
+      title: "Her iş fonksiyonu için sorumlu süreç sahibi ve anahtar kullanıcılar belirlendi mi?",
+      description: "Projeyi departman bazında sahiplenecek liderler ve test kullanıcıları atanmalıdır.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "İnsan Kaynakları & Genel Müdür",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "PEOPLE",
+      check_code: "CHK-PPL-02",
+      title: "Kullanıcı grupları, yetki matrisi ve departman rolleri tanımlandı mı?",
+      description: "ERP/CRM kullanıcı lisans sayıları, onay hiyerarşisi ve rol tanımları çıkarılmalıdır.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "BT Sistem Yöneticisi",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "PEOPLE",
+      check_code: "CHK-PPL-03",
+      title: "Son kullanıcı ERP/CRM eğitim ve değişim yönetimi ihtiyaçları planlandı mı?",
+      description: "Eğitim takvimi, kullanım kılavuzları ve canlı destek organizasyonu belirlenmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Eğitim ve Değişim Danışmanı",
+      evidence_required: 0,
+      action_required: 0,
+    },
+
+    // REPORTING (Rapor ve Çıktı Bütünlüğü)
+    {
+      project_id: projectId,
+      category: "REPORTING",
+      check_code: "CHK-REP-01",
+      title: "Keşif raporu HTML, DOCX ve PDF formatlarında eksiksiz derlenebiliyor mu?",
+      description: "Rapor üretimi offline ortamda sıfır hata ve sıfır eksik veri ile çalışmalıdır.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Dokümantasyon Sorumlusu",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "REPORTING",
+      check_code: "CHK-REP-02",
+      title: "Rapor önizleme, Word ve PDF çıktılarında sayaçlar ve tablolar %100 tutarlı mı?",
+      description: "Tüm dışa aktarımlar aynı kanonik ReportModel verisini eksiksiz yansıtmalıdır.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Raporlama Mimarı",
+      evidence_required: 0,
+      action_required: 0,
+    },
+    {
+      project_id: projectId,
+      category: "REPORTING",
+      check_code: "CHK-REP-03",
+      title: "Rapor yönetici özeti ve genel dönüşüm değerlendirmesi tamamlandı mı?",
+      description: "Üst yönetim için stratejik öncelikler, bütçe hedefleri ve kazanım beklentileri girilmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Yönetim Danışmanı",
+      evidence_required: 0,
+      action_required: 0,
+    },
+
+    // SUPPORT (Destek ve Aksiyon Planı)
+    {
+      project_id: projectId,
+      category: "SUPPORT",
+      check_code: "CHK-SUP-01",
+      title: "Uygulama öncesi kapatılması gereken tüm açık aksiyonlar listelendi mi?",
+      description: "Keşif sürecinde tespit edilen eksiklikler somut aksiyon maddelerine dönüştürülmelidir.",
+      status: "NOT_STARTED",
+      critical: 1,
+      owner_role: "Proje Yöneticisi",
+      evidence_required: 0,
+      action_required: 1,
+    },
+    {
+      project_id: projectId,
+      category: "SUPPORT",
+      check_code: "CHK-SUP-02",
+      title: "Aksiyon sorumluları, öncelikler ve hedef tamamlanma tarihleri netleştirildi mi?",
+      description: "Her aksiyon için sorumlu rol, termin tarihi ve çözüm notu girilmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "PMO Koordinatörü",
+      evidence_required: 0,
+      action_required: 1,
+    },
+    {
+      project_id: projectId,
+      category: "SUPPORT",
+      check_code: "CHK-SUP-03",
+      title: "Pilot saha kabulü sonrası takip ve canlıya geçiş hazırlık yöntemi tanımlandı mı?",
+      description: "Canlı öncesi son kontrol kriterleri ve risk eskalasyon mekanizması belirlenmelidir.",
+      status: "NOT_STARTED",
+      critical: 0,
+      owner_role: "Genel Müdür / Direktör",
+      evidence_required: 0,
+      action_required: 0,
+    },
+  ];
+
+  for (const item of starterItems) {
+    await createReadinessCheck(item);
+  }
+
+  return starterItems.length;
+}
+
+/**
+ * Projeye ait hazır olma (Discovery Readiness) metrik ve analiz özetini hesaplar.
+ */
+export async function getReadinessSummary(projectId: string): Promise<ReadinessSummaryResult> {
+  const checks = await getReadinessChecks(projectId);
+
+  const totalChecks = checks.length;
+  let readyCount = 0;
+  let inProgressCount = 0;
+  let blockedCount = 0;
+  let notStartedCount = 0;
+  let notApplicableCount = 0;
+  let criticalTotalCount = 0;
+  let criticalOpenCount = 0;
+  let criticalBlockedCount = 0;
+  let actionRequiredCount = 0;
+
+  const categoryMap: Record<ReadinessCategory, {
+    total: number;
+    ready: number;
+    inProgress: number;
+    blocked: number;
+    notStarted: number;
+    notApplicable: number;
+    criticalOpen: number;
+  }> = {
+    DATA: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    PROCESS: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    GOVERNANCE: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    OT: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    EVIDENCE: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    PEOPLE: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    REPORTING: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+    SUPPORT: { total: 0, ready: 0, inProgress: 0, blocked: 0, notStarted: 0, notApplicable: 0, criticalOpen: 0 },
+  };
+
+  const criticalGaps: ReadinessCheckItem[] = [];
+  const actions: ReadinessActionItem[] = [];
+
+  for (const c of checks) {
+    const isCrit = c.critical === 1;
+    const cat = c.category;
+
+    if (categoryMap[cat]) {
+      categoryMap[cat].total++;
+    }
+
+    if (isCrit) {
+      criticalTotalCount++;
+    }
+
+    if (c.status === "READY") {
+      readyCount++;
+      if (categoryMap[cat]) categoryMap[cat].ready++;
+    } else if (c.status === "IN_PROGRESS") {
+      inProgressCount++;
+      if (categoryMap[cat]) categoryMap[cat].inProgress++;
+      if (isCrit) {
+        criticalOpenCount++;
+        if (categoryMap[cat]) categoryMap[cat].criticalOpen++;
+        criticalGaps.push(c);
+      }
+    } else if (c.status === "BLOCKED") {
+      blockedCount++;
+      if (categoryMap[cat]) categoryMap[cat].blocked++;
+      if (isCrit) {
+        criticalOpenCount++;
+        criticalBlockedCount++;
+        if (categoryMap[cat]) categoryMap[cat].criticalOpen++;
+        criticalGaps.push(c);
+      }
+    } else if (c.status === "NOT_APPLICABLE") {
+      notApplicableCount++;
+      if (categoryMap[cat]) categoryMap[cat].notApplicable++;
+    } else {
+      // NOT_STARTED
+      notStartedCount++;
+      if (categoryMap[cat]) categoryMap[cat].notStarted++;
+      if (isCrit) {
+        criticalOpenCount++;
+        if (categoryMap[cat]) categoryMap[cat].criticalOpen++;
+        criticalGaps.push(c);
+      }
+    }
+
+    if (c.action_required === 1 || Boolean(c.action_note) || c.status === "BLOCKED") {
+      actionRequiredCount++;
+      actions.push({
+        id: c.id,
+        category: c.category,
+        categoryLabel: READINESS_CATEGORY_LABELS[c.category] || c.category,
+        checkCode: c.check_code,
+        title: c.title,
+        actionNote: c.action_note || (c.status === "BLOCKED" ? "Engelleyici durumun çözülmesi gerekiyor." : "Aksiyon bekleniyor."),
+        ownerRole: c.owner_role || "Atanmamış",
+        dueDate: c.due_date || null,
+        critical: isCrit,
+        status: c.status,
+      });
+    }
+  }
+
+  const applicableChecks = totalChecks - notApplicableCount;
+  const readinessPercentage =
+    applicableChecks > 0 ? Math.round((readyCount / applicableChecks) * 100) : 0;
+
+  // Kritik bir kontrol READY değilse proje asla "hazır" sayılamaz
+  const isDiscoveryReady = totalChecks > 0 && readinessPercentage === 100 && criticalOpenCount === 0;
+
+  const stats: ReadinessSummaryStats = {
+    totalChecks,
+    applicableChecks,
+    readyCount,
+    inProgressCount,
+    blockedCount,
+    notStartedCount,
+    notApplicableCount,
+    criticalTotalCount,
+    criticalOpenCount,
+    criticalBlockedCount,
+    actionRequiredCount,
+    readinessPercentage,
+    isDiscoveryReady,
+  };
+
+  const categories: CategoryReadinessStats[] = (
+    Object.keys(categoryMap) as ReadinessCategory[]
+  ).map((cat) => {
+    const data = categoryMap[cat];
+    const catApplicable = data.total - data.notApplicable;
+    const catPercentage =
+      catApplicable > 0 ? Math.round((data.ready / catApplicable) * 100) : 0;
+
+    return {
+      category: cat,
+      categoryLabel: READINESS_CATEGORY_LABELS[cat],
+      totalCount: data.total,
+      applicableCount: catApplicable,
+      readyCount: data.ready,
+      inProgressCount: data.inProgress,
+      blockedCount: data.blocked,
+      notStartedCount: data.notStarted,
+      notApplicableCount: data.notApplicable,
+      criticalOpenCount: data.criticalOpen,
+      readinessPercentage: catPercentage,
+    };
+  });
+
+  return {
+    stats,
+    categories,
+    criticalGaps,
+    actions,
+  };
+}
+
 export * from './governanceClient';

@@ -37,9 +37,10 @@ export interface BackupRecordCounts {
   dataGovernanceApprovals?: number;
   evidenceItems?: number;
   evidenceLinks?: number;
+  readinessChecks?: number;
 }
 
-export const BACKUP_CURRENT_SCHEMA_VERSION = 18;
+export const BACKUP_CURRENT_SCHEMA_VERSION = 19;
 
 export interface BackupManifest {
   formatVersion: string; // e.g. "1.0.0" | "1.1.0"
@@ -49,7 +50,7 @@ export interface BackupManifest {
   projectId?: string;
   projectName: string;
   companyName: string;
-  schemaVersion: number; // 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18
+  schemaVersion: number; // 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19
   recordCounts: BackupRecordCounts;
   attachmentCount: number;
   dataChecksum: string; // SHA-256 of project-data.json
@@ -93,6 +94,7 @@ export interface ProjectBackupData {
   dataGovernanceApprovals?: Record<string, any>[];
   evidenceItems?: Record<string, any>[];
   evidenceLinks?: Record<string, any>[];
+  readinessChecks?: Record<string, any>[];
 }
 
 export interface BackupInspectionResult {

@@ -648,6 +648,74 @@ export interface ReportEvidenceSummary {
   unsupportedCriticalFindings: ReportUnsupportedCriticalItem[];
 }
 
+export interface ReportReadinessItem {
+  id: string;
+  category: string;
+  categoryLabel: string;
+  checkCode: string;
+  title: string;
+  description: string | null;
+  status: string;
+  statusLabel: string;
+  critical: boolean;
+  ownerRole: string | null;
+  evidenceRequired: boolean;
+  actionRequired: boolean;
+  actionNote: string | null;
+  dueDate: string | null;
+  notes: string | null;
+}
+
+export interface ReportReadinessCategoryStats {
+  category: string;
+  categoryLabel: string;
+  totalCount: number;
+  readyCount: number;
+  inProgressCount: number;
+  blockedCount: number;
+  notStartedCount: number;
+  notApplicableCount: number;
+  criticalOpenCount: number;
+  readinessPercentage: number;
+}
+
+export interface ReportReadinessActionItem {
+  id: string;
+  category: string;
+  categoryLabel: string;
+  checkCode: string;
+  title: string;
+  actionNote: string;
+  ownerRole: string;
+  dueDate: string | null;
+  critical: boolean;
+  status: string;
+  statusLabel: string;
+}
+
+export interface ReportReadinessSummary {
+  disclaimer: string;
+  stats: {
+    totalChecks: number;
+    applicableChecks: number;
+    readyCount: number;
+    inProgressCount: number;
+    blockedCount: number;
+    notStartedCount: number;
+    notApplicableCount: number;
+    criticalTotalCount: number;
+    criticalOpenCount: number;
+    criticalBlockedCount: number;
+    actionRequiredCount: number;
+    readinessPercentage: number;
+    isDiscoveryReady: boolean;
+  };
+  categories: ReportReadinessCategoryStats[];
+  checklist: ReportReadinessItem[];
+  criticalGaps: ReportReadinessItem[];
+  actions: ReportReadinessActionItem[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -663,6 +731,7 @@ export interface ReportModel {
   processMapsSummary?: ReportProcessMapsSummary;
   dataGovernanceSummary?: ReportDataGovernanceSummary;
   evidenceSummary?: ReportEvidenceSummary;
+  readinessSummary?: ReportReadinessSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

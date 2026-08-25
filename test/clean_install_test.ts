@@ -159,6 +159,7 @@ const EXPECTED_TABLES = [
   "data_governance_approvals",
   "evidence_items",
   "evidence_links",
+  "readiness_checks",
 ];
 
 for (const expected of EXPECTED_TABLES) {

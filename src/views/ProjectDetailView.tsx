@@ -26,6 +26,7 @@ import {
   X as XIcon,
   GitCommit,
   FileCheck,
+  Zap,
 } from "lucide-react";
 import {
   getProjectDetail,
@@ -41,6 +42,7 @@ import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { OtStationsSection } from "../components/OtStationsSection";
 import { ProcessMapsSection } from "../components/ProcessMapsSection";
 import { EvidenceRegistrySection } from "../components/evidence/EvidenceRegistrySection";
+import { ReadinessChecklistSection } from "../components/readiness/ReadinessChecklistSection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
@@ -84,7 +86,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error" | "idle">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<"process" | "process_maps" | "governance" | "evidence">("process");
+  const [viewMode, setViewMode] = useState<"process" | "process_maps" | "governance" | "evidence" | "readiness">("process");
 
   // Backup & Operations state
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
@@ -852,6 +854,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           <FileCheck size={16} />
           <span>Saha Kanıtları & Doğrulama</span>
         </button>
+        <button
+          type="button"
+          className={`btn ${viewMode === "readiness" ? "btn-primary" : "btn-secondary"}`}
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1.25rem", fontWeight: 600 }}
+          onClick={() => setViewMode("readiness")}
+        >
+          <Zap size={16} />
+          <span>Go-Live Hazırlığı</span>
+        </button>
       </div>
 
       {viewMode === "process" ? (
@@ -1172,7 +1183,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
           projectId={projectId}
           isProjectPassive={isPassive}
         />
-      ) : (
+      ) : viewMode === "evidence" ? (
         /* Evidence & Validation Registry Section (FAZ-65) */
         <EvidenceRegistrySection
           projectId={projectId}
@@ -1181,6 +1192,12 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             code: f.code,
             name_tr: f.name_tr,
           }))}
+        />
+      ) : (
+        /* Readiness & Go-Live Checklist Section (FAZ-66) */
+        <ReadinessChecklistSection
+          projectId={projectId}
+          readOnly={isPassive}
         />
       )}
 
