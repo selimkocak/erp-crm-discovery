@@ -25,6 +25,10 @@ import {
   getGovernanceSodRisks,
   getGovernanceAttachments,
   getOtStations,
+  getOtDataRequirements,
+  getOtAlarmRequirements,
+  getOtQualityDevices,
+  getOtMatrixSummaryCounts,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -56,6 +60,7 @@ import type {
   ReportScheduleItem,
   ReportScheduleSummary,
   ReportOtStationsSummary,
+  ReportOtMatrixSummary,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -89,6 +94,10 @@ export async function buildReportModel(
     govSodRisks,
     govAttachments,
     otStations,
+    otDataReqs,
+    otAlarmReqs,
+    otQualityDevs,
+    otMatrixCounts,
   ] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
@@ -106,6 +115,10 @@ export async function buildReportModel(
     getGovernanceSodRisks(projectId),
     getGovernanceAttachments(projectId),
     getOtStations(projectId),
+    getOtDataRequirements(projectId),
+    getOtAlarmRequirements(projectId),
+    getOtQualityDevices(projectId),
+    getOtMatrixSummaryCounts(projectId),
   ]);
 
 
@@ -741,6 +754,100 @@ export async function buildReportModel(
     };
   }
 
+  // OT Veri Gereksinimleri, Alarm ve Kalite Cihazları Matrisi (FAZ-62C)
+  let otMatrixSummary: ReportOtMatrixSummary | undefined = undefined;
+  if (
+    (otDataReqs && otDataReqs.length > 0) ||
+    (otAlarmReqs && otAlarmReqs.length > 0) ||
+    (otQualityDevs && otQualityDevs.length > 0)
+  ) {
+    const stationMap = new Map<string, { code: string; name: string }>();
+    for (const st of otStations || []) {
+      stationMap.set(st.id, { code: st.station_code, name: st.station_name });
+    }
+
+    otMatrixSummary = {
+      stats: otMatrixCounts,
+      dataRequirements: (otDataReqs || []).map((d) => {
+        const st = stationMap.get(d.station_id);
+        return {
+          id: d.id,
+          stationId: d.station_id,
+          stationCode: st ? st.code : "OT-ST",
+          stationName: st ? st.name : "İstasyon",
+          purpose: d.purpose,
+          decisionSupported: d.decision_supported,
+          requiredAction: d.required_action,
+          dataCategory: d.data_category || null,
+          measurementName: d.measurement_name,
+          sourceType: d.source_type || null,
+          sourceName: d.source_name || null,
+          collectionMethod: d.collection_method || null,
+          frequency: d.frequency || null,
+          criticality: d.criticality || "medium",
+          targetSystem: d.target_system || null,
+          retentionRequired: Boolean(d.retention_required),
+          retentionPeriod: d.retention_period || null,
+          businessValue: d.business_value || null,
+          integrationComplexity: d.integration_complexity || "medium",
+          priority: d.priority || "medium",
+          status: d.status === "active" ? "Aktif" : "Pasif",
+          notes: d.notes || null,
+        };
+      }),
+      alarmRequirements: (otAlarmReqs || []).map((a) => {
+        const st = stationMap.get(a.station_id);
+        return {
+          id: a.id,
+          stationId: a.station_id,
+          stationCode: st ? st.code : "OT-ST",
+          stationName: st ? st.name : "İstasyon",
+          alarmName: a.alarm_name,
+          alarmCode: a.alarm_code || null,
+          sourceType: a.source_type || null,
+          triggerCondition: a.trigger_condition || null,
+          severity: a.severity || "warning",
+          safetyCritical: Boolean(a.safety_critical),
+          responsibleRole: a.responsible_role || null,
+          responseSla: a.response_sla || null,
+          requiredAction: a.required_action || null,
+          acknowledgementRequired: Boolean(a.acknowledgement_required),
+          escalationRequired: Boolean(a.escalation_required),
+          targetSystem: a.target_system || null,
+          status: a.status === "active" ? "Aktif" : "Pasif",
+          notes: a.notes || null,
+        };
+      }),
+      qualityDevices: (otQualityDevs || []).map((q) => {
+        const st = stationMap.get(q.station_id);
+        return {
+          id: q.id,
+          stationId: q.station_id,
+          stationCode: st ? st.code : "OT-ST",
+          stationName: st ? st.name : "İstasyon",
+          deviceName: q.device_name,
+          deviceType: q.device_type || null,
+          manufacturer: q.manufacturer || null,
+          model: q.model || null,
+          outputFormat: q.output_format || null,
+          interfaceType: q.interface_type || null,
+          apiAvailable: Boolean(q.api_available),
+          networkShareAvailable: Boolean(q.network_share_available),
+          testResultAvailable: Boolean(q.test_result_available),
+          passFailAvailable: Boolean(q.pass_fail_available),
+          measurementValuesAvailable: Boolean(q.measurement_values_available),
+          productCodeAvailable: Boolean(q.product_code_available),
+          lotBatchAvailable: Boolean(q.lot_batch_available),
+          operatorAvailable: Boolean(q.operator_available),
+          integrationMethod: q.integration_method || null,
+          targetSystem: q.target_system || null,
+          status: q.status === "active" ? "Aktif" : "Pasif",
+          notes: q.notes || null,
+        };
+      }),
+    };
+  }
+
   return {
     metadata,
     profile,
@@ -752,6 +859,7 @@ export async function buildReportModel(
     governance: reportGovernance,
     scheduleSummary,
     otStationsSummary,
+    otMatrixSummary,
     globalFindings,
     globalRequirements,
     globalRisks,

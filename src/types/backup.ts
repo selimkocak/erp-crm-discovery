@@ -26,6 +26,9 @@ export interface BackupRecordCounts {
   scopeChanges?: number;
   otStations?: number;
   otStationAnswers?: number;
+  otDataRequirements?: number;
+  otAlarmRequirements?: number;
+  otQualityDevices?: number;
 }
 
 export interface BackupManifest {
@@ -36,7 +39,7 @@ export interface BackupManifest {
   projectId?: string;
   projectName: string;
   companyName: string;
-  schemaVersion: number; // 11 | 12 | 13 | 14
+  schemaVersion: number; // 11 | 12 | 13 | 14 | 15
   recordCounts: BackupRecordCounts;
   attachmentCount: number;
   dataChecksum: string; // SHA-256 of project-data.json
@@ -69,6 +72,9 @@ export interface ProjectBackupData {
   scopeChanges?: Record<string, any>[];
   otStations?: Record<string, any>[];
   otStationAnswers?: Record<string, any>[];
+  otDataRequirements?: Record<string, any>[];
+  otAlarmRequirements?: Record<string, any>[];
+  otQualityDevices?: Record<string, any>[];
 }
 
 export interface BackupInspectionResult {

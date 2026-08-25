@@ -325,6 +325,16 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 3.1 Proje Takvimi & Zaman Planı
               </a>
             )}
+            {report.otStationsSummary && report.otStationsSummary.totalStations > 0 && (
+              <a href="#sec-ot-stations" className="report-toc__link">
+                3.2 Saha İstasyonları & Makine Envanteri
+              </a>
+            )}
+            {report.otMatrixSummary && (
+              <a href="#sec-ot-matrix" className="report-toc__link">
+                3.3 OT Veri, Alarm & Kalite Matrisi
+              </a>
+            )}
             <div className="report-toc__group">
               <span className="report-toc__group-title">4. İş Fonksiyonları</span>
               {businessFunctions.map((fn, idx) => (
@@ -705,6 +715,240 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                   </tbody>
                 </table>
               </div>
+            </section>
+          )}
+
+          {/* ── Bölüm 3.3: OT Veri Gereksinimleri, Alarm ve Kalite Cihazları (FAZ-62C) ── */}
+          {report.otMatrixSummary && (
+            <section id="sec-ot-matrix" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">BÖLÜM 3.3</span>
+                <h2 className="report-section__title">OT Veri Gereksinimleri, Alarm ve Kalite Cihazları Matrisi</h2>
+              </div>
+
+              {/* Matrix Overview KPI Box */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                <h3 className="report-summary-box__title">Endüstriyel Veri ve Cihaz Envanter Özeti</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "1rem", marginTop: "0.75rem" }}>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>VERİ GEREKSİNİMİ</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--color-primary, #1e3a8a)" }}>
+                      {report.otMatrixSummary.stats.totalDataRequirements} Kayıt
+                    </span>
+                    <span className="text-xs text-muted" style={{ display: "block" }}>
+                      ({report.otMatrixSummary.stats.criticalDataRequirements} Kritik)
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>TANIMLI ALARMLAR</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "#b45309" }}>
+                      {report.otMatrixSummary.stats.totalAlarms} Alarm
+                    </span>
+                    <span className="text-xs text-muted" style={{ display: "block" }}>
+                      ({report.otMatrixSummary.stats.safetyCriticalAlarms} Safety Kritik)
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>KALİTE CİHAZLARI</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "#15803d" }}>
+                      {report.otMatrixSummary.stats.totalQualityDevices} Cihaz
+                    </span>
+                    <span className="text-xs text-muted" style={{ display: "block" }}>
+                      ({report.otMatrixSummary.stats.automatedTransferDevices} Otomatik Aktarım)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3.3.1 OT Data Requirements */}
+              {report.otMatrixSummary.dataRequirements.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">3.3.1 OT Veri Gereksinimi & Karar/Aksiyon Matrisi</h3>
+                  <p className="text-xs text-muted" style={{ marginBottom: "0.75rem" }}>
+                    "Hangi veri, hangi karar için, hangi kaynaktan, hangi sıklıkta ve hangi aksiyona bağlanarak alınmalı?" ilkesiyle toplanan saha veri gereksinimleri.
+                  </p>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "12%" }}>İstasyon</th>
+                          <th style={{ width: "18%" }}>Ölçüm / Sinyal</th>
+                          <th style={{ width: "20%" }}>Amaç & Desteklenen Karar</th>
+                          <th style={{ width: "18%" }}>Tetiklenen Aksiyon</th>
+                          <th style={{ width: "14%" }}>Kaynak & Sıklık</th>
+                          <th style={{ width: "10%" }}>Kritiklik / Öncelik</th>
+                          <th style={{ width: "8%" }}>Hedef</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.otMatrixSummary.dataRequirements.map((d) => (
+                          <tr key={d.id}>
+                            <td>
+                              <strong className="text-mono" style={{ color: "var(--color-primary, #1e3a8a)" }}>{d.stationCode}</strong>
+                              <span className="text-xs text-muted" style={{ display: "block" }}>{d.stationName}</span>
+                            </td>
+                            <td>
+                              <div className="font-bold">{d.measurementName}</div>
+                              {d.dataCategory && <span className="text-xs text-muted">{d.dataCategory}</span>}
+                            </td>
+                            <td>
+                              <div><strong>Amaç:</strong> {d.purpose}</div>
+                              <div className="text-xs text-muted" style={{ marginTop: "2px" }}><strong>Karar:</strong> {d.decisionSupported}</div>
+                            </td>
+                            <td>
+                              <div style={{ fontSize: "0.8125rem" }}>{d.requiredAction}</div>
+                              {d.businessValue && <span className="text-xs text-muted" style={{ display: "block" }}>Değer: {d.businessValue}</span>}
+                            </td>
+                            <td>
+                              <div style={{ fontSize: "0.8125rem" }}>{d.sourceName || d.sourceType || "—"}</div>
+                              <span className="text-xs text-muted">
+                                {[d.collectionMethod, d.frequency].filter(Boolean).join(" • ")}
+                              </span>
+                            </td>
+                            <td>
+                              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                                <span className={`badge ${d.criticality === "critical" ? "badge--danger" : d.criticality === "high" ? "badge--warning" : "badge--info"}`}>
+                                  {d.criticality === "critical" ? "Kritik" : d.criticality === "high" ? "Yüksek" : d.criticality === "low" ? "Düşük" : "Orta"}
+                                </span>
+                              </div>
+                            </td>
+                            <td>
+                              <span className="badge badge--secondary">{d.targetSystem || "ERP/MES"}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 3.3.2 OT Alarm Requirements */}
+              {report.otMatrixSummary.alarmRequirements.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                    <h3 className="report-summary-box__title" style={{ margin: 0 }}>3.3.2 Alarm ve Safety Gereksinimleri</h3>
+                  </div>
+                  <div className="text-xs" style={{ background: "#fffbeb", border: "1px solid #fef3c7", padding: "0.5rem 0.75rem", borderRadius: "4px", color: "#92400e", marginBottom: "0.75rem" }}>
+                    <strong>⚠️ Güvenlik ve Yetki Sınırı Notu:</strong> Safety kritiklik işareti yalnızca saha keşif ve operasyonel danışmanlık amaçlıdır. ERP/CRM sistemi safety PLC yerine geçmez ve makinelere doğrudan acil durdurma komutu iletmez.
+                  </div>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "12%" }}>İstasyon</th>
+                          <th style={{ width: "20%" }}>Alarm Adı & Kodu</th>
+                          <th style={{ width: "20%" }}>Tetikleme Koşulu</th>
+                          <th style={{ width: "14%" }}>Ciddiyet / Safety</th>
+                          <th style={{ width: "16%" }}>Sorumlu & SLA</th>
+                          <th style={{ width: "18%" }}>Gerekli Aksiyon</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.otMatrixSummary.alarmRequirements.map((a) => (
+                          <tr key={a.id}>
+                            <td>
+                              <strong className="text-mono" style={{ color: "var(--color-primary, #1e3a8a)" }}>{a.stationCode}</strong>
+                              <span className="text-xs text-muted" style={{ display: "block" }}>{a.stationName}</span>
+                            </td>
+                            <td>
+                              <div className="font-bold">{a.alarmName}</div>
+                              {a.alarmCode && <span className="text-xs text-mono text-muted">{a.alarmCode}</span>}
+                            </td>
+                            <td>
+                              <div style={{ fontSize: "0.8125rem" }}>{a.triggerCondition || "—"}</div>
+                              {a.sourceType && <span className="text-xs text-muted">Kaynak: {a.sourceType}</span>}
+                            </td>
+                            <td>
+                              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                                <span className={`badge ${a.severity === "critical" ? "badge--danger" : a.severity === "high" ? "badge--warning" : "badge--info"}`}>
+                                  {a.severity === "critical" ? "Kritik" : a.severity === "high" ? "Yüksek" : a.severity === "low" ? "Düşük" : "Uyarı"}
+                                </span>
+                                {a.safetyCritical && (
+                                  <span className="badge badge--danger" style={{ fontSize: "0.6875rem" }}>
+                                    🚨 Safety Kritik
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td>
+                              <div className="font-bold" style={{ fontSize: "0.8125rem" }}>{a.responsibleRole || "—"}</div>
+                              {a.responseSla && <span className="text-xs text-muted">SLA: {a.responseSla}</span>}
+                            </td>
+                            <td>
+                              <div style={{ fontSize: "0.8125rem" }}>{a.requiredAction || "—"}</div>
+                              <div className="text-xs text-muted" style={{ marginTop: "2px" }}>
+                                {[
+                                  a.acknowledgementRequired ? "Onay Zorunlu" : null,
+                                  a.escalationRequired ? "Eskalasyon Var" : null,
+                                ].filter(Boolean).join(" • ")}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 3.3.3 OT Quality Devices */}
+              {report.otMatrixSummary.qualityDevices.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">3.3.3 Kalite Ölçüm Cihazları ve Entegrasyon Profili</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "12%" }}>İstasyon</th>
+                          <th style={{ width: "20%" }}>Cihaz & Model</th>
+                          <th style={{ width: "16%" }}>Format / Arayüz</th>
+                          <th style={{ width: "26%" }}>Veri Yetenekleri</th>
+                          <th style={{ width: "14%" }}>Entegrasyon Yolu</th>
+                          <th style={{ width: "12%" }}>Hedef Sistem</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.otMatrixSummary.qualityDevices.map((q) => (
+                          <tr key={q.id}>
+                            <td>
+                              <strong className="text-mono" style={{ color: "var(--color-primary, #1e3a8a)" }}>{q.stationCode}</strong>
+                              <span className="text-xs text-muted" style={{ display: "block" }}>{q.stationName}</span>
+                            </td>
+                            <td>
+                              <div className="font-bold">{q.deviceName}</div>
+                              <span className="text-xs text-muted">
+                                {[q.deviceType, q.manufacturer, q.model].filter(Boolean).join(" • ")}
+                              </span>
+                            </td>
+                            <td>
+                              <div style={{ fontSize: "0.8125rem" }}>{q.outputFormat || "—"}</div>
+                              {q.interfaceType && <span className="text-xs text-muted">{q.interfaceType}</span>}
+                            </td>
+                            <td>
+                              <div style={{ display: "flex", flexWrap: "wrap", gap: "2px" }}>
+                                {q.passFailAvailable && <span className="badge badge--success text-xs">PASS/FAIL</span>}
+                                {q.measurementValuesAvailable && <span className="badge badge--info text-xs">Ölçüm Değeri</span>}
+                                {q.lotBatchAvailable && <span className="badge badge--secondary text-xs">Lot/Parti</span>}
+                                {q.productCodeAvailable && <span className="badge badge--secondary text-xs">Ürün Kodu</span>}
+                                {q.operatorAvailable && <span className="badge badge--secondary text-xs">Operatör</span>}
+                              </div>
+                            </td>
+                            <td>
+                              <span className="badge badge--outline-secondary text-xs">
+                                {q.integrationMethod || "Manuel Giriş"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge badge--secondary">{q.targetSystem || "ERP/QM"}</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </section>
           )}
 

@@ -31,7 +31,7 @@ import type {
 } from "../types/backup";
 
 export const BACKUP_FORMAT_VERSION = "1.1.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 14;
+export const BACKUP_CURRENT_SCHEMA_VERSION = 15;
 export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
@@ -248,7 +248,7 @@ export async function exportProjectBackup(
     [projectId]
   );
 
-  // 7. OT İstasyonları ve İstasyon Cevapları (FAZ-62B)
+  // 7. OT İstasyonları, İstasyon Cevapları, Veri/Alarm/Kalite Matrisleri (FAZ-62B + FAZ-62C)
   const otStations = await db.select<any[]>(
     "SELECT * FROM ot_stations WHERE project_id = $1 ORDER BY sort_order ASC, created_at ASC",
     [projectId]
@@ -256,6 +256,21 @@ export async function exportProjectBackup(
 
   const otStationAnswers = await db.select<any[]>(
     "SELECT * FROM ot_station_answers WHERE project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const otDataRequirements = await db.select<any[]>(
+    "SELECT * FROM ot_data_requirements WHERE project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const otAlarmRequirements = await db.select<any[]>(
+    "SELECT * FROM ot_alarm_requirements WHERE project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
+
+  const otQualityDevices = await db.select<any[]>(
+    "SELECT * FROM ot_quality_devices WHERE project_id = $1 ORDER BY created_at ASC",
     [projectId]
   );
 
@@ -286,6 +301,9 @@ export async function exportProjectBackup(
     scopeChanges,
     otStations,
     otStationAnswers,
+    otDataRequirements,
+    otAlarmRequirements,
+    otQualityDevices,
   };
 
   const enc = new TextEncoder();
@@ -342,6 +360,9 @@ export async function exportProjectBackup(
     scopeChanges: scopeChanges.length,
     otStations: otStations.length,
     otStationAnswers: otStationAnswers.length,
+    otDataRequirements: otDataRequirements.length,
+    otAlarmRequirements: otAlarmRequirements.length,
+    otQualityDevices: otQualityDevices.length,
   };
 
   const manifest: BackupManifest = {
@@ -1286,6 +1307,108 @@ export async function restoreProjectBackup(
       );
     }
 
+    // Z. ot_data_requirements, ot_alarm_requirements, ot_quality_devices (FAZ-62C)
+    for (const dReq of projectData.otDataRequirements || []) {
+      const newDReqId = generateId("otreq");
+      const mappedStationId = stationIdMap.get(dReq.station_id) || dReq.station_id;
+      await db.execute(
+        `INSERT INTO ot_data_requirements
+           (id, project_id, station_id, purpose, decision_supported, required_action, data_category, measurement_name, source_type, source_name, collection_method, frequency, criticality, target_system, retention_required, retention_period, business_value, integration_complexity, priority, status, notes, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)`,
+        [
+          newDReqId,
+          newProjectId,
+          mappedStationId,
+          dReq.purpose,
+          dReq.decision_supported,
+          dReq.required_action,
+          dReq.data_category || null,
+          dReq.measurement_name,
+          dReq.source_type || null,
+          dReq.source_name || null,
+          dReq.collection_method || null,
+          dReq.frequency || null,
+          dReq.criticality || "medium",
+          dReq.target_system || null,
+          dReq.retention_required ? 1 : 0,
+          dReq.retention_period || null,
+          dReq.business_value || null,
+          dReq.integration_complexity || "medium",
+          dReq.priority || "medium",
+          dReq.status || "active",
+          dReq.notes || null,
+          dReq.created_at || now,
+          dReq.updated_at || now,
+        ]
+      );
+    }
+
+    for (const alm of projectData.otAlarmRequirements || []) {
+      const newAlmId = generateId("otalm");
+      const mappedStationId = stationIdMap.get(alm.station_id) || alm.station_id;
+      await db.execute(
+        `INSERT INTO ot_alarm_requirements
+           (id, project_id, station_id, alarm_name, alarm_code, source_type, trigger_condition, severity, safety_critical, responsible_role, response_sla, required_action, acknowledgement_required, escalation_required, target_system, status, notes, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+        [
+          newAlmId,
+          newProjectId,
+          mappedStationId,
+          alm.alarm_name,
+          alm.alarm_code || null,
+          alm.source_type || null,
+          alm.trigger_condition || null,
+          alm.severity || "warning",
+          alm.safety_critical ? 1 : 0,
+          alm.responsible_role || null,
+          alm.response_sla || null,
+          alm.required_action || null,
+          alm.acknowledgement_required ? 1 : 0,
+          alm.escalation_required ? 1 : 0,
+          alm.target_system || null,
+          alm.status || "active",
+          alm.notes || null,
+          alm.created_at || now,
+          alm.updated_at || now,
+        ]
+      );
+    }
+
+    for (const qd of projectData.otQualityDevices || []) {
+      const newQdId = generateId("otqd");
+      const mappedStationId = stationIdMap.get(qd.station_id) || qd.station_id;
+      await db.execute(
+        `INSERT INTO ot_quality_devices
+           (id, project_id, station_id, device_name, device_type, manufacturer, model, output_format, interface_type, api_available, network_share_available, test_result_available, pass_fail_available, measurement_values_available, product_code_available, lot_batch_available, operator_available, integration_method, target_system, status, notes, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23)`,
+        [
+          newQdId,
+          newProjectId,
+          mappedStationId,
+          qd.device_name,
+          qd.device_type || null,
+          qd.manufacturer || null,
+          qd.model || null,
+          qd.output_format || null,
+          qd.interface_type || null,
+          qd.api_available ? 1 : 0,
+          qd.network_share_available ? 1 : 0,
+          qd.test_result_available !== undefined ? (qd.test_result_available ? 1 : 0) : 1,
+          qd.pass_fail_available !== undefined ? (qd.pass_fail_available ? 1 : 0) : 1,
+          qd.measurement_values_available !== undefined ? (qd.measurement_values_available ? 1 : 0) : 1,
+          qd.product_code_available !== undefined ? (qd.product_code_available ? 1 : 0) : 1,
+          qd.lot_batch_available ? 1 : 0,
+          qd.operator_available ? 1 : 0,
+          qd.integration_method || null,
+          qd.target_system || null,
+          qd.status || "active",
+          qd.notes || null,
+          qd.created_at || now,
+          qd.updated_at || now,
+        ]
+      );
+    }
+
     // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
     const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
@@ -1431,6 +1554,9 @@ export async function duplicateProject(
       scopeChanges: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.scopeChanges || 0) : 0,
       otStations: exportData.manifest.recordCounts.otStations || 0,
       otStationAnswers: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.otStationAnswers || 0) : 0,
+      otDataRequirements: exportData.manifest.recordCounts.otDataRequirements || 0,
+      otAlarmRequirements: exportData.manifest.recordCounts.otAlarmRequirements || 0,
+      otQualityDevices: exportData.manifest.recordCounts.otQualityDevices || 0,
     },
   };
 

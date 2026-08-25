@@ -45,6 +45,10 @@ import type {
   OtStation,
   StationStatus,
   OtStationsSummaryStats,
+  OtDataRequirement,
+  OtAlarmRequirement,
+  OtQualityDevice,
+  OtMatrixSummaryCounts,
 } from "../types";
 import type { AnswerData } from "../engine/types";
 
@@ -2322,4 +2326,598 @@ export async function getOtStationsSummary(
   };
 }
 
+// ─────────────────────────────────────────────────────────────
+// FAZ-62C: OT Data Requirements CRUD
+// ─────────────────────────────────────────────────────────────
+
+export async function createOtDataRequirement(
+  payload: Omit<OtDataRequirement, "id" | "created_at" | "updated_at">
+): Promise<OtDataRequirement> {
+  const db = await getDb();
+  const id = generateId("otreq");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO ot_data_requirements (
+       id, project_id, station_id, purpose, decision_supported, required_action,
+       data_category, measurement_name, source_type, source_name, collection_method,
+       frequency, criticality, target_system, retention_required, retention_period,
+       business_value, integration_complexity, priority, status, notes,
+       created_at, updated_at
+     ) VALUES (
+       $1, $2, $3, $4, $5, $6,
+       $7, $8, $9, $10, $11,
+       $12, $13, $14, $15, $16,
+       $17, $18, $19, $20, $21,
+       $22, $22
+     )`,
+    [
+      id,
+      payload.project_id,
+      payload.station_id,
+      payload.purpose,
+      payload.decision_supported,
+      payload.required_action,
+      payload.data_category ?? null,
+      payload.measurement_name,
+      payload.source_type ?? null,
+      payload.source_name ?? null,
+      payload.collection_method ?? null,
+      payload.frequency ?? null,
+      payload.criticality ?? "medium",
+      payload.target_system ?? null,
+      payload.retention_required ? 1 : 0,
+      payload.retention_period ?? null,
+      payload.business_value ?? null,
+      payload.integration_complexity ?? "medium",
+      payload.priority ?? "medium",
+      payload.status ?? "active",
+      payload.notes ?? null,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    project_id: payload.project_id,
+    station_id: payload.station_id,
+    purpose: payload.purpose,
+    decision_supported: payload.decision_supported,
+    required_action: payload.required_action,
+    data_category: payload.data_category ?? null,
+    measurement_name: payload.measurement_name,
+    source_type: payload.source_type ?? null,
+    source_name: payload.source_name ?? null,
+    collection_method: payload.collection_method ?? null,
+    frequency: payload.frequency ?? null,
+    criticality: payload.criticality ?? "medium",
+    target_system: payload.target_system ?? null,
+    retention_required: payload.retention_required ? 1 : 0,
+    retention_period: payload.retention_period ?? null,
+    business_value: payload.business_value ?? null,
+    integration_complexity: payload.integration_complexity ?? "medium",
+    priority: payload.priority ?? "medium",
+    status: payload.status ?? "active",
+    notes: payload.notes ?? null,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function updateOtDataRequirement(
+  id: string,
+  updates: Partial<Omit<OtDataRequirement, "id" | "project_id" | "station_id" | "created_at" | "updated_at">>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE ot_data_requirements
+     SET purpose = COALESCE($1, purpose),
+         decision_supported = COALESCE($2, decision_supported),
+         required_action = COALESCE($3, required_action),
+         data_category = CASE WHEN $4 IS NOT NULL THEN $5 ELSE data_category END,
+         measurement_name = COALESCE($6, measurement_name),
+         source_type = CASE WHEN $7 IS NOT NULL THEN $8 ELSE source_type END,
+         source_name = CASE WHEN $9 IS NOT NULL THEN $10 ELSE source_name END,
+         collection_method = CASE WHEN $11 IS NOT NULL THEN $12 ELSE collection_method END,
+         frequency = CASE WHEN $13 IS NOT NULL THEN $14 ELSE frequency END,
+         criticality = COALESCE($15, criticality),
+         target_system = CASE WHEN $16 IS NOT NULL THEN $17 ELSE target_system END,
+         retention_required = CASE WHEN $18 IS NOT NULL THEN $19 ELSE retention_required END,
+         retention_period = CASE WHEN $20 IS NOT NULL THEN $21 ELSE retention_period END,
+         business_value = CASE WHEN $22 IS NOT NULL THEN $23 ELSE business_value END,
+         integration_complexity = COALESCE($24, integration_complexity),
+         priority = COALESCE($25, priority),
+         status = COALESCE($26, status),
+         notes = CASE WHEN $27 IS NOT NULL THEN $28 ELSE notes END,
+         updated_at = $29
+     WHERE id = $30`,
+    [
+      updates.purpose ?? null,
+      updates.decision_supported ?? null,
+      updates.required_action ?? null,
+      updates.data_category !== undefined ? 1 : null,
+      updates.data_category ?? null,
+      updates.measurement_name ?? null,
+      updates.source_type !== undefined ? 1 : null,
+      updates.source_type ?? null,
+      updates.source_name !== undefined ? 1 : null,
+      updates.source_name ?? null,
+      updates.collection_method !== undefined ? 1 : null,
+      updates.collection_method ?? null,
+      updates.frequency !== undefined ? 1 : null,
+      updates.frequency ?? null,
+      updates.criticality ?? null,
+      updates.target_system !== undefined ? 1 : null,
+      updates.target_system ?? null,
+      updates.retention_required !== undefined ? 1 : null,
+      updates.retention_required ? 1 : 0,
+      updates.retention_period !== undefined ? 1 : null,
+      updates.retention_period ?? null,
+      updates.business_value !== undefined ? 1 : null,
+      updates.business_value ?? null,
+      updates.integration_complexity ?? null,
+      updates.priority ?? null,
+      updates.status ?? null,
+      updates.notes !== undefined ? 1 : null,
+      updates.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteOtDataRequirement(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM ot_data_requirements WHERE id = $1`, [id]);
+}
+
+export async function getOtDataRequirements(
+  projectId: string,
+  stationId?: string
+): Promise<OtDataRequirement[]> {
+  const db = await getDb();
+  if (stationId) {
+    return db.select<OtDataRequirement[]>(
+      `SELECT * FROM ot_data_requirements WHERE project_id = $1 AND station_id = $2 ORDER BY created_at ASC`,
+      [projectId, stationId]
+    );
+  }
+  return db.select<OtDataRequirement[]>(
+    `SELECT * FROM ot_data_requirements WHERE project_id = $1 ORDER BY created_at ASC`,
+    [projectId]
+  );
+}
+
+export async function getOtDataRequirementById(id: string): Promise<OtDataRequirement | null> {
+  const db = await getDb();
+  const rows = await db.select<OtDataRequirement[]>(
+    `SELECT * FROM ot_data_requirements WHERE id = $1 LIMIT 1`,
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-62C: OT Alarm Requirements CRUD
+// ─────────────────────────────────────────────────────────────
+
+export async function createOtAlarmRequirement(
+  payload: Omit<OtAlarmRequirement, "id" | "created_at" | "updated_at">
+): Promise<OtAlarmRequirement> {
+  const db = await getDb();
+  const id = generateId("otalm");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO ot_alarm_requirements (
+       id, project_id, station_id, alarm_name, alarm_code, source_type,
+       trigger_condition, severity, safety_critical, responsible_role, response_sla,
+       required_action, acknowledgement_required, escalation_required, target_system,
+       status, notes, created_at, updated_at
+     ) VALUES (
+       $1, $2, $3, $4, $5, $6,
+       $7, $8, $9, $10, $11,
+       $12, $13, $14, $15,
+       $16, $17, $18, $18
+     )`,
+    [
+      id,
+      payload.project_id,
+      payload.station_id,
+      payload.alarm_name,
+      payload.alarm_code ?? null,
+      payload.source_type ?? null,
+      payload.trigger_condition ?? null,
+      payload.severity ?? "warning",
+      payload.safety_critical ? 1 : 0,
+      payload.responsible_role ?? null,
+      payload.response_sla ?? null,
+      payload.required_action ?? null,
+      payload.acknowledgement_required ? 1 : 0,
+      payload.escalation_required ? 1 : 0,
+      payload.target_system ?? null,
+      payload.status ?? "active",
+      payload.notes ?? null,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    project_id: payload.project_id,
+    station_id: payload.station_id,
+    alarm_name: payload.alarm_name,
+    alarm_code: payload.alarm_code ?? null,
+    source_type: payload.source_type ?? null,
+    trigger_condition: payload.trigger_condition ?? null,
+    severity: payload.severity ?? "warning",
+    safety_critical: payload.safety_critical ? 1 : 0,
+    responsible_role: payload.responsible_role ?? null,
+    response_sla: payload.response_sla ?? null,
+    required_action: payload.required_action ?? null,
+    acknowledgement_required: payload.acknowledgement_required ? 1 : 0,
+    escalation_required: payload.escalation_required ? 1 : 0,
+    target_system: payload.target_system ?? null,
+    status: payload.status ?? "active",
+    notes: payload.notes ?? null,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function updateOtAlarmRequirement(
+  id: string,
+  updates: Partial<Omit<OtAlarmRequirement, "id" | "project_id" | "station_id" | "created_at" | "updated_at">>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE ot_alarm_requirements
+     SET alarm_name = COALESCE($1, alarm_name),
+         alarm_code = CASE WHEN $2 IS NOT NULL THEN $3 ELSE alarm_code END,
+         source_type = CASE WHEN $4 IS NOT NULL THEN $5 ELSE source_type END,
+         trigger_condition = CASE WHEN $6 IS NOT NULL THEN $7 ELSE trigger_condition END,
+         severity = COALESCE($8, severity),
+         safety_critical = CASE WHEN $9 IS NOT NULL THEN $10 ELSE safety_critical END,
+         responsible_role = CASE WHEN $11 IS NOT NULL THEN $12 ELSE responsible_role END,
+         response_sla = CASE WHEN $13 IS NOT NULL THEN $14 ELSE response_sla END,
+         required_action = CASE WHEN $15 IS NOT NULL THEN $16 ELSE required_action END,
+         acknowledgement_required = CASE WHEN $17 IS NOT NULL THEN $18 ELSE acknowledgement_required END,
+         escalation_required = CASE WHEN $19 IS NOT NULL THEN $20 ELSE escalation_required END,
+         target_system = CASE WHEN $21 IS NOT NULL THEN $22 ELSE target_system END,
+         status = COALESCE($23, status),
+         notes = CASE WHEN $24 IS NOT NULL THEN $25 ELSE notes END,
+         updated_at = $26
+     WHERE id = $27`,
+    [
+      updates.alarm_name ?? null,
+      updates.alarm_code !== undefined ? 1 : null,
+      updates.alarm_code ?? null,
+      updates.source_type !== undefined ? 1 : null,
+      updates.source_type ?? null,
+      updates.trigger_condition !== undefined ? 1 : null,
+      updates.trigger_condition ?? null,
+      updates.severity ?? null,
+      updates.safety_critical !== undefined ? 1 : null,
+      updates.safety_critical ? 1 : 0,
+      updates.responsible_role !== undefined ? 1 : null,
+      updates.responsible_role ?? null,
+      updates.response_sla !== undefined ? 1 : null,
+      updates.response_sla ?? null,
+      updates.required_action !== undefined ? 1 : null,
+      updates.required_action ?? null,
+      updates.acknowledgement_required !== undefined ? 1 : null,
+      updates.acknowledgement_required ? 1 : 0,
+      updates.escalation_required !== undefined ? 1 : null,
+      updates.escalation_required ? 1 : 0,
+      updates.target_system !== undefined ? 1 : null,
+      updates.target_system ?? null,
+      updates.status ?? null,
+      updates.notes !== undefined ? 1 : null,
+      updates.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteOtAlarmRequirement(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM ot_alarm_requirements WHERE id = $1`, [id]);
+}
+
+export async function getOtAlarmRequirements(
+  projectId: string,
+  stationId?: string
+): Promise<OtAlarmRequirement[]> {
+  const db = await getDb();
+  if (stationId) {
+    return db.select<OtAlarmRequirement[]>(
+      `SELECT * FROM ot_alarm_requirements WHERE project_id = $1 AND station_id = $2 ORDER BY created_at ASC`,
+      [projectId, stationId]
+    );
+  }
+  return db.select<OtAlarmRequirement[]>(
+    `SELECT * FROM ot_alarm_requirements WHERE project_id = $1 ORDER BY created_at ASC`,
+    [projectId]
+  );
+}
+
+export async function getOtAlarmRequirementById(id: string): Promise<OtAlarmRequirement | null> {
+  const db = await getDb();
+  const rows = await db.select<OtAlarmRequirement[]>(
+    `SELECT * FROM ot_alarm_requirements WHERE id = $1 LIMIT 1`,
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-62C: OT Quality Devices CRUD
+// ─────────────────────────────────────────────────────────────
+
+export async function createOtQualityDevice(
+  payload: Omit<OtQualityDevice, "id" | "created_at" | "updated_at">
+): Promise<OtQualityDevice> {
+  const db = await getDb();
+  const id = generateId("otqd");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO ot_quality_devices (
+       id, project_id, station_id, device_name, device_type, manufacturer, model,
+       output_format, interface_type, api_available, network_share_available,
+       test_result_available, pass_fail_available, measurement_values_available,
+       product_code_available, lot_batch_available, operator_available,
+       integration_method, target_system, status, notes, created_at, updated_at
+     ) VALUES (
+       $1, $2, $3, $4, $5, $6, $7,
+       $8, $9, $10, $11,
+       $12, $13, $14,
+       $15, $16, $17,
+       $18, $19, $20, $21, $22, $22
+     )`,
+    [
+      id,
+      payload.project_id,
+      payload.station_id,
+      payload.device_name,
+      payload.device_type ?? null,
+      payload.manufacturer ?? null,
+      payload.model ?? null,
+      payload.output_format ?? null,
+      payload.interface_type ?? null,
+      payload.api_available ? 1 : 0,
+      payload.network_share_available ? 1 : 0,
+      payload.test_result_available !== undefined ? (payload.test_result_available ? 1 : 0) : 1,
+      payload.pass_fail_available !== undefined ? (payload.pass_fail_available ? 1 : 0) : 1,
+      payload.measurement_values_available !== undefined ? (payload.measurement_values_available ? 1 : 0) : 1,
+      payload.product_code_available !== undefined ? (payload.product_code_available ? 1 : 0) : 1,
+      payload.lot_batch_available ? 1 : 0,
+      payload.operator_available ? 1 : 0,
+      payload.integration_method ?? null,
+      payload.target_system ?? null,
+      payload.status ?? "active",
+      payload.notes ?? null,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    project_id: payload.project_id,
+    station_id: payload.station_id,
+    device_name: payload.device_name,
+    device_type: payload.device_type ?? null,
+    manufacturer: payload.manufacturer ?? null,
+    model: payload.model ?? null,
+    output_format: payload.output_format ?? null,
+    interface_type: payload.interface_type ?? null,
+    api_available: payload.api_available ? 1 : 0,
+    network_share_available: payload.network_share_available ? 1 : 0,
+    test_result_available: payload.test_result_available !== undefined ? (payload.test_result_available ? 1 : 0) : 1,
+    pass_fail_available: payload.pass_fail_available !== undefined ? (payload.pass_fail_available ? 1 : 0) : 1,
+    measurement_values_available: payload.measurement_values_available !== undefined ? (payload.measurement_values_available ? 1 : 0) : 1,
+    product_code_available: payload.product_code_available !== undefined ? (payload.product_code_available ? 1 : 0) : 1,
+    lot_batch_available: payload.lot_batch_available ? 1 : 0,
+    operator_available: payload.operator_available ? 1 : 0,
+    integration_method: payload.integration_method ?? null,
+    target_system: payload.target_system ?? null,
+    status: payload.status ?? "active",
+    notes: payload.notes ?? null,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function updateOtQualityDevice(
+  id: string,
+  updates: Partial<Omit<OtQualityDevice, "id" | "project_id" | "station_id" | "created_at" | "updated_at">>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE ot_quality_devices
+     SET device_name = COALESCE($1, device_name),
+         device_type = CASE WHEN $2 IS NOT NULL THEN $3 ELSE device_type END,
+         manufacturer = CASE WHEN $4 IS NOT NULL THEN $5 ELSE manufacturer END,
+         model = CASE WHEN $6 IS NOT NULL THEN $7 ELSE model END,
+         output_format = CASE WHEN $8 IS NOT NULL THEN $9 ELSE output_format END,
+         interface_type = CASE WHEN $10 IS NOT NULL THEN $11 ELSE interface_type END,
+         api_available = CASE WHEN $12 IS NOT NULL THEN $13 ELSE api_available END,
+         network_share_available = CASE WHEN $14 IS NOT NULL THEN $15 ELSE network_share_available END,
+         test_result_available = CASE WHEN $16 IS NOT NULL THEN $17 ELSE test_result_available END,
+         pass_fail_available = CASE WHEN $18 IS NOT NULL THEN $19 ELSE pass_fail_available END,
+         measurement_values_available = CASE WHEN $20 IS NOT NULL THEN $21 ELSE measurement_values_available END,
+         product_code_available = CASE WHEN $22 IS NOT NULL THEN $23 ELSE product_code_available END,
+         lot_batch_available = CASE WHEN $24 IS NOT NULL THEN $25 ELSE lot_batch_available END,
+         operator_available = CASE WHEN $26 IS NOT NULL THEN $27 ELSE operator_available END,
+         integration_method = CASE WHEN $28 IS NOT NULL THEN $29 ELSE integration_method END,
+         target_system = CASE WHEN $30 IS NOT NULL THEN $31 ELSE target_system END,
+         status = COALESCE($32, status),
+         notes = CASE WHEN $33 IS NOT NULL THEN $34 ELSE notes END,
+         updated_at = $35
+     WHERE id = $36`,
+    [
+      updates.device_name ?? null,
+      updates.device_type !== undefined ? 1 : null,
+      updates.device_type ?? null,
+      updates.manufacturer !== undefined ? 1 : null,
+      updates.manufacturer ?? null,
+      updates.model !== undefined ? 1 : null,
+      updates.model ?? null,
+      updates.output_format !== undefined ? 1 : null,
+      updates.output_format ?? null,
+      updates.interface_type !== undefined ? 1 : null,
+      updates.interface_type ?? null,
+      updates.api_available !== undefined ? 1 : null,
+      updates.api_available ? 1 : 0,
+      updates.network_share_available !== undefined ? 1 : null,
+      updates.network_share_available ? 1 : 0,
+      updates.test_result_available !== undefined ? 1 : null,
+      updates.test_result_available ? 1 : 0,
+      updates.pass_fail_available !== undefined ? 1 : null,
+      updates.pass_fail_available ? 1 : 0,
+      updates.measurement_values_available !== undefined ? 1 : null,
+      updates.measurement_values_available ? 1 : 0,
+      updates.product_code_available !== undefined ? 1 : null,
+      updates.product_code_available ? 1 : 0,
+      updates.lot_batch_available !== undefined ? 1 : null,
+      updates.lot_batch_available ? 1 : 0,
+      updates.operator_available !== undefined ? 1 : null,
+      updates.operator_available ? 1 : 0,
+      updates.integration_method !== undefined ? 1 : null,
+      updates.integration_method ?? null,
+      updates.target_system !== undefined ? 1 : null,
+      updates.target_system ?? null,
+      updates.status ?? null,
+      updates.notes !== undefined ? 1 : null,
+      updates.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteOtQualityDevice(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM ot_quality_devices WHERE id = $1`, [id]);
+}
+
+export async function getOtQualityDevices(
+  projectId: string,
+  stationId?: string
+): Promise<OtQualityDevice[]> {
+  const db = await getDb();
+  if (stationId) {
+    return db.select<OtQualityDevice[]>(
+      `SELECT * FROM ot_quality_devices WHERE project_id = $1 AND station_id = $2 ORDER BY created_at ASC`,
+      [projectId, stationId]
+    );
+  }
+  return db.select<OtQualityDevice[]>(
+    `SELECT * FROM ot_quality_devices WHERE project_id = $1 ORDER BY created_at ASC`,
+    [projectId]
+  );
+}
+
+export async function getOtQualityDeviceById(id: string): Promise<OtQualityDevice | null> {
+  const db = await getDb();
+  const rows = await db.select<OtQualityDevice[]>(
+    `SELECT * FROM ot_quality_devices WHERE id = $1 LIMIT 1`,
+    [id]
+  );
+  return rows[0] ?? null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// FAZ-62C: OT Matrix Summary Counts & Statistics
+// ─────────────────────────────────────────────────────────────
+
+export async function getOtMatrixSummaryCounts(
+  projectId: string
+): Promise<OtMatrixSummaryCounts> {
+  const db = await getDb();
+  const [dataReqs, alarms, qualityDevs] = await Promise.all([
+    db.select<OtDataRequirement[]>(
+      `SELECT * FROM ot_data_requirements WHERE project_id = $1`,
+      [projectId]
+    ),
+    db.select<OtAlarmRequirement[]>(
+      `SELECT * FROM ot_alarm_requirements WHERE project_id = $1`,
+      [projectId]
+    ),
+    db.select<OtQualityDevice[]>(
+      `SELECT * FROM ot_quality_devices WHERE project_id = $1`,
+      [projectId]
+    ),
+  ]);
+
+  const totalDataRequirements = dataReqs.length;
+  const criticalDataRequirements = dataReqs.filter(
+    (d) => d.criticality === "critical" || d.priority === "high"
+  ).length;
+
+  let eventBasedCount = 0;
+  let cycleBasedCount = 0;
+  let timeBasedCount = 0;
+  let highComplexityItems = 0;
+
+  for (const d of dataReqs) {
+    const f = (d.frequency || "").toLowerCase();
+    const c = (d.collection_method || "").toLowerCase();
+    if (f.includes("event") || f.includes("olay") || c.includes("event") || c.includes("olay")) {
+      eventBasedCount++;
+    } else if (f.includes("cycle") || f.includes("çevrim") || f.includes("part") || f.includes("adet") || c.includes("cycle")) {
+      cycleBasedCount++;
+    } else if (f.includes("sec") || f.includes("sn") || f.includes("dakika") || f.includes("min") || f.includes("saat") || f.includes("zaman") || f.includes("periyodik")) {
+      timeBasedCount++;
+    }
+
+    if (d.integration_complexity === "high") {
+      highComplexityItems++;
+    }
+  }
+
+  const totalAlarms = alarms.length;
+  const safetyCriticalAlarms = alarms.filter((a) => Number(a.safety_critical) === 1).length;
+  const unassignedRoleAlarms = alarms.filter((a) => !a.responsible_role || a.responsible_role.trim() === "").length;
+  const missingActionAlarms = alarms.filter((a) => !a.required_action || a.required_action.trim() === "").length;
+
+  const totalQualityDevices = qualityDevs.length;
+  const automatedTransferDevices = qualityDevs.filter(
+    (q) =>
+      Number(q.api_available) === 1 ||
+      Number(q.network_share_available) === 1 ||
+      (q.integration_method && (q.integration_method.toLowerCase().includes("auto") || q.integration_method.toLowerCase().includes("otomatik") || q.integration_method.toLowerCase().includes("api")))
+  ).length;
+
+  const pdfOnlyDevices = qualityDevs.filter((q) => {
+    const out = (q.output_format || "").toLowerCase();
+    const isPdf = out.includes("pdf") && !out.includes("csv") && !out.includes("excel") && !out.includes("json") && !out.includes("api");
+    return isPdf && Number(q.api_available) === 0 && Number(q.network_share_available) === 0;
+  }).length;
+
+  return {
+    totalDataRequirements,
+    criticalDataRequirements,
+    eventBasedCount,
+    cycleBasedCount,
+    timeBasedCount,
+    totalAlarms,
+    safetyCriticalAlarms,
+    unassignedRoleAlarms,
+    missingActionAlarms,
+    totalQualityDevices,
+    automatedTransferDevices,
+    pdfOnlyDevices,
+    highComplexityItems,
+  };
+}
+
 export * from './governanceClient';
+

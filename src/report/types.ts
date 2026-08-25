@@ -357,6 +357,98 @@ export interface ReportOtStationsSummary {
   stations: ReportOtStation[];
 }
 
+export interface ReportOtDataRequirement {
+  id: string;
+  stationId: string;
+  stationCode: string;
+  stationName: string;
+  purpose: string;
+  decisionSupported: string;
+  requiredAction: string;
+  dataCategory: string | null;
+  measurementName: string;
+  sourceType: string | null;
+  sourceName: string | null;
+  collectionMethod: string | null;
+  frequency: string | null;
+  criticality: string;
+  targetSystem: string | null;
+  retentionRequired: boolean;
+  retentionPeriod: string | null;
+  businessValue: string | null;
+  integrationComplexity: string;
+  priority: string;
+  status: string;
+  notes: string | null;
+}
+
+export interface ReportOtAlarmRequirement {
+  id: string;
+  stationId: string;
+  stationCode: string;
+  stationName: string;
+  alarmName: string;
+  alarmCode: string | null;
+  sourceType: string | null;
+  triggerCondition: string | null;
+  severity: string;
+  safetyCritical: boolean;
+  responsibleRole: string | null;
+  responseSla: string | null;
+  requiredAction: string | null;
+  acknowledgementRequired: boolean;
+  escalationRequired: boolean;
+  targetSystem: string | null;
+  status: string;
+  notes: string | null;
+}
+
+export interface ReportOtQualityDevice {
+  id: string;
+  stationId: string;
+  stationCode: string;
+  stationName: string;
+  deviceName: string;
+  deviceType: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  outputFormat: string | null;
+  interfaceType: string | null;
+  apiAvailable: boolean;
+  networkShareAvailable: boolean;
+  testResultAvailable: boolean;
+  passFailAvailable: boolean;
+  measurementValuesAvailable: boolean;
+  productCodeAvailable: boolean;
+  lotBatchAvailable: boolean;
+  operatorAvailable: boolean;
+  integrationMethod: string | null;
+  targetSystem: string | null;
+  status: string;
+  notes: string | null;
+}
+
+export interface ReportOtMatrixSummary {
+  stats: {
+    totalDataRequirements: number;
+    criticalDataRequirements: number;
+    eventBasedCount: number;
+    cycleBasedCount: number;
+    timeBasedCount: number;
+    totalAlarms: number;
+    safetyCriticalAlarms: number;
+    unassignedRoleAlarms: number;
+    missingActionAlarms: number;
+    totalQualityDevices: number;
+    automatedTransferDevices: number;
+    pdfOnlyDevices: number;
+    highComplexityItems: number;
+  };
+  dataRequirements: ReportOtDataRequirement[];
+  alarmRequirements: ReportOtAlarmRequirement[];
+  qualityDevices: ReportOtQualityDevice[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -368,6 +460,7 @@ export interface ReportModel {
   governance?: ReportGovernanceModel;
   scheduleSummary?: ReportScheduleSummary;
   otStationsSummary?: ReportOtStationsSummary;
+  otMatrixSummary?: ReportOtMatrixSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

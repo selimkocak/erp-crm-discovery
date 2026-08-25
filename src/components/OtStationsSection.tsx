@@ -15,9 +15,11 @@ import {
   XCircle,
   ArrowRight,
   AlertTriangle,
+  Database,
 } from "lucide-react";
 import type { OtStation, StationStatus } from "../types";
 import { OtStationModal } from "./modals/OtStationModal";
+import { OtStationMatrixModal } from "./modals/OtStationMatrixModal";
 import {
   createOtStation,
   updateOtStation,
@@ -44,6 +46,7 @@ export const OtStationsSection: React.FC<OtStationsSectionProps> = ({
   const [editingStation, setEditingStation] = useState<OtStation | null>(null);
   const [deletingStation, setDeletingStation] = useState<OtStation | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [matrixStation, setMatrixStation] = useState<OtStation | null>(null);
 
   const totalStations = stations.length;
   const activeStations = stations.filter((s) => s.status === "active").length;
@@ -243,12 +246,12 @@ export const OtStationsSection: React.FC<OtStationsSectionProps> = ({
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", fontSize: "0.875rem" }}>
             <thead>
               <tr style={{ backgroundColor: "#f8fafc", borderBottom: "1px solid #e2e8f0", color: "#475569" }}>
-                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "14%" }}>İstasyon Kodu</th>
-                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "22%" }}>İstasyon Adı & Türü</th>
-                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "18%" }}>Alan / Hat</th>
-                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "22%" }}>Makine & PLC</th>
+                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "13%" }}>İstasyon Kodu</th>
+                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "20%" }}>İstasyon Adı & Türü</th>
+                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "17%" }}>Alan / Hat</th>
+                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "20%" }}>Makine & PLC</th>
                 <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "10%" }}>Durum</th>
-                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "14%", textAlign: "right" }}>Aksiyonlar</th>
+                <th style={{ padding: "0.75rem 1rem", fontWeight: 600, width: "20%", textAlign: "right" }}>Aksiyonlar</th>
               </tr>
             </thead>
             <tbody>
@@ -315,6 +318,26 @@ export const OtStationsSection: React.FC<OtStationsSectionProps> = ({
                   </td>
                   <td style={{ padding: "0.875rem 1rem", textAlign: "right" }}>
                     <div style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem" }}>
+                      <button
+                        type="button"
+                        onClick={() => setMatrixStation(st)}
+                        title="Veri, Alarm & Kalite Matrisi"
+                        className="button button--secondary"
+                        style={{
+                          padding: "4px 8px",
+                          fontSize: "0.75rem",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          color: "#1d4ed8",
+                          borderColor: "#bfdbfe",
+                          backgroundColor: "#eff6ff",
+                        }}
+                      >
+                        <Database size={12} />
+                        <span>Matris</span>
+                      </button>
+
                       <button
                         type="button"
                         onClick={() => onOpenStationQuestions(st)}
@@ -399,6 +422,17 @@ export const OtStationsSection: React.FC<OtStationsSectionProps> = ({
         editingStation={editingStation}
         existingCodes={stations.map((s) => s.station_code)}
       />
+
+      {/* OtStationMatrixModal (FAZ-62C) */}
+      {matrixStation && (
+        <OtStationMatrixModal
+          isOpen={Boolean(matrixStation)}
+          onClose={() => setMatrixStation(null)}
+          station={matrixStation}
+          projectId={projectId}
+          onRefreshStats={onReloadStations}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {deletingStation && (

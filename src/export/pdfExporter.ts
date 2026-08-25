@@ -324,6 +324,125 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY = (doc as any).lastAutoTable.finalY + 8;
   }
 
+  // ── Section 3.3: OT Veri Gereksinimleri, Alarm ve Kalite Cihazları (FAZ-62C) ──
+  if (report.otMatrixSummary) {
+    const matrixSummary = report.otMatrixSummary;
+    checkPageBreak(35);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("3.3 OT Veri Gereksinimleri, Alarm ve Kalite Cihazları Matrisi", marginX, currentY);
+    currentY += 6;
+
+    // 3.3.1 Veri Gereksinimleri
+    if (matrixSummary.dataRequirements.length > 0) {
+      checkPageBreak(25);
+      doc.setFont(PDF_FONT_FAMILY, "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text("3.3.1 OT Veri Gereksinimi & Karar/Aksiyon Matrisi", marginX, currentY);
+      currentY += 5;
+
+      const dataRows = matrixSummary.dataRequirements.map((d) => [
+        `${d.stationCode}\n(${d.stationName})`,
+        `${d.measurementName}${d.dataCategory ? `\n[${d.dataCategory}]` : ""}`,
+        `Amaç: ${d.purpose}\nKarar: ${d.decisionSupported}`,
+        `${d.requiredAction}${d.businessValue ? `\nDeğer: ${d.businessValue}` : ""}`,
+        `${d.sourceName || d.sourceType || "—"}\n(${[d.collectionMethod, d.frequency].filter(Boolean).join(" • ") || "—"})`,
+        d.criticality.toUpperCase(),
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["İstasyon", "Ölçüm / Sinyal", "Veri Amacı & Desteklenen Karar", "Tetiklenen Aksiyon", "Kaynak & Sıklık", "Kritiklik"]],
+        body: dataRows,
+        theme: "striped",
+        styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 7.5 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 6;
+    }
+
+    // 3.3.2 Alarm ve Safety
+    if (matrixSummary.alarmRequirements.length > 0) {
+      checkPageBreak(25);
+      doc.setFont(PDF_FONT_FAMILY, "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text("3.3.2 Alarm ve Safety Gereksinimleri", marginX, currentY);
+      currentY += 4.5;
+
+      doc.setFont(PDF_FONT_FAMILY, "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(180, 83, 9);
+      doc.text("⚠️ Güvenlik ve Yetki Sınırı Notu: Safety kritiklik işareti yalnızca saha keşif ve danışmanlık amaçlıdır. ERP/CRM sistemi safety PLC yerine geçmez.", marginX, currentY);
+      currentY += 4.5;
+
+      const alarmRows = matrixSummary.alarmRequirements.map((a) => [
+        `${a.stationCode}\n(${a.stationName})`,
+        `${a.alarmName}${a.alarmCode ? `\n[${a.alarmCode}]` : ""}`,
+        a.triggerCondition || "—",
+        `${a.severity.toUpperCase()}${a.safetyCritical ? "\n🚨 SAFETY" : ""}`,
+        `${a.responsibleRole || "—"}${a.responseSla ? `\nSLA: ${a.responseSla}` : ""}`,
+        `${a.requiredAction || "—"}${a.escalationRequired ? "\n(Eskalasyon)" : ""}`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["İstasyon", "Alarm Adı & Kodu", "Tetikleme Koşulu", "Ciddiyet & Safety", "Sorumlu & SLA", "Gerekli Aksiyon"]],
+        body: alarmRows,
+        theme: "striped",
+        styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [254, 243, 199], textColor: [146, 64, 14], fontSize: 7.5 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 6;
+    }
+
+    // 3.3.3 Kalite Cihazları
+    if (matrixSummary.qualityDevices.length > 0) {
+      checkPageBreak(25);
+      doc.setFont(PDF_FONT_FAMILY, "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text("3.3.3 Kalite Ölçüm Cihazları ve Entegrasyon Profili", marginX, currentY);
+      currentY += 5;
+
+      const qualityRows = matrixSummary.qualityDevices.map((q) => {
+        const capList = [
+          q.passFailAvailable ? "PASS/FAIL" : null,
+          q.measurementValuesAvailable ? "Ölçüm" : null,
+          q.lotBatchAvailable ? "Lot" : null,
+          q.productCodeAvailable ? "Ürün" : null,
+          q.operatorAvailable ? "Operatör" : null,
+        ].filter(Boolean).join(", ") || "—";
+
+        return [
+          `${q.stationCode}\n(${q.stationName})`,
+          `${q.deviceName}\n${[q.deviceType, q.manufacturer, q.model].filter(Boolean).join(" • ") || "—"}`,
+          `${q.outputFormat || "—"}\n(${q.interfaceType || "—"})`,
+          capList,
+          `${q.integrationMethod || "Manuel"}\n-> ${q.targetSystem || "ERP/QM"}`,
+        ];
+      });
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["İstasyon", "Cihaz & Model", "Format & Arayüz", "Veri Yetenekleri", "Entegrasyon & Hedef"]],
+        body: qualityRows,
+        theme: "striped",
+        styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 7.5 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 8;
+    }
+  }
+
   // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   checkPageBreak(35);
   doc.setFont(PDF_FONT_FAMILY, "bold");

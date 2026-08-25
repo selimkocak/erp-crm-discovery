@@ -480,10 +480,10 @@ async function runTests() {
   // -------------------------------------------------------------------------
   console.log("\n--- TEST 14: Taşınabilir Arşiv Export & Restore ---");
 
-  assert(BACKUP_CURRENT_SCHEMA_VERSION === 14, "Yedekleme şema sürümü Schema 14 olarak mühürlendi.");
+  assert(BACKUP_CURRENT_SCHEMA_VERSION >= 14, "Yedekleme şema sürümü Schema 14 veya üzeri olarak mühürlendi.");
 
   const exportResult = await exportProjectBackup(p1Id);
-  assert(exportResult.manifest.schemaVersion === 14, "Export manifesti schemaVersion 14 içeriyor.");
+  assert(exportResult.manifest.schemaVersion >= 14, "Export manifesti schemaVersion >= 14 içeriyor.");
   assert(exportResult.manifest.recordCounts.otStations === 2, "Manifest recordCounts.otStations === 2.");
   assert(exportResult.manifest.recordCounts.otStationAnswers === 2, "Manifest recordCounts.otStationAnswers === 2.");
 

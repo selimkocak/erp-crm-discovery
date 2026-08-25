@@ -148,6 +148,9 @@ for (const expected of [
   "project_scope_changes",
   "ot_stations",
   "ot_station_answers",
+  "ot_data_requirements",
+  "ot_alarm_requirements",
+  "ot_quality_devices",
 ]) {
   assert(tableNames.includes(expected), `Tablo mevcut: ${expected}`);
 }
@@ -205,7 +208,7 @@ const tableCount2 = (
     .prepare("SELECT COUNT(*) as c FROM sqlite_master WHERE type='table'")
     .get() as { c: number }
 ).c;
-assert(tableCount2 === 27, `Tablo sayısı değişmedi: 27 (gerçek: ${tableCount2})`);
+assert(tableCount2 === 30, `Tablo sayısı değişmedi: 30 (gerçek: ${tableCount2})`);
 
 const pscTable2 = db2
   .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='project_scope_changes'")

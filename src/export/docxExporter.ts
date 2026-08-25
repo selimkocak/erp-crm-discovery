@@ -651,6 +651,215 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     );
   }
 
+  // ── Section 3.3: OT Veri Gereksinimleri, Alarm ve Kalite Cihazları Matrisi (FAZ-62C) ──
+  if (report.otMatrixSummary) {
+    const matrixSummary = report.otMatrixSummary;
+
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "3.3 OT Veri Gereksinimleri, Alarm ve Kalite Cihazları Matrisi",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 100, after: 100 },
+        children: [
+          new TextRun({
+            text: `Toplam ${matrixSummary.stats.totalDataRequirements} veri gereksinimi (${matrixSummary.stats.criticalDataRequirements} kritik), ${matrixSummary.stats.totalAlarms} alarm (${matrixSummary.stats.safetyCriticalAlarms} safety kritik) ve ${matrixSummary.stats.totalQualityDevices} kalite cihazı (${matrixSummary.stats.automatedTransferDevices} otomatik aktarım) analiz edilmiştir.`,
+            size: 20,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    // 3.3.1 Veri Gereksinimleri
+    if (matrixSummary.dataRequirements.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "3.3.1 OT Veri Gereksinimi & Karar/Aksiyon Matrisi",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const dataHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("İstasyon", { isHeader: true, widthPercent: 15 }),
+          createTableCell("Ölçüm / Sinyal", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Veri Amacı & Desteklenen Karar", { isHeader: true, widthPercent: 25 }),
+          createTableCell("Tetiklenen Aksiyon", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Kaynak & Sıklık", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Kritiklik", { isHeader: true, widthPercent: 8 }),
+        ],
+      });
+
+      const dataRows: TableRow[] = matrixSummary.dataRequirements.map(
+        (d) =>
+          new TableRow({
+            children: [
+              createTableCell(`${d.stationCode}\n(${d.stationName})`, { bold: true }),
+              createTableCell(`${d.measurementName}${d.dataCategory ? `\n[${d.dataCategory}]` : ""}`),
+              createTableCell(`Amaç: ${d.purpose}\nKarar: ${d.decisionSupported}`),
+              createTableCell(`${d.requiredAction}${d.businessValue ? `\nDeğer: ${d.businessValue}` : ""}`),
+              createTableCell(`${d.sourceName || d.sourceType || "—"}\n(${[d.collectionMethod, d.frequency].filter(Boolean).join(" • ") || "—"})`),
+              createTableCell(d.criticality.toUpperCase()),
+            ],
+          })
+      );
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [dataHeaderRow, ...dataRows],
+        }),
+        new Paragraph({ spacing: { after: 150 } })
+      );
+    }
+
+    // 3.3.2 Alarm ve Safety
+    if (matrixSummary.alarmRequirements.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "3.3.2 Alarm ve Safety Gereksinimleri",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        }),
+        new Paragraph({
+          spacing: { after: 80 },
+          children: [
+            new TextRun({
+              text: "⚠️ Güvenlik ve Yetki Sınırı Notu: Safety kritiklik işareti yalnızca saha keşif ve danışmanlık amaçlıdır. ERP/CRM sistemi safety PLC yerine geçmez ve sahaya doğrudan durdurma komutu iletmez.",
+              italics: true,
+              size: 18,
+              color: "B45309",
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const alarmHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("İstasyon", { isHeader: true, widthPercent: 15 }),
+          createTableCell("Alarm Adı & Kodu", { isHeader: true, widthPercent: 22 }),
+          createTableCell("Tetikleme Koşulu", { isHeader: true, widthPercent: 23 }),
+          createTableCell("Ciddiyet & Safety", { isHeader: true, widthPercent: 15 }),
+          createTableCell("Sorumlu & SLA", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Gerekli Aksiyon", { isHeader: true, widthPercent: 13 }),
+        ],
+      });
+
+      const alarmRows: TableRow[] = matrixSummary.alarmRequirements.map(
+        (a) =>
+          new TableRow({
+            children: [
+              createTableCell(`${a.stationCode}\n(${a.stationName})`, { bold: true }),
+              createTableCell(`${a.alarmName}${a.alarmCode ? `\n[${a.alarmCode}]` : ""}`),
+              createTableCell(a.triggerCondition || "—"),
+              createTableCell(`${a.severity.toUpperCase()}${a.safetyCritical ? "\n🚨 SAFETY KRİTİK" : ""}`),
+              createTableCell(`${a.responsibleRole || "—"}${a.responseSla ? `\nSLA: ${a.responseSla}` : ""}`),
+              createTableCell(`${a.requiredAction || "—"}${a.escalationRequired ? "\n(Eskalasyon Var)" : ""}`),
+            ],
+          })
+      );
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [alarmHeaderRow, ...alarmRows],
+        }),
+        new Paragraph({ spacing: { after: 150 } })
+      );
+    }
+
+    // 3.3.3 Kalite Cihazları
+    if (matrixSummary.qualityDevices.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "3.3.3 Kalite Ölçüm Cihazları ve Entegrasyon Profili",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const qualityHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("İstasyon", { isHeader: true, widthPercent: 15 }),
+          createTableCell("Cihaz & Model", { isHeader: true, widthPercent: 25 }),
+          createTableCell("Format & Arayüz", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Veri Yetenekleri", { isHeader: true, widthPercent: 25 }),
+          createTableCell("Entegrasyon & Hedef", { isHeader: true, widthPercent: 15 }),
+        ],
+      });
+
+      const qualityRows: TableRow[] = matrixSummary.qualityDevices.map(
+        (q) => {
+          const capList = [
+            q.passFailAvailable ? "PASS/FAIL" : null,
+            q.measurementValuesAvailable ? "Ölçüm Değeri" : null,
+            q.lotBatchAvailable ? "Lot/Parti" : null,
+            q.productCodeAvailable ? "Ürün Kodu" : null,
+            q.operatorAvailable ? "Operatör" : null,
+          ].filter(Boolean).join(", ") || "—";
+
+          return new TableRow({
+            children: [
+              createTableCell(`${q.stationCode}\n(${q.stationName})`, { bold: true }),
+              createTableCell(`${q.deviceName}\n${[q.deviceType, q.manufacturer, q.model].filter(Boolean).join(" • ") || "—"}`),
+              createTableCell(`${q.outputFormat || "—"}\n(${q.interfaceType || "—"})`),
+              createTableCell(capList),
+              createTableCell(`${q.integrationMethod || "Manuel"}\n-> ${q.targetSystem || "ERP/QM"}`),
+            ],
+          });
+        }
+      );
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [qualityHeaderRow, ...qualityRows],
+        }),
+        new Paragraph({ spacing: { after: 200 } })
+      );
+    }
+  }
+
   // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   docChildren.push(
     new Paragraph({

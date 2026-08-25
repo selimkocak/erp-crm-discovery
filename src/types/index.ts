@@ -430,5 +430,102 @@ export interface OtStationsSummaryStats {
   lineCount: number;
 }
 
+export type OtMatrixItemStatus = 'active' | 'passive';
+export type OtCriticality = 'low' | 'medium' | 'high' | 'critical';
+export type OtAlarmSeverity = 'info' | 'warning' | 'critical';
+export type OtIntegrationComplexity = 'low' | 'medium' | 'high';
+export type OtPriority = 'low' | 'medium' | 'high';
+
+export interface OtDataRequirement {
+  id: string;
+  project_id: string;
+  station_id: string;
+  purpose: string;
+  decision_supported: string;
+  required_action: string;
+  data_category?: string | null;
+  measurement_name: string;
+  source_type?: string | null;
+  source_name?: string | null;
+  collection_method?: string | null;
+  frequency?: string | null;
+  criticality: OtCriticality | string;
+  target_system?: string | null;
+  retention_required: number;
+  retention_period?: string | null;
+  business_value?: string | null;
+  integration_complexity: OtIntegrationComplexity | string;
+  priority: OtPriority | string;
+  status: OtMatrixItemStatus | string;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OtAlarmRequirement {
+  id: string;
+  project_id: string;
+  station_id: string;
+  alarm_name: string;
+  alarm_code?: string | null;
+  source_type?: string | null;
+  trigger_condition?: string | null;
+  severity: OtAlarmSeverity | string;
+  safety_critical: number;
+  responsible_role?: string | null;
+  response_sla?: string | null;
+  required_action?: string | null;
+  acknowledgement_required: number;
+  escalation_required: number;
+  target_system?: string | null;
+  status: OtMatrixItemStatus | string;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OtQualityDevice {
+  id: string;
+  project_id: string;
+  station_id: string;
+  device_name: string;
+  device_type?: string | null;
+  manufacturer?: string | null;
+  model?: string | null;
+  output_format?: string | null;
+  interface_type?: string | null;
+  api_available: number;
+  network_share_available: number;
+  test_result_available: number;
+  pass_fail_available: number;
+  measurement_values_available: number;
+  product_code_available: number;
+  lot_batch_available: number;
+  operator_available: number;
+  integration_method?: string | null;
+  target_system?: string | null;
+  status: OtMatrixItemStatus | string;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OtMatrixSummaryCounts {
+  totalDataRequirements: number;
+  criticalDataRequirements: number;
+  eventBasedCount: number;
+  cycleBasedCount: number;
+  timeBasedCount: number;
+  totalAlarms: number;
+  safetyCriticalAlarms: number;
+  unassignedRoleAlarms: number;
+  missingActionAlarms: number;
+  totalQualityDevices: number;
+  automatedTransferDevices: number;
+  pdfOnlyDevices: number;
+  highComplexityItems: number;
+}
+
 export * from './governance';
 export * from './backup';
+
