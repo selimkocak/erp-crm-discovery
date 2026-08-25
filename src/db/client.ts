@@ -53,8 +53,12 @@ import type {
   ProcessNode,
   ProcessEdge,
   ProcessMapsSummaryStats,
+  DataGovernanceAsset,
+  DataGovernanceAccess,
+  DataGovernanceApproval,
+  DataGovernanceSummaryStats,
 } from "../types";
-import { calculateAdoptionRisk } from "../types";
+import { calculateAdoptionRisk, checkAssetSodRisk } from "../types";
 import type { AnswerData } from "../engine/types";
 
 // ---------------------------------------------------------------
@@ -3338,6 +3342,566 @@ export async function getProcessMapsSummaryStats(
     valueAddedStepCount,
     simplificationOpportunityCount,
   };
+}
+
+// ---------------------------------------------------------------
+// 30. FAZ-64: Data Governance Assets, Access and Approvals CRUD
+// ---------------------------------------------------------------
+
+export async function getDataGovernanceAssets(
+  projectId: string
+): Promise<DataGovernanceAsset[]> {
+  const db = await getDb();
+  return db.select<DataGovernanceAsset[]>(
+    `SELECT * FROM data_governance_assets WHERE project_id = $1 ORDER BY asset_name ASC`,
+    [projectId]
+  );
+}
+
+export async function getDataGovernanceAssetById(
+  id: string
+): Promise<DataGovernanceAsset | null> {
+  const db = await getDb();
+  const rows = await db.select<DataGovernanceAsset[]>(
+    `SELECT * FROM data_governance_assets WHERE id = $1`,
+    [id]
+  );
+  return rows.length > 0 ? rows[0] : null;
+}
+
+export async function createDataGovernanceAsset(
+  payload: Omit<DataGovernanceAsset, "id" | "created_at" | "updated_at">
+): Promise<string> {
+  const db = await getDb();
+  const id = generateId("dg_asset");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO data_governance_assets (
+      id, project_id, domain, asset_name, asset_type, description,
+      system_of_record, criticality, master_data, process_data,
+      personal_data, financial_data, quality_or_safety_data,
+      owner_role, steward_role, technical_custodian_role, status, notes,
+      created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
+    [
+      id,
+      payload.project_id,
+      payload.domain ?? null,
+      payload.asset_name.trim(),
+      payload.asset_type || "MASTER_DATA",
+      payload.description ?? null,
+      payload.system_of_record ?? null,
+      payload.criticality || "MEDIUM",
+      payload.master_data !== undefined ? (payload.master_data ? 1 : 0) : 1,
+      payload.process_data !== undefined ? (payload.process_data ? 1 : 0) : 0,
+      payload.personal_data !== undefined ? (payload.personal_data ? 1 : 0) : 0,
+      payload.financial_data !== undefined ? (payload.financial_data ? 1 : 0) : 0,
+      payload.quality_or_safety_data !== undefined ? (payload.quality_or_safety_data ? 1 : 0) : 0,
+      payload.owner_role?.trim() || null,
+      payload.steward_role?.trim() || null,
+      payload.technical_custodian_role?.trim() || null,
+      payload.status || "active",
+      payload.notes ?? null,
+      now,
+      now,
+    ]
+  );
+  return id;
+}
+
+export async function updateDataGovernanceAsset(
+  id: string,
+  payload: Partial<DataGovernanceAsset>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE data_governance_assets
+     SET domain = COALESCE($1, domain),
+         asset_name = COALESCE($2, asset_name),
+         asset_type = COALESCE($3, asset_type),
+         description = $4,
+         system_of_record = $5,
+         criticality = COALESCE($6, criticality),
+         master_data = COALESCE($7, master_data),
+         process_data = COALESCE($8, process_data),
+         personal_data = COALESCE($9, personal_data),
+         financial_data = COALESCE($10, financial_data),
+         quality_or_safety_data = COALESCE($11, quality_or_safety_data),
+         owner_role = $12,
+         steward_role = $13,
+         technical_custodian_role = $14,
+         status = COALESCE($15, status),
+         notes = $16,
+         updated_at = $17
+     WHERE id = $18`,
+    [
+      payload.domain ?? null,
+      payload.asset_name?.trim() || null,
+      payload.asset_type || null,
+      payload.description ?? null,
+      payload.system_of_record ?? null,
+      payload.criticality || null,
+      payload.master_data !== undefined ? (payload.master_data ? 1 : 0) : null,
+      payload.process_data !== undefined ? (payload.process_data ? 1 : 0) : null,
+      payload.personal_data !== undefined ? (payload.personal_data ? 1 : 0) : null,
+      payload.financial_data !== undefined ? (payload.financial_data ? 1 : 0) : null,
+      payload.quality_or_safety_data !== undefined ? (payload.quality_or_safety_data ? 1 : 0) : null,
+      payload.owner_role !== undefined ? payload.owner_role?.trim() || null : null,
+      payload.steward_role !== undefined ? payload.steward_role?.trim() || null : null,
+      payload.technical_custodian_role !== undefined ? payload.technical_custodian_role?.trim() || null : null,
+      payload.status || null,
+      payload.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteDataGovernanceAsset(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM data_governance_assets WHERE id = $1`, [id]);
+}
+
+// ---------------------------------------------------------------
+// 30.1 Access Rules CRUD
+// ---------------------------------------------------------------
+
+export async function getDataGovernanceAccessRules(
+  projectId: string,
+  assetId?: string
+): Promise<DataGovernanceAccess[]> {
+  const db = await getDb();
+  if (assetId) {
+    return db.select<DataGovernanceAccess[]>(
+      `SELECT * FROM data_governance_access WHERE project_id = $1 AND asset_id = $2 ORDER BY actor_name ASC`,
+      [projectId, assetId]
+    );
+  }
+  return db.select<DataGovernanceAccess[]>(
+    `SELECT * FROM data_governance_access WHERE project_id = $1 ORDER BY actor_name ASC`,
+    [projectId]
+  );
+}
+
+export async function createDataGovernanceAccess(
+  payload: Omit<DataGovernanceAccess, "id" | "created_at" | "updated_at">
+): Promise<string> {
+  const db = await getDb();
+  const id = generateId("dg_access");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO data_governance_access (
+      id, project_id, asset_id, actor_type, actor_name, access_level,
+      scope_type, scope_value, approval_required, approval_role,
+      task_separation_required, conflict_note, limit_description, status, notes,
+      created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+    [
+      id,
+      payload.project_id,
+      payload.asset_id,
+      payload.actor_type || "ROLE",
+      payload.actor_name.trim(),
+      payload.access_level || "READ_ONLY",
+      payload.scope_type || "COMPANY",
+      payload.scope_value?.trim() || null,
+      payload.approval_required ? 1 : 0,
+      payload.approval_role?.trim() || null,
+      payload.task_separation_required ? 1 : 0,
+      payload.conflict_note ?? null,
+      payload.limit_description ?? null,
+      payload.status || "active",
+      payload.notes ?? null,
+      now,
+      now,
+    ]
+  );
+  return id;
+}
+
+export async function updateDataGovernanceAccess(
+  id: string,
+  payload: Partial<DataGovernanceAccess>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE data_governance_access
+     SET actor_type = COALESCE($1, actor_type),
+         actor_name = COALESCE($2, actor_name),
+         access_level = COALESCE($3, access_level),
+         scope_type = COALESCE($4, scope_type),
+         scope_value = $5,
+         approval_required = COALESCE($6, approval_required),
+         approval_role = $7,
+         task_separation_required = COALESCE($8, task_separation_required),
+         conflict_note = $9,
+         limit_description = $10,
+         status = COALESCE($11, status),
+         notes = $12,
+         updated_at = $13
+     WHERE id = $14`,
+    [
+      payload.actor_type || null,
+      payload.actor_name?.trim() || null,
+      payload.access_level || null,
+      payload.scope_type || null,
+      payload.scope_value !== undefined ? payload.scope_value?.trim() || null : null,
+      payload.approval_required !== undefined ? (payload.approval_required ? 1 : 0) : null,
+      payload.approval_role !== undefined ? payload.approval_role?.trim() || null : null,
+      payload.task_separation_required !== undefined ? (payload.task_separation_required ? 1 : 0) : null,
+      payload.conflict_note ?? null,
+      payload.limit_description ?? null,
+      payload.status || null,
+      payload.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteDataGovernanceAccess(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM data_governance_access WHERE id = $1`, [id]);
+}
+
+// ---------------------------------------------------------------
+// 30.2 Approvals CRUD
+// ---------------------------------------------------------------
+
+export async function getDataGovernanceApprovals(
+  projectId: string,
+  assetId?: string
+): Promise<DataGovernanceApproval[]> {
+  const db = await getDb();
+  if (assetId) {
+    return db.select<DataGovernanceApproval[]>(
+      `SELECT * FROM data_governance_approvals WHERE project_id = $1 AND asset_id = $2 ORDER BY approval_order ASC`,
+      [projectId, assetId]
+    );
+  }
+  return db.select<DataGovernanceApproval[]>(
+    `SELECT * FROM data_governance_approvals WHERE project_id = $1 ORDER BY approval_order ASC`,
+    [projectId]
+  );
+}
+
+export async function createDataGovernanceApproval(
+  payload: Omit<DataGovernanceApproval, "id" | "created_at" | "updated_at">
+): Promise<string> {
+  const db = await getDb();
+  const id = generateId("dg_appr");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO data_governance_approvals (
+      id, project_id, asset_id, process_map_id, approval_name, approval_role,
+      threshold_description, approval_order, mandatory, separation_of_duties, notes,
+      created_at, updated_at
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+    [
+      id,
+      payload.project_id,
+      payload.asset_id || null,
+      payload.process_map_id || null,
+      payload.approval_name.trim(),
+      payload.approval_role.trim(),
+      payload.threshold_description ?? null,
+      Number(payload.approval_order) || 1,
+      payload.mandatory ? 1 : 0,
+      payload.separation_of_duties ? 1 : 0,
+      payload.notes ?? null,
+      now,
+      now,
+    ]
+  );
+  return id;
+}
+
+export async function updateDataGovernanceApproval(
+  id: string,
+  payload: Partial<DataGovernanceApproval>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE data_governance_approvals
+     SET asset_id = $1,
+         process_map_id = $2,
+         approval_name = COALESCE($3, approval_name),
+         approval_role = COALESCE($4, approval_role),
+         threshold_description = $5,
+         approval_order = COALESCE($6, approval_order),
+         mandatory = COALESCE($7, mandatory),
+         separation_of_duties = COALESCE($8, separation_of_duties),
+         notes = $9,
+         updated_at = $10
+     WHERE id = $11`,
+    [
+      payload.asset_id !== undefined ? payload.asset_id : null,
+      payload.process_map_id !== undefined ? payload.process_map_id : null,
+      payload.approval_name?.trim() || null,
+      payload.approval_role?.trim() || null,
+      payload.threshold_description ?? null,
+      payload.approval_order !== undefined ? Number(payload.approval_order) : null,
+      payload.mandatory !== undefined ? (payload.mandatory ? 1 : 0) : null,
+      payload.separation_of_duties !== undefined ? (payload.separation_of_duties ? 1 : 0) : null,
+      payload.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteDataGovernanceApproval(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM data_governance_approvals WHERE id = $1`, [id]);
+}
+
+// ---------------------------------------------------------------
+// 30.3 Summary Statistics
+// ---------------------------------------------------------------
+
+export async function getDataGovernanceSummaryStats(
+  projectId: string
+): Promise<DataGovernanceSummaryStats> {
+  const [assets, accessRules, approvals] = await Promise.all([
+    getDataGovernanceAssets(projectId),
+    getDataGovernanceAccessRules(projectId),
+    getDataGovernanceApprovals(projectId),
+  ]);
+
+  let unassignedOwnerCount = 0;
+  let unassignedStewardCount = 0;
+  let unassignedCustodianCount = 0;
+  let criticalAssetCount = 0;
+  let masterDataCount = 0;
+  let personalDataCount = 0;
+  let financialDataCount = 0;
+  let qualitySafetyCount = 0;
+  let sodConflictCount = 0;
+
+  for (const a of assets) {
+    if (!a.owner_role || !a.owner_role.trim()) unassignedOwnerCount++;
+    if (!a.steward_role || !a.steward_role.trim()) unassignedStewardCount++;
+    if (!a.technical_custodian_role || !a.technical_custodian_role.trim()) unassignedCustodianCount++;
+    if (a.criticality === "CRITICAL" || a.criticality === "HIGH") criticalAssetCount++;
+    if (Number(a.master_data) === 1) masterDataCount++;
+    if (Number(a.personal_data) === 1) personalDataCount++;
+    if (Number(a.financial_data) === 1) financialDataCount++;
+    if (Number(a.quality_or_safety_data) === 1) qualitySafetyCount++;
+
+    const sod = checkAssetSodRisk(a);
+    if (sod.hasRisk) sodConflictCount++;
+  }
+
+  // Assets without approval rules
+  const assetsWithApprovals = new Set(
+    approvals.map((ap) => ap.asset_id).filter(Boolean)
+  );
+  let missingApprovalRulesCount = 0;
+  for (const a of assets) {
+    if (
+      (a.criticality === "CRITICAL" || a.criticality === "HIGH" || a.financial_data === 1) &&
+      !assetsWithApprovals.has(a.id)
+    ) {
+      missingApprovalRulesCount++;
+    }
+  }
+
+  return {
+    totalAssets: assets.length,
+    unassignedOwnerCount,
+    unassignedStewardCount,
+    unassignedCustodianCount,
+    criticalAssetCount,
+    masterDataCount,
+    personalDataCount,
+    financialDataCount,
+    qualitySafetyCount,
+    totalAccessRules: accessRules.length,
+    totalApprovals: approvals.length,
+    sodConflictCount,
+    missingApprovalRulesCount,
+  };
+}
+
+// ---------------------------------------------------------------
+// 30.4 Seed Starter Data Governance Assets
+// ---------------------------------------------------------------
+
+export async function seedDefaultDataGovernanceAssets(
+  projectId: string
+): Promise<number> {
+  const existing = await getDataGovernanceAssets(projectId);
+  if (existing.length > 0) return 0;
+
+  const starterAssets: Omit<DataGovernanceAsset, "id" | "created_at" | "updated_at">[] = [
+    {
+      project_id: projectId,
+      domain: "INVENTORY",
+      asset_name: "Stok Kartı Ana Verisi",
+      asset_type: "MASTER_DATA",
+      description: "Ürün, hammadde, yarı mamul ve ticari malların temel tanım, birim, ağırlık ve barkod verileri",
+      system_of_record: "ERP",
+      criticality: "HIGH",
+      master_data: 1,
+      process_data: 0,
+      personal_data: 0,
+      financial_data: 0,
+      quality_or_safety_data: 0,
+      owner_role: "Ürün Yöneticisi",
+      steward_role: "Stok ve Depo Sorumlusu",
+      technical_custodian_role: "BT Veritabanı Yöneticisi",
+      status: "active",
+      notes: "ERP geçişinde mükerrer stok açılmasını engelleyecek kodlama standardı şarttır.",
+    },
+    {
+      project_id: projectId,
+      domain: "SALES",
+      asset_name: "Müşteri ve Cari Kartı",
+      asset_type: "MASTER_DATA",
+      description: "Müşteri ticari unvanı, vergi no, fatura ve sevk adresleri, e-Fatura posta kutusu",
+      system_of_record: "ERP / CRM",
+      criticality: "HIGH",
+      master_data: 1,
+      process_data: 0,
+      personal_data: 1,
+      financial_data: 1,
+      quality_or_safety_data: 0,
+      owner_role: "Satış Direktörü",
+      steward_role: "Müşteri İlişkileri Uzmanı",
+      technical_custodian_role: "BT Sistem Yöneticisi",
+      status: "active",
+      notes: "KVKK ve vergi mevzuatı gereği yetkisiz veri silme ve güncelleme engellenmelidir.",
+    },
+    {
+      project_id: projectId,
+      domain: "PROCUREMENT",
+      asset_name: "Tedarikçi ve Satıcı Kartı",
+      asset_type: "MASTER_DATA",
+      description: "Hammadde ve hizmet sağlayıcı ticari bilgileri, banka hesap/IBAN verileri, ödeme vadeleri",
+      system_of_record: "ERP",
+      criticality: "HIGH",
+      master_data: 1,
+      process_data: 0,
+      personal_data: 0,
+      financial_data: 1,
+      quality_or_safety_data: 0,
+      owner_role: "Satınalma Müdürü",
+      steward_role: "Satınalma Uzmanı",
+      technical_custodian_role: "BT Veritabanı Yöneticisi",
+      status: "active",
+      notes: "IBAN ve banka hesap değişiklikleri çift onay mekanizmasına bağlanmalıdır.",
+    },
+    {
+      project_id: projectId,
+      domain: "SALES",
+      asset_name: "Satış Fiyat Listeleri & İskonto Matrisi",
+      asset_type: "MASTER_DATA",
+      description: "Müşteri grubu ve ürün bazlı taban fiyatlar, iskonto baremleri ve geçerlilik tarihleri",
+      system_of_record: "ERP / CRM",
+      criticality: "CRITICAL",
+      master_data: 1,
+      process_data: 0,
+      personal_data: 0,
+      financial_data: 1,
+      quality_or_safety_data: 0,
+      owner_role: "Ticari Direktör",
+      steward_role: "Fiyatlandırma Uzmanı",
+      technical_custodian_role: "BT Veritabanı Yöneticisi",
+      status: "active",
+      notes: "Kritik ticari sır niteliğinde veridir. Yetkisiz dışa aktarım engellenmelidir.",
+    },
+    {
+      project_id: projectId,
+      domain: "MANUFACTURING",
+      asset_name: "Ürün Reçetesi (BOM) & Operasyon Rotaları",
+      asset_type: "MASTER_DATA",
+      description: "Ürün bileşenleri, fire oranları, operasyon adımları, çevrim süreleri ve standart maliyetler",
+      system_of_record: "ERP / PLM",
+      criticality: "HIGH",
+      master_data: 1,
+      process_data: 0,
+      personal_data: 0,
+      financial_data: 0,
+      quality_or_safety_data: 1,
+      owner_role: "Ar-Ge / Üretim Müdürü",
+      steward_role: "Metot ve Proses Mühendisi",
+      technical_custodian_role: "BT Sistem Yöneticisi",
+      status: "active",
+      notes: "Revizyon takibi zorunlu tutulmalıdır. Eski reçeteler arşivlenmelidir.",
+    },
+    {
+      project_id: projectId,
+      domain: "ACCOUNTING",
+      asset_name: "Muhasebe Hesap Planı & Masraf Merkezleri",
+      asset_type: "MASTER_DATA",
+      description: "Tekdüzen hesap planı, alt hesaplar, masraf ve kar merkezleri kodlama yapısı",
+      system_of_record: "ERP",
+      criticality: "CRITICAL",
+      master_data: 1,
+      process_data: 0,
+      personal_data: 0,
+      financial_data: 1,
+      quality_or_safety_data: 0,
+      owner_role: "Mali İşler Direktörü (CFO)",
+      steward_role: "Baş Muhasebeci",
+      technical_custodian_role: "BT Veritabanı Yöneticisi",
+      status: "active",
+      notes: "Mevzuat uyumu ve bilanço bütünlüğü için yeni hesap açılışı mali işler onayına tabi olmalıdır.",
+    },
+    {
+      project_id: projectId,
+      domain: "PURCHASING",
+      asset_name: "Satınalma Sipariş ve Talep Verileri",
+      asset_type: "PROCESS_DATA",
+      description: "Departman talepleri, tedarikçi teklifleri, onaylı PO'lar ve mal kabul irsaliye eşleşmeleri",
+      system_of_record: "ERP",
+      criticality: "HIGH",
+      master_data: 0,
+      process_data: 1,
+      personal_data: 0,
+      financial_data: 1,
+      quality_or_safety_data: 0,
+      owner_role: "Satınalma Müdürü",
+      steward_role: "Satınalma Operasyon Sorumlusu",
+      technical_custodian_role: "BT Sistem Yöneticisi",
+      status: "active",
+      notes: "Bütçe aşımı durumlarında kademeli genel müdür onay kuralı uygulanmalıdır.",
+    },
+    {
+      project_id: projectId,
+      domain: "QUALITY_MANAGEMENT",
+      asset_name: "Kalite Kontrol ve Uygunsuzluk Verisi",
+      asset_type: "PROCESS_DATA",
+      description: "Giriş kalite kontrol, proses ara kontrol ve nihai ürün laboratuvar test sonuçları",
+      system_of_record: "ERP / QMS",
+      criticality: "HIGH",
+      master_data: 0,
+      process_data: 1,
+      personal_data: 0,
+      financial_data: 0,
+      quality_or_safety_data: 1,
+      owner_role: "Kalite Güvence Müdürü",
+      steward_role: "Kalite Kontrol Şefi",
+      technical_custodian_role: "BT Sistem Yöneticisi",
+      status: "active",
+      notes: "Hatalı lotların sevkiyatını otomatik bloklayan kalite kilidi devrede olmalıdır.",
+    },
+  ];
+
+  for (const a of starterAssets) {
+    await createDataGovernanceAsset(a);
+  }
+
+  return starterAssets.length;
 }
 
 export * from './governanceClient';

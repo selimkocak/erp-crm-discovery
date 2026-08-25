@@ -31,7 +31,7 @@ import type {
 } from "../types/backup";
 
 export const BACKUP_FORMAT_VERSION = "1.1.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 16;
+export const BACKUP_CURRENT_SCHEMA_VERSION = 17;
 export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
@@ -296,6 +296,20 @@ export async function exportProjectBackup(
     );
   }
 
+  // 9. FAZ-64: Veri Sahipliği, Yetkiler ve Onaylar
+  const dataGovernanceAssets = await db.select<any[]>(
+    "SELECT * FROM data_governance_assets WHERE project_id = $1 ORDER BY asset_name ASC",
+    [projectId]
+  );
+  const dataGovernanceAccess = await db.select<any[]>(
+    "SELECT * FROM data_governance_access WHERE project_id = $1 ORDER BY actor_name ASC",
+    [projectId]
+  );
+  const dataGovernanceApprovals = await db.select<any[]>(
+    "SELECT * FROM data_governance_approvals WHERE project_id = $1 ORDER BY approval_order ASC",
+    [projectId]
+  );
+
   const projectData: ProjectBackupData = {
     project,
     company,
@@ -329,6 +343,9 @@ export async function exportProjectBackup(
     processMaps,
     processNodes,
     processEdges,
+    dataGovernanceAssets,
+    dataGovernanceAccess,
+    dataGovernanceApprovals,
   };
 
   const enc = new TextEncoder();
@@ -391,6 +408,9 @@ export async function exportProjectBackup(
     processMaps: processMaps.length,
     processNodes: processNodes.length,
     processEdges: processEdges.length,
+    dataGovernanceAssets: dataGovernanceAssets.length,
+    dataGovernanceAccess: dataGovernanceAccess.length,
+    dataGovernanceApprovals: dataGovernanceApprovals.length,
   };
 
   const manifest: BackupManifest = {
@@ -1523,6 +1543,104 @@ export async function restoreProjectBackup(
       );
     }
 
+    // BB. FAZ-64: data_governance_assets, data_governance_access, data_governance_approvals
+    const dgAssetIdMap = new Map<string, string>();
+    for (const dga of projectData.dataGovernanceAssets || []) {
+      const newDgaId = generateId("dg_asset");
+      dgAssetIdMap.set(dga.id, newDgaId);
+      await db.execute(
+        `INSERT INTO data_governance_assets (
+          id, project_id, domain, asset_name, asset_type, description,
+          system_of_record, criticality, master_data, process_data,
+          personal_data, financial_data, quality_or_safety_data,
+          owner_role, steward_role, technical_custodian_role, status, notes,
+          created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20)`,
+        [
+          newDgaId,
+          newProjectId,
+          dga.domain || null,
+          dga.asset_name,
+          dga.asset_type || "MASTER_DATA",
+          dga.description || null,
+          dga.system_of_record || null,
+          dga.criticality || "MEDIUM",
+          dga.master_data !== undefined ? (dga.master_data ? 1 : 0) : 1,
+          dga.process_data !== undefined ? (dga.process_data ? 1 : 0) : 0,
+          dga.personal_data !== undefined ? (dga.personal_data ? 1 : 0) : 0,
+          dga.financial_data !== undefined ? (dga.financial_data ? 1 : 0) : 0,
+          dga.quality_or_safety_data !== undefined ? (dga.quality_or_safety_data ? 1 : 0) : 0,
+          dga.owner_role || null,
+          dga.steward_role || null,
+          dga.technical_custodian_role || null,
+          dga.status || "active",
+          dga.notes || null,
+          dga.created_at || now,
+          dga.updated_at || now,
+        ]
+      );
+    }
+
+    for (const dgc of projectData.dataGovernanceAccess || []) {
+      const newDgcId = generateId("dg_access");
+      const mappedAssetId = dgAssetIdMap.get(dgc.asset_id) || dgc.asset_id;
+      await db.execute(
+        `INSERT INTO data_governance_access (
+          id, project_id, asset_id, actor_type, actor_name, access_level,
+          scope_type, scope_value, approval_required, approval_role,
+          task_separation_required, conflict_note, limit_description, status, notes,
+          created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
+        [
+          newDgcId,
+          newProjectId,
+          mappedAssetId,
+          dgc.actor_type || "ROLE",
+          dgc.actor_name,
+          dgc.access_level || "READ_ONLY",
+          dgc.scope_type || "COMPANY",
+          dgc.scope_value || null,
+          dgc.approval_required ? 1 : 0,
+          dgc.approval_role || null,
+          dgc.task_separation_required ? 1 : 0,
+          dgc.conflict_note || null,
+          dgc.limit_description || null,
+          dgc.status || "active",
+          dgc.notes || null,
+          dgc.created_at || now,
+          dgc.updated_at || now,
+        ]
+      );
+    }
+
+    for (const dga of projectData.dataGovernanceApprovals || []) {
+      const newDgaApprId = generateId("dg_appr");
+      const mappedAssetId = dga.asset_id ? (dgAssetIdMap.get(dga.asset_id) || dga.asset_id) : null;
+      const mappedPmapId = dga.process_map_id ? (pmapIdMap.get(dga.process_map_id) || dga.process_map_id) : null;
+      await db.execute(
+        `INSERT INTO data_governance_approvals (
+          id, project_id, asset_id, process_map_id, approval_name, approval_role,
+          threshold_description, approval_order, mandatory, separation_of_duties, notes,
+          created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+        [
+          newDgaApprId,
+          newProjectId,
+          mappedAssetId,
+          mappedPmapId,
+          dga.approval_name,
+          dga.approval_role,
+          dga.threshold_description || null,
+          Number(dga.approval_order) || 1,
+          dga.mandatory ? 1 : 0,
+          dga.separation_of_duties ? 1 : 0,
+          dga.notes || null,
+          dga.created_at || now,
+          dga.updated_at || now,
+        ]
+      );
+    }
+
     // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
     const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
@@ -1674,6 +1792,9 @@ export async function duplicateProject(
       processMaps: exportData.manifest.recordCounts.processMaps || 0,
       processNodes: exportData.manifest.recordCounts.processNodes || 0,
       processEdges: exportData.manifest.recordCounts.processEdges || 0,
+      dataGovernanceAssets: exportData.manifest.recordCounts.dataGovernanceAssets || 0,
+      dataGovernanceAccess: exportData.manifest.recordCounts.dataGovernanceAccess || 0,
+      dataGovernanceApprovals: exportData.manifest.recordCounts.dataGovernanceApprovals || 0,
     },
   };
 

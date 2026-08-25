@@ -33,6 +33,10 @@ import {
   getProcessNodes,
   getProcessEdges,
   getProcessMapsSummaryStats,
+  getDataGovernanceAssets,
+  getDataGovernanceAccessRules,
+  getDataGovernanceApprovals,
+  getDataGovernanceSummaryStats,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -69,9 +73,14 @@ import type {
   ReportProcessMap,
   ReportProcessNode,
   ReportProcessEdge,
+  ReportDataGovernanceSummary,
+  ReportDataGovernanceAsset,
+  ReportDataGovernanceAccess,
+  ReportDataGovernanceApproval,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
+import { checkAssetSodRisk } from "../types";
 
 export interface BuildReportOptions {
   includeUnanswered?: boolean;
@@ -108,6 +117,10 @@ export async function buildReportModel(
     otMatrixCounts,
     procMaps,
     procSummaryStats,
+    dgAssets,
+    dgAccessRules,
+    dgApprovals,
+    dgSummaryStats,
   ] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
@@ -131,6 +144,10 @@ export async function buildReportModel(
     getOtMatrixSummaryCounts(projectId),
     getProcessMaps(projectId),
     getProcessMapsSummaryStats(projectId),
+    getDataGovernanceAssets(projectId),
+    getDataGovernanceAccessRules(projectId),
+    getDataGovernanceApprovals(projectId),
+    getDataGovernanceSummaryStats(projectId),
   ]);
 
   const allProcNodes = await Promise.all(
@@ -949,6 +966,88 @@ export async function buildReportModel(
     };
   }
 
+  // 13. FAZ-64: Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi
+  let dataGovernanceSummary: ReportDataGovernanceSummary | undefined = undefined;
+  if (dgAssets && dgAssets.length > 0) {
+    const assetMap = new Map<string, string>();
+    for (const a of dgAssets) {
+      assetMap.set(a.id, a.asset_name);
+    }
+    const pmapMap = new Map<string, string>();
+    for (const pm of procMaps || []) {
+      pmapMap.set(pm.id, pm.name);
+    }
+
+    const reportAssets: ReportDataGovernanceAsset[] = dgAssets.map((a) => {
+      const sod = checkAssetSodRisk(a);
+      return {
+        id: a.id,
+        domain: a.domain || null,
+        assetName: a.asset_name,
+        assetType: a.asset_type || "MASTER_DATA",
+        description: a.description || null,
+        systemOfRecord: a.system_of_record || null,
+        criticality: a.criticality || "MEDIUM",
+        masterData: Boolean(a.master_data),
+        processData: Boolean(a.process_data),
+        personalData: Boolean(a.personal_data),
+        financialData: Boolean(a.financial_data),
+        qualityOrSafetyData: Boolean(a.quality_or_safety_data),
+        ownerRole: a.owner_role || null,
+        stewardRole: a.steward_role || null,
+        technicalCustodianRole: a.technical_custodian_role || null,
+        status: a.status === "active" ? "Aktif" : "Pasif",
+        notes: a.notes || null,
+        hasSodRisk: sod.hasRisk,
+        sodRiskMessage: sod.message,
+      };
+    });
+
+    const reportAccessRules: ReportDataGovernanceAccess[] = dgAccessRules.map((acc) => {
+      const a = dgAssets.find((ast) => ast.id === acc.asset_id);
+      return {
+        id: acc.id,
+        assetId: acc.asset_id,
+        assetName: a ? a.asset_name : "Bilinmeyen Varlık",
+        domain: a ? a.domain || null : null,
+        actorType: acc.actor_type || "ROLE",
+        actorName: acc.actor_name,
+        accessLevel: acc.access_level || "READ_ONLY",
+        scopeType: acc.scope_type || "COMPANY",
+        scopeValue: acc.scope_value || null,
+        approvalRequired: Boolean(acc.approval_required),
+        approvalRole: acc.approval_role || null,
+        taskSeparationRequired: Boolean(acc.task_separation_required),
+        conflictNote: acc.conflict_note || null,
+        limitDescription: acc.limit_description || null,
+        status: acc.status === "active" ? "Aktif" : "Pasif",
+        notes: acc.notes || null,
+      };
+    });
+
+    const reportApprovals: ReportDataGovernanceApproval[] = dgApprovals.map((appr) => ({
+      id: appr.id,
+      assetId: appr.asset_id || null,
+      assetName: appr.asset_id ? assetMap.get(appr.asset_id) || null : null,
+      processMapId: appr.process_map_id || null,
+      processMapName: appr.process_map_id ? pmapMap.get(appr.process_map_id) || null : null,
+      approvalName: appr.approval_name,
+      approvalRole: appr.approval_role,
+      thresholdDescription: appr.threshold_description || null,
+      approvalOrder: Number(appr.approval_order) || 1,
+      mandatory: Boolean(appr.mandatory),
+      separationOfDuties: Boolean(appr.separation_of_duties),
+      notes: appr.notes || null,
+    }));
+
+    dataGovernanceSummary = {
+      stats: dgSummaryStats,
+      assets: reportAssets,
+      accessRules: reportAccessRules,
+      approvals: reportApprovals,
+    };
+  }
+
   return {
     metadata,
     profile,
@@ -962,6 +1061,7 @@ export async function buildReportModel(
     otStationsSummary,
     otMatrixSummary,
     processMapsSummary,
+    dataGovernanceSummary,
     globalFindings,
     globalRequirements,
     globalRisks,
@@ -969,4 +1069,3 @@ export async function buildReportModel(
     summaryStats,
   };
 }
-

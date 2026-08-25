@@ -1409,8 +1409,228 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     }
   }
 
-  // ── Section 5: Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi (FAZ-46) ──
-  if (report.governance) {
+  // ── Section 5: Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi (FAZ-64 / dataGovernanceSummary) ──
+  if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) {
+    const dgSummary = report.dataGovernanceSummary;
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "5. Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 100, after: 100 },
+        children: [
+          new TextRun({
+            text: `Toplam ${dgSummary.stats.totalAssets} veri varlığı, ${dgSummary.stats.unassignedOwnerCount} sahipsiz veri, ${dgSummary.stats.criticalAssetCount} kritik veri, ${dgSummary.stats.sodConflictCount} SoD çatışma uyarısı, ${dgSummary.stats.totalAccessRules} erişim kuralı ve ${dgSummary.stats.totalApprovals} onay kuralı incelenmiştir.`,
+            size: 20,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    // 5.1 Veri Varlıkları ve Sorumluluk Matrisi
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_2,
+        spacing: { before: 180, after: 80 },
+        children: [
+          new TextRun({
+            text: "5.1 Veri Varlıkları, Sahiplik ve Görevler Ayrılığı Matrisi",
+            bold: true,
+            size: 22,
+            color: COLOR_DARK,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    const assetHeaderRow = new TableRow({
+      tableHeader: true,
+      children: [
+        createTableCell("Veri Varlığı & Domain", { isHeader: true, widthPercent: 25 }),
+        createTableCell("Tip / Kayıt Sistemi", { isHeader: true, widthPercent: 15 }),
+        createTableCell("Veri Sahibi (Owner)", { isHeader: true, widthPercent: 18 }),
+        createTableCell("Veri Sorumlusu (Steward)", { isHeader: true, widthPercent: 18 }),
+        createTableCell("Teknik Emanetçi (Custodian)", { isHeader: true, widthPercent: 14 }),
+        createTableCell("Kritiklik / SoD", { isHeader: true, widthPercent: 10 }),
+      ],
+    });
+
+    const assetRows: TableRow[] = dgSummary.assets.map((ast) => {
+      const tags = [
+        ast.masterData ? "Ana Veri" : null,
+        ast.financialData ? "Finansal" : null,
+        ast.personalData ? "KVKK" : null,
+        ast.qualityOrSafetyData ? "Kalite/Güvenlik" : null,
+      ].filter(Boolean).join(", ");
+
+      const sodText = ast.hasSodRisk ? `\n⚠️ SoD: ${ast.sodRiskMessage || "Çatışma"}` : "";
+
+      return new TableRow({
+        children: [
+          createTableCell(`${ast.assetName}${ast.domain ? `\n(${ast.domain})` : ""}${tags ? `\n[${tags}]` : ""}`, { bold: true }),
+          createTableCell(`${ast.assetType}\n(${ast.systemOfRecord || "ERP"})`),
+          createTableCell(ast.ownerRole || "Tanımsız", { bold: Boolean(ast.ownerRole) }),
+          createTableCell(ast.stewardRole || "Tanımsız"),
+          createTableCell(ast.technicalCustodianRole || "Tanımsız"),
+          createTableCell(
+            `${ast.criticality}${sodText}`,
+            {
+              bold: true,
+              bgColor: ast.hasSodRisk ? "FEF2F2" : ast.criticality === "CRITICAL" ? "FFFBEB" : "FFFFFF",
+              color: ast.hasSodRisk ? "B91C1C" : "334155",
+            }
+          ),
+        ],
+      });
+    });
+
+    docChildren.push(
+      new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        rows: [assetHeaderRow, ...assetRows],
+      }),
+      new Paragraph({ spacing: { after: 120 } })
+    );
+
+    // 5.2 Erişim ve Yetki Kuralları
+    if (dgSummary.accessRules.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "5.2 Rol ve Grup Bazlı Erişim / Yetki Kuralları",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const accessHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Erişen Rol / Grup", { isHeader: true, widthPercent: 22 }),
+          createTableCell("İlgili Veri Varlığı", { isHeader: true, widthPercent: 24 }),
+          createTableCell("Erişim Seviyesi", { isHeader: true, widthPercent: 14 }),
+          createTableCell("Organizasyon Kapsamı", { isHeader: true, widthPercent: 16 }),
+          createTableCell("Onay Gereksinimi", { isHeader: true, widthPercent: 12 }),
+          createTableCell("Limit / Çatışma Notu", { isHeader: true, widthPercent: 12 }),
+        ],
+      });
+
+      const accessRows: TableRow[] = dgSummary.accessRules.map((acc) => {
+        return new TableRow({
+          children: [
+            createTableCell(`${acc.actorName}\n(${acc.actorType})`, { bold: true }),
+            createTableCell(`${acc.assetName}${acc.domain ? `\n(${acc.domain})` : ""}`),
+            createTableCell(acc.accessLevel, { bold: true }),
+            createTableCell(`${acc.scopeType}${acc.scopeValue ? `\n(${acc.scopeValue})` : ""}`),
+            createTableCell(acc.approvalRequired ? `Onay Şartı\n(${acc.approvalRole || "Yönetici"})` : "Doğrudan"),
+            createTableCell(
+              [
+                acc.taskSeparationRequired ? "⚠️ SoD Zorunlu" : null,
+                acc.limitDescription || null,
+                acc.conflictNote || null,
+              ].filter(Boolean).join("\n") || "—",
+              { bgColor: acc.taskSeparationRequired ? "FEF2F2" : "FFFFFF" }
+            ),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [accessHeaderRow, ...accessRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+
+    // 5.3 Onay Kuralları ve Limit Kademeleri
+    if (dgSummary.approvals.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "5.3 Onay Kuralları ve Limit Kademeleri",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const apprHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Sıra", { isHeader: true, widthPercent: 8 }),
+          createTableCell("Onay Adı", { isHeader: true, widthPercent: 26 }),
+          createTableCell("İlgili Varlık / Süreç", { isHeader: true, widthPercent: 26 }),
+          createTableCell("Onaylayan Rol", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Eşik / Limit", { isHeader: true, widthPercent: 12 }),
+          createTableCell("SoD", { isHeader: true, widthPercent: 8 }),
+        ],
+      });
+
+      const apprRows: TableRow[] = dgSummary.approvals.map((appr) => {
+        return new TableRow({
+          children: [
+            createTableCell(`${appr.approvalOrder}`, { bold: true }),
+            createTableCell(`${appr.approvalName}${appr.mandatory ? "\n[Zorunlu Onay]" : ""}`, { bold: true }),
+            createTableCell(`${appr.assetName || "—"}${appr.processMapName ? `\n(🗺️ ${appr.processMapName})` : ""}`),
+            createTableCell(appr.approvalRole, { bold: true }),
+            createTableCell(appr.thresholdDescription || "Tüm Tutarlar"),
+            createTableCell(appr.separationOfDuties ? "Ayrılık Şart" : "—"),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [apprHeaderRow, ...apprRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+
+    // 5.4 Yönetişim ve SoD İlkesi Notu
+    docChildren.push(
+      new Paragraph({
+        spacing: { before: 100, after: 150 },
+        children: [
+          new TextRun({
+            text: "⚠️ Yönetişim ve Görevler Ayrılığı (SoD) İlkeleri: Veri varlığı sahibi, sorumlusu ve teknik emanetçisinin aynı role verilmesi kurumsal hata, tekil yetki suistimali ve denetim riskini artırır. Sistem bu durumları 'görevler ayrılığı değerlendirilmelidir' uyarısıyla raporlar. Bu matris yalnızca keşif ve danışmanlık amaçlı yönetişim modelini kaydeder; canlı kullanıcı hesabı veya parola yönetim sistemi içermez.",
+            italics: true,
+            size: 18,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+  } else if (report.governance) {
     docChildren.push(
       new Paragraph({
         heading: HeadingLevel.HEADING_1,
@@ -1426,183 +1646,6 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
         ],
       })
     );
-
-    // 5.1 Sorumluluk Matrisi
-    if (report.governance.responsibilities.length > 0) {
-      docChildren.push(
-        new Paragraph({
-          heading: HeadingLevel.HEADING_2,
-          spacing: { before: 180, after: 80 },
-          children: [
-            new TextRun({
-              text: "5.1 Veri Sahipliği ve Sorumluluk Matrisi",
-              bold: true,
-              size: 22,
-              color: COLOR_DARK,
-              font: FONT_FAMILY,
-            }),
-          ],
-        })
-      );
-
-      const respRows: TableRow[] = [
-        new TableRow({
-          tableHeader: true,
-          children: [
-            createTableCell("Yönetişim Nesnesi", { isHeader: true, widthPercent: 25 }),
-            createTableCell("Sorumluluk Türü", { isHeader: true, widthPercent: 20 }),
-            createTableCell("Atanan Rol / Kişi", { isHeader: true, widthPercent: 25 }),
-            createTableCell("Kapsam", { isHeader: true, widthPercent: 15 }),
-            createTableCell("Model", { isHeader: true, widthPercent: 15 }),
-          ],
-        }),
-      ];
-
-      for (const r of report.governance.responsibilities) {
-        respRows.push(
-          new TableRow({
-            children: [
-              createTableCell(`${r.object_name_tr}\n(${r.object_code})`, { bgColor: "FFFFFF" }),
-              createTableCell(r.responsibility_type, { bgColor: "FFFFFF", bold: true }),
-              createTableCell(`${r.subject_name}\n(${r.subject_type})`, { bgColor: "FFFFFF" }),
-              createTableCell(r.scope_name || "Tüm Organizasyon", { bgColor: "FFFFFF" }),
-              createTableCell(r.state_type === "to_be" ? "Hedef (To-Be)" : "Mevcut (As-Is)", { bgColor: "FFFFFF" }),
-            ],
-          })
-        );
-      }
-
-      docChildren.push(
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: respRows,
-        }),
-        new Paragraph({ spacing: { after: 120 } })
-      );
-    }
-
-    // 5.2 Yetki Matrisi
-    if (report.governance.authorizations.length > 0) {
-      docChildren.push(
-        new Paragraph({
-          heading: HeadingLevel.HEADING_2,
-          spacing: { before: 180, after: 80 },
-          children: [
-            new TextRun({
-              text: "5.2 Yetki ve Erişim Matrisi",
-              bold: true,
-              size: 22,
-              color: COLOR_DARK,
-              font: FONT_FAMILY,
-            }),
-          ],
-        })
-      );
-
-      const authRows: TableRow[] = [
-        new TableRow({
-          tableHeader: true,
-          children: [
-            createTableCell("Özne (Rol/Kişi)", { isHeader: true, widthPercent: 25 }),
-            createTableCell("Yönetişim Nesnesi", { isHeader: true, widthPercent: 25 }),
-            createTableCell("Yetki Seviyesi", { isHeader: true, widthPercent: 20 }),
-            createTableCell("Efektif Sapma", { isHeader: true, widthPercent: 15 }),
-            createTableCell("İzinler", { isHeader: true, widthPercent: 15 }),
-          ],
-        }),
-      ];
-
-      for (const a of report.governance.authorizations) {
-        const perms = [
-          a.can_view ? "G" : "-",
-          a.can_create ? "E" : "-",
-          a.can_edit ? "D" : "-",
-          a.can_delete ? "S" : "-",
-          a.can_approve ? "O" : "-",
-          a.can_cancel ? "İ" : "-",
-          a.can_export ? "X" : "-",
-          a.can_view_cost ? "M" : "-",
-        ].join("");
-
-        authRows.push(
-          new TableRow({
-            children: [
-              createTableCell(`${a.subject_name}\n(${a.subject_type})`, { bgColor: "FFFFFF" }),
-              createTableCell(a.object_name_tr || a.governance_object_id, { bgColor: "FFFFFF" }),
-              createTableCell(a.permission_level, { bgColor: "FFFFFF", bold: true }),
-              createTableCell(
-                a.has_discrepancy === 1 && a.effective_level ? `Sapma: ${a.effective_level}` : "Yok",
-                { bgColor: a.has_discrepancy === 1 ? "FEF2F2" : "FFFFFF" }
-              ),
-              createTableCell(perms, { bgColor: "FFFFFF" }),
-            ],
-          })
-        );
-      }
-
-      docChildren.push(
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: authRows,
-        }),
-        new Paragraph({ spacing: { after: 120 } })
-      );
-    }
-
-    // 5.3 Görevler Ayrılığı (SoD)
-    if (report.governance.sodRisks.length > 0) {
-      docChildren.push(
-        new Paragraph({
-          heading: HeadingLevel.HEADING_2,
-          spacing: { before: 180, after: 80 },
-          children: [
-            new TextRun({
-              text: "5.3 Görevler Ayrılığı (SoD) Riskleri",
-              bold: true,
-              size: 22,
-              color: COLOR_DARK,
-              font: FONT_FAMILY,
-            }),
-          ],
-        })
-      );
-
-      const sodRows: TableRow[] = [
-        new TableRow({
-          tableHeader: true,
-          children: [
-            createTableCell("Risk Başlığı", { isHeader: true, widthPercent: 30 }),
-            createTableCell("Ciddiyet", { isHeader: true, widthPercent: 15 }),
-            createTableCell("Çatışan Görevler", { isHeader: true, widthPercent: 30 }),
-            createTableCell("Hedef Çözüm / Kontrol", { isHeader: true, widthPercent: 25 }),
-          ],
-        }),
-      ];
-
-      for (const s of report.governance.sodRisks) {
-        sodRows.push(
-          new TableRow({
-            children: [
-              createTableCell(s.risk_title, { bgColor: "FFFFFF", bold: true }),
-              createTableCell(s.risk_severity.toUpperCase(), {
-                bgColor: s.risk_severity === "critical" ? "FEF2F2" : "FFFFFF",
-                bold: true,
-              }),
-              createTableCell(`A: ${s.conflicting_duty_a}\nB: ${s.conflicting_duty_b}`, { bgColor: "FFFFFF" }),
-              createTableCell(s.mitigation_action || s.current_control || "—", { bgColor: "FFFFFF" }),
-            ],
-          })
-        );
-      }
-
-      docChildren.push(
-        new Table({
-          width: { size: 100, type: WidthType.PERCENTAGE },
-          rows: sodRows,
-        }),
-        new Paragraph({ spacing: { after: 120 } })
-      );
-    }
   }
 
   // ── Section 6/5: Proje Notları & Açık Konular ───────────────────────────────

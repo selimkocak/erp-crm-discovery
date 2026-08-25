@@ -709,97 +709,158 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY += 4;
   }
 
-  // ── Section 5: Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi (FAZ-46) ──
-  if (report.governance) {
+  // ── Section 5: Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi (FAZ-64 / dataGovernanceSummary) ──
+  if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) {
+    const dgSummary = report.dataGovernanceSummary;
+    checkPageBreak(35);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("5. Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi", marginX, currentY);
+    currentY += 6;
+
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(
+      `Toplam ${dgSummary.stats.totalAssets} veri varlığı, ${dgSummary.stats.unassignedOwnerCount} sahipsiz veri, ${dgSummary.stats.criticalAssetCount} kritik veri, ${dgSummary.stats.sodConflictCount} SoD çatışması, ${dgSummary.stats.totalAccessRules} erişim kuralı, ${dgSummary.stats.totalApprovals} onay kuralı.`,
+      marginX,
+      currentY
+    );
+    currentY += 6;
+
+    // 5.1 Varlıklar Tablosu
+    const assetRows = dgSummary.assets.map((ast) => {
+      const tags = [
+        ast.masterData ? "Ana" : null,
+        ast.financialData ? "Fin" : null,
+        ast.personalData ? "KVKK" : null,
+        ast.qualityOrSafetyData ? "Kalite" : null,
+      ].filter(Boolean).join("/");
+
+      return [
+        `${ast.assetName}${ast.domain ? `\n(${ast.domain})` : ""}${tags ? ` [${tags}]` : ""}`,
+        `${ast.assetType}\n(${ast.systemOfRecord || "ERP"})`,
+        ast.ownerRole || "Tanımsız",
+        ast.stewardRole || "Tanımsız",
+        ast.technicalCustodianRole || "Tanımsız",
+        ast.criticality,
+        ast.hasSodRisk ? "⚠️ Çatışma" : "Uygun",
+      ];
+    });
+
+    autoTable(doc, {
+      startY: currentY,
+      margin: { left: marginX, right: marginX },
+      head: [["Veri Varlığı", "Tip/Sistem", "Veri Sahibi", "Sorumlu", "Emanetçi", "Kritiklik", "SoD"]],
+      body: assetRows,
+      theme: "striped",
+      styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+      headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 7.5 },
+      bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7, cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 42 },
+        1: { cellWidth: 24 },
+        2: { cellWidth: 26 },
+        3: { cellWidth: 26 },
+        4: { cellWidth: 26 },
+        5: { cellWidth: 16 },
+        6: { cellWidth: "auto" },
+      },
+    });
+    currentY = (doc as any).lastAutoTable.finalY + 6;
+
+    // 5.2 Erişim Kuralları
+    if (dgSummary.accessRules.length > 0) {
+      checkPageBreak(25);
+      doc.setFont(PDF_FONT_FAMILY, "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(30, 41, 59);
+      doc.text("5.2 Rol / Grup Bazlı Erişim ve Yetki Kuralları", marginX, currentY);
+      currentY += 4.5;
+
+      const accessRows = dgSummary.accessRules.map((acc) => [
+        `${acc.actorName}\n(${acc.actorType})`,
+        `${acc.assetName}${acc.domain ? `\n(${acc.domain})` : ""}`,
+        acc.accessLevel,
+        `${acc.scopeType}${acc.scopeValue ? `\n(${acc.scopeValue})` : ""}`,
+        acc.approvalRequired ? `Onay Şartı\n(${acc.approvalRole || "Yönetici"})` : "Doğrudan",
+        [
+          acc.taskSeparationRequired ? "⚠️ SoD Zorunlu" : null,
+          acc.limitDescription || null,
+          acc.conflictNote || null,
+        ].filter(Boolean).join(", ") || "—",
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Erişen Rol/Grup", "Veri Varlığı", "Erişim Seviyesi", "Kapsam", "Onay Şartı", "Limit / Not"]],
+        body: accessRows,
+        theme: "striped",
+        styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 7.5 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7, cellPadding: 2 },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 6;
+    }
+
+    // 5.3 Onay Kuralları
+    if (dgSummary.approvals.length > 0) {
+      checkPageBreak(25);
+      doc.setFont(PDF_FONT_FAMILY, "bold");
+      doc.setFontSize(9.5);
+      doc.setTextColor(30, 41, 59);
+      doc.text("5.3 Onay Kuralları ve Limit Kademeleri", marginX, currentY);
+      currentY += 4.5;
+
+      const apprRows = dgSummary.approvals.map((appr) => [
+        `${appr.approvalOrder}`,
+        `${appr.approvalName}${appr.mandatory ? " (Zorunlu)" : ""}`,
+        `${appr.assetName || "—"}${appr.processMapName ? `\n(🗺️ ${appr.processMapName})` : ""}`,
+        appr.approvalRole,
+        appr.thresholdDescription || "Tüm Tutarlar",
+        appr.separationOfDuties ? "Ayrılık Şart" : "—",
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Sıra", "Onay Adı", "İlgili Varlık / Süreç", "Onaylayan Rol", "Eşik / Limit", "SoD"]],
+        body: apprRows,
+        theme: "striped",
+        styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 7.5 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 10 },
+          1: { cellWidth: 42 },
+          2: { cellWidth: 42 },
+          3: { cellWidth: 35 },
+          4: { cellWidth: 26 },
+          5: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 6;
+    }
+
+    checkPageBreak(15);
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(30, 58, 138);
+    doc.text(
+      "⚠️ Görevler Ayrılığı (SoD) İlkesi: Veri varlığı sahibi, sorumlusu ve teknik emanetçisi aynı rolde toplandığında hata ve denetim riski oluşur. Bu rapor keşif ve danışmanlık amaçlıdır.",
+      marginX,
+      currentY
+    );
+    currentY += 6;
+  } else if (report.governance) {
     checkPageBreak(30);
     doc.setFont(PDF_FONT_FAMILY, "bold");
     doc.setFontSize(13);
     doc.setTextColor(2, 132, 199);
     doc.text("5. Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi", marginX, currentY);
     currentY += 6;
-
-    // 5.1 Sorumluluk Matrisi
-    if (report.governance.responsibilities.length > 0) {
-      checkPageBreak(25);
-      const respRows = report.governance.responsibilities.map((r) => [
-        `${r.object_name_tr}\n(${r.object_code})`,
-        r.responsibility_type,
-        `${r.subject_name}\n(${r.subject_type})`,
-        r.scope_name || "Tüm Organizasyon",
-        r.state_type === "to_be" ? "Hedef (To-Be)" : "Mevcut (As-Is)",
-      ]);
-
-      autoTable(doc, {
-        startY: currentY,
-        margin: { left: marginX, right: marginX },
-        head: [["Yönetişim Nesnesi", "Sorumluluk Türü", "Atanan Rol / Kişi", "Kapsam", "Model"]],
-        body: respRows,
-        theme: "grid",
-        styles: { font: PDF_FONT_FAMILY },
-        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8 },
-        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
-      });
-      currentY = (doc as any).lastAutoTable.finalY + 4;
-    }
-
-    // 5.2 Yetki Matrisi
-    if (report.governance.authorizations.length > 0) {
-      checkPageBreak(25);
-      const authRows = report.governance.authorizations.map((a) => {
-        const perms = [
-          a.can_view ? "G" : "-",
-          a.can_create ? "E" : "-",
-          a.can_edit ? "D" : "-",
-          a.can_delete ? "S" : "-",
-          a.can_approve ? "O" : "-",
-          a.can_cancel ? "İ" : "-",
-          a.can_export ? "X" : "-",
-          a.can_view_cost ? "M" : "-",
-        ].join("");
-        return [
-          `${a.subject_name}\n(${a.subject_type})`,
-          a.object_name_tr || a.governance_object_id,
-          a.permission_level,
-          a.has_discrepancy === 1 && a.effective_level ? `Sapma: ${a.effective_level}` : "Yok",
-          perms,
-        ];
-      });
-
-      autoTable(doc, {
-        startY: currentY,
-        margin: { left: marginX, right: marginX },
-        head: [["Özne (Rol/Kişi)", "Yönetişim Nesnesi", "Yetki Seviyesi", "Efektif Sapma", "İzinler"]],
-        body: authRows,
-        theme: "grid",
-        styles: { font: PDF_FONT_FAMILY },
-        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 8 },
-        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
-      });
-      currentY = (doc as any).lastAutoTable.finalY + 4;
-    }
-
-    // 5.3 Görevler Ayrılığı (SoD) Riskleri
-    if (report.governance.sodRisks.length > 0) {
-      checkPageBreak(25);
-      const sodRows = report.governance.sodRisks.map((s) => [
-        s.risk_title,
-        s.risk_severity.toUpperCase(),
-        `A: ${s.conflicting_duty_a}\nB: ${s.conflicting_duty_b}`,
-        s.mitigation_action || s.current_control || "—",
-      ]);
-
-      autoTable(doc, {
-        startY: currentY,
-        margin: { left: marginX, right: marginX },
-        head: [["SoD Risk Başlığı", "Ciddiyet", "Çatışan Görevler", "Hedef Çözüm / Kontrol"]],
-        body: sodRows,
-        theme: "grid",
-        styles: { font: PDF_FONT_FAMILY },
-        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [254, 226, 226], textColor: [185, 28, 28], fontSize: 8 },
-        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
-      });
-      currentY = (doc as any).lastAutoTable.finalY + 4;
-    }
   }
 
   // ── Section 6/5: Proje Notları & Açık Konular ───────────────────────────────

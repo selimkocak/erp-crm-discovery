@@ -518,6 +518,83 @@ export interface ReportProcessMapsSummary {
   maps: ReportProcessMap[];
 }
 
+export interface ReportDataGovernanceAsset {
+  id: string;
+  domain: string | null;
+  assetName: string;
+  assetType: string;
+  description: string | null;
+  systemOfRecord: string | null;
+  criticality: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  masterData: boolean;
+  processData: boolean;
+  personalData: boolean;
+  financialData: boolean;
+  qualityOrSafetyData: boolean;
+  ownerRole: string | null;
+  stewardRole: string | null;
+  technicalCustodianRole: string | null;
+  status: string;
+  notes: string | null;
+  hasSodRisk: boolean;
+  sodRiskMessage?: string;
+}
+
+export interface ReportDataGovernanceAccess {
+  id: string;
+  assetId: string;
+  assetName: string;
+  domain: string | null;
+  actorType: 'ROLE' | 'GROUP' | 'DEPARTMENT' | 'EXTERNAL_PARTY';
+  actorName: string;
+  accessLevel: 'FULL' | 'READ_ONLY' | 'NO_ACCESS' | 'CREATE' | 'UPDATE' | 'APPROVE';
+  scopeType: 'COMPANY' | 'BRANCH' | 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'PROCESS';
+  scopeValue: string | null;
+  approvalRequired: boolean;
+  approvalRole: string | null;
+  taskSeparationRequired: boolean;
+  conflictNote: string | null;
+  limitDescription: string | null;
+  status: string;
+  notes: string | null;
+}
+
+export interface ReportDataGovernanceApproval {
+  id: string;
+  assetId: string | null;
+  assetName: string | null;
+  processMapId: string | null;
+  processMapName: string | null;
+  approvalName: string;
+  approvalRole: string;
+  thresholdDescription: string | null;
+  approvalOrder: number;
+  mandatory: boolean;
+  separationOfDuties: boolean;
+  notes: string | null;
+}
+
+export interface ReportDataGovernanceSummary {
+  stats: {
+    totalAssets: number;
+    unassignedOwnerCount: number;
+    unassignedStewardCount: number;
+    unassignedCustodianCount: number;
+    criticalAssetCount: number;
+    masterDataCount: number;
+    personalDataCount: number;
+    financialDataCount: number;
+    qualitySafetyCount: number;
+    totalAccessRules: number;
+    totalApprovals: number;
+    sodConflictCount: number;
+    missingApprovalRulesCount: number;
+  };
+  assets: ReportDataGovernanceAsset[];
+  accessRules: ReportDataGovernanceAccess[];
+  approvals: ReportDataGovernanceApproval[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -531,11 +608,10 @@ export interface ReportModel {
   otStationsSummary?: ReportOtStationsSummary;
   otMatrixSummary?: ReportOtMatrixSummary;
   processMapsSummary?: ReportProcessMapsSummary;
+  dataGovernanceSummary?: ReportDataGovernanceSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];
   projectNotes: ReportProjectNote[];
   summaryStats: ReportSummaryStats;
 }
-
-

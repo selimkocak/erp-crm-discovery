@@ -32,6 +32,9 @@ export interface BackupRecordCounts {
   processMaps?: number;
   processNodes?: number;
   processEdges?: number;
+  dataGovernanceAssets?: number;
+  dataGovernanceAccess?: number;
+  dataGovernanceApprovals?: number;
 }
 
 export interface BackupManifest {
@@ -42,7 +45,7 @@ export interface BackupManifest {
   projectId?: string;
   projectName: string;
   companyName: string;
-  schemaVersion: number; // 11 | 12 | 13 | 14 | 15 | 16
+  schemaVersion: number; // 11 | 12 | 13 | 14 | 15 | 16 | 17
   recordCounts: BackupRecordCounts;
   attachmentCount: number;
   dataChecksum: string; // SHA-256 of project-data.json
@@ -81,6 +84,9 @@ export interface ProjectBackupData {
   processMaps?: Record<string, any>[];
   processNodes?: Record<string, any>[];
   processEdges?: Record<string, any>[];
+  dataGovernanceAssets?: Record<string, any>[];
+  dataGovernanceAccess?: Record<string, any>[];
+  dataGovernanceApprovals?: Record<string, any>[];
 }
 
 export interface BackupInspectionResult {

@@ -627,6 +627,122 @@ export function calculateAdoptionRisk(node: {
   return 'low';
 }
 
+// ── FAZ-64: Data Governance & Ownership Matrix ──
+export type DataGovernanceCriticality = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type DataGovernanceAccessLevel = 'FULL' | 'READ_ONLY' | 'NO_ACCESS' | 'CREATE' | 'UPDATE' | 'APPROVE';
+export type DataGovernanceScopeType = 'COMPANY' | 'BRANCH' | 'DEPARTMENT' | 'TEAM' | 'PROJECT' | 'PROCESS';
+export type DataGovernanceActorType = 'ROLE' | 'GROUP' | 'DEPARTMENT' | 'EXTERNAL_PARTY';
+
+export interface DataGovernanceAsset {
+  id: string;
+  project_id: string;
+  domain?: string | null;
+  asset_name: string;
+  asset_type: string;
+  description?: string | null;
+  system_of_record?: string | null;
+  criticality: DataGovernanceCriticality;
+  master_data: number;
+  process_data: number;
+  personal_data: number;
+  financial_data: number;
+  quality_or_safety_data: number;
+  owner_role?: string | null;
+  steward_role?: string | null;
+  technical_custodian_role?: string | null;
+  status: 'active' | 'passive';
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DataGovernanceAccess {
+  id: string;
+  project_id: string;
+  asset_id: string;
+  actor_type: DataGovernanceActorType;
+  actor_name: string;
+  access_level: DataGovernanceAccessLevel;
+  scope_type: DataGovernanceScopeType;
+  scope_value?: string | null;
+  approval_required: number;
+  approval_role?: string | null;
+  task_separation_required: number;
+  conflict_note?: string | null;
+  limit_description?: string | null;
+  status: 'active' | 'passive';
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DataGovernanceApproval {
+  id: string;
+  project_id: string;
+  asset_id?: string | null;
+  process_map_id?: string | null;
+  approval_name: string;
+  approval_role: string;
+  threshold_description?: string | null;
+  approval_order: number;
+  mandatory: number;
+  separation_of_duties: number;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DataGovernanceSummaryStats {
+  totalAssets: number;
+  unassignedOwnerCount: number;
+  unassignedStewardCount: number;
+  unassignedCustodianCount: number;
+  criticalAssetCount: number;
+  masterDataCount: number;
+  personalDataCount: number;
+  financialDataCount: number;
+  qualitySafetyCount: number;
+  totalAccessRules: number;
+  totalApprovals: number;
+  sodConflictCount: number;
+  missingApprovalRulesCount: number;
+}
+
+/**
+ * Checks whether an asset has a Separation of Duties (SoD) risk:
+ * When owner, steward, or technical custodian are assigned to the same role.
+ */
+export function checkAssetSodRisk(asset: {
+  owner_role?: string | null;
+  steward_role?: string | null;
+  technical_custodian_role?: string | null;
+}): { hasRisk: boolean; message?: string } {
+  const o = asset.owner_role?.trim().toLowerCase();
+  const s = asset.steward_role?.trim().toLowerCase();
+  const c = asset.technical_custodian_role?.trim().toLowerCase();
+
+  if (!o && !s && !c) return { hasRisk: false };
+
+  const conflicts: string[] = [];
+  if (o && s && o === s) {
+    conflicts.push("Veri Sahibi ve Veri Sorumlusu aynı rolde");
+  }
+  if (o && c && o === c) {
+    conflicts.push("Veri Sahibi ve Teknik Emanetçi aynı rolde");
+  }
+  if (s && c && s === c) {
+    conflicts.push("Veri Sorumlusu ve Teknik Emanetçi aynı rolde");
+  }
+
+  if (conflicts.length > 0) {
+    return {
+      hasRisk: true,
+      message: `${conflicts.join(", ")}. Görevler ayrılığı (SoD) değerlendirilmelidir.`,
+    };
+  }
+  return { hasRisk: false };
+}
+
 export * from './governance';
 export * from './backup';
 

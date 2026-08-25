@@ -340,28 +340,47 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 4. Süreç Haritaları & Benimseme Riski
               </a>
             )}
+            {report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0 && (
+              <a href="#sec-data-governance" className="report-toc__link">
+                {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0
+                  ? "5. Veri Sahipliği & Yetki Matrisi"
+                  : "4. Veri Sahipliği & Yetki Matrisi"}
+              </a>
+            )}
             <div className="report-toc__group">
               <span className="report-toc__group-title">
-                {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "5. İş Fonksiyonları" : "4. İş Fonksiyonları"}
+                {(() => {
+                  let sectionNum = 4;
+                  if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                  if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                  return `${sectionNum}. İş Fonksiyonları`;
+                })()}
               </span>
-              {businessFunctions.map((fn, idx) => (
-                <a key={fn.code} href={`#sec-fn-${fn.code}`} className="report-toc__sublink">
-                  {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? `5.${idx + 1}` : `4.${idx + 1}`} {fn.nameTr}
-                </a>
-              ))}
+              {businessFunctions.map((fn, idx) => {
+                let sectionNum = 4;
+                if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                return (
+                  <a key={fn.code} href={`#sec-fn-${fn.code}`} className="report-toc__sublink">
+                    {`${sectionNum}.${idx + 1}`} {fn.nameTr}
+                  </a>
+                );
+              })}
             </div>
-            {report.governance && (
+            {report.governance && !report.dataGovernanceSummary && (
               <a href="#sec-governance" className="report-toc__link">
-                {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "6. Veri Sahipliği ve Yönetişim" : "5. Veri Sahipliği ve Yönetişim"}
+                Yönetişim & Yetki Matrisi
               </a>
             )}
             <a href="#sec-notes" className="report-toc__link">
-              {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0
-                ? (report.governance ? "7. Proje Notları & Açık Konular" : "6. Proje Notları & Açık Konular")
-                : (report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular")}
+              {(() => {
+                let sectionNum = 5;
+                if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                return `${sectionNum}. Proje Notları & Açık Konular`;
+              })()}
             </a>
           </nav>
-
         </aside>
 
         {/* ── Main Report Document ──────────────────────────────────────── */}
@@ -1398,204 +1417,260 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             ))}
           </section>
 
-          {/* ── Bölüm 5: Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi (FAZ-46) ── */}
-          {report.governance && (
+          {/* ── Bölüm 5: Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi (FAZ-64 / dataGovernanceSummary) ── */}
+          {report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0 && (
+            <section id="sec-data-governance" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">
+                  {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "BÖLÜM 5" : "BÖLÜM 4"}
+                </span>
+                <h2 className="report-section__title">Veri Sahipliği, Yetkiler ve Sorumluluk Matrisi</h2>
+              </div>
+
+              {/* Data Governance KPI Band */}
+              <div className="report-kpi-band" style={{ marginBottom: "1.25rem" }}>
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "var(--color-primary, #1e3a8a)" }}>
+                    {report.dataGovernanceSummary.stats.totalAssets}
+                  </span>
+                  <span className="report-kpi-band__label">Veri Varlığı</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.dataGovernanceSummary.stats.unassignedOwnerCount > 0 ? "text-danger" : ""}`}>
+                    {report.dataGovernanceSummary.stats.unassignedOwnerCount}
+                  </span>
+                  <span className="report-kpi-band__label">Sahipsiz / Owner Yok</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "#b45309" }}>
+                    {report.dataGovernanceSummary.stats.criticalAssetCount}
+                  </span>
+                  <span className="report-kpi-band__label">Kritik / Yüksek Veri</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.dataGovernanceSummary.stats.sodConflictCount > 0 ? "text-danger" : "#15803d"}`}>
+                    {report.dataGovernanceSummary.stats.sodConflictCount}
+                  </span>
+                  <span className="report-kpi-band__label">SoD Çatışma Uyarısı</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count">
+                    {report.dataGovernanceSummary.stats.totalAccessRules} Kural / {report.dataGovernanceSummary.stats.totalApprovals} Onay
+                  </span>
+                  <span className="report-kpi-band__label">Erişim & Onay Kuralı</span>
+                </div>
+              </div>
+
+              {/* 5.1 Data Assets & Roles Table */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                <h3 className="report-summary-box__title">
+                  {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "5.1" : "4.1"} Veri Varlıkları, Sahiplik ve Görevler Ayrılığı Matrisi
+                </h3>
+                <p className="text-xs text-muted" style={{ marginBottom: "0.75rem" }}>
+                  Ana verilerin ve kritik süreç verilerinin sahibi (iş kararı), sorumlusu (veri kalitesi) ve teknik emanetçisi (altyapı/güvenlik).
+                </p>
+                <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                  <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                    <thead>
+                      <tr>
+                        <th style={{ width: "20%" }}>Veri Varlığı & Domain</th>
+                        <th style={{ width: "12%" }}>Tip & Kayıt Sistemi</th>
+                        <th style={{ width: "16%" }}>Veri Sahibi (Owner)</th>
+                        <th style={{ width: "16%" }}>Veri Sorumlusu (Steward)</th>
+                        <th style={{ width: "16%" }}>Teknik Emanetçi (Custodian)</th>
+                        <th style={{ width: "10%" }}>Kritiklik</th>
+                        <th style={{ width: "10%" }}>SoD Durumu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {report.dataGovernanceSummary.assets.map((ast) => (
+                        <tr key={ast.id}>
+                          <td>
+                            <div className="font-bold">{ast.assetName}</div>
+                            {ast.domain && <span className="text-xs text-muted">{ast.domain}</span>}
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: "2px", marginTop: "3px" }}>
+                              {ast.masterData && <span className="badge badge--secondary text-xs">Ana Veri</span>}
+                              {ast.financialData && <span className="badge badge--warning text-xs">Finansal</span>}
+                              {ast.personalData && <span className="badge badge--danger text-xs">KVKK</span>}
+                              {ast.qualityOrSafetyData && <span className="badge badge--info text-xs">Kalite/Güvenlik</span>}
+                            </div>
+                          </td>
+                          <td>
+                            <span className="badge badge--secondary text-xs">{ast.assetType}</span>
+                            <div className="text-xs text-muted" style={{ marginTop: "2px" }}>
+                              {ast.systemOfRecord || "ERP"}
+                            </div>
+                          </td>
+                          <td>
+                            <strong>{ast.ownerRole || <span className="text-danger italic">Tanımsız</span>}</strong>
+                          </td>
+                          <td>
+                            <div>{ast.stewardRole || <span className="text-danger italic">Tanımsız</span>}</div>
+                          </td>
+                          <td>
+                            <div>{ast.technicalCustodianRole || <span className="text-danger italic">Tanımsız</span>}</div>
+                          </td>
+                          <td>
+                            <span className={`badge ${ast.criticality === "CRITICAL" ? "badge--danger" : ast.criticality === "HIGH" ? "badge--warning" : "badge--info"}`}>
+                              {ast.criticality}
+                            </span>
+                          </td>
+                          <td>
+                            {ast.hasSodRisk ? (
+                              <span className="badge badge--danger" title={ast.sodRiskMessage || "Görevler ayrılığı değerlendirilmelidir"}>
+                                ⚠️ SoD Riski
+                              </span>
+                            ) : (
+                              <span className="badge badge--outline-success">Uygun</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* 5.2 Access & Permission Rules Table */}
+              {report.dataGovernanceSummary.accessRules.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">
+                    {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "5.2" : "4.2"} Rol ve Grup Bazlı Erişim / Yetki Kuralları
+                  </h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "18%" }}>Erişen Rol / Grup</th>
+                          <th style={{ width: "20%" }}>İlgili Veri Varlığı</th>
+                          <th style={{ width: "14%" }}>Erişim Seviyesi</th>
+                          <th style={{ width: "16%" }}>Organizasyon Kapsamı</th>
+                          <th style={{ width: "16%" }}>Onay Gereksinimi</th>
+                          <th style={{ width: "16%" }}>Limit / Çatışma Notu</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.dataGovernanceSummary.accessRules.map((acc) => (
+                          <tr key={acc.id}>
+                            <td>
+                              <div className="font-bold">{acc.actorName}</div>
+                              <span className="text-xs text-muted">({acc.actorType})</span>
+                            </td>
+                            <td>
+                              <strong>{acc.assetName}</strong>
+                              {acc.domain && <span className="text-xs text-muted" style={{ display: "block" }}>{acc.domain}</span>}
+                            </td>
+                            <td>
+                              <span className={`badge ${acc.accessLevel === "FULL" ? "badge--danger" : acc.accessLevel === "CREATE" || acc.accessLevel === "UPDATE" ? "badge--warning" : "badge--info"}`}>
+                                {acc.accessLevel}
+                              </span>
+                            </td>
+                            <td>
+                              <div>{acc.scopeType}</div>
+                              {acc.scopeValue && <span className="text-xs text-muted">{acc.scopeValue}</span>}
+                            </td>
+                            <td>
+                              {acc.approvalRequired ? (
+                                <span className="badge badge--warning">
+                                  Onay Şartı ({acc.approvalRole || "Yönetici"})
+                                </span>
+                              ) : (
+                                <span className="text-muted text-xs">Doğrudan Erişim</span>
+                              )}
+                            </td>
+                            <td>
+                              {acc.taskSeparationRequired && (
+                                <span className="badge badge--danger text-xs" style={{ display: "inline-block", marginBottom: "2px" }}>
+                                  ⚠️ Görevler Ayrılığı Zorunlu
+                                </span>
+                              )}
+                              {acc.limitDescription && <div className="text-xs">{acc.limitDescription}</div>}
+                              {acc.conflictNote && <div className="text-xs text-danger">{acc.conflictNote}</div>}
+                              {!acc.taskSeparationRequired && !acc.limitDescription && !acc.conflictNote && "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 5.3 Approval Rules Table */}
+              {report.dataGovernanceSummary.approvals.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">
+                    {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "5.3" : "4.3"} Onay Kuralları ve Limit Kademeleri
+                  </h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "6%" }}>Sıra</th>
+                          <th style={{ width: "22%" }}>Onay Adı</th>
+                          <th style={{ width: "18%" }}>İlgili Varlık</th>
+                          <th style={{ width: "18%" }}>İlgili Süreç Haritası</th>
+                          <th style={{ width: "16%" }}>Onaylayan Rol</th>
+                          <th style={{ width: "12%" }}>Eşik / Limit</th>
+                          <th style={{ width: "8%" }}>SoD</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.dataGovernanceSummary.approvals.map((appr) => (
+                          <tr key={appr.id}>
+                            <td><strong className="text-mono">{appr.approvalOrder}</strong></td>
+                            <td>
+                              <div className="font-bold">{appr.approvalName}</div>
+                              {appr.mandatory && <span className="badge badge--danger text-xs">Zorunlu Onay</span>}
+                            </td>
+                            <td>{appr.assetName || "—"}</td>
+                            <td>{appr.processMapName ? <span>🗺️ {appr.processMapName}</span> : "—"}</td>
+                            <td><strong>{appr.approvalRole}</strong></td>
+                            <td>{appr.thresholdDescription || "Tüm Tutarlar"}</td>
+                            <td>
+                              {appr.separationOfDuties ? (
+                                <span className="badge badge--warning text-xs">Ayrılık Şart</span>
+                              ) : (
+                                "—"
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 5.4 Governance & SoD Safety Note */}
+              <div className="report-summary-box" style={{ marginTop: "1.25rem", borderLeft: "4px solid #1e3a8a" }}>
+                <h3 className="report-summary-box__title" style={{ color: "#1e3a8a" }}>
+                  {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "5.4" : "4.4"} Yönetişim ve Görevler Ayrılığı (SoD) İlkeleri
+                </h3>
+                <p className="text-xs text-muted" style={{ lineHeight: 1.6 }}>
+                  Veri varlığı sahibi, sorumlusu ve teknik emanetçisinin aynı role verilmesi kurumsal hata, tekil yetki suistimali ve denetim riskini artırır. Sistem bu durumları <strong>"görevler ayrılığı değerlendirilmelidir"</strong> uyarısıyla raporlar. Bu matris yalnızca keşif ve danışmanlık amaçlı yönetişim modelini kaydeder; canlı kullanıcı hesabı veya parola yönetim sistemi içermez.
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* ── Legacy Governance Section Fallback ── */}
+          {report.governance && !report.dataGovernanceSummary && (
             <section id="sec-governance" className="report-section">
               <div className="report-section__header">
                 <span className="report-section__num">BÖLÜM 5</span>
                 <h2 className="report-section__title">Veri Sahipliği, Yetkiler ve Sorumluluk Yönetişimi</h2>
               </div>
-
-              {/* Yönetişim KPI Özeti */}
-              <div className="report-kpi-band" style={{ marginBottom: "1rem" }}>
-                <div className="report-kpi-band__item">
-                  <span className="report-kpi-band__count">{report.governance.summary.totalObjects}</span>
-                  <span className="report-kpi-band__label">Yönetişim Nesnesi</span>
-                </div>
-                <div className="report-kpi-band__divider" />
-                <div className="report-kpi-band__item">
-                  <span className={`report-kpi-band__count ${report.governance.summary.unassignedOwnerCount > 0 ? "text-danger" : ""}`}>
-                    {report.governance.summary.unassignedOwnerCount}
-                  </span>
-                  <span className="report-kpi-band__label">Sahipsiz Veri (Owner Yok)</span>
-                </div>
-                <div className="report-kpi-band__divider" />
-                <div className="report-kpi-band__item">
-                  <span className={`report-kpi-band__count ${report.governance.summary.criticalSodRiskCount > 0 ? "text-danger" : ""}`}>
-                    {report.governance.summary.criticalSodRiskCount}
-                  </span>
-                  <span className="report-kpi-band__label">Kritik SoD Riski</span>
-                </div>
-                <div className="report-kpi-band__divider" />
-                <div className="report-kpi-band__item">
-                  <span className="report-kpi-band__count">{report.governance.summary.discrepancyCount}</span>
-                  <span className="report-kpi-band__label">Yetki Sapması</span>
-                </div>
+              <div className="report-summary-box">
+                <p className="text-xs text-muted">Yönetişim nesneleri ve sorumluluk matrisi.</p>
               </div>
-
-              {/* Sorumluluk ve Veri Sahipliği Matrisi */}
-              {report.governance.responsibilities.length > 0 && (
-                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
-                  <h3 className="report-summary-box__title">5.1 Veri Sahipliği ve Rol Matrisi</h3>
-                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
-                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
-                      <thead>
-                        <tr>
-                          <th>Yönetişim Nesnesi</th>
-                          <th>Sorumluluk Türü</th>
-                          <th>Atanan Özne (Kişi/Rol)</th>
-                          <th>Kapsam</th>
-                          <th>Model</th>
-                          <th>Notlar</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.governance.responsibilities.map((r) => (
-                          <tr key={r.id}>
-                            <td><strong>{r.object_name_tr}</strong> ({r.object_code})</td>
-                            <td><span className="badge badge--info">{r.responsibility_type}</span></td>
-                            <td>{r.subject_name} ({r.subject_type})</td>
-                            <td>{r.scope_name || "Tüm Organizasyon"}</td>
-                            <td>{r.state_type === "to_be" ? "Hedef (To-Be)" : "Mevcut (As-Is)"}</td>
-                            <td>{r.notes || "—"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* Yetki ve Erişim Matrisi */}
-              {report.governance.authorizations.length > 0 && (
-                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
-                  <h3 className="report-summary-box__title">5.2 Yetki ve Erişim Matrisi</h3>
-                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
-                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
-                      <thead>
-                        <tr>
-                          <th>Özne (Rol/Kişi)</th>
-                          <th>Yönetişim Nesnesi</th>
-                          <th>Beyan Edilen Yetki</th>
-                          <th>Efektif Yetki / Sapma</th>
-                          <th>Kapsam</th>
-                          <th>İzin Detayı (G/E/D/S/O/İ/X/M)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.governance.authorizations.map((a) => (
-                          <tr key={a.id}>
-                            <td><strong>{a.subject_name}</strong> ({a.subject_type})</td>
-                            <td>{a.object_name_tr}</td>
-                            <td><span className="badge badge--secondary">{a.permission_level}</span></td>
-                            <td>
-                              {a.has_discrepancy === 1 && a.effective_level ? (
-                                <span className="badge badge--danger">Sapma: {a.effective_level}</span>
-                              ) : (
-                                "Sapma Yok"
-                              )}
-                            </td>
-                            <td>{a.scope_name || "Genel"}</td>
-                            <td>
-                              <code>
-                                {[
-                                  a.can_view ? "G" : "-",
-                                  a.can_create ? "E" : "-",
-                                  a.can_edit ? "D" : "-",
-                                  a.can_delete ? "S" : "-",
-                                  a.can_approve ? "O" : "-",
-                                  a.can_cancel ? "İ" : "-",
-                                  a.can_export ? "X" : "-",
-                                  a.can_view_cost ? "M" : "-",
-                                ].join("")}
-                              </code>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* Limitler ve Onay Kademeleri */}
-              {report.governance.limits.length > 0 && (
-                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
-                  <h3 className="report-summary-box__title">5.3 Yetki ve Onay Limitleri</h3>
-                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
-                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
-                      <thead>
-                        <tr>
-                          <th>Limit Türü</th>
-                          <th>Limit Sahibi (Özne)</th>
-                          <th>Limit Aralığı</th>
-                          <th>Onay Kademesi</th>
-                          <th>Onaylayan Rol/Kişi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.governance.limits.map((l) => (
-                          <tr key={l.id}>
-                            <td><strong>{l.limit_type}</strong></td>
-                            <td>{l.subject_name}</td>
-                            <td>
-                              {l.min_value != null || l.max_value != null
-                                ? `${l.min_value ?? 0} — ${l.max_value ?? "∞"} ${l.currency_or_unit}`
-                                : `Limitsiz (${l.currency_or_unit})`}
-                            </td>
-                            <td>{l.approval_tier || "Standart"}</td>
-                            <td>{l.approver_subject_name || "Doğrudan Yetkili"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-
-              {/* Görevler Ayrılığı (SoD) Riskleri */}
-              {report.governance.sodRisks.length > 0 && (
-                <div className="report-summary-box" style={{ marginBottom: "1rem" }}>
-                  <h3 className="report-summary-box__title">5.4 Görevler Ayrılığı (SoD) Risk Matrisi</h3>
-                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
-                    <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
-                      <thead>
-                        <tr>
-                          <th>Risk Başlığı</th>
-                          <th>Ciddiyet</th>
-                          <th>Çatışan Görevler (A vs B)</th>
-                          <th>Mevcut Kontrol</th>
-                          <th>Önerilen Çözüm (To-Be)</th>
-                          <th>Durum</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {report.governance.sodRisks.map((s) => (
-                          <tr key={s.id}>
-                            <td><strong>{s.risk_title}</strong></td>
-                            <td>
-                              <span className={`badge ${s.risk_severity === "critical" ? "badge--danger" : "badge--warning"}`}>
-                                {s.risk_severity.toUpperCase()}
-                              </span>
-                            </td>
-                            <td>
-                              <div style={{ fontSize: "0.75rem" }}>
-                                <div><strong>A:</strong> {s.conflicting_duty_a}</div>
-                                <div><strong>B:</strong> {s.conflicting_duty_b}</div>
-                              </div>
-                            </td>
-                            <td>{s.current_control || "Kontrol Yok"}</td>
-                            <td>{s.mitigation_action || "—"}</td>
-                            <td><span className="badge badge--secondary">{s.status}</span></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
             </section>
           )}
+
 
           {/* ── Bölüm {report.governance ? "6" : "5"}: Proje Notları & Açık Konular ── */}
           <section id="sec-notes" className="report-section">

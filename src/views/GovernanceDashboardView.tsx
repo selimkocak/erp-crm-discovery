@@ -84,6 +84,8 @@ import {
   SodRiskModal,
 } from "../components/governance/GovernanceModals";
 
+import { DataGovernanceSection } from "../components/governance/DataGovernanceSection";
+
 interface GovernanceDashboardViewProps {
   projectId: string;
   projectName?: string;
@@ -97,7 +99,7 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
   companyName,
   isProjectPassive = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<string>("objects");
+  const [activeTab, setActiveTab] = useState<string>("data_governance");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSeeding, setIsSeeding] = useState<boolean>(false);
   const [summary, setSummary] = useState<GovernanceSummary | null>(null);
@@ -414,6 +416,14 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
       <div className="gov-nav-tabs">
         <button
           type="button"
+          className={`gov-nav-tab ${activeTab === "data_governance" ? "active" : ""}`}
+          onClick={() => setActiveTab("data_governance")}
+        >
+          <Database size={16} />
+          <span>Veri Sahipliği & Sorumluluk Matrisi</span>
+        </button>
+        <button
+          type="button"
           className={`gov-nav-tab ${activeTab === "objects" ? "active" : ""}`}
           onClick={() => setActiveTab("objects")}
         >
@@ -472,6 +482,13 @@ export const GovernanceDashboardView: React.FC<GovernanceDashboardViewProps> = (
 
       {/* Tab Contents */}
       <div className="gov-tab-content-wrapper">
+        {activeTab === "data_governance" && (
+          <DataGovernanceSection
+            projectId={projectId}
+            isProjectPassive={isProjectPassive}
+          />
+        )}
+
         {activeTab === "objects" && (
           <ObjectsTab
             objects={objects}
