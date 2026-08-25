@@ -120,7 +120,7 @@ const tables = db1
 
 const tableNames = tables.map((t) => t.name);
 
-for (const expected of [
+const EXPECTED_TABLES = [
   "analysis_projects",
   "business_functions",
   "company_profiles",
@@ -151,7 +151,17 @@ for (const expected of [
   "ot_data_requirements",
   "ot_alarm_requirements",
   "ot_quality_devices",
-]) {
+  "process_maps",
+  "process_nodes",
+  "process_edges",
+  "data_governance_assets",
+  "data_governance_access",
+  "data_governance_approvals",
+  "evidence_items",
+  "evidence_links",
+];
+
+for (const expected of EXPECTED_TABLES) {
   assert(tableNames.includes(expected), `Tablo mevcut: ${expected}`);
 }
 
@@ -208,7 +218,7 @@ const tableCount2 = (
     .prepare("SELECT COUNT(*) as c FROM sqlite_master WHERE type='table'")
     .get() as { c: number }
 ).c;
-assert(tableCount2 === 30, `Tablo sayısı değişmedi: 30 (gerçek: ${tableCount2})`);
+assert(tableCount2 === EXPECTED_TABLES.length, `Tablo sayısı değişmedi: ${EXPECTED_TABLES.length} (gerçek: ${tableCount2})`);
 
 const pscTable2 = db2
   .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='project_scope_changes'")
