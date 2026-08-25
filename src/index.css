@@ -1950,6 +1950,7 @@ textarea.form-input {
 .gov-modal,
 .gov-modal-container,
 .modal-container,
+.modal-dialog,
 .modal {
   background: var(--bg-surface, #ffffff);
   border-radius: 12px;
@@ -1990,6 +1991,10 @@ textarea.form-input {
   max-width: min(780px, calc(100% - 0px));
 }
 
+.custom-question-modal {
+  max-width: min(680px, calc(100vw - 20px));
+}
+
 .modal--xl,
 .gov-modal-container--large {
   max-width: min(1080px, calc(100% - 0px));
@@ -1999,7 +2004,8 @@ textarea.form-input {
 .modal-content > form,
 .gov-modal > form,
 .modal > form,
-.gov-modal-container > form {
+.gov-modal-container > form,
+.modal-dialog > form {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;

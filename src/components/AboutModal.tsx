@@ -72,7 +72,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ onClose }) => {
                 ERP CRM Discovery
               </h3>
               <div style={{ fontSize: "0.8125rem", color: "var(--text-muted, #64748b)", marginTop: "0.15rem" }}>
-                Sürüm: v0.1.4 • MIT Lisansı
+                Sürüm: v0.1.5 • MIT Lisansı
               </div>
             </div>
           </div>

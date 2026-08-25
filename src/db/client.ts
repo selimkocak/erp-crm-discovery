@@ -118,8 +118,7 @@ export function generateId(prefix: string = "id"): string {
 export async function getProjects(): Promise<ProjectListItem[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProjects();
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<ProjectListItem[]>(`
     SELECT
       p.id,
@@ -147,7 +146,9 @@ export async function updateProjectStatus(
   projectId: string,
   status: ProjectStatus
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProjectStatus(projectId, status);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE analysis_projects SET status = $1, updated_at = $2 WHERE id = $3`,
@@ -161,8 +162,7 @@ export async function updateProjectStatus(
 export async function getMasterBusinessFunctions(): Promise<BusinessFunction[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getMasterBusinessFunctions();
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<BusinessFunction[]>(`
     SELECT id, code, name_tr, name_en, category, sort_order, is_active
     FROM business_functions
@@ -177,8 +177,7 @@ export async function getMasterBusinessFunctions(): Promise<BusinessFunction[]> 
 export async function createProject(payload: CreateProjectPayload): Promise<string> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).createProject(payload);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const projectId = generateId("proj");
   const companyProfileId = generateId("comp");
   const now = new Date().toISOString();
@@ -263,7 +262,9 @@ export async function assignBusinessFunctionsToProject(
   projectId: string,
   functions: (string | AssignBusinessFunctionInput)[]
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).assignBusinessFunctionsToProject(projectId, functions);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   // 1. Ebeveyn Proje Kaydı Kontrolü (Parent Check 1)
@@ -351,8 +352,7 @@ export async function assignBusinessFunctionsToProject(
 export async function getProjectDetail(projectId: string): Promise<ProjectDetailData | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProjectDetail(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
 
   const projects = await db.select<ProjectDetailData["project"][]>(
     `SELECT id, name, status, planned_start_date, planned_end_date, actual_start_date, actual_end_date, created_at, updated_at FROM analysis_projects WHERE id = $1`,
@@ -414,7 +414,9 @@ export async function updateCompanyProfile(
   projectId: string,
   payload: Partial<CompanyProfile>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateCompanyProfile(projectId, payload);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -455,7 +457,9 @@ export async function updateProjectDetails(
   projectId: string,
   payload: UpdateProjectDetailsPayload
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProjectDetails(projectId, payload);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   // 1. Proje adı / durumu / tarihleri güncellenmişse analysis_projects tablosunu güncelle
@@ -550,7 +554,9 @@ export async function updateProjectSchedule(
   projectId: string,
   schedule: ScheduleDates
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProjectSchedule(projectId, schedule);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   const check = await db.select<{ id: string }[]>(
@@ -583,7 +589,9 @@ export async function updateProjectSchedule(
 export async function getProjectSchedule(
   projectId: string
 ): Promise<ScheduleDates | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjectSchedule(projectId);
+  }const db = await getDb();
   const rows = await db.select<
     {
       planned_start_date: string | null;
@@ -612,7 +620,9 @@ export async function updateProjectFunctionSchedule(
   bfCode: string,
   schedule: ScheduleDates
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProjectFunctionSchedule(projectId, bfCode, schedule);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   // Find business_function_id
@@ -657,7 +667,9 @@ export async function getProjectFunctionSchedule(
   projectId: string,
   bfCode: string
 ): Promise<ScheduleDates | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjectFunctionSchedule(projectId, bfCode);
+  }const db = await getDb();
   const rows = await db.select<
     {
       planned_start_date: string | null;
@@ -690,7 +702,9 @@ export async function addOrReactivateProjectFunction(
   bfCode: string,
   performedBy?: string
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).addOrReactivateProjectFunction(projectId, bfCode, performedBy);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   // 1. business_functions tablosundan ID'yi bul
@@ -750,7 +764,9 @@ export async function deactivateProjectFunction(
   reason?: string,
   performedBy?: string
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deactivateProjectFunction(projectId, bfCode, reason, performedBy);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   const bfs = await db.select<{ id: string; code: string }[]>(
@@ -787,7 +803,9 @@ export async function getFunctionDataCounts(
   projectId: string,
   bfCode: string
 ): Promise<FunctionDataCounts> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getFunctionDataCounts(projectId, bfCode);
+  }const db = await getDb();
   const [
     ans,
     fnd,
@@ -877,8 +895,7 @@ export async function getFunctionDataCounts(
 export async function getProjectScopeChanges(projectId: string): Promise<ProjectScopeChange[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProjectScopeChanges(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<ProjectScopeChange[]>(
     "SELECT * FROM project_scope_changes WHERE analysis_project_id = $1 ORDER BY created_at DESC",
     [projectId]
@@ -896,7 +913,9 @@ export async function updateProjectBusinessFunction(
     status?: FunctionStatus;
   }
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProjectBusinessFunction(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -922,8 +941,7 @@ export async function updateProjectBusinessFunction(
 export async function deleteProject(projectId: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteProject(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM analysis_projects WHERE id = $1`, [projectId]);
   try {
     const { deleteProjectAttachmentsDirectory } = await import("../storage/attachmentManager");
@@ -944,7 +962,9 @@ export async function saveAnswer(
   questionId: string,
   answerData: AnswerData
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).saveAnswer(projectId, bfCode, packId, packVersion, questionId, answerData);
+  }const db = await getDb();
   const now = new Date().toISOString();
   const id = generateId("qa");
   const answerJson = JSON.stringify(answerData);
@@ -970,7 +990,9 @@ export async function getAnswer(
   bfCode: string,
   questionId: string
 ): Promise<AnswerData | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getAnswer(projectId, bfCode, questionId);
+  }const db = await getDb();
   const rows = await db.select<{ answer_data: string }[]>(
     `SELECT answer_data FROM question_answers
      WHERE analysis_project_id = $1
@@ -994,7 +1016,9 @@ export async function getAllAnswers(
   projectId: string,
   bfCode: string
 ): Promise<Map<string, AnswerData>> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getAllAnswers(projectId, bfCode);
+  }const db = await getDb();
   const rows = await db.select<{ question_id: string; answer_data: string }[]>(
     `SELECT question_id, answer_data FROM question_answers
      WHERE analysis_project_id = $1
@@ -1020,7 +1044,9 @@ export async function saveLastQuestionId(
   bfCode: string,
   questionId: string
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).saveLastQuestionId(projectId, bfCode, questionId);
+  }const db = await getDb();
   const now = new Date().toISOString();
   const id = generateId("qss");
 
@@ -1041,7 +1067,9 @@ export async function getLastQuestionId(
   projectId: string,
   bfCode: string
 ): Promise<string | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getLastQuestionId(projectId, bfCode);
+  }const db = await getDb();
   const rows = await db.select<{ last_question_id: string | null }[]>(
     `SELECT last_question_id FROM question_session_state
      WHERE analysis_project_id = $1
@@ -1060,7 +1088,9 @@ export async function updateFunctionStatusByCode(
   bfCode: string,
   newStatus: FunctionStatus
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateFunctionStatusByCode(projectId, bfCode, newStatus);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE project_business_functions
@@ -1083,7 +1113,9 @@ export async function updateFunctionStatusByCode(
 export async function createFinding(
   payload: Omit<Finding, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createFinding(payload);
+  }const db = await getDb();
   const id = generateId("fnd");
   const now = new Date().toISOString();
   await db.execute(
@@ -1109,7 +1141,9 @@ export async function updateFinding(
   id: string,
   updates: Partial<Pick<Finding, "title" | "description" | "priority" | "status" | "business_function_code" | "question_id">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateFinding(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE analysis_findings
@@ -1138,8 +1172,7 @@ export async function updateFinding(
 export async function deleteFinding(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteFinding(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM analysis_findings WHERE id = $1`, [id]);
 }
 
@@ -1148,7 +1181,9 @@ export async function getFindings(
   bfCode?: string,
   questionId?: string
 ): Promise<Finding[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getFindings(projectId, bfCode, questionId);
+  }const db = await getDb();
   let query = `SELECT * FROM analysis_findings WHERE analysis_project_id = $1`;
   const params: unknown[] = [projectId];
 
@@ -1170,7 +1205,9 @@ export async function getFindings(
 export async function createRequirement(
   payload: Omit<Requirement, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createRequirement(payload);
+  }const db = await getDb();
   const id = generateId("req");
   const now = new Date().toISOString();
   await db.execute(
@@ -1196,7 +1233,9 @@ export async function updateRequirement(
   id: string,
   updates: Partial<Pick<Requirement, "title" | "description" | "priority" | "status" | "business_function_code" | "question_id">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateRequirement(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE analysis_requirements
@@ -1225,8 +1264,7 @@ export async function updateRequirement(
 export async function deleteRequirement(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteRequirement(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM analysis_requirements WHERE id = $1`, [id]);
 }
 
@@ -1235,7 +1273,9 @@ export async function getRequirements(
   bfCode?: string,
   questionId?: string
 ): Promise<Requirement[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getRequirements(projectId, bfCode, questionId);
+  }const db = await getDb();
   let query = `SELECT * FROM analysis_requirements WHERE analysis_project_id = $1`;
   const params: unknown[] = [projectId];
 
@@ -1257,7 +1297,9 @@ export async function getRequirements(
 export async function createRisk(
   payload: Omit<Risk, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createRisk(payload);
+  }const db = await getDb();
   const id = generateId("rsk");
   const now = new Date().toISOString();
   await db.execute(
@@ -1285,7 +1327,9 @@ export async function updateRisk(
   id: string,
   updates: Partial<Pick<Risk, "title" | "description" | "impact" | "probability" | "mitigation_note" | "status" | "business_function_code" | "question_id">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateRisk(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE analysis_risks
@@ -1319,8 +1363,7 @@ export async function updateRisk(
 export async function deleteRisk(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteRisk(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM analysis_risks WHERE id = $1`, [id]);
 }
 
@@ -1329,7 +1372,9 @@ export async function getRisks(
   bfCode?: string,
   questionId?: string
 ): Promise<Risk[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getRisks(projectId, bfCode, questionId);
+  }const db = await getDb();
   let query = `SELECT * FROM analysis_risks WHERE analysis_project_id = $1`;
   const params: unknown[] = [projectId];
 
@@ -1351,7 +1396,9 @@ export async function getRisks(
 export async function createProjectNote(
   payload: Omit<ProjectNote, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createProjectNote(payload);
+  }const db = await getDb();
   const id = generateId("not");
   const now = new Date().toISOString();
   await db.execute(
@@ -1374,7 +1421,9 @@ export async function updateProjectNote(
   id: string,
   updates: { note: string; business_function_code?: string | null; question_id?: string | null }
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProjectNote(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE project_notes
@@ -1398,8 +1447,7 @@ export async function updateProjectNote(
 export async function deleteProjectNote(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteProjectNote(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM project_notes WHERE id = $1`, [id]);
 }
 
@@ -1408,7 +1456,9 @@ export async function getProjectNotes(
   bfCode?: string,
   questionId?: string
 ): Promise<ProjectNote[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjectNotes(projectId, bfCode, questionId);
+  }const db = await getDb();
   let query = `SELECT * FROM project_notes WHERE analysis_project_id = $1`;
   const params: unknown[] = [projectId];
 
@@ -1430,7 +1480,9 @@ export async function getProjectNotes(
 export async function getSemanticSummaryCounts(
   projectId: string
 ): Promise<SemanticSummaryCounts> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getSemanticSummaryCounts(projectId);
+  }const db = await getDb();
   const [fCount, rCount, riskStats, nCount] = await Promise.all([
     db.select<{ count: number }[]>(
       `SELECT COUNT(*) as count FROM analysis_findings WHERE analysis_project_id = $1`,
@@ -1478,8 +1530,7 @@ export interface ReportProfileData {
 export async function getReportProfile(projectId: string): Promise<ReportProfileData | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getReportProfile(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<ReportProfileData[]>(
     `SELECT id, analysis_project_id, executive_summary, overall_assessment, open_topics, created_at, updated_at
      FROM analysis_report_profiles
@@ -1498,7 +1549,9 @@ export async function saveReportProfile(
     open_topics?: string | null;
   }
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).saveReportProfile(projectId, profile);
+  }const db = await getDb();
   const id = generateId("rp");
   const now = new Date().toISOString();
 
@@ -1542,7 +1595,9 @@ export interface CreateCustomQuestionPayload {
 export async function createCustomQuestion(
   payload: CreateCustomQuestionPayload
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createCustomQuestion(payload);
+  }const db = await getDb();
   const id = generateId(`cq_${payload.business_function_code.toLowerCase()}`);
   const now = new Date().toISOString();
 
@@ -1584,7 +1639,9 @@ export async function getCustomQuestions(
   projectId: string,
   bfCode?: string
 ): Promise<ProjectCustomQuestion[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getCustomQuestions(projectId, bfCode);
+  }const db = await getDb();
   let questions: ProjectCustomQuestion[];
 
   if (bfCode) {
@@ -1636,7 +1693,9 @@ export async function updateCustomQuestion(
   id: string,
   payload: Partial<CreateCustomQuestionPayload>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateCustomQuestion(id, payload);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -1677,8 +1736,7 @@ export async function updateCustomQuestion(
 export async function deleteCustomQuestion(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteCustomQuestion(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM project_custom_questions WHERE id = $1`, [id]);
 }
 
@@ -1688,7 +1746,9 @@ export async function saveCustomAnswer(
   customQuestionId: string,
   answerData: AnswerData
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).saveCustomAnswer(projectId, bfCode, customQuestionId, answerData);
+  }const db = await getDb();
   const id = generateId("cqa");
   const now = new Date().toISOString();
   const rawJson = JSON.stringify(answerData);
@@ -1707,7 +1767,9 @@ export async function getCustomAnswers(
   projectId: string,
   bfCode?: string
 ): Promise<Map<string, AnswerData>> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getCustomAnswers(projectId, bfCode);
+  }const db = await getDb();
   let rows: { custom_question_id: string; answer_data: string }[];
 
   if (bfCode) {
@@ -1752,7 +1814,9 @@ export interface SetQuestionFollowupPayload {
 export async function setQuestionFollowup(
   payload: SetQuestionFollowupPayload
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).setQuestionFollowup(payload);
+  }const db = await getDb();
   const id = generateId("qf");
   const now = new Date().toISOString();
 
@@ -1785,7 +1849,9 @@ export async function removeQuestionFollowup(
   bfCode: string,
   questionId: string
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).removeQuestionFollowup(projectId, bfCode, questionId);
+  }const db = await getDb();
   await db.execute(
     `DELETE FROM question_followups
      WHERE analysis_project_id = $1 AND business_function_code = $2 AND question_id = $3`,
@@ -1798,7 +1864,9 @@ export async function resolveQuestionFollowup(
   bfCode: string,
   questionId: string
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).resolveQuestionFollowup(projectId, bfCode, questionId);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE question_followups
@@ -1812,7 +1880,9 @@ export async function getQuestionFollowups(
   projectId: string,
   bfCode?: string
 ): Promise<Map<string, QuestionFollowup>> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getQuestionFollowups(projectId, bfCode);
+  }const db = await getDb();
   let rows: QuestionFollowup[];
 
   if (bfCode) {
@@ -1841,7 +1911,9 @@ export async function getQuestionFollowups(
 export async function getAllProjectFollowups(
   projectId: string
 ): Promise<QuestionFollowup[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getAllProjectFollowups(projectId);
+  }const db = await getDb();
   return db.select<QuestionFollowup[]>(
     `SELECT id, analysis_project_id, business_function_code, question_id, flag_type, note, status, created_at, updated_at, resolved_at
      FROM question_followups
@@ -1855,7 +1927,9 @@ export async function getFollowupSummaryCounts(
   projectId: string,
   bfCode?: string
 ): Promise<FollowupSummaryCounts> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getFollowupSummaryCounts(projectId, bfCode);
+  }const db = await getDb();
   let rows: { flag_type: FollowupFlagType; count: number }[];
 
   if (bfCode) {
@@ -1898,7 +1972,9 @@ export async function getFollowupSummaryCounts(
 export async function addQuestionAttachment(
   payload: CreateQuestionAttachmentPayload
 ): Promise<QuestionAttachment> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).addQuestionAttachment(payload);
+  }const db = await getDb();
   const id = generateId("att");
   const now = new Date().toISOString();
   const importedAt = payload.imported_at || now;
@@ -1975,7 +2051,9 @@ export async function updateQuestionAttachmentReimport(
     source_absolute_path?: string | null;
   }
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateQuestionAttachmentReimport(attachmentId, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE question_attachments
@@ -2004,7 +2082,9 @@ export async function getQuestionAttachments(
   bfCode: string,
   questionId: string
 ): Promise<QuestionAttachment[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getQuestionAttachments(projectId, bfCode, questionId);
+  }const db = await getDb();
   const rows = await db.select<QuestionAttachment[]>(
     `SELECT *
      FROM question_attachments
@@ -2018,7 +2098,9 @@ export async function getQuestionAttachments(
 export async function getProjectAttachments(
   projectId: string
 ): Promise<QuestionAttachment[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjectAttachments(projectId);
+  }const db = await getDb();
   const rows = await db.select<QuestionAttachment[]>(
     `SELECT *
      FROM question_attachments
@@ -2033,7 +2115,9 @@ export async function updateAttachmentDescription(
   attachmentId: string,
   description: string | null
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateAttachmentDescription(attachmentId, description);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE question_attachments
@@ -2046,7 +2130,9 @@ export async function updateAttachmentDescription(
 export async function deleteQuestionAttachment(
   attachmentId: string
 ): Promise<QuestionAttachment | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteQuestionAttachment(attachmentId);
+  }const db = await getDb();
   const existing = await db.select<QuestionAttachment[]>(
     `SELECT * FROM question_attachments WHERE id = $1`,
     [attachmentId]
@@ -2064,7 +2150,9 @@ export async function findAttachmentBySha256(
   projectId: string,
   sha256: string
 ): Promise<QuestionAttachment | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).findAttachmentBySha256(projectId, sha256);
+  }const db = await getDb();
   const rows = await db.select<QuestionAttachment[]>(
     `SELECT *
      FROM question_attachments
@@ -2078,7 +2166,9 @@ export async function findAttachmentBySha256(
 export async function getAttachmentSummaryStats(
   projectId: string
 ): Promise<AttachmentSummaryStats> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getAttachmentSummaryStats(projectId);
+  }const db = await getDb();
   const rows = await db.select<{ count: number; total_bytes: number }[]>(
     `SELECT COUNT(*) as count, COALESCE(SUM(file_size), 0) as total_bytes
      FROM question_attachments
@@ -2102,8 +2192,7 @@ export async function getAttachmentSummaryStats(
 export async function getOtStations(projectId: string): Promise<OtStation[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getOtStations(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<OtStation[]>(
     `SELECT * FROM ot_stations
      WHERE project_id = $1
@@ -2118,8 +2207,7 @@ export async function getOtStations(projectId: string): Promise<OtStation[]> {
 export async function getOtStationById(stationId: string): Promise<OtStation | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getOtStationById(stationId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<OtStation[]>(
     `SELECT * FROM ot_stations WHERE id = $1 LIMIT 1`,
     [stationId]
@@ -2134,7 +2222,9 @@ export async function getOtStationById(stationId: string): Promise<OtStation | n
 export async function createOtStation(
   station: Omit<OtStation, "id" | "created_at" | "updated_at">
 ): Promise<OtStation> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createOtStation(station);
+  }const db = await getDb();
   const now = new Date().toISOString();
   const id = generateId("ots");
 
@@ -2186,7 +2276,9 @@ export async function updateOtStation(
   stationId: string,
   updates: Partial<OtStation>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateOtStation(stationId, updates);
+  }const db = await getDb();
   const existing = await getOtStationById(stationId);
   if (!existing) {
     throw new Error(`Güncellenecek istasyon bulunamadı: ${stationId}`);
@@ -2252,7 +2344,9 @@ export async function toggleOtStationStatus(
   stationId: string,
   status: StationStatus
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).toggleOtStationStatus(stationId, status);
+  }const db = await getDb();
   const now = new Date().toISOString();
   await db.execute(
     `UPDATE ot_stations SET status = $1, updated_at = $2 WHERE id = $3`,
@@ -2266,8 +2360,7 @@ export async function toggleOtStationStatus(
 export async function deleteOtStation(stationId: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteOtStation(stationId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM ot_stations WHERE id = $1`, [stationId]);
 }
 
@@ -2278,7 +2371,9 @@ export async function getOtStationAnswers(
   projectId: string,
   stationId: string
 ): Promise<Map<string, AnswerData>> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtStationAnswers(projectId, stationId);
+  }const db = await getDb();
   const rows = await db.select<{ question_id: string; answer_data: string }[]>(
     `SELECT question_id, answer_data FROM ot_station_answers
      WHERE project_id = $1 AND station_id = $2`,
@@ -2304,7 +2399,9 @@ export async function getOtStationAnswer(
   stationId: string,
   questionId: string
 ): Promise<AnswerData | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtStationAnswer(projectId, stationId, questionId);
+  }const db = await getDb();
   const rows = await db.select<{ answer_data: string }[]>(
     `SELECT answer_data FROM ot_station_answers
      WHERE project_id = $1 AND station_id = $2 AND question_id = $3
@@ -2331,7 +2428,9 @@ export async function saveOtStationAnswer(
   packId = "tr.ot_industrial_data.core",
   packVersion = "0.1.0"
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).saveOtStationAnswer(projectId, stationId, questionId, answerData, bfCode, packId, packVersion);
+  }const db = await getDb();
   const now = new Date().toISOString();
   const id = generateId("otsa");
   const answerJson = JSON.stringify(answerData);
@@ -2355,7 +2454,9 @@ export async function saveOtStationAnswer(
 export async function getOtStationsSummary(
   projectId: string
 ): Promise<OtStationsSummaryStats> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtStationsSummary(projectId);
+  }const db = await getDb();
   const stations = await db.select<OtStation[]>(
     `SELECT * FROM ot_stations WHERE project_id = $1`,
     [projectId]
@@ -2388,7 +2489,9 @@ export async function getOtStationsSummary(
 export async function createOtDataRequirement(
   payload: Omit<OtDataRequirement, "id" | "created_at" | "updated_at">
 ): Promise<OtDataRequirement> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createOtDataRequirement(payload);
+  }const db = await getDb();
   const id = generateId("otreq");
   const now = new Date().toISOString();
 
@@ -2463,7 +2566,9 @@ export async function updateOtDataRequirement(
   id: string,
   updates: Partial<Omit<OtDataRequirement, "id" | "project_id" | "station_id" | "created_at" | "updated_at">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateOtDataRequirement(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -2526,8 +2631,7 @@ export async function updateOtDataRequirement(
 export async function deleteOtDataRequirement(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteOtDataRequirement(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM ot_data_requirements WHERE id = $1`, [id]);
 }
 
@@ -2535,7 +2639,9 @@ export async function getOtDataRequirements(
   projectId: string,
   stationId?: string
 ): Promise<OtDataRequirement[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtDataRequirements(projectId, stationId);
+  }const db = await getDb();
   if (stationId) {
     return db.select<OtDataRequirement[]>(
       `SELECT * FROM ot_data_requirements WHERE project_id = $1 AND station_id = $2 ORDER BY created_at ASC`,
@@ -2551,8 +2657,7 @@ export async function getOtDataRequirements(
 export async function getOtDataRequirementById(id: string): Promise<OtDataRequirement | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getOtDataRequirementById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<OtDataRequirement[]>(
     `SELECT * FROM ot_data_requirements WHERE id = $1 LIMIT 1`,
     [id]
@@ -2567,7 +2672,9 @@ export async function getOtDataRequirementById(id: string): Promise<OtDataRequir
 export async function createOtAlarmRequirement(
   payload: Omit<OtAlarmRequirement, "id" | "created_at" | "updated_at">
 ): Promise<OtAlarmRequirement> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createOtAlarmRequirement(payload);
+  }const db = await getDb();
   const id = generateId("otalm");
   const now = new Date().toISOString();
 
@@ -2632,7 +2739,9 @@ export async function updateOtAlarmRequirement(
   id: string,
   updates: Partial<Omit<OtAlarmRequirement, "id" | "project_id" | "station_id" | "created_at" | "updated_at">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateOtAlarmRequirement(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -2688,8 +2797,7 @@ export async function updateOtAlarmRequirement(
 export async function deleteOtAlarmRequirement(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteOtAlarmRequirement(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM ot_alarm_requirements WHERE id = $1`, [id]);
 }
 
@@ -2697,7 +2805,9 @@ export async function getOtAlarmRequirements(
   projectId: string,
   stationId?: string
 ): Promise<OtAlarmRequirement[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtAlarmRequirements(projectId, stationId);
+  }const db = await getDb();
   if (stationId) {
     return db.select<OtAlarmRequirement[]>(
       `SELECT * FROM ot_alarm_requirements WHERE project_id = $1 AND station_id = $2 ORDER BY created_at ASC`,
@@ -2713,8 +2823,7 @@ export async function getOtAlarmRequirements(
 export async function getOtAlarmRequirementById(id: string): Promise<OtAlarmRequirement | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getOtAlarmRequirementById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<OtAlarmRequirement[]>(
     `SELECT * FROM ot_alarm_requirements WHERE id = $1 LIMIT 1`,
     [id]
@@ -2729,7 +2838,9 @@ export async function getOtAlarmRequirementById(id: string): Promise<OtAlarmRequ
 export async function createOtQualityDevice(
   payload: Omit<OtQualityDevice, "id" | "created_at" | "updated_at">
 ): Promise<OtQualityDevice> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createOtQualityDevice(payload);
+  }const db = await getDb();
   const id = generateId("otqd");
   const now = new Date().toISOString();
 
@@ -2804,7 +2915,9 @@ export async function updateOtQualityDevice(
   id: string,
   updates: Partial<Omit<OtQualityDevice, "id" | "project_id" | "station_id" | "created_at" | "updated_at">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateOtQualityDevice(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -2873,8 +2986,7 @@ export async function updateOtQualityDevice(
 export async function deleteOtQualityDevice(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteOtQualityDevice(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM ot_quality_devices WHERE id = $1`, [id]);
 }
 
@@ -2882,7 +2994,9 @@ export async function getOtQualityDevices(
   projectId: string,
   stationId?: string
 ): Promise<OtQualityDevice[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtQualityDevices(projectId, stationId);
+  }const db = await getDb();
   if (stationId) {
     return db.select<OtQualityDevice[]>(
       `SELECT * FROM ot_quality_devices WHERE project_id = $1 AND station_id = $2 ORDER BY created_at ASC`,
@@ -2898,8 +3012,7 @@ export async function getOtQualityDevices(
 export async function getOtQualityDeviceById(id: string): Promise<OtQualityDevice | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getOtQualityDeviceById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<OtQualityDevice[]>(
     `SELECT * FROM ot_quality_devices WHERE id = $1 LIMIT 1`,
     [id]
@@ -2914,7 +3027,9 @@ export async function getOtQualityDeviceById(id: string): Promise<OtQualityDevic
 export async function getOtMatrixSummaryCounts(
   projectId: string
 ): Promise<OtMatrixSummaryCounts> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtMatrixSummaryCounts(projectId);
+  }const db = await getDb();
   const [dataReqs, alarms, qualityDevs] = await Promise.all([
     db.select<OtDataRequirement[]>(
       `SELECT * FROM ot_data_requirements WHERE project_id = $1`,
@@ -2999,7 +3114,9 @@ export async function getOtMatrixSummaryCounts(
 export async function createProcessMap(
   payload: Omit<ProcessMap, "id" | "created_at" | "updated_at">
 ): Promise<ProcessMap> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createProcessMap(payload);
+  }const db = await getDb();
   const id = generateId("pmap");
   const now = new Date().toISOString();
 
@@ -3037,8 +3154,7 @@ export async function createProcessMap(
 export async function getProcessMaps(projectId: string): Promise<ProcessMap[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProcessMaps(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<ProcessMap[]>(
     `SELECT * FROM process_maps WHERE project_id = $1 ORDER BY sort_order ASC, created_at ASC`,
     [projectId]
@@ -3048,8 +3164,7 @@ export async function getProcessMaps(projectId: string): Promise<ProcessMap[]> {
 export async function getProcessMapById(id: string): Promise<ProcessMap | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProcessMapById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<ProcessMap[]>(
     `SELECT * FROM process_maps WHERE id = $1 LIMIT 1`,
     [id]
@@ -3061,7 +3176,9 @@ export async function updateProcessMap(
   id: string,
   updates: Partial<Pick<ProcessMap, "name" | "process_area" | "owner_role" | "status" | "description" | "sort_order">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProcessMap(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -3093,15 +3210,16 @@ export async function updateProcessMap(
 export async function deleteProcessMap(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteProcessMap(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM process_maps WHERE id = $1`, [id]);
 }
 
 export async function createProcessNode(
   payload: Omit<ProcessNode, "id" | "adoption_risk" | "created_at" | "updated_at"> & { adoption_risk?: string }
 ): Promise<ProcessNode> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createProcessNode(payload);
+  }const db = await getDb();
   const id = generateId("pnode");
   const now = new Date().toISOString();
   const adoptionRisk =
@@ -3183,8 +3301,7 @@ export async function createProcessNode(
 export async function getProcessNodes(processMapId: string): Promise<ProcessNode[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProcessNodes(processMapId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<ProcessNode[]>(
     `SELECT * FROM process_nodes WHERE process_map_id = $1 ORDER BY step_order ASC, created_at ASC`,
     [processMapId]
@@ -3194,8 +3311,7 @@ export async function getProcessNodes(processMapId: string): Promise<ProcessNode
 export async function getProcessNodeById(id: string): Promise<ProcessNode | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProcessNodeById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<ProcessNode[]>(
     `SELECT * FROM process_nodes WHERE id = $1 LIMIT 1`,
     [id]
@@ -3207,7 +3323,9 @@ export async function updateProcessNode(
   id: string,
   updates: Partial<Omit<ProcessNode, "id" | "process_map_id" | "created_at" | "updated_at">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateProcessNode(id, updates);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   // If node metrics changed and adoption_risk not explicitly passed, recalculate
@@ -3291,15 +3409,16 @@ export async function updateProcessNode(
 export async function deleteProcessNode(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteProcessNode(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM process_nodes WHERE id = $1`, [id]);
 }
 
 export async function createProcessEdge(
   payload: Omit<ProcessEdge, "id" | "created_at" | "updated_at">
 ): Promise<ProcessEdge> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createProcessEdge(payload);
+  }const db = await getDb();
   const id = generateId("pedge");
   const now = new Date().toISOString();
 
@@ -3335,8 +3454,7 @@ export async function createProcessEdge(
 export async function getProcessEdges(processMapId: string): Promise<ProcessEdge[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getProcessEdges(processMapId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<ProcessEdge[]>(
     `SELECT * FROM process_edges WHERE process_map_id = $1 ORDER BY sort_order ASC, created_at ASC`,
     [processMapId]
@@ -3346,15 +3464,16 @@ export async function getProcessEdges(processMapId: string): Promise<ProcessEdge
 export async function deleteProcessEdge(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteProcessEdge(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM process_edges WHERE id = $1`, [id]);
 }
 
 export async function getProcessMapsSummaryStats(
   projectId: string
 ): Promise<ProcessMapsSummaryStats> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProcessMapsSummaryStats(projectId);
+  }const db = await getDb();
   const [maps, nodes, edges] = await Promise.all([
     db.select<ProcessMap[]>(
       `SELECT * FROM process_maps WHERE project_id = $1`,
@@ -3439,7 +3558,9 @@ export async function getProcessMapsSummaryStats(
 export async function getDataGovernanceAssets(
   projectId: string
 ): Promise<DataGovernanceAsset[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getDataGovernanceAssets(projectId);
+  }const db = await getDb();
   return db.select<DataGovernanceAsset[]>(
     `SELECT * FROM data_governance_assets WHERE project_id = $1 ORDER BY asset_name ASC`,
     [projectId]
@@ -3449,7 +3570,9 @@ export async function getDataGovernanceAssets(
 export async function getDataGovernanceAssetById(
   id: string
 ): Promise<DataGovernanceAsset | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getDataGovernanceAssetById(id);
+  }const db = await getDb();
   const rows = await db.select<DataGovernanceAsset[]>(
     `SELECT * FROM data_governance_assets WHERE id = $1`,
     [id]
@@ -3460,7 +3583,9 @@ export async function getDataGovernanceAssetById(
 export async function createDataGovernanceAsset(
   payload: Omit<DataGovernanceAsset, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createDataGovernanceAsset(payload);
+  }const db = await getDb();
   const id = generateId("dg_asset");
   const now = new Date().toISOString();
 
@@ -3502,7 +3627,9 @@ export async function updateDataGovernanceAsset(
   id: string,
   payload: Partial<DataGovernanceAsset>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateDataGovernanceAsset(id, payload);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -3551,8 +3678,7 @@ export async function updateDataGovernanceAsset(
 export async function deleteDataGovernanceAsset(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteDataGovernanceAsset(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM data_governance_assets WHERE id = $1`, [id]);
 }
 
@@ -3564,7 +3690,9 @@ export async function getDataGovernanceAccessRules(
   projectId: string,
   assetId?: string
 ): Promise<DataGovernanceAccess[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getDataGovernanceAccessRules(projectId, assetId);
+  }const db = await getDb();
   if (assetId) {
     return db.select<DataGovernanceAccess[]>(
       `SELECT * FROM data_governance_access WHERE project_id = $1 AND asset_id = $2 ORDER BY actor_name ASC`,
@@ -3580,7 +3708,9 @@ export async function getDataGovernanceAccessRules(
 export async function createDataGovernanceAccess(
   payload: Omit<DataGovernanceAccess, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createDataGovernanceAccess(payload);
+  }const db = await getDb();
   const id = generateId("dg_access");
   const now = new Date().toISOString();
 
@@ -3618,7 +3748,9 @@ export async function updateDataGovernanceAccess(
   id: string,
   payload: Partial<DataGovernanceAccess>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateDataGovernanceAccess(id, payload);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -3659,8 +3791,7 @@ export async function updateDataGovernanceAccess(
 export async function deleteDataGovernanceAccess(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteDataGovernanceAccess(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM data_governance_access WHERE id = $1`, [id]);
 }
 
@@ -3672,7 +3803,9 @@ export async function getDataGovernanceApprovals(
   projectId: string,
   assetId?: string
 ): Promise<DataGovernanceApproval[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getDataGovernanceApprovals(projectId, assetId);
+  }const db = await getDb();
   if (assetId) {
     return db.select<DataGovernanceApproval[]>(
       `SELECT * FROM data_governance_approvals WHERE project_id = $1 AND asset_id = $2 ORDER BY approval_order ASC`,
@@ -3688,7 +3821,9 @@ export async function getDataGovernanceApprovals(
 export async function createDataGovernanceApproval(
   payload: Omit<DataGovernanceApproval, "id" | "created_at" | "updated_at">
 ): Promise<string> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createDataGovernanceApproval(payload);
+  }const db = await getDb();
   const id = generateId("dg_appr");
   const now = new Date().toISOString();
 
@@ -3721,7 +3856,9 @@ export async function updateDataGovernanceApproval(
   id: string,
   payload: Partial<DataGovernanceApproval>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateDataGovernanceApproval(id, payload);
+  }const db = await getDb();
   const now = new Date().toISOString();
 
   await db.execute(
@@ -3756,8 +3893,7 @@ export async function updateDataGovernanceApproval(
 export async function deleteDataGovernanceApproval(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteDataGovernanceApproval(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM data_governance_approvals WHERE id = $1`, [id]);
 }
 
@@ -3768,7 +3904,9 @@ export async function deleteDataGovernanceApproval(id: string): Promise<void> {
 export async function getDataGovernanceSummaryStats(
   projectId: string
 ): Promise<DataGovernanceSummaryStats> {
-  const [assets, accessRules, approvals] = await Promise.all([
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getDataGovernanceSummaryStats(projectId);
+  }const [assets, accessRules, approvals] = await Promise.all([
     getDataGovernanceAssets(projectId),
     getDataGovernanceAccessRules(projectId),
     getDataGovernanceApprovals(projectId),
@@ -3836,7 +3974,9 @@ export async function getDataGovernanceSummaryStats(
 export async function seedDefaultDataGovernanceAssets(
   projectId: string
 ): Promise<number> {
-  const existing = await getDataGovernanceAssets(projectId);
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).seedDefaultDataGovernanceAssets(projectId);
+  }const existing = await getDataGovernanceAssets(projectId);
   if (existing.length > 0) return 0;
 
   const starterAssets: Omit<DataGovernanceAsset, "id" | "created_at" | "updated_at">[] = [
@@ -4020,8 +4160,7 @@ import { deleteEvidencePhysicalFile } from "../storage/attachmentManager";
 export async function getEvidenceItems(projectId: string): Promise<EvidenceItem[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getEvidenceItems(projectId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const items = await db.select<EvidenceItem[]>(
     `SELECT e.*,
             (SELECT COUNT(*) FROM evidence_links el WHERE el.evidence_id = e.id) AS link_count
@@ -4039,8 +4178,7 @@ export async function getEvidenceItems(projectId: string): Promise<EvidenceItem[
 export async function getEvidenceItemById(id: string): Promise<EvidenceItem | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getEvidenceItemById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<EvidenceItem[]>(
     `SELECT e.*,
             (SELECT COUNT(*) FROM evidence_links el WHERE el.evidence_id = e.id) AS link_count
@@ -4061,7 +4199,9 @@ export async function getEvidenceItemById(id: string): Promise<EvidenceItem | nu
 export async function createEvidenceItem(
   item: Omit<EvidenceItem, "id" | "created_at" | "updated_at">
 ): Promise<EvidenceItem> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createEvidenceItem(item);
+  }const db = await getDb();
   const now = new Date().toISOString();
   const id = generateId("evd");
 
@@ -4111,7 +4251,9 @@ export async function updateEvidenceItem(
   id: string,
   updates: Partial<Omit<EvidenceItem, "id" | "project_id" | "created_at" | "updated_at">>
 ): Promise<void> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateEvidenceItem(id, updates);
+  }const db = await getDb();
   const existing = await getEvidenceItemById(id);
   if (!existing) throw new Error(`Güncellenecek kanıt bulunamadı: ${id}`);
 
@@ -4172,8 +4314,7 @@ export async function updateEvidenceItem(
 export async function deleteEvidenceItem(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteEvidenceItem(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const existing = await getEvidenceItemById(id);
   if (existing?.stored_path) {
     await deleteEvidencePhysicalFile(existing.stored_path);
@@ -4189,7 +4330,9 @@ export async function getEvidenceLinks(
   targetType?: EvidenceTargetType,
   targetId?: string
 ): Promise<EvidenceLink[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getEvidenceLinks(projectId, targetType, targetId);
+  }const db = await getDb();
   if (targetType && targetId) {
     return db.select<EvidenceLink[]>(
       `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
@@ -4226,8 +4369,7 @@ export async function getEvidenceLinks(
 export async function getEvidenceLinksByEvidenceId(evidenceId: string): Promise<EvidenceLink[]> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getEvidenceLinksByEvidenceId(evidenceId);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   return db.select<EvidenceLink[]>(
     `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
      FROM evidence_links el
@@ -4244,7 +4386,9 @@ export async function getEvidenceLinksByEvidenceId(evidenceId: string): Promise<
 export async function createEvidenceLink(
   link: Omit<EvidenceLink, "id" | "created_at">
 ): Promise<EvidenceLink> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createEvidenceLink(link);
+  }const db = await getDb();
   const id = generateId("evdl");
   const now = new Date().toISOString();
 
@@ -4298,8 +4442,7 @@ export async function createEvidenceLink(
 export async function deleteEvidenceLink(id: string): Promise<void> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteEvidenceLink(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM evidence_links WHERE id = $1`, [id]);
 }
 
@@ -4309,8 +4452,7 @@ export async function deleteEvidenceLink(id: string): Promise<void> {
 export async function getEvidenceSummaryStats(projectId: string): Promise<EvidenceSummaryStats> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getEvidenceSummaryStats(projectId);
-  }
-  const items = await getEvidenceItems(projectId);
+  }const items = await getEvidenceItems(projectId);
   const links = await getEvidenceLinks(projectId);
 
   const totalEvidence = items.length;
@@ -4354,7 +4496,9 @@ export async function getEvidenceSummaryStats(projectId: string): Promise<Eviden
 export async function getUnsupportedCriticalFindings(
   projectId: string
 ): Promise<UnsupportedCriticalFinding[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getUnsupportedCriticalFindings(projectId);
+  }const db = await getDb();
   const result: UnsupportedCriticalFinding[] = [];
 
   // 1. Kritik Takip Soruları (question_followups with flag_type = 'critical')
@@ -4515,7 +4659,9 @@ export async function getReadinessChecks(
   projectId: string,
   category?: ReadinessCategory
 ): Promise<ReadinessCheckItem[]> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getReadinessChecks(projectId, category);
+  }const db = await getDb();
   if (category) {
     return await db.select<ReadinessCheckItem[]>(
       `SELECT * FROM readiness_checks
@@ -4538,8 +4684,7 @@ export async function getReadinessChecks(
 export async function getReadinessCheckById(id: string): Promise<ReadinessCheckItem | null> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getReadinessCheckById(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   const rows = await db.select<ReadinessCheckItem[]>(
     `SELECT * FROM readiness_checks WHERE id = $1`,
     [id]
@@ -4553,7 +4698,9 @@ export async function getReadinessCheckById(id: string): Promise<ReadinessCheckI
 export async function createReadinessCheck(
   payload: CreateReadinessCheckPayload
 ): Promise<ReadinessCheckItem> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createReadinessCheck(payload);
+  }const db = await getDb();
   const id = generateId("chk");
   const now = new Date().toISOString();
 
@@ -4597,7 +4744,9 @@ export async function updateReadinessCheck(
   id: string,
   payload: UpdateReadinessCheckPayload
 ): Promise<ReadinessCheckItem | null> {
-  const db = await getDb();
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).updateReadinessCheck(id, payload);
+  }const db = await getDb();
   const existing = await getReadinessCheckById(id);
   if (!existing) return null;
 
@@ -4673,8 +4822,7 @@ export async function updateReadinessCheck(
 export async function deleteReadinessCheck(id: string): Promise<boolean> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).deleteReadinessCheck(id);
-  }
-  const db = await getDb();
+  }const db = await getDb();
   await db.execute(`DELETE FROM readiness_checks WHERE id = $1`, [id]);
   return true;
 }
@@ -4685,8 +4833,7 @@ export async function deleteReadinessCheck(id: string): Promise<boolean> {
 export async function seedStarterReadinessChecks(projectId: string): Promise<number> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).seedStarterReadinessChecks(projectId);
-  }
-  const existing = await getReadinessChecks(projectId);
+  }const existing = await getReadinessChecks(projectId);
   if (existing.length > 0) {
     return 0; // Zaten mevcut
   }
@@ -5010,8 +5157,7 @@ export async function seedStarterReadinessChecks(projectId: string): Promise<num
 export async function getReadinessSummary(projectId: string): Promise<ReadinessSummaryResult> {
   if (!isTauriEnvironment()) {
     return (getRepository() as any).getReadinessSummary(projectId);
-  }
-  const checks = await getReadinessChecks(projectId);
+  }const checks = await getReadinessChecks(projectId);
 
   const totalChecks = checks.length;
   let readyCount = 0;

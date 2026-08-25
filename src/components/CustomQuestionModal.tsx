@@ -4,6 +4,9 @@
  * Modal allowing Project Managers to create and edit project-specific custom questions.
  * Supports: single_choice, multiple_choice, yes_no, text, textarea, number.
  * Enforces 2-10 options for choice types, with optional 'Diğer' choice.
+ *
+ * Fully integrated with Universal Modal Framework, clean solid-white card surface,
+ * fixed header/footer, scrollable body, and full WCAG AA contrast.
  */
 
 import React, { useState, useEffect } from "react";
@@ -44,6 +47,17 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
   const [hasOtherOption, setHasOtherOption] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  // Klavye Escape ile kapatma desteği
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !isSaving) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isSaving, onClose]);
 
   useEffect(() => {
     if (existingQuestion) {
@@ -170,47 +184,140 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
   };
 
   return (
-    <div className="modal-backdrop" style={{ zIndex: 100 }}>
-      <div className="modal-dialog" style={{ maxWidth: "560px", width: "95%" }}>
+    <div
+      className="modal-backdrop"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="custom-question-modal-title"
+    >
+      <div
+        className="modal-content custom-question-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: "680px",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          maxHeight: "min(calc(100vh - 40px), calc(100dvh - 40px))",
+          background: "var(--bg-surface, #ffffff)",
+          borderRadius: "12px",
+          overflow: "hidden",
+          boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+          border: "1px solid var(--border-subtle, #e2e8f0)",
+        }}
+      >
+        {/* Modal Header */}
         <div className="modal-header">
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <Sparkles size={18} style={{ color: "var(--primary)" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "0.625rem" }}>
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "8px",
+                background: "rgba(37, 99, 235, 0.1)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "var(--primary, #2563eb)",
+                flexShrink: 0,
+              }}
+            >
+              <Sparkles size={20} />
+            </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: "1.0625rem", fontWeight: 700 }}>
+              <h3
+                id="custom-question-modal-title"
+                style={{
+                  margin: 0,
+                  fontSize: "1.0625rem",
+                  fontWeight: 700,
+                  color: "var(--text-primary, #0f172a)",
+                  lineHeight: 1.3,
+                }}
+              >
                 {existingQuestion ? "Özel Soruyu Düzenle" : "Yeni Proje Özel Sorusu Ekle"}
               </h3>
-              <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+              <span style={{ fontSize: "0.75rem", color: "var(--text-muted, #64748b)", fontWeight: 500 }}>
                 {bfNameTr} • Yalnızca bu proje için geçerlidir
               </span>
             </div>
           </div>
-          <button type="button" className="btn-icon" onClick={onClose} title="Kapat">
+          <button
+            type="button"
+            className="btn-icon"
+            onClick={onClose}
+            title="Kapat (Esc)"
+            aria-label="Kapat"
+            style={{
+              color: "var(--text-muted, #64748b)",
+              borderRadius: "6px",
+              padding: "0.4rem",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ display: "flex", flexDirection: "column", gap: "1rem", maxHeight: "70vh", overflowY: "auto" }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            flex: "1 1 auto",
+            minHeight: 0,
+            overflow: "hidden",
+            margin: 0,
+          }}
+        >
+          {/* Modal Body */}
+          <div
+            className="modal-body"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.125rem",
+              padding: "1.25rem 1.5rem",
+              overflowY: "auto",
+              flex: "1 1 auto",
+              background: "var(--bg-surface, #ffffff)",
+            }}
+          >
             {error && (
-              <div style={{
-                padding: "0.625rem 0.75rem",
-                borderRadius: "var(--radius-md)",
-                backgroundColor: "var(--danger-bg)",
-                border: "1px solid var(--danger-border)",
-                color: "var(--danger-text)",
-                fontSize: "0.8125rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              }}>
-                <AlertCircle size={16} />
+              <div
+                style={{
+                  padding: "0.625rem 0.875rem",
+                  borderRadius: "var(--radius-md, 8px)",
+                  backgroundColor: "var(--danger-bg, #fef2f2)",
+                  border: "1px solid var(--danger-border, #fecaca)",
+                  color: "var(--danger-text, #991b1b)",
+                  fontSize: "0.8125rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  fontWeight: 500,
+                }}
+              >
+                <AlertCircle size={16} style={{ flexShrink: 0 }} />
                 <span>{error}</span>
               </div>
             )}
 
             {/* Süreç / Bölüm */}
-            <div className="form-group">
-              <label className="form-label" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
+            <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+              <label
+                className="form-label"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  color: "var(--text-primary, #0f172a)",
+                  margin: 0,
+                }}
+              >
                 Süreç / Bölüm Adı
               </label>
               <input
@@ -219,14 +326,32 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                 placeholder="Örn: Müşteri ve Sipariş Yönetimi"
                 value={processName}
                 onChange={(e) => setProcessName(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.55rem 0.75rem",
+                  fontSize: "0.875rem",
+                  background: "#ffffff",
+                  border: "1px solid var(--border-medium, #cbd5e1)",
+                  borderRadius: "6px",
+                  color: "var(--text-primary, #0f172a)",
+                  boxSizing: "border-box",
+                }}
                 required
               />
             </div>
 
             {/* Soru Metni */}
-            <div className="form-group">
-              <label className="form-label" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
-                Soru Metni <span style={{ color: "var(--danger)" }}>*</span>
+            <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+              <label
+                className="form-label"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  color: "var(--text-primary, #0f172a)",
+                  margin: 0,
+                }}
+              >
+                Soru Metni <span style={{ color: "var(--danger, #dc2626)" }}>*</span>
               </label>
               <input
                 type="text"
@@ -234,13 +359,31 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                 placeholder="Örn: Saha satış personeli siparişleri hangi cihaz üzerinden giriyor?"
                 value={questionText}
                 onChange={(e) => setQuestionText(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "0.55rem 0.75rem",
+                  fontSize: "0.875rem",
+                  background: "#ffffff",
+                  border: "1px solid var(--border-medium, #cbd5e1)",
+                  borderRadius: "6px",
+                  color: "var(--text-primary, #0f172a)",
+                  boxSizing: "border-box",
+                }}
                 required
               />
             </div>
 
             {/* Açıklama / Amaç */}
-            <div className="form-group">
-              <label className="form-label" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
+            <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+              <label
+                className="form-label"
+                style={{
+                  fontSize: "0.8125rem",
+                  fontWeight: 600,
+                  color: "var(--text-primary, #0f172a)",
+                  margin: 0,
+                }}
+              >
                 Açıklama / Danışmanlık Rehberi (Opsiyonel)
               </label>
               <textarea
@@ -249,19 +392,55 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
+                style={{
+                  width: "100%",
+                  padding: "0.55rem 0.75rem",
+                  fontSize: "0.875rem",
+                  background: "#ffffff",
+                  border: "1px solid var(--border-medium, #cbd5e1)",
+                  borderRadius: "6px",
+                  color: "var(--text-primary, #0f172a)",
+                  boxSizing: "border-box",
+                  resize: "vertical",
+                }}
               />
             </div>
 
             {/* Soru Tipi ve Zorunluluk */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div className="form-group">
-                <label className="form-label" style={{ fontSize: "0.8125rem", fontWeight: 600 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "1rem",
+                alignItems: "flex-end",
+              }}
+            >
+              <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                <label
+                  className="form-label"
+                  style={{
+                    fontSize: "0.8125rem",
+                    fontWeight: 600,
+                    color: "var(--text-primary, #0f172a)",
+                    margin: 0,
+                  }}
+                >
                   Soru Tipi
                 </label>
                 <select
                   className="form-control"
                   value={questionType}
                   onChange={(e) => setQuestionType(e.target.value as CustomQuestionType)}
+                  style={{
+                    width: "100%",
+                    padding: "0.55rem 0.75rem",
+                    fontSize: "0.875rem",
+                    background: "#ffffff",
+                    border: "1px solid var(--border-medium, #cbd5e1)",
+                    borderRadius: "6px",
+                    color: "var(--text-primary, #0f172a)",
+                    boxSizing: "border-box",
+                  }}
                 >
                   <option value="single_choice">Tek Seçim (Radio)</option>
                   <option value="multiple_choice">Çoklu Seçim (Checkbox)</option>
@@ -272,12 +451,31 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                 </select>
               </div>
 
-              <div className="form-group" style={{ display: "flex", alignItems: "center", paddingTop: "1.75rem" }}>
-                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontSize: "0.8125rem" }}>
+              <div
+                className="form-group"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  paddingBottom: "0.55rem",
+                }}
+              >
+                <label
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                    color: "var(--text-primary, #0f172a)",
+                    userSelect: "none",
+                  }}
+                >
                   <input
                     type="checkbox"
                     checked={isRequired}
                     onChange={(e) => setIsRequired(e.target.checked)}
+                    style={{ width: "16px", height: "16px", cursor: "pointer" }}
                   />
                   <span>Zorunlu Soru</span>
                 </label>
@@ -286,14 +484,32 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
 
             {/* Seçenekler Listesi (Choice Types) */}
             {isChoiceType && (
-              <div style={{
-                padding: "0.875rem",
-                borderRadius: "var(--radius-md)",
-                backgroundColor: "var(--bg-app)",
-                border: "1px solid var(--border-subtle)",
-              }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
-                  <label style={{ fontSize: "0.8125rem", fontWeight: 600, margin: 0 }}>
+              <div
+                style={{
+                  padding: "1rem 1.125rem",
+                  borderRadius: "8px",
+                  backgroundColor: "var(--bg-surface-subtle, #f8fafc)",
+                  border: "1px solid var(--border-subtle, #e2e8f0)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.75rem",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <label
+                    style={{
+                      fontSize: "0.8125rem",
+                      fontWeight: 600,
+                      color: "var(--text-primary, #0f172a)",
+                      margin: 0,
+                    }}
+                  >
                     Seçenekler (2-10 arası)
                   </label>
                   {options.length < 10 && (
@@ -301,16 +517,38 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                       type="button"
                       className="btn btn--outline btn--xs"
                       onClick={handleAddOption}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.25rem",
+                        fontSize: "0.75rem",
+                        padding: "0.25rem 0.5rem",
+                      }}
                     >
                       <Plus size={12} /> Seçenek Ekle
                     </button>
                   )}
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                   {options.map((opt, idx) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", width: "1.25rem" }}>
+                    <div
+                      key={idx}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "0.8125rem",
+                          fontWeight: 600,
+                          color: "var(--text-muted, #64748b)",
+                          minWidth: "1.25rem",
+                          textAlign: "right",
+                        }}
+                      >
                         {idx + 1}.
                       </span>
                       <input
@@ -319,7 +557,16 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                         placeholder={`Seçenek ${idx + 1}`}
                         value={opt.label}
                         onChange={(e) => handleOptionLabelChange(idx, e.target.value)}
-                        style={{ fontSize: "0.8125rem", padding: "0.35rem 0.5rem" }}
+                        style={{
+                          flex: 1,
+                          fontSize: "0.875rem",
+                          padding: "0.45rem 0.65rem",
+                          background: "#ffffff",
+                          border: "1px solid var(--border-medium, #cbd5e1)",
+                          borderRadius: "6px",
+                          color: "var(--text-primary, #0f172a)",
+                          boxSizing: "border-box",
+                        }}
                         required
                       />
                       {options.length > 2 && (
@@ -328,21 +575,47 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
                           className="btn-icon"
                           onClick={() => handleRemoveOption(idx)}
                           title="Seçeneği sil"
-                          style={{ color: "var(--danger)", padding: "0.25rem" }}
+                          aria-label="Seçeneği sil"
+                          style={{
+                            color: "var(--danger, #dc2626)",
+                            padding: "0.35rem",
+                            borderRadius: "4px",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                          }}
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={15} />
                         </button>
                       )}
                     </div>
                   ))}
                 </div>
 
-                <div style={{ marginTop: "0.75rem", paddingTop: "0.5rem", borderTop: "1px solid var(--border-subtle)" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontSize: "0.75rem" }}>
+                <div
+                  style={{
+                    marginTop: "0.25rem",
+                    paddingTop: "0.625rem",
+                    borderTop: "1px solid var(--border-subtle, #e2e8f0)",
+                  }}
+                >
+                  <label
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      cursor: "pointer",
+                      fontSize: "0.8125rem",
+                      color: "var(--text-secondary, #334155)",
+                      userSelect: "none",
+                    }}
+                  >
                     <input
                       type="checkbox"
                       checked={hasOtherOption}
                       onChange={(e) => setHasOtherOption(e.target.checked)}
+                      style={{ width: "15px", height: "15px", cursor: "pointer" }}
                     />
                     <span>"Diğer (Açıklayınız)" seçeneği ekle</span>
                   </label>
@@ -351,11 +624,34 @@ export const CustomQuestionModal: React.FC<CustomQuestionModalProps> = ({
             )}
           </div>
 
-          <div className="modal-footer" style={{ padding: "0.875rem 1.25rem", display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-            <button type="button" className="btn btn--outline btn--sm" onClick={onClose} disabled={isSaving}>
+          {/* Modal Footer */}
+          <div
+            className="modal-footer"
+            style={{
+              padding: "0.875rem 1.5rem",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "0.625rem",
+              background: "var(--bg-surface-subtle, #f8fafc)",
+              borderTop: "1px solid var(--border-subtle, #e2e8f0)",
+              borderBottomLeftRadius: "12px",
+              borderBottomRightRadius: "12px",
+              flexShrink: 0,
+            }}
+          >
+            <button
+              type="button"
+              className="btn btn--outline btn--sm"
+              onClick={onClose}
+              disabled={isSaving}
+            >
               İptal
             </button>
-            <button type="submit" className="btn btn--success btn--sm" disabled={isSaving}>
+            <button
+              type="submit"
+              className="btn btn--success btn--sm"
+              disabled={isSaving}
+            >
               {isSaving ? "Kaydediliyor..." : existingQuestion ? "Güncelle" : "Soruyu Ekle"}
             </button>
           </div>

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.5] - 2026-08-25
+
+### Fixed
+* **Özel Soru Modalı UI & Hiyerarşi Onarımı:** `.modal-dialog` sınıfının Universal Modal Framework seçicilerine dahil edilmesiyle `CustomQuestionModal` bileşeni tek parça, opak (`#ffffff`), gölgeli kart yüzeyine kavuşturuldu; şeffaf arka plan ve kopuk beyaz panel sorunu giderildi.
+* **Form Okunabilirliği ve WCAG AA Kontrastı:** Form etiketlerine koyu `#0f172a` tipografi, seçenek kutusuna hafif slate (`#f8fafc`) dolgu, seçenek giriş alanlarına beyaz (`#ffffff`) zemin atanarak maksimum kontrast ve okunabilirlik sağlandı.
+* **Modal Ergonomisi ve Kapatma Davranışları:** Sabit başlık ve altlık (footer), kaydırılabilir bağımsız gövde (`overflow-y: auto`), klavye `Escape` tuşu ve arka plan (backdrop) tıklamasıyla kapanma desteği eklendi.
+
+### Added
+* **FAZ-72 Browser Test Harness & Repository Adapter:** Tarayıcı / Chrome önizleme ortamında SQLite çağrısı veya IPC hatası olmaksızın çalışan `BrowserTestRepository` (`localStorage`) ve `AppRepository` soyutlaması eklendi.
+* **Vitrin ve LinkedIn Ekran Görüntüleri:** `docs/ui_png/` dizini altında 6 adet 1920x1080 yüksek çözünürlüklü vitrin görseli hazırlandı.
+
+---
+
 ## [0.1.4] - 2026-08-25
 
 ### Added
