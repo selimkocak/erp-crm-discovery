@@ -94,7 +94,7 @@ Aşağıdaki 3 temel metadata kaynağının sürüm bilgisi ve proje tanımlayı
   - Şablon Çoğaltma: Sorular ve yapı korunurken, cevaplar ve Go-Live kontrolleri `NOT_STARTED` olarak sıfırlanır.
 
 ### 6.1 Kanonik Soru Külliyatı İstatistikleri (`npm run audit:corpus`)
-- **Toplam Soru Paketi:** 35 Paket
+- **Toplam Soru Paketi:** 35 Paket (34 kanonik iş fonksiyonu + 1 temel eğitim paketi)
 - **Toplam Kanonik Soru:** 1.550 Soru
 - **Zorunlu Sorular (Required):** 831 Soru (%53.6)
 - **Opsiyonel Sorular (Optional):** 719 Soru (%46.4)

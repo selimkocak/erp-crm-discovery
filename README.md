@@ -130,10 +130,10 @@ npm run tauri dev
 
 ## Kanonik Soru Paketi Kataloğu (Question Pack Catalog)
 
-`v0.1.4` itibarıyla **35 soru paketi** (34 dikey kanonik modül + 1 yatay yönetişim paketi) ile **34 kanonik iş fonksiyonunun tamamı (%100)** mühürlenmiştir. Sistemde eksik kanonik modül bulunmamaktadır.
+`v0.1.4` itibarıyla **35 soru paketi** (34 kanonik iş fonksiyonu + 1 temel eğitim paketi) ile **34 kanonik iş fonksiyonunun tamamı (%100)** mühürlenmiştir. Sistemde eksik kanonik modül bulunmamaktadır.
 Toplam: **1.550 soru**, **831 zorunlu soru** (%53.6), **719 opsiyonel soru** (%46.4), **222 koşullu dallanma (branching) noktası**.
 
-### Dikey Kanonik Modüller (34 Paket) ve Yatay Yönetişim (1 Paket)
+### Kanonik İş Fonksiyonları (34 Modül) ve Temel Eğitim Paketi (1 Paket)
 
 | # | Modül | İş Fonksiyonu Kodu | Soru | Zorunlu | Branching | Durum |
 |---|---|---|:---:|:---:|:---:|:---:|
