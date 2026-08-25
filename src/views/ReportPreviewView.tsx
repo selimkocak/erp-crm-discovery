@@ -347,12 +347,23 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                   : "4. Veri Sahipliği & Yetki Matrisi"}
               </a>
             )}
+            {report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0 && (
+              <a href="#sec-evidence" className="report-toc__link">
+                {(() => {
+                  let sectionNum = 4;
+                  if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                  if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                  return `${sectionNum}. Kanıt & Saha Doğrulama`;
+                })()}
+              </a>
+            )}
             <div className="report-toc__group">
               <span className="report-toc__group-title">
                 {(() => {
                   let sectionNum = 4;
                   if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
                   if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                  if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
                   return `${sectionNum}. İş Fonksiyonları`;
                 })()}
               </span>
@@ -360,6 +371,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 let sectionNum = 4;
                 if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
                 if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
                 return (
                   <a key={fn.code} href={`#sec-fn-${fn.code}`} className="report-toc__sublink">
                     {`${sectionNum}.${idx + 1}`} {fn.nameTr}
@@ -377,6 +389,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 let sectionNum = 5;
                 if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
                 if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
                 return `${sectionNum}. Proje Notları & Açık Konular`;
               })()}
             </a>
@@ -1671,11 +1684,230 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             </section>
           )}
 
+          {/* ── Bölüm 6: Kanıt ve Saha Doğrulama Kaydı (FAZ-65) ── */}
+          {report.evidenceSummary && (
+            <section id="sec-evidence" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">
+                  {(() => {
+                    let sectionNum = 4;
+                    if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                    if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                    return `BÖLÜM ${sectionNum}`;
+                  })()}
+                </span>
+                <h2 className="report-section__title">Kanıt, Ek Dosya ve Saha Doğrulama Kaydı</h2>
+              </div>
 
-          {/* ── Bölüm {report.governance ? "6" : "5"}: Proje Notları & Açık Konular ── */}
+              {/* Evidence KPI Band */}
+              <div className="report-kpi-band" style={{ marginBottom: "1.25rem" }}>
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "var(--color-primary, #1e3a8a)" }}>
+                    {report.evidenceSummary.stats.totalEvidence}
+                  </span>
+                  <span className="report-kpi-band__label">Saha Kanıtı</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "#15803d" }}>
+                    {report.evidenceSummary.stats.acceptedCount}
+                  </span>
+                  <span className="report-kpi-band__label">Kabul Edildi</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count" style={{ color: "#b45309" }}>
+                    {report.evidenceSummary.stats.unreviewedCount + report.evidenceSummary.stats.reviewedCount}
+                  </span>
+                  <span className="report-kpi-band__label">İncelemede</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className={`report-kpi-band__count ${report.evidenceSummary.stats.unsupportedCriticalFindingsCount > 0 ? "text-danger" : "#15803d"}`}>
+                    {report.evidenceSummary.stats.unsupportedCriticalFindingsCount}
+                  </span>
+                  <span className="report-kpi-band__label">Kanıtsız Kritik Konu</span>
+                </div>
+                <div className="report-kpi-band__divider" />
+                <div className="report-kpi-band__item">
+                  <span className="report-kpi-band__count">
+                    %{report.evidenceSummary.stats.evidenceCoverageRate}
+                  </span>
+                  <span className="report-kpi-band__label">Kanıt Kapsama Oranı</span>
+                </div>
+              </div>
+
+              {/* Principle Box */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem", background: "var(--color-primary-50, #eff6ff)", borderLeft: "4px solid var(--color-primary-600, #2563eb)" }}>
+                <div style={{ fontSize: "0.8125rem", color: "var(--color-primary-900, #1e3a8a)", lineHeight: 1.5 }}>
+                  <strong>Doğruluk İlkesi:</strong> Rapor artık yalnızca "süreç böyle işliyor" beyanını değil; <em>"bu beyanı hangi saha kanıtıyla biliyoruz ve kanıt kabul edildi mi?"</em> güvencesini sunar. Ayrım: <strong>Beyan var → Kanıt var → Kanıt incelendi → Kanıt kabul edildi</strong> zinciriyle işletilmektedir.
+                </div>
+              </div>
+
+              {/* 6.1 Evidence Register */}
+              {report.evidenceSummary.evidenceRegister.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">Kanıt Kayıt Defteri (Evidence Register)</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "12%" }}>Referans</th>
+                          <th style={{ width: "22%" }}>Kanıt Başlığı & Tür</th>
+                          <th style={{ width: "18%" }}>Kaynak & Toplayan</th>
+                          <th style={{ width: "14%" }}>Doğrulama Durumu</th>
+                          <th style={{ width: "12%" }}>Güvenilirlik</th>
+                          <th style={{ width: "22%" }}>İlişkili Hedefler</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.evidenceSummary.evidenceRegister.map((ev) => (
+                          <tr key={ev.id}>
+                            <td>
+                              <span className="font-bold text-mono" style={{ color: "var(--color-primary, #1e3a8a)" }}>
+                                {ev.refCode}
+                              </span>
+                              {ev.fileName && (
+                                <div className="text-xs text-muted" style={{ wordBreak: "break-all" }}>
+                                  📎 {ev.fileName}
+                                </div>
+                              )}
+                            </td>
+                            <td>
+                              <div className="font-bold">{ev.title}</div>
+                              <span className="badge badge--secondary text-xs">{ev.evidenceType}</span>
+                              {ev.notes && <div className="text-xs text-muted" style={{ marginTop: "2px" }}>{ev.notes}</div>}
+                            </td>
+                            <td>
+                              <div>{ev.sourceType}</div>
+                              {ev.collectedByRole && (
+                                <div className="text-xs text-muted">Rol: {ev.collectedByRole}</div>
+                              )}
+                            </td>
+                            <td>
+                              <span className={`badge ${
+                                ev.verificationStatus === "ACCEPTED" ? "badge--success" :
+                                ev.verificationStatus === "REJECTED" ? "badge--danger" :
+                                ev.verificationStatus === "REVIEWED" ? "badge--warning" : "badge--neutral"
+                              }`}>
+                                {ev.verificationStatus === "ACCEPTED" ? "✓ Kabul Edildi" :
+                                 ev.verificationStatus === "REJECTED" ? "✕ Reddedildi" :
+                                 ev.verificationStatus === "REVIEWED" ? "İncelendi" : "İncelenmedi"}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`badge ${
+                                ev.credibilityLevel === "HIGH" ? "badge--success" :
+                                ev.credibilityLevel === "LOW" ? "badge--danger" : "badge--warning"
+                              }`}>
+                                {ev.credibilityLevel === "HIGH" ? "Yüksek" :
+                                 ev.credibilityLevel === "LOW" ? "Düşük" : "Orta"}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="text-xs" style={{ color: "var(--text-color)" }}>
+                                {ev.linkedTargetsSummary}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 6.2 Evidence Coverage */}
+              {report.evidenceSummary.evidenceCoverage.length > 0 && (
+                <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <h3 className="report-summary-box__title">Kanıt Kapsama ve Desteklenme Oranları</h3>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "35%" }}>Keşif Kategorisi</th>
+                          <th style={{ width: "20%" }}>Toplam Hedef Sayısı</th>
+                          <th style={{ width: "25%" }}>Kanıtla Desteklenen</th>
+                          <th style={{ width: "20%" }}>Kapsama Oranı</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.evidenceSummary.evidenceCoverage.map((c) => (
+                          <tr key={c.category}>
+                            <td><strong>{c.category}</strong></td>
+                            <td>{c.totalTargetCount}</td>
+                            <td>{c.supportedTargetCount}</td>
+                            <td>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                <span className={`badge ${c.coveragePercentage >= 80 ? "badge--success" : c.coveragePercentage >= 40 ? "badge--warning" : "badge--neutral"}`}>
+                                  %{c.coveragePercentage}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* 6.3 Unsupported Critical Findings */}
+              {report.evidenceSummary.unsupportedCriticalFindings.length > 0 && (
+                <div className="report-summary-box" style={{ borderLeft: "4px solid var(--danger, #ef4444)" }}>
+                  <h3 className="report-summary-box__title" style={{ color: "#b91c1c", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span>⚠️ Kanıtla Desteklenmeyen Kritik Başlıklar ({report.evidenceSummary.unsupportedCriticalFindings.length})</span>
+                  </h3>
+                  <p className="text-xs text-muted" style={{ marginBottom: "0.75rem" }}>
+                    Aşağıdaki kritik başlıklar için henüz saha kanıtı sunulmamış veya sunulan kanıtlar reddedilmiştir. Karar vericilerin bu başlıklara özel ihtiyat göstermesi önerilir.
+                  </p>
+                  <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                    <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                      <thead>
+                        <tr>
+                          <th style={{ width: "15%" }}>Hedef Türü</th>
+                          <th style={{ width: "30%" }}>Konu / Başlık</th>
+                          <th style={{ width: "35%" }}>Açıklama</th>
+                          <th style={{ width: "20%" }}>Kritiklik & Neden</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {report.evidenceSummary.unsupportedCriticalFindings.map((u, idx) => (
+                          <tr key={`${u.targetType}-${u.targetId}-${idx}`}>
+                            <td>
+                              <span className="badge badge--secondary text-xs">{u.targetType}</span>
+                              <div className="text-xs text-mono text-muted">{u.targetId}</div>
+                            </td>
+                            <td><strong>{u.title}</strong></td>
+                            <td className="text-xs text-muted">{u.description}</td>
+                            <td>
+                              <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                                <span className="badge badge--danger text-xs">{u.severity}</span>
+                                <span className="text-xs text-danger font-bold">{u.reason}</span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* ── Proje Notları & Açık Konular ── */}
           <section id="sec-notes" className="report-section">
             <div className="report-section__header">
-              <span className="report-section__num">BÖLÜM {report.governance ? "6" : "5"}</span>
+              <span className="report-section__num">
+                {(() => {
+                  let sectionNum = 5;
+                  if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) sectionNum++;
+                  if (report.dataGovernanceSummary && report.dataGovernanceSummary.assets.length > 0) sectionNum++;
+                  if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) sectionNum++;
+                  return `BÖLÜM ${sectionNum}`;
+                })()}
+              </span>
               <h2 className="report-section__title">Proje Notları & Açık Konular</h2>
             </div>
 

@@ -1648,14 +1648,229 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     );
   }
 
-  // ── Section 6/5: Proje Notları & Açık Konular ───────────────────────────────
+  // ── Section 6: Kanıt, Ek Dosya ve Saha Doğrulama Kaydı (FAZ-65) ──────────
+  if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) {
+    const evSummary = report.evidenceSummary;
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "6. Kanıt, Ek Dosya ve Saha Doğrulama Kaydı",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 100, after: 100 },
+        children: [
+          new TextRun({
+            text: `Toplam ${evSummary.stats.totalEvidence} saha kanıtı kaydedilmiş; ${evSummary.stats.acceptedCount} kanıt kabul edilmiş, ${evSummary.stats.unreviewedCount + evSummary.stats.reviewedCount} kanıt inceleme aşamasındadır. Kanıt kapsama oranı %${evSummary.stats.evidenceCoverageRate} olup, ${evSummary.stats.unsupportedCriticalFindingsCount} adet kanıtsız kritik konu tespit edilmiştir.`,
+            size: 20,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { after: 120 },
+        children: [
+          new TextRun({
+            text: "Doğruluk İlkesi: Beyan var → Kanıt var → Kanıt incelendi → Kanıt kabul edildi zinciri işletilerek beyanların saha güvenilirliği doğrulanmaktadır.",
+            italics: true,
+            size: 18,
+            color: COLOR_MUTED,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    // 6.1 Kanıt Kayıt Defteri
+    if (evSummary.evidenceRegister.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "6.1 Kanıt Kayıt Defteri (Evidence Register)",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const evHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Referans", { isHeader: true, widthPercent: 14 }),
+          createTableCell("Kanıt Başlığı & Tür", { isHeader: true, widthPercent: 24 }),
+          createTableCell("Kaynak & Toplayan", { isHeader: true, widthPercent: 18 }),
+          createTableCell("Doğrulama Durumu", { isHeader: true, widthPercent: 14 }),
+          createTableCell("Güvenilirlik", { isHeader: true, widthPercent: 10 }),
+          createTableCell("İlişkili Hedefler", { isHeader: true, widthPercent: 20 }),
+        ],
+      });
+
+      const evRows: TableRow[] = evSummary.evidenceRegister.map((ev) => {
+        const statusLabel =
+          ev.verificationStatus === "ACCEPTED" ? "✓ Kabul Edildi" :
+          ev.verificationStatus === "REJECTED" ? "✕ Reddedildi" :
+          ev.verificationStatus === "REVIEWED" ? "İncelendi" : "İncelenmedi";
+
+        return new TableRow({
+          children: [
+            createTableCell(`${ev.refCode}${ev.fileName ? `\n(📎 ${ev.fileName})` : ""}`, { bold: true }),
+            createTableCell(`${ev.title}\n[${ev.evidenceType}]${ev.notes ? `\n${ev.notes}` : ""}`),
+            createTableCell(`${ev.sourceType}${ev.collectedByRole ? `\n(${ev.collectedByRole})` : ""}`),
+            createTableCell(
+              statusLabel,
+              {
+                bold: true,
+                bgColor: ev.verificationStatus === "ACCEPTED" ? "F0FDF4" : ev.verificationStatus === "REJECTED" ? "FEF2F2" : "FFFFFF",
+                color: ev.verificationStatus === "ACCEPTED" ? "15803D" : ev.verificationStatus === "REJECTED" ? "B91C1C" : "334155",
+              }
+            ),
+            createTableCell(
+              ev.credibilityLevel === "HIGH" ? "Yüksek" : ev.credibilityLevel === "LOW" ? "Düşük" : "Orta",
+              { bold: true }
+            ),
+            createTableCell(ev.linkedTargetsSummary || "Bağlantısız"),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [evHeaderRow, ...evRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+
+    // 6.2 Kanıt Kapsama Matrisi
+    if (evSummary.evidenceCoverage.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: "6.2 Kanıt Kapsama ve Desteklenme Oranları",
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const covHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Keşif Kategorisi", { isHeader: true, widthPercent: 40 }),
+          createTableCell("Toplam Hedef Sayısı", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Kanıtla Desteklenen", { isHeader: true, widthPercent: 20 }),
+          createTableCell("Kapsama Oranı", { isHeader: true, widthPercent: 20 }),
+        ],
+      });
+
+      const covRows: TableRow[] = evSummary.evidenceCoverage.map((c) => {
+        return new TableRow({
+          children: [
+            createTableCell(c.category, { bold: true }),
+            createTableCell(`${c.totalTargetCount}`),
+            createTableCell(`${c.supportedTargetCount}`),
+            createTableCell(
+              `%${c.coveragePercentage}`,
+              {
+                bold: true,
+                bgColor: c.coveragePercentage >= 80 ? "F0FDF4" : c.coveragePercentage >= 40 ? "FFFBEB" : "FFFFFF",
+                color: c.coveragePercentage >= 80 ? "15803D" : c.coveragePercentage >= 40 ? "B45309" : "334155",
+              }
+            ),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [covHeaderRow, ...covRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+
+    // 6.3 Kanıtla Desteklenmeyen Kritik Konular
+    if (evSummary.unsupportedCriticalFindings.length > 0) {
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: `6.3 Kanıtla Desteklenmeyen Kritik Başlıklar (${evSummary.unsupportedCriticalFindings.length})`,
+              bold: true,
+              size: 22,
+              color: "B91C1C",
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      const unsupHeaderRow = new TableRow({
+        tableHeader: true,
+        children: [
+          createTableCell("Hedef Türü", { isHeader: true, widthPercent: 18 }),
+          createTableCell("Konu / Başlık", { isHeader: true, widthPercent: 32 }),
+          createTableCell("Açıklama", { isHeader: true, widthPercent: 32 }),
+          createTableCell("Kritiklik & Durum", { isHeader: true, widthPercent: 18 }),
+        ],
+      });
+
+      const unsupRows: TableRow[] = evSummary.unsupportedCriticalFindings.map((u) => {
+        return new TableRow({
+          children: [
+            createTableCell(`${u.targetType}\n(${u.targetId})`),
+            createTableCell(u.title, { bold: true }),
+            createTableCell(u.description),
+            createTableCell(
+              `${u.severity}\n(${u.reason})`,
+              { bold: true, bgColor: "FEF2F2", color: "B91C1C" }
+            ),
+          ],
+        });
+      });
+
+      docChildren.push(
+        new Table({
+          width: { size: 100, type: WidthType.PERCENTAGE },
+          rows: [unsupHeaderRow, ...unsupRows],
+        }),
+        new Paragraph({ spacing: { after: 120 } })
+      );
+    }
+  }
+
+  // ── Section 7/6/5: Proje Notları & Açık Konular ───────────────────────────────
   docChildren.push(
     new Paragraph({
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 300, after: 120 },
       children: [
         new TextRun({
-          text: report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular",
+          text: "7. Proje Notları & Açık Konular",
           bold: true,
           size: 28,
           color: COLOR_PRIMARY,

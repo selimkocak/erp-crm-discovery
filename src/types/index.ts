@@ -744,5 +744,6 @@ export function checkAssetSodRisk(asset: {
 }
 
 export * from './governance';
+export * from './evidence';
 export * from './backup';
 

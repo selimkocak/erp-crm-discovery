@@ -25,6 +25,7 @@ import {
   Layers,
   X as XIcon,
   GitCommit,
+  FileCheck,
 } from "lucide-react";
 import {
   getProjectDetail,
@@ -39,6 +40,7 @@ import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { OtStationsSection } from "../components/OtStationsSection";
 import { ProcessMapsSection } from "../components/ProcessMapsSection";
+import { EvidenceRegistrySection } from "../components/evidence/EvidenceRegistrySection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
@@ -82,7 +84,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error" | "idle">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<"process" | "process_maps" | "governance">("process");
+  const [viewMode, setViewMode] = useState<"process" | "process_maps" | "governance" | "evidence">("process");
 
   // Backup & Operations state
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
@@ -812,7 +814,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         );
       })()}
 
-      {/* View Mode Tabs (Süreç Analizi & Süreç Haritaları & Veri/Yetki Yönetişimi) */}
+      {/* View Mode Tabs (Süreç Analizi & Süreç Haritaları & Veri/Yetki Yönetişimi & Saha Kanıtları) */}
       <div className="project-view-mode-tabs" style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
         <button
           type="button"
@@ -840,6 +842,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         >
           <Shield size={16} />
           <span>Veri ve Yetki Yönetişimi</span>
+        </button>
+        <button
+          type="button"
+          className={`btn ${viewMode === "evidence" ? "btn-primary" : "btn-secondary"}`}
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1.25rem", fontWeight: 600 }}
+          onClick={() => setViewMode("evidence")}
+        >
+          <FileCheck size={16} />
+          <span>Saha Kanıtları & Doğrulama</span>
         </button>
       </div>
 
@@ -1155,11 +1166,21 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             name_tr: f.name_tr,
           }))}
         />
-      ) : (
-        /* Governance Dashboard View Mode */
+      ) : viewMode === "governance" ? (
+        /* Governance Dashboard View Mode (FAZ-64) */
         <GovernanceDashboardView
           projectId={projectId}
           isProjectPassive={isPassive}
+        />
+      ) : (
+        /* Evidence & Validation Registry Section (FAZ-65) */
+        <EvidenceRegistrySection
+          projectId={projectId}
+          isReadOnly={isPassive}
+          businessFunctions={activeFunctions.map((f) => ({
+            code: f.code,
+            name_tr: f.name_tr,
+          }))}
         />
       )}
 

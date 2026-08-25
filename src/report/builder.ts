@@ -37,6 +37,10 @@ import {
   getDataGovernanceAccessRules,
   getDataGovernanceApprovals,
   getDataGovernanceSummaryStats,
+  getEvidenceItems,
+  getEvidenceLinks,
+  getEvidenceSummaryStats,
+  getUnsupportedCriticalFindings,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -77,6 +81,10 @@ import type {
   ReportDataGovernanceAsset,
   ReportDataGovernanceAccess,
   ReportDataGovernanceApproval,
+  ReportEvidenceSummary,
+  ReportEvidenceItem,
+  ReportEvidenceCoverageItem,
+  ReportUnsupportedCriticalItem,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -1048,6 +1056,112 @@ export async function buildReportModel(
     };
   }
 
+  // 16. Field Evidence and Validation Summary (FAZ-65)
+  let evidenceSummary: ReportEvidenceSummary | undefined;
+  const [evidenceItems, evidenceLinks, evidenceStats, unsupportedCriticalFindings] = await Promise.all([
+    getEvidenceItems(projectId),
+    getEvidenceLinks(projectId),
+    getEvidenceSummaryStats(projectId),
+    getUnsupportedCriticalFindings(projectId),
+  ]);
+
+  const evidenceLinkMap = new Map<string, string[]>();
+  for (const el of evidenceLinks) {
+    const list = evidenceLinkMap.get(el.evidence_id) || [];
+    let desc = "";
+    if (el.target_type === "QUESTION") {
+      desc = `Soru: ${el.question_id || el.target_id || "Belirtilmemiş"}`;
+      if (el.business_function_code) desc += ` (${el.business_function_code})`;
+    } else if (el.target_type === "OT_STATION") {
+      desc = `İstasyon: ${el.target_id || el.ot_station_id || "Belirtilmemiş"}`;
+    } else if (el.target_type === "PROCESS_MAP") {
+      desc = `Süreç Haritası: ${el.target_id || el.process_map_id || "Belirtilmemiş"}`;
+    } else if (el.target_type === "PROCESS_NODE") {
+      desc = `Süreç Adımı: ${el.target_id || el.process_node_id || "Belirtilmemiş"}`;
+    } else if (el.target_type === "GOVERNANCE_ASSET") {
+      desc = `Veri Varlığı: ${el.target_id || el.governance_asset_id || "Belirtilmemiş"}`;
+    } else {
+      desc = `${el.target_type}: ${el.target_id || ""}`;
+    }
+    list.push(desc);
+    evidenceLinkMap.set(el.evidence_id, list);
+  }
+
+  const evidenceRegister: ReportEvidenceItem[] = evidenceItems.map((ev, index) => {
+    const refNum = (index + 1).toString().padStart(3, "0");
+    const targets = evidenceLinkMap.get(ev.id) || [];
+    return {
+      id: ev.id,
+      refCode: `REF-EVD-${refNum}`,
+      title: ev.title,
+      evidenceType: ev.evidence_type,
+      fileName: ev.file_name || null,
+      fileSize: Number(ev.file_size) || 0,
+      fileHash: ev.file_hash || null,
+      sourceType: ev.source_type,
+      sourceDescription: ev.source_description || null,
+      collectedAt: ev.collected_at,
+      collectedByRole: ev.collected_by_role || null,
+      verificationStatus: ev.verification_status,
+      credibilityLevel: ev.credibility_level,
+      sensitivityLevel: ev.sensitivity_level,
+      notes: ev.notes || null,
+      linkedTargetsSummary: targets.length > 0 ? targets.join(", ") : "Bağlantısız",
+    };
+  });
+
+  const totalQuestions = summaryStats.totalQuestions || 1;
+  const linkedQuestionCount = new Set(evidenceLinks.filter((l) => l.target_type === "QUESTION").map((l) => l.question_id || l.target_id)).size;
+  const totalOtStations = otStationsSummary?.totalStations || 0;
+  const linkedOtStationCount = new Set(evidenceLinks.filter((l) => l.target_type === "OT_STATION").map((l) => l.ot_station_id || l.target_id)).size;
+  const totalProcessMaps = processMapsSummary?.stats.totalMaps || 0;
+  const linkedProcessMapCount = new Set(evidenceLinks.filter((l) => l.target_type === "PROCESS_MAP").map((l) => l.process_map_id || l.target_id)).size;
+  const totalGovAssets = dataGovernanceSummary?.stats.totalAssets || 0;
+  const linkedGovAssetCount = new Set(evidenceLinks.filter((l) => l.target_type === "GOVERNANCE_ASSET").map((l) => l.governance_asset_id || l.target_id)).size;
+
+  const evidenceCoverage: ReportEvidenceCoverageItem[] = [
+    {
+      category: "Soru & Beyanlar",
+      totalTargetCount: totalQuestions,
+      supportedTargetCount: linkedQuestionCount,
+      coveragePercentage: totalQuestions > 0 ? Math.round((linkedQuestionCount / totalQuestions) * 100) : 0,
+    },
+    {
+      category: "OT İstasyonları",
+      totalTargetCount: totalOtStations,
+      supportedTargetCount: linkedOtStationCount,
+      coveragePercentage: totalOtStations > 0 ? Math.round((linkedOtStationCount / totalOtStations) * 100) : 0,
+    },
+    {
+      category: "Süreç Haritaları",
+      totalTargetCount: totalProcessMaps,
+      supportedTargetCount: linkedProcessMapCount,
+      coveragePercentage: totalProcessMaps > 0 ? Math.round((linkedProcessMapCount / totalProcessMaps) * 100) : 0,
+    },
+    {
+      category: "Veri Yönetişimi Varlıkları",
+      totalTargetCount: totalGovAssets,
+      supportedTargetCount: linkedGovAssetCount,
+      coveragePercentage: totalGovAssets > 0 ? Math.round((linkedGovAssetCount / totalGovAssets) * 100) : 0,
+    },
+  ];
+
+  const unsupportedItems: ReportUnsupportedCriticalItem[] = unsupportedCriticalFindings.map((u) => ({
+    targetType: u.targetType,
+    targetId: u.targetId,
+    title: u.title,
+    description: u.description,
+    severity: u.severity,
+    reason: u.reason === "NO_EVIDENCE" ? "Kanıt Yok" : u.reason === "EVIDENCE_REJECTED" ? "Kanıt Reddedildi" : "İncelenmedi",
+  }));
+
+  evidenceSummary = {
+    stats: evidenceStats,
+    evidenceRegister,
+    evidenceCoverage,
+    unsupportedCriticalFindings: unsupportedItems,
+  };
+
   return {
     metadata,
     profile,
@@ -1062,6 +1176,7 @@ export async function buildReportModel(
     otMatrixSummary,
     processMapsSummary,
     dataGovernanceSummary,
+    evidenceSummary,
     globalFindings,
     globalRequirements,
     globalRisks,

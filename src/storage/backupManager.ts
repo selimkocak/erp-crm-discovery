@@ -309,6 +309,14 @@ export async function exportProjectBackup(
     "SELECT * FROM data_governance_approvals WHERE project_id = $1 ORDER BY approval_order ASC",
     [projectId]
   );
+  const evidenceItems = await db.select<any[]>(
+    "SELECT * FROM evidence_items WHERE project_id = $1 ORDER BY collected_at ASC",
+    [projectId]
+  );
+  const evidenceLinks = await db.select<any[]>(
+    "SELECT * FROM evidence_links WHERE project_id = $1 ORDER BY created_at ASC",
+    [projectId]
+  );
 
   const projectData: ProjectBackupData = {
     project,
@@ -346,6 +354,8 @@ export async function exportProjectBackup(
     dataGovernanceAssets,
     dataGovernanceAccess,
     dataGovernanceApprovals,
+    evidenceItems,
+    evidenceLinks,
   };
 
   const enc = new TextEncoder();
@@ -371,6 +381,22 @@ export async function exportProjectBackup(
       continue;
     }
     const archivePath = `attachments/${att.relative_path}`;
+    archiveFiles.push({
+      name: archivePath,
+      data: fileBytes,
+    });
+    checksums[archivePath] = await computeSha256Hex(fileBytes);
+  }
+
+  // Field Evidence dosyalarını ekle
+  for (const ev of evidenceItems) {
+    if (!ev.stored_path) continue;
+    const fileBytes = await readAttachmentFile(ev.stored_path);
+    if (!fileBytes) {
+      console.warn(`[backup] Saha kanıt dosyası okunamadı: ${ev.stored_path}`);
+      continue;
+    }
+    const archivePath = `attachments/${ev.stored_path}`;
     archiveFiles.push({
       name: archivePath,
       data: fileBytes,
@@ -411,6 +437,8 @@ export async function exportProjectBackup(
     dataGovernanceAssets: dataGovernanceAssets.length,
     dataGovernanceAccess: dataGovernanceAccess.length,
     dataGovernanceApprovals: dataGovernanceApprovals.length,
+    evidenceItems: evidenceItems.length,
+    evidenceLinks: evidenceLinks.length,
   };
 
   const manifest: BackupManifest = {
@@ -1641,6 +1669,75 @@ export async function restoreProjectBackup(
       );
     }
 
+    // CC. FAZ-65: evidence_items & evidence_links
+    const evidenceIdMap = new Map<string, string>();
+    for (const ev of projectData.evidenceItems || []) {
+      const newEvId = generateId("evd");
+      evidenceIdMap.set(ev.id, newEvId);
+      const newStoredPath = ev.stored_path ? remapAttachmentPath(ev.stored_path) : null;
+      await db.execute(
+        `INSERT INTO evidence_items (
+          id, project_id, title, evidence_type, file_name, stored_path, mime_type,
+          file_size, file_hash, source_type, source_description, collected_at,
+          collected_by_role, verification_status, credibility_level, sensitivity_level,
+          notes, created_at, updated_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
+        [
+          newEvId,
+          newProjectId,
+          ev.title,
+          ev.evidence_type || "DOCUMENT",
+          ev.file_name || null,
+          newStoredPath,
+          ev.mime_type || null,
+          ev.file_size || 0,
+          ev.file_hash || null,
+          ev.source_type || "DOCUMENT",
+          ev.source_description || null,
+          ev.collected_at || now,
+          ev.collected_by_role || null,
+          ev.verification_status || "UNREVIEWED",
+          ev.credibility_level || "MEDIUM",
+          ev.sensitivity_level || "NORMAL",
+          ev.notes || null,
+          ev.created_at || now,
+          ev.updated_at || now,
+        ]
+      );
+    }
+
+    for (const el of projectData.evidenceLinks || []) {
+      const newElId = generateId("evdl");
+      const mappedEvidenceId = evidenceIdMap.get(el.evidence_id) || el.evidence_id;
+      const mappedStationId = el.ot_station_id ? (stationIdMap.get(el.ot_station_id) || el.ot_station_id) : null;
+      const mappedPmapId = el.process_map_id ? (pmapIdMap.get(el.process_map_id) || el.process_map_id) : null;
+      const mappedPnodeId = el.process_node_id ? (pnodeIdMap.get(el.process_node_id) || el.process_node_id) : null;
+      const mappedDgAssetId = el.governance_asset_id ? (dgAssetIdMap.get(el.governance_asset_id) || el.governance_asset_id) : null;
+
+      await db.execute(
+        `INSERT INTO evidence_links (
+          id, project_id, evidence_id, target_type, target_id, question_id,
+          business_function_code, ot_station_id, process_map_id, process_node_id,
+          governance_asset_id, link_note, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
+        [
+          newElId,
+          newProjectId,
+          mappedEvidenceId,
+          el.target_type,
+          el.target_id || null,
+          el.question_id || null,
+          el.business_function_code || null,
+          mappedStationId,
+          mappedPmapId,
+          mappedPnodeId,
+          mappedDgAssetId,
+          el.link_note || null,
+          el.created_at || now,
+        ]
+      );
+    }
+
     // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
     const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
@@ -1724,6 +1821,8 @@ export async function duplicateProject(
     projectData.questionAttachments = [];
     projectData.governanceAttachments = [];
     projectData.otStationAnswers = [];
+    projectData.evidenceItems = [];
+    projectData.evidenceLinks = [];
 
     // Proje gerçekleşen tarihlerini sıfırla (planlananlar korunur)
     if (projectData.project) {
@@ -1795,6 +1894,8 @@ export async function duplicateProject(
       dataGovernanceAssets: exportData.manifest.recordCounts.dataGovernanceAssets || 0,
       dataGovernanceAccess: exportData.manifest.recordCounts.dataGovernanceAccess || 0,
       dataGovernanceApprovals: exportData.manifest.recordCounts.dataGovernanceApprovals || 0,
+      evidenceItems: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.evidenceItems || 0) : 0,
+      evidenceLinks: options.copyAnswersAndAttachments ? (exportData.manifest.recordCounts.evidenceLinks || 0) : 0,
     },
   };
 

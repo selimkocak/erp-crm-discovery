@@ -863,12 +863,124 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     currentY += 6;
   }
 
-  // ── Section 6/5: Proje Notları & Açık Konular ───────────────────────────────
+  // ── Section 6: Kanıt, Ek Dosya ve Saha Doğrulama Kaydı (FAZ-65) ──────────
+  if (report.evidenceSummary && report.evidenceSummary.stats.totalEvidence > 0) {
+    const evSummary = report.evidenceSummary;
+    checkPageBreak(30);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("6. Kanıt, Ek Dosya ve Saha Doğrulama Kaydı", marginX, currentY);
+    currentY += 6;
+
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(51, 65, 85);
+    doc.text(
+      `Toplam ${evSummary.stats.totalEvidence} saha kanıtı (${evSummary.stats.acceptedCount} kabul, ${evSummary.stats.unreviewedCount + evSummary.stats.reviewedCount} incelemede). Kapsama: %${evSummary.stats.evidenceCoverageRate} | Kanıtsız Kritik Konu: ${evSummary.stats.unsupportedCriticalFindingsCount}`,
+      marginX,
+      currentY
+    );
+    currentY += 6;
+
+    // 6.1 Kanıt Kayıt Defteri Tablosu
+    if (evSummary.evidenceRegister.length > 0) {
+      const evRows = evSummary.evidenceRegister.map((ev) => [
+        `${ev.refCode}\n${ev.fileName ? `📎 ${ev.fileName}` : ""}`,
+        `${ev.title}\n[${ev.evidenceType}]`,
+        `${ev.sourceType}${ev.collectedByRole ? `\n(${ev.collectedByRole})` : ""}`,
+        ev.verificationStatus === "ACCEPTED" ? "✓ Kabul Edildi" :
+        ev.verificationStatus === "REJECTED" ? "✕ Reddedildi" :
+        ev.verificationStatus === "REVIEWED" ? "İncelendi" : "İncelenmedi",
+        ev.credibilityLevel === "HIGH" ? "Yüksek" : ev.credibilityLevel === "LOW" ? "Düşük" : "Orta",
+        ev.linkedTargetsSummary || "Bağlantısız",
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Ref / Dosya", "Kanıt Başlığı & Tür", "Kaynak & Toplayan", "Durum", "Güven", "İlişkili Hedefler"]],
+        body: evRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [240, 249, 255], textColor: [3, 105, 161], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 28 },
+          1: { cellWidth: 42 },
+          2: { cellWidth: 32 },
+          3: { cellWidth: 24 },
+          4: { cellWidth: 16 },
+          5: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 5;
+    }
+
+    // 6.2 Kanıt Kapsama Tablosu
+    if (evSummary.evidenceCoverage.length > 0) {
+      const covRows = evSummary.evidenceCoverage.map((c) => [
+        c.category,
+        `${c.totalTargetCount}`,
+        `${c.supportedTargetCount}`,
+        `%${c.coveragePercentage}`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [["Keşif Kategorisi", "Toplam Hedef", "Kanıtla Desteklenen", "Kapsama Oranı"]],
+        body: covRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [248, 250, 252], textColor: [51, 65, 85], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 60 },
+          1: { cellWidth: 35 },
+          2: { cellWidth: 45 },
+          3: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 5;
+    }
+
+    // 6.3 Kanıtla Desteklenmeyen Kritik Konular
+    if (evSummary.unsupportedCriticalFindings.length > 0) {
+      checkPageBreak(25);
+      const unsupRows = evSummary.unsupportedCriticalFindings.map((u) => [
+        `${u.targetType}\n(${u.targetId})`,
+        u.title,
+        u.description,
+        `${u.severity}\n(${u.reason})`,
+      ]);
+
+      autoTable(doc, {
+        startY: currentY,
+        margin: { left: marginX, right: marginX },
+        head: [[`⚠️ Kanıtsız Kritik Konular (${evSummary.unsupportedCriticalFindings.length})`, "Başlık", "Açıklama", "Durum & Neden"]],
+        body: unsupRows,
+        theme: "grid",
+        styles: { font: PDF_FONT_FAMILY },
+        headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [254, 242, 242], textColor: [185, 28, 28], fontSize: 8 },
+        bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 30 },
+          1: { cellWidth: 50 },
+          2: { cellWidth: 65 },
+          3: { cellWidth: "auto" },
+        },
+      });
+      currentY = (doc as any).lastAutoTable.finalY + 5;
+    }
+  }
+
+  // ── Section 7/6/5: Proje Notları & Açık Konular ───────────────────────────────
   checkPageBreak(30);
   doc.setFont(PDF_FONT_FAMILY, "bold");
   doc.setFontSize(13);
   doc.setTextColor(2, 132, 199);
-  doc.text(report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular", marginX, currentY);
+  doc.text("7. Proje Notları & Açık Konular", marginX, currentY);
   currentY += 6;
 
   // Açık Sorular ve Teyit Bekleyen Saha Başlıkları Tablosu (FAZ-9)

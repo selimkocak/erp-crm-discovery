@@ -764,5 +764,62 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_dg_approvals_asset ON data_governance_approvals(asset_id);`,
       `CREATE INDEX IF NOT EXISTS idx_dg_approvals_pmap ON data_governance_approvals(process_map_id);`
     ]
+  },
+  {
+    version: 18,
+    description: "Field Evidence, File Attachments and Verification Registry (FAZ-65)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS evidence_items (
+        id                  TEXT PRIMARY KEY,
+        project_id          TEXT NOT NULL,
+        title               TEXT NOT NULL,
+        evidence_type       TEXT NOT NULL DEFAULT 'DOCUMENT',
+        file_name           TEXT,
+        stored_path         TEXT,
+        mime_type           TEXT,
+        file_size           INTEGER DEFAULT 0,
+        file_hash           TEXT,
+        source_type         TEXT NOT NULL DEFAULT 'DOCUMENT',
+        source_description  TEXT,
+        collected_at        TEXT NOT NULL,
+        collected_by_role   TEXT,
+        verification_status TEXT NOT NULL DEFAULT 'UNREVIEWED',
+        credibility_level   TEXT NOT NULL DEFAULT 'MEDIUM',
+        sensitivity_level   TEXT NOT NULL DEFAULT 'NORMAL',
+        notes               TEXT,
+        created_at          TEXT NOT NULL,
+        updated_at          TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE
+      );`,
+      `CREATE TABLE IF NOT EXISTS evidence_links (
+        id                     TEXT PRIMARY KEY,
+        project_id             TEXT NOT NULL,
+        evidence_id            TEXT NOT NULL,
+        target_type            TEXT NOT NULL,
+        target_id              TEXT,
+        question_id            TEXT,
+        business_function_code TEXT,
+        ot_station_id          TEXT,
+        process_map_id         TEXT,
+        process_node_id        TEXT,
+        governance_asset_id    TEXT,
+        link_note              TEXT,
+        created_at             TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE,
+        FOREIGN KEY (evidence_id) REFERENCES evidence_items(id) ON DELETE CASCADE,
+        FOREIGN KEY (ot_station_id) REFERENCES ot_stations(id) ON DELETE SET NULL,
+        FOREIGN KEY (process_map_id) REFERENCES process_maps(id) ON DELETE SET NULL,
+        FOREIGN KEY (process_node_id) REFERENCES process_nodes(id) ON DELETE SET NULL,
+        FOREIGN KEY (governance_asset_id) REFERENCES data_governance_assets(id) ON DELETE SET NULL
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_items_project ON evidence_items(project_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_items_status ON evidence_items(project_id, verification_status);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_items_type ON evidence_items(evidence_type);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_links_project ON evidence_links(project_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_links_evidence ON evidence_links(evidence_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_links_question ON evidence_links(project_id, question_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_links_target ON evidence_links(target_type, target_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_evd_links_pnode ON evidence_links(process_node_id);`
+    ]
   }
 ] as const;

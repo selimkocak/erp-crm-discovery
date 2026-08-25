@@ -595,6 +595,59 @@ export interface ReportDataGovernanceSummary {
   approvals: ReportDataGovernanceApproval[];
 }
 
+export interface ReportEvidenceItem {
+  id: string;
+  refCode: string;
+  title: string;
+  evidenceType: string;
+  fileName: string | null;
+  fileSize: number;
+  fileHash: string | null;
+  sourceType: string;
+  sourceDescription: string | null;
+  collectedAt: string;
+  collectedByRole: string | null;
+  verificationStatus: string;
+  credibilityLevel: string;
+  sensitivityLevel: string;
+  notes: string | null;
+  linkedTargetsSummary: string;
+}
+
+export interface ReportEvidenceCoverageItem {
+  category: string;
+  totalTargetCount: number;
+  supportedTargetCount: number;
+  coveragePercentage: number;
+}
+
+export interface ReportUnsupportedCriticalItem {
+  targetType: string;
+  targetId: string;
+  title: string;
+  description: string;
+  severity: string;
+  reason: string;
+}
+
+export interface ReportEvidenceSummary {
+  stats: {
+    totalEvidence: number;
+    unreviewedCount: number;
+    reviewedCount: number;
+    acceptedCount: number;
+    rejectedCount: number;
+    unsupportedCriticalFindingsCount: number;
+    evidenceCoverageRate: number;
+    confidentialOrRestrictedCount: number;
+    linkedEvidenceCount: number;
+    unlinkedEvidenceCount: number;
+  };
+  evidenceRegister: ReportEvidenceItem[];
+  evidenceCoverage: ReportEvidenceCoverageItem[];
+  unsupportedCriticalFindings: ReportUnsupportedCriticalItem[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -609,6 +662,7 @@ export interface ReportModel {
   otMatrixSummary?: ReportOtMatrixSummary;
   processMapsSummary?: ReportProcessMapsSummary;
   dataGovernanceSummary?: ReportDataGovernanceSummary;
+  evidenceSummary?: ReportEvidenceSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

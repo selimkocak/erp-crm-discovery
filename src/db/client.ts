@@ -3904,5 +3904,475 @@ export async function seedDefaultDataGovernanceAssets(
   return starterAssets.length;
 }
 
-export * from './governanceClient';
+// ─────────────────────────────────────────────────────────────
+// FAZ-65: Field Evidence & Validation Registry CRUD
+// ─────────────────────────────────────────────────────────────
 
+import type {
+  EvidenceItem,
+  EvidenceLink,
+  EvidenceSummaryStats,
+  UnsupportedCriticalFinding,
+  EvidenceTargetType,
+} from "../types/evidence";
+import { deleteEvidencePhysicalFile } from "../storage/attachmentManager";
+
+/**
+ * Projeye ait tüm saha kanıtı kayıtlarını (ve bağlı link sayılarını) döndürür.
+ */
+export async function getEvidenceItems(projectId: string): Promise<EvidenceItem[]> {
+  const db = await getDb();
+  const items = await db.select<EvidenceItem[]>(
+    `SELECT e.*,
+            (SELECT COUNT(*) FROM evidence_links el WHERE el.evidence_id = e.id) AS link_count
+     FROM evidence_items e
+     WHERE e.project_id = $1
+     ORDER BY e.collected_at DESC, e.created_at DESC`,
+    [projectId]
+  );
+  return items;
+}
+
+/**
+ * Tek bir saha kanıtı kaydını linkleriyle birlikte getirir.
+ */
+export async function getEvidenceItemById(id: string): Promise<EvidenceItem | null> {
+  const db = await getDb();
+  const rows = await db.select<EvidenceItem[]>(
+    `SELECT e.*,
+            (SELECT COUNT(*) FROM evidence_links el WHERE el.evidence_id = e.id) AS link_count
+     FROM evidence_items e
+     WHERE e.id = $1
+     LIMIT 1`,
+    [id]
+  );
+  if (rows.length === 0) return null;
+  const item = rows[0];
+  item.links = await getEvidenceLinksByEvidenceId(id);
+  return item;
+}
+
+/**
+ * Yeni bir saha kanıtı kaydı oluşturur.
+ */
+export async function createEvidenceItem(
+  item: Omit<EvidenceItem, "id" | "created_at" | "updated_at">
+): Promise<EvidenceItem> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  const id = generateId("evd");
+
+  await db.execute(
+    `INSERT INTO evidence_items (
+       id, project_id, title, evidence_type, file_name, stored_path, mime_type,
+       file_size, file_hash, source_type, source_description, collected_at,
+       collected_by_role, verification_status, credibility_level, sensitivity_level,
+       notes, created_at, updated_at
+     ) VALUES (
+       $1, $2, $3, $4, $5, $6, $7,
+       $8, $9, $10, $11, $12,
+       $13, $14, $15, $16,
+       $17, $18, $18
+     )`,
+    [
+      id,
+      item.project_id,
+      item.title.trim(),
+      item.evidence_type || "DOCUMENT",
+      item.file_name || null,
+      item.stored_path || null,
+      item.mime_type || null,
+      item.file_size || 0,
+      item.file_hash || null,
+      item.source_type || "DOCUMENT",
+      item.source_description || null,
+      item.collected_at || now,
+      item.collected_by_role || null,
+      item.verification_status || "UNREVIEWED",
+      item.credibility_level || "MEDIUM",
+      item.sensitivity_level || "NORMAL",
+      item.notes || null,
+      now,
+    ]
+  );
+
+  const created = await getEvidenceItemById(id);
+  if (!created) throw new Error("Kanıt kaydı oluşturulamadı.");
+  return created;
+}
+
+/**
+ * Mevcut bir saha kanıtı kaydını günceller.
+ */
+export async function updateEvidenceItem(
+  id: string,
+  updates: Partial<Omit<EvidenceItem, "id" | "project_id" | "created_at" | "updated_at">>
+): Promise<void> {
+  const db = await getDb();
+  const existing = await getEvidenceItemById(id);
+  if (!existing) throw new Error(`Güncellenecek kanıt bulunamadı: ${id}`);
+
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE evidence_items
+     SET title = COALESCE($1, title),
+         evidence_type = COALESCE($2, evidence_type),
+         file_name = CASE WHEN $3 IS NOT NULL THEN $4 ELSE file_name END,
+         stored_path = CASE WHEN $5 IS NOT NULL THEN $6 ELSE stored_path END,
+         mime_type = CASE WHEN $7 IS NOT NULL THEN $8 ELSE mime_type END,
+         file_size = CASE WHEN $9 IS NOT NULL THEN $10 ELSE file_size END,
+         file_hash = CASE WHEN $11 IS NOT NULL THEN $12 ELSE file_hash END,
+         source_type = COALESCE($13, source_type),
+         source_description = CASE WHEN $14 IS NOT NULL THEN $15 ELSE source_description END,
+         collected_at = COALESCE($16, collected_at),
+         collected_by_role = CASE WHEN $17 IS NOT NULL THEN $18 ELSE collected_by_role END,
+         verification_status = COALESCE($19, verification_status),
+         credibility_level = COALESCE($20, credibility_level),
+         sensitivity_level = COALESCE($21, sensitivity_level),
+         notes = CASE WHEN $22 IS NOT NULL THEN $23 ELSE notes END,
+         updated_at = $24
+     WHERE id = $25`,
+    [
+      updates.title ? updates.title.trim() : null,
+      updates.evidence_type ?? null,
+      updates.file_name !== undefined ? 1 : null,
+      updates.file_name ?? null,
+      updates.stored_path !== undefined ? 1 : null,
+      updates.stored_path ?? null,
+      updates.mime_type !== undefined ? 1 : null,
+      updates.mime_type ?? null,
+      updates.file_size !== undefined ? 1 : null,
+      updates.file_size ?? null,
+      updates.file_hash !== undefined ? 1 : null,
+      updates.file_hash ?? null,
+      updates.source_type ?? null,
+      updates.source_description !== undefined ? 1 : null,
+      updates.source_description ?? null,
+      updates.collected_at ?? null,
+      updates.collected_by_role !== undefined ? 1 : null,
+      updates.collected_by_role ?? null,
+      updates.verification_status ?? null,
+      updates.credibility_level ?? null,
+      updates.sensitivity_level ?? null,
+      updates.notes !== undefined ? 1 : null,
+      updates.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+/**
+ * Saha kanıtını, fiziksel dosyasını ve tüm bağlantılarını siler.
+ */
+export async function deleteEvidenceItem(id: string): Promise<void> {
+  const db = await getDb();
+  const existing = await getEvidenceItemById(id);
+  if (existing?.stored_path) {
+    await deleteEvidencePhysicalFile(existing.stored_path);
+  }
+  await db.execute(`DELETE FROM evidence_items WHERE id = $1`, [id]);
+}
+
+/**
+ * Kanıt bağlantılarını (links) çeker.
+ */
+export async function getEvidenceLinks(
+  projectId: string,
+  targetType?: EvidenceTargetType,
+  targetId?: string
+): Promise<EvidenceLink[]> {
+  const db = await getDb();
+  if (targetType && targetId) {
+    return db.select<EvidenceLink[]>(
+      `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
+       FROM evidence_links el
+       JOIN evidence_items e ON e.id = el.evidence_id
+       WHERE el.project_id = $1 AND el.target_type = $2 AND el.target_id = $3
+       ORDER BY el.created_at ASC`,
+      [projectId, targetType, targetId]
+    );
+  }
+  if (targetType) {
+    return db.select<EvidenceLink[]>(
+      `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
+       FROM evidence_links el
+       JOIN evidence_items e ON e.id = el.evidence_id
+       WHERE el.project_id = $1 AND el.target_type = $2
+       ORDER BY el.created_at ASC`,
+      [projectId, targetType]
+    );
+  }
+  return db.select<EvidenceLink[]>(
+    `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
+     FROM evidence_links el
+     JOIN evidence_items e ON e.id = el.evidence_id
+     WHERE el.project_id = $1
+     ORDER BY el.created_at ASC`,
+    [projectId]
+  );
+}
+
+/**
+ * Belirli bir kanıta bağlı tüm bağlantıları getirir.
+ */
+export async function getEvidenceLinksByEvidenceId(evidenceId: string): Promise<EvidenceLink[]> {
+  const db = await getDb();
+  return db.select<EvidenceLink[]>(
+    `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
+     FROM evidence_links el
+     JOIN evidence_items e ON e.id = el.evidence_id
+     WHERE el.evidence_id = $1
+     ORDER BY el.created_at ASC`,
+    [evidenceId]
+  );
+}
+
+/**
+ * Kanıt ile hedef arasında yeni bağlantı oluşturur.
+ */
+export async function createEvidenceLink(
+  link: Omit<EvidenceLink, "id" | "created_at">
+): Promise<EvidenceLink> {
+  const db = await getDb();
+  const id = generateId("evdl");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO evidence_links (
+       id, project_id, evidence_id, target_type, target_id, question_id,
+       business_function_code, ot_station_id, process_map_id, process_node_id,
+       governance_asset_id, link_note, created_at
+     ) VALUES (
+       $1, $2, $3, $4, $5, $6,
+       $7, $8, $9, $10,
+       $11, $12, $13
+     )`,
+    [
+      id,
+      link.project_id,
+      link.evidence_id,
+      link.target_type,
+      link.target_id || null,
+      link.question_id || null,
+      link.business_function_code || null,
+      link.ot_station_id || null,
+      link.process_map_id || null,
+      link.process_node_id || null,
+      link.governance_asset_id || null,
+      link.link_note || null,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    project_id: link.project_id,
+    evidence_id: link.evidence_id,
+    target_type: link.target_type,
+    target_id: link.target_id || null,
+    question_id: link.question_id || null,
+    business_function_code: link.business_function_code || null,
+    ot_station_id: link.ot_station_id || null,
+    process_map_id: link.process_map_id || null,
+    process_node_id: link.process_node_id || null,
+    governance_asset_id: link.governance_asset_id || null,
+    link_note: link.link_note || null,
+    created_at: now,
+  };
+}
+
+/**
+ * Yalnızca kanıt bağlantısını kaldırır (Unlink - Kanıt ve dosya silinmez).
+ */
+export async function deleteEvidenceLink(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM evidence_links WHERE id = $1`, [id]);
+}
+
+/**
+ * Projenin kanıt ve saha doğrulama özet metriklerini hesaplar.
+ */
+export async function getEvidenceSummaryStats(projectId: string): Promise<EvidenceSummaryStats> {
+  const items = await getEvidenceItems(projectId);
+  const links = await getEvidenceLinks(projectId);
+
+  const totalEvidence = items.length;
+  const unreviewedCount = items.filter((i) => i.verification_status === "UNREVIEWED").length;
+  const reviewedCount = items.filter((i) => i.verification_status === "REVIEWED").length;
+  const acceptedCount = items.filter((i) => i.verification_status === "ACCEPTED").length;
+  const rejectedCount = items.filter((i) => i.verification_status === "REJECTED").length;
+  const confidentialOrRestrictedCount = items.filter(
+    (i) => i.sensitivity_level === "CONFIDENTIAL" || i.sensitivity_level === "RESTRICTED"
+  ).length;
+
+  const linkedEvidenceIds = new Set(links.map((l) => l.evidence_id));
+  const linkedEvidenceCount = linkedEvidenceIds.size;
+  const unlinkedEvidenceCount = totalEvidence - linkedEvidenceCount;
+
+  const unsupportedCriticalFindings = await getUnsupportedCriticalFindings(projectId);
+  const unsupportedCriticalFindingsCount = unsupportedCriticalFindings.length;
+
+  // Kapsama oranı: Kabul edilmiş kanıtların bağlı olduğu hedeflerin toplam hedeflere oranı veya kanıt kapsama oranı
+  const evidenceCoverageRate = totalEvidence > 0
+    ? Math.round(((acceptedCount + reviewedCount) / totalEvidence) * 100)
+    : 0;
+
+  return {
+    totalEvidence,
+    unreviewedCount,
+    reviewedCount,
+    acceptedCount,
+    rejectedCount,
+    unsupportedCriticalFindingsCount,
+    evidenceCoverageRate,
+    confidentialOrRestrictedCount,
+    linkedEvidenceCount,
+    unlinkedEvidenceCount,
+  };
+}
+
+/**
+ * Kanıtsız, kanıtı reddedilmiş veya incelenmemiş kritik bulguları, riskleri ve takip sorularını listeler.
+ */
+export async function getUnsupportedCriticalFindings(
+  projectId: string
+): Promise<UnsupportedCriticalFinding[]> {
+  const db = await getDb();
+  const result: UnsupportedCriticalFinding[] = [];
+
+  // 1. Kritik Takip Soruları (question_followups with flag_type = 'critical')
+  const criticalFollowups = await db.select<{
+    id: string;
+    business_function_code: string;
+    question_id: string;
+    note: string | null;
+  }[]>(
+    `SELECT id, business_function_code, question_id, note
+     FROM question_followups
+     WHERE analysis_project_id = $1 AND flag_type = 'critical'`,
+    [projectId]
+  );
+
+  for (const fol of criticalFollowups) {
+    const links = await db.select<{ verification_status: string }[]>(
+      `SELECT e.verification_status
+       FROM evidence_links el
+       JOIN evidence_items e ON e.id = el.evidence_id
+       WHERE el.project_id = $1 AND (el.question_id = $2 OR el.target_id = $2)`,
+      [projectId, fol.question_id]
+    );
+
+    if (links.length === 0) {
+      result.push({
+        targetType: "QUESTION",
+        targetId: fol.question_id,
+        title: `Kritik Takip Sorusu [${fol.question_id}]`,
+        description: fol.note || "Kritik takip bayrağı konulmuş fakat henüz kanıt bağlanmamış.",
+        businessFunctionCode: fol.business_function_code,
+        severity: "CRITICAL",
+        reason: "NO_EVIDENCE",
+      });
+    } else {
+      const allRejected = links.every((l) => l.verification_status === "REJECTED");
+      const hasAccepted = links.some((l) => l.verification_status === "ACCEPTED");
+      if (allRejected) {
+        result.push({
+          targetType: "QUESTION",
+          targetId: fol.question_id,
+          title: `Kritik Takip Sorusu [${fol.question_id}]`,
+          description: "Bağlanan kanıtlar inceleme sonucunda reddedildi.",
+          businessFunctionCode: fol.business_function_code,
+          severity: "CRITICAL",
+          reason: "EVIDENCE_REJECTED",
+        });
+      } else if (!hasAccepted) {
+        result.push({
+          targetType: "QUESTION",
+          targetId: fol.question_id,
+          title: `Kritik Takip Sorusu [${fol.question_id}]`,
+          description: "Bağlı kanıt henüz incelenmemiş veya kabul edilmemiş.",
+          businessFunctionCode: fol.business_function_code,
+          severity: "HIGH",
+          reason: "EVIDENCE_UNREVIEWED",
+        });
+      }
+    }
+  }
+
+  // 2. Yüksek/Kritik Riskler (project_risks with impact/probability high/critical)
+  const criticalRisks = await db.select<{
+    id: string;
+    business_function_code: string | null;
+    title: string;
+    description: string;
+    question_id: string | null;
+  }[]>(
+    `SELECT id, business_function_code, title, description, question_id
+     FROM project_risks
+     WHERE analysis_project_id = $1 AND (impact IN ('high', 'critical') OR probability IN ('high', 'critical'))`,
+    [projectId]
+  );
+
+  for (const r of criticalRisks) {
+    const qId = r.question_id;
+    if (qId) {
+      const links = await db.select<{ verification_status: string }[]>(
+        `SELECT e.verification_status
+         FROM evidence_links el
+         JOIN evidence_items e ON e.id = el.evidence_id
+         WHERE el.project_id = $1 AND (el.question_id = $2 OR el.target_id = $2)`,
+        [projectId, qId]
+      );
+      if (links.length === 0) {
+        result.push({
+          targetType: "QUESTION",
+          targetId: qId,
+          title: `Yüksek Risk: ${r.title}`,
+          description: r.description,
+          businessFunctionCode: r.business_function_code || undefined,
+          severity: "HIGH",
+          reason: "NO_EVIDENCE",
+        });
+      }
+    }
+  }
+
+  // 3. Kritik Veri Yönetişimi Varlıkları (CRITICAL with no evidence or SoD risk)
+  const criticalAssets = await db.select<{
+    id: string;
+    asset_name: string;
+    domain: string | null;
+    criticality: string;
+  }[]>(
+    `SELECT id, asset_name, domain, criticality
+     FROM data_governance_assets
+     WHERE project_id = $1 AND criticality = 'CRITICAL'`,
+    [projectId]
+  );
+
+  for (const ast of criticalAssets) {
+    const links = await db.select<{ verification_status: string }[]>(
+      `SELECT e.verification_status
+       FROM evidence_links el
+       JOIN evidence_items e ON e.id = el.evidence_id
+       WHERE el.project_id = $1 AND (el.governance_asset_id = $2 OR (el.target_type = 'GOVERNANCE_ASSET' AND el.target_id = $2))`,
+      [projectId, ast.id]
+    );
+    if (links.length === 0) {
+      result.push({
+        targetType: "GOVERNANCE_ASSET",
+        targetId: ast.id,
+        title: `Kritik Veri Varlığı: ${ast.asset_name}`,
+        description: `${ast.domain || "Genel"} alanındaki bu kritik veri varlığı için saha doğrulama kanıtı bulunmuyor.`,
+        severity: "CRITICAL",
+        reason: "NO_EVIDENCE",
+      });
+    }
+  }
+
+  return result;
+}
+
+export * from './governanceClient';
