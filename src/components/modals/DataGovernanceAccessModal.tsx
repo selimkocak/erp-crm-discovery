@@ -116,26 +116,26 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: "640px", width: "95%" }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="modal-content modal--md" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">
             {initialData ? "Erişim / Yetki Kuralını Düzenle" : "Yeni Erişim / Yetki Kuralı Ekle"}
           </h3>
-          <button type="button" className="btn-close" onClick={onClose} aria-label="Kapat">
+          <button type="button" className="btn-close modal-close-btn" onClick={onClose} aria-label="Kapat">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ maxHeight: "75vh", overflowY: "auto", paddingRight: "0.5rem" }}>
+          <div className="modal-body">
             {errorMsg && (
               <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                 {errorMsg}
               </div>
             )}
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">İlgili Veri Varlığı *</label>
               <select
                 className="form-control"
@@ -153,7 +153,7 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
               </select>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid" style={{ gridTemplateColumns: "1fr 2fr" }}>
               <div className="form-group">
                 <label className="form-label">Özne Türü</label>
                 <select
@@ -184,7 +184,7 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Erişim Seviyesi</label>
                 <select
@@ -220,7 +220,7 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Kapsam Detayı / Filtresi</label>
               <input
                 type="text"
@@ -274,7 +274,7 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Tutar / Adet / Kayıt Limiti</label>
                 <input
@@ -300,7 +300,7 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Notlar</label>
               <textarea
                 className="form-control"
@@ -313,7 +313,7 @@ export const DataGovernanceAccessModal: React.FC<DataGovernanceAccessModalProps>
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSaving}>
               İptal
             </button>

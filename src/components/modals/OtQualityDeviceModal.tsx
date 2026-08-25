@@ -179,12 +179,12 @@ export const OtQualityDeviceModal: React.FC<OtQualityDeviceModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "700px",
-          maxHeight: "92vh",
-          overflowY: "auto",
+          maxWidth: "min(700px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -225,337 +225,265 @@ export const OtQualityDeviceModal: React.FC<OtQualityDeviceModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.125rem" }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                color: "#b91c1c",
-                fontSize: "0.875rem",
-              }}
-            >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Row 1: Device Name & Device Type */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Cihaz Adı <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 3D CMM Koordinat Ölçüm Cihazı, Dijital Terazi"
-                value={deviceName}
-                onChange={(e) => setDeviceName(e.target.value)}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
+            {errorMessage && (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: "8px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#b91c1c",
                   fontSize: "0.875rem",
-                }}
-                required
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Cihaz Tipi
-              </label>
-              <select
-                value={deviceType}
-                onChange={(e) => setDeviceType(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
                 }}
               >
-                <option value="">Seçiniz</option>
-                <option value="CMM / 3D Tarama">CMM / 3D Tarama</option>
-                <option value="Dijital Kumpas / Mikrometre">Dijital Kumpas / Mikrometre</option>
-                <option value="Endüstriyel Terazi">Endüstriyel Terazi</option>
-                <option value="Kamera / Vision Sistemi">Kamera / Vision Sistemi</option>
-                <option value="Sertlik / Mukavemet Ölçer">Sertlik / Mukavemet Ölçer</option>
-                <option value="Sızdırmazlık / Test Cihazı">Sızdırmazlık / Test Cihazı</option>
-                <option value="Spektrometre / Laboratuvar">Spektrometre / Laboratuvar</option>
-              </select>
-            </div>
-          </div>
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
-          {/* Row 2: Manufacturer & Model */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Cihaz Üreticisi (OEM)
+            {/* Row 1: Device Name & Device Type */}
+            <div className="form-grid" style={{ gridTemplateColumns: "2fr 1fr" }}>
+              <div className="form-group">
+                <label className="form-label">
+                  Cihaz Adı <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: 3D CMM Koordinat Ölçüm Cihazı, Dijital Terazi"
+                  value={deviceName}
+                  onChange={(e) => setDeviceName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Cihaz Tipi
+                </label>
+                <select
+                  className="form-control"
+                  value={deviceType}
+                  onChange={(e) => setDeviceType(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="CMM / 3D Tarama">CMM / 3D Tarama</option>
+                  <option value="Dijital Kumpas / Mikrometre">Dijital Kumpas / Mikrometre</option>
+                  <option value="Endüstriyel Terazi">Endüstriyel Terazi</option>
+                  <option value="Kamera / Vision Sistemi">Kamera / Vision Sistemi</option>
+                  <option value="Sertlik / Mukavemet Ölçer">Sertlik / Mukavemet Ölçer</option>
+                  <option value="Sızdırmazlık / Test Cihazı">Sızdırmazlık / Test Cihazı</option>
+                  <option value="Spektrometre / Laboratuvar">Spektrometre / Laboratuvar</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Row 2: Manufacturer & Model */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Cihaz Üreticisi (OEM)
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Zeiss, Mitutoyo, Mettler Toledo, Keyence"
+                  value={manufacturer}
+                  onChange={(e) => setManufacturer(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Cihaz Modeli
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Contura G2, Digimatic, CV-X400"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 3: Output Format & Interface Type */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Çıktı / Dosya Formatı
+                </label>
+                <select
+                  className="form-control"
+                  value={outputFormat}
+                  onChange={(e) => setOutputFormat(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="CSV / Excel">CSV / Excel</option>
+                  <option value="JSON / REST API">JSON / REST API</option>
+                  <option value="Seri ASCII / Ham Metin">Seri ASCII / Ham Metin</option>
+                  <option value="Veritabanı (SQL Doğrudan)">Veritabanı (SQL Doğrudan)</option>
+                  <option value="PDF Rapor">PDF Rapor</option>
+                  <option value="OPC-UA / MQTT">OPC-UA / MQTT</option>
+                  <option value="Yalnızca Ekran (Giriş Yok)">Yalnızca Ekran (Giriş Yok)</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Fiziksel / Ağ Arayüzü
+                </label>
+                <select
+                  className="form-control"
+                  value={interfaceType}
+                  onChange={(e) => setInterfaceType(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Ethernet (TCP/IP)">Ethernet (TCP/IP)</option>
+                  <option value="RS-232 / RS-485 Seri Port">RS-232 / RS-485 Seri Port</option>
+                  <option value="USB (Sanal COM / HID)">USB (Sanal COM / HID)</option>
+                  <option value="Bluetooth / Kablosuz">Bluetooth / Kablosuz</option>
+                  <option value="Wi-Fi Ağ Paylaşımı">Wi-Fi Ağ Paylaşımı</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Row 4: Data Capabilities Checkboxes */}
+            <div style={{ backgroundColor: "#f8fafc", padding: "0.875rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0", marginBottom: "1rem" }}>
+              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 700, color: "#1e293b", marginBottom: "0.625rem" }}>
+                Cihazın Ürettiği Veri Yetenekleri & Alanlar
               </label>
-              <input
-                type="text"
-                placeholder="Örn: Zeiss, Mitutoyo, Mettler Toledo, Keyence"
-                value={manufacturer}
-                onChange={(e) => setManufacturer(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.5rem" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={passFailAvailable}
+                    onChange={(e) => setPassFailAvailable(e.target.checked)}
+                  />
+                  <span>✓ PASS / FAIL Kararı</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={measurementValuesAvailable}
+                    onChange={(e) => setMeasurementValuesAvailable(e.target.checked)}
+                  />
+                  <span>✓ Sayısal Ölçüm Değerleri</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={lotBatchAvailable}
+                    onChange={(e) => setLotBatchAvailable(e.target.checked)}
+                  />
+                  <span>✓ Lot / Parti Numarası</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={productCodeAvailable}
+                    onChange={(e) => setProductCodeAvailable(e.target.checked)}
+                  />
+                  <span>✓ Ürün / Parça Kodu</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={operatorAvailable}
+                    onChange={(e) => setOperatorAvailable(e.target.checked)}
+                  />
+                  <span>✓ Operatör / Kullanıcı ID</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={apiAvailable}
+                    onChange={(e) => setApiAvailable(e.target.checked)}
+                  />
+                  <span>✓ Doğrudan API / SDK Var</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={networkShareAvailable}
+                    onChange={(e) => setNetworkShareAvailable(e.target.checked)}
+                  />
+                  <span>✓ Ağ Klasör Paylaşımı (SMB)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Row 5: Integration Method & Target System */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Önerilen Entegrasyon Yöntemi
+                </label>
+                <select
+                  className="form-control"
+                  value={integrationMethod}
+                  onChange={(e) => setIntegrationMethod(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Otomatik (Ağ Klasörü / Dosya İzleyici)">Otomatik (Ağ Klasörü / Dosya İzleyici)</option>
+                  <option value="Doğrudan Cihaz API / Webhook">Doğrudan Cihaz API / Webhook</option>
+                  <option value="Seri Port Dinleyici (Agent)">Seri Port Dinleyici (Agent)</option>
+                  <option value="Manuel Form ile Giriş">Manuel Form ile Giriş</option>
+                  <option value="PLC Üzerinden Aktarım">PLC Üzerinden Aktarım</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Hedef Kalite / ERP Modülü
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: ERP Kalite Kontrol (QM), MES Kalite Modülü"
+                  value={targetSystem}
+                  onChange={(e) => setTargetSystem(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 6: Notes */}
+            <div className="form-group">
+              <label className="form-label">
+                Kalite Cihazı Saha Notları
+              </label>
+              <textarea
+                className="form-control"
+                rows={2}
+                placeholder="Cihaz kalibrasyon periyotları, operatör alışkanlıkları veya entegrasyon sınırları..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
               />
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Cihaz Modeli
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Contura G2, Digimatic, CV-X400"
-                value={model}
-                onChange={(e) => setModel(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 3: Output Format & Interface Type */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Çıktı / Dosya Formatı
-              </label>
-              <select
-                value={outputFormat}
-                onChange={(e) => setOutputFormat(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="">Seçiniz</option>
-                <option value="CSV / Excel">CSV / Excel</option>
-                <option value="JSON / REST API">JSON / REST API</option>
-                <option value="Seri ASCII / Ham Metin">Seri ASCII / Ham Metin</option>
-                <option value="Veritabanı (SQL Doğrudan)">Veritabanı (SQL Doğrudan)</option>
-                <option value="PDF Rapor">PDF Rapor</option>
-                <option value="OPC-UA / MQTT">OPC-UA / MQTT</option>
-                <option value="Yalnızca Ekran (Giriş Yok)">Yalnızca Ekran (Giriş Yok)</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Fiziksel / Ağ Arayüzü
-              </label>
-              <select
-                value={interfaceType}
-                onChange={(e) => setInterfaceType(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="">Seçiniz</option>
-                <option value="Ethernet (TCP/IP)">Ethernet (TCP/IP)</option>
-                <option value="RS-232 / RS-485 Seri Port">RS-232 / RS-485 Seri Port</option>
-                <option value="USB (Sanal COM / HID)">USB (Sanal COM / HID)</option>
-                <option value="Bluetooth / Kablosuz">Bluetooth / Kablosuz</option>
-                <option value="Wi-Fi Ağ Paylaşımı">Wi-Fi Ağ Paylaşımı</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Row 4: Data Capabilities Checkboxes */}
-          <div style={{ backgroundColor: "#f8fafc", padding: "0.875rem 1rem", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 700, color: "#1e293b", marginBottom: "0.625rem" }}>
-              Cihazın Ürettiği Veri Yetenekleri & Alanlar
-            </label>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "0.5rem" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={passFailAvailable}
-                  onChange={(e) => setPassFailAvailable(e.target.checked)}
-                />
-                <span>✓ PASS / FAIL Kararı</span>
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={measurementValuesAvailable}
-                  onChange={(e) => setMeasurementValuesAvailable(e.target.checked)}
-                />
-                <span>✓ Sayısal Ölçüm Değerleri</span>
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={lotBatchAvailable}
-                  onChange={(e) => setLotBatchAvailable(e.target.checked)}
-                />
-                <span>✓ Lot / Parti Numarası</span>
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={productCodeAvailable}
-                  onChange={(e) => setProductCodeAvailable(e.target.checked)}
-                />
-                <span>✓ Ürün / Parça Kodu</span>
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={operatorAvailable}
-                  onChange={(e) => setOperatorAvailable(e.target.checked)}
-                />
-                <span>✓ Operatör / Kullanıcı ID</span>
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={apiAvailable}
-                  onChange={(e) => setApiAvailable(e.target.checked)}
-                />
-                <span>✓ Doğrudan API / SDK Var</span>
-              </label>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.8125rem", color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={networkShareAvailable}
-                  onChange={(e) => setNetworkShareAvailable(e.target.checked)}
-                />
-                <span>✓ Ağ Klasör Paylaşımı (SMB)</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Row 5: Integration Method & Target System */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Önerilen Entegrasyon Yöntemi
-              </label>
-              <select
-                value={integrationMethod}
-                onChange={(e) => setIntegrationMethod(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="">Seçiniz</option>
-                <option value="Otomatik (Ağ Klasörü / Dosya İzleyici)">Otomatik (Ağ Klasörü / Dosya İzleyici)</option>
-                <option value="Doğrudan Cihaz API / Webhook">Doğrudan Cihaz API / Webhook</option>
-                <option value="Seri Port Dinleyici (Agent)">Seri Port Dinleyici (Agent)</option>
-                <option value="Manuel Form ile Giriş">Manuel Form ile Giriş</option>
-                <option value="PLC Üzerinden Aktarım">PLC Üzerinden Aktarım</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Hedef Kalite / ERP Modülü
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: ERP Kalite Kontrol (QM), MES Kalite Modülü"
-                value={targetSystem}
-                onChange={(e) => setTargetSystem(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 6: Notes */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Kalite Cihazı Saha Notları
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Cihaz kalibrasyon periyotları, operatör alışkanlıkları veya entegrasyon sınırları..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-                resize: "vertical",
-              }}
-            />
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "0.5rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >

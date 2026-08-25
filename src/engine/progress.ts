@@ -13,6 +13,8 @@ import type { Question, AnswerData, ProgressResult } from "./types";
 
 /**
  * Bir sorunun gerçek bir kullanıcı cevabına sahip olup olmadığını denetler (bayraklardan bağımsız).
+ * Visited ≠ Answered: Bir soru salt görüntülendi diye veya sadece genel not/ek/bayrak içeriyor diye
+ * cevaplanmış sayılamaz.
  */
 export function hasProvidedAnswer(
   question: Question,
@@ -21,14 +23,21 @@ export function hasProvidedAnswer(
   if (!answerData) return false;
   const { answer_type } = question;
 
-  if (answer_type === "single_choice" || answer_type === "multiple_choice" || answer_type === "yes_no") {
+  if (
+    answer_type === "single_choice" ||
+    answer_type === "multiple_choice" ||
+    answer_type === "yes_no"
+  ) {
     const selected = answerData.selected ?? [];
-    if (selected.length === 0) return false;
+    const validSelected = selected.filter(
+      (s) => s && typeof s.value === "string" && s.value.trim().length > 0
+    );
+    if (validSelected.length === 0) return false;
 
-    // other seçilmişse note zorunlu
+    // "Diğer" (is_other) seçilmişse note alanı zorunludur
     const hasOtherOption = (question.options ?? []).some((o) => o.is_other);
     if (hasOtherOption) {
-      const otherSelected = selected.find((s) => {
+      const otherSelected = validSelected.find((s) => {
         const opt = (question.options ?? []).find((o) => o.value === s.value);
         return opt?.is_other === true;
       });
@@ -54,8 +63,11 @@ export function hasProvidedAnswer(
 }
 
 /**
- * Bir sorunun cevaplanmış sayılıp sayılmadığını döndürür (İlerleme motoru için).
- * 🟡 Sonra Dön veya 🔴 Kritik Takip bayrağı açık olan sorular "cevaplanmış" SAYILMAZ.
+ * Bir sorunun cevaplanmış sayılıp sayılmadığını döndürür.
+ * Kural: Visited ≠ Answered.
+ * Soru ister zorunlu ister opsiyonel olsun:
+ * 1. 🟡 Sonra Dön veya 🔴 Kritik Takip bayrağı açık olan sorular "cevaplanmış" SAYILMAZ.
+ * 2. Yalnızca veritabanında/state'de geçerli bir cevap varsa "cevaplanmış" sayılır.
  */
 export function isQuestionAnswered(
   question: Question,
@@ -66,7 +78,6 @@ export function isQuestionAnswered(
     return false;
   }
 
-  if (!question.required) return true;
   return hasProvidedAnswer(question, answerData);
 }
 

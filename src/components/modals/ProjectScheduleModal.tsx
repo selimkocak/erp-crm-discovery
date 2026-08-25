@@ -143,7 +143,7 @@ export const ProjectScheduleModal: React.FC<ProjectScheduleModalProps> = ({
             )}
 
             {/* Date Inputs Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label" htmlFor="proj-plan-start">
                   Planlanan Başlangıç

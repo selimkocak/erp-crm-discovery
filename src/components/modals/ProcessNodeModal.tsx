@@ -186,12 +186,12 @@ export const ProcessNodeModal: React.FC<ProcessNodeModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "760px",
-          maxHeight: "90vh",
-          overflowY: "auto",
+          maxWidth: "min(760px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -232,21 +232,16 @@ export const ProcessNodeModal: React.FC<ProcessNodeModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
           {errorMessage && (
             <div
               style={{
@@ -591,29 +586,21 @@ export const ProcessNodeModal: React.FC<ProcessNodeModalProps> = ({
               }}
             />
           </div>
+          </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "0.5rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >

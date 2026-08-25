@@ -272,17 +272,24 @@ export async function showAttachmentInFolder(
   try {
     const absPath = await resolveAttachmentAbsolutePath(relativePath);
 
-    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+    if (isTauriRuntime()) {
       try {
         const { invoke } = await import("@tauri-apps/api/core");
         await invoke("show_attachment_in_folder", { path: absPath });
         return { success: true };
       } catch (invokeErr: any) {
-        console.warn("show_attachment_in_folder invoke hatası:", invokeErr);
-        return {
-          success: false,
-          error: `Klasör açılamadı: ${invokeErr?.message || invokeErr}`,
-        };
+        // Fallback: @tauri-apps/plugin-opener revealItemInDir
+        try {
+          const { revealItemInDir } = await import("@tauri-apps/plugin-opener");
+          await revealItemInDir(absPath);
+          return { success: true };
+        } catch (openerErr: any) {
+          console.warn("show_attachment_in_folder hatasi:", invokeErr, openerErr);
+          return {
+            success: false,
+            error: `Klasör açılamadı: ${invokeErr?.message || invokeErr}`,
+          };
+        }
       }
     }
 
@@ -310,10 +317,10 @@ export async function openAttachment(attachment: {
     attachment.original_file_name ||
     "Dosya";
 
-  if (!validateRelativePath(relPath)) {
+  if (!relPath || !validateRelativePath(relPath)) {
     return {
       success: false,
-      error: "Geçersiz dosya yolu formatı.",
+      error: `Geçersiz dosya yolu formatı: "${relPath || 'boş'}".`,
     };
   }
 
@@ -321,7 +328,7 @@ export async function openAttachment(attachment: {
   if (!exists) {
     return {
       success: false,
-      error: `Kanıt dosyası yerel Attachment Vault içinde bulunamadı: "${originalName}" [Vault Yolu: ${relPath}]. Dosyayı yeniden içe aktarınız veya uygulamayı yeniden başlatınız.`,
+      error: `Kanıt dosyası yerel Attachment Vault içinde bulunamadı: "${originalName}" [Vault Yolu: ${relPath}]. Lütfen dosyayı soru kartından yeniden içe aktarınız.`,
     };
   }
 
@@ -329,14 +336,25 @@ export async function openAttachment(attachment: {
     // Platforma özgü mutlak yolu çöz (Windows: backslash, POSIX: forward-slash)
     const absPath = await resolveAttachmentAbsolutePath(relPath);
 
-    // 1. Tauri Runtime: open_attachment_path Rust command
-    if (typeof window !== "undefined" && "__TAURI_INTERNALS__" in window) {
+    // 1. Tauri Runtime: open_attachment_path Rust command + plugin-opener fallback
+    if (isTauriRuntime()) {
       try {
         const { invoke } = await import("@tauri-apps/api/core");
         await invoke("open_attachment_path", { path: absPath });
         return { success: true };
       } catch (invokeErr: any) {
-        console.warn("Tauri open_attachment_path invoke fallback:", invokeErr);
+        // Fallback: @tauri-apps/plugin-opener openPath
+        try {
+          const { openPath } = await import("@tauri-apps/plugin-opener");
+          await openPath(absPath);
+          return { success: true };
+        } catch (openerErr: any) {
+          console.warn("Tauri open_attachment_path hatası:", invokeErr, openerErr);
+          return {
+            success: false,
+            error: `Dosya açılamadı: ${invokeErr?.message || invokeErr}`,
+          };
+        }
       }
     }
 
@@ -367,7 +385,7 @@ export async function openAttachment(attachment: {
   } catch (err: any) {
     return {
       success: false,
-      error: `Dosya açılırken bir sorun oluştu: "${originalName}". Lütfen dosya izinlerini kontrol edin.`,
+      error: `Dosya açılırken bir sorun oluştu: "${originalName}". ${err?.message || err}`,
     };
   }
 }

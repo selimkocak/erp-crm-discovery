@@ -164,7 +164,7 @@ export const FunctionScheduleModal: React.FC<FunctionScheduleModalProps> = ({
             )}
 
             {/* Date Inputs Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label" htmlFor="func-plan-start">
                   Planlanan Başlangıç

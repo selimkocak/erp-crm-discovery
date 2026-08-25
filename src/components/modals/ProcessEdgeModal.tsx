@@ -117,12 +117,12 @@ export const ProcessEdgeModal: React.FC<ProcessEdgeModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "540px",
-          maxHeight: "90vh",
-          overflowY: "auto",
+          maxWidth: "min(540px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -163,156 +163,119 @@ export const ProcessEdgeModal: React.FC<ProcessEdgeModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                color: "#b91c1c",
-                fontSize: "0.875rem",
-              }}
-            >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Source Node */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Başlangıç Adımı (Çıkış) <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <select
-              value={sourceNodeId}
-              onChange={(e) => setSourceNodeId(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-                backgroundColor: "#ffffff",
-              }}
-              required
-            >
-              <option value="">— Başlangıç Adımı Seçiniz —</option>
-              {nodes.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.step_order}. {n.name} ({n.node_type})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Target Node */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Hedef Adım (Varış) <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <select
-              value={targetNodeId}
-              onChange={(e) => setTargetNodeId(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-                backgroundColor: "#ffffff",
-              }}
-              required
-            >
-              <option value="">— Hedef Adım Seçiniz —</option>
-              {nodes.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.step_order}. {n.name} ({n.node_type})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Label & Condition */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Bağlantı Etiketi
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Onaylandı, Reddedildi, Stok Var"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
+            {errorMessage && (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: "8px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#b91c1c",
                   fontSize: "0.875rem",
                 }}
-              />
+              >
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Source & Target Nodes */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Başlangıç Adımı <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <select
+                  className="form-control"
+                  value={sourceNodeId}
+                  onChange={(e) => setSourceNodeId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Başlangıç Seçin --</option>
+                  {nodes.map((n) => (
+                    <option key={n.id} value={n.id}>
+                      {n.step_order}. {n.name} ({n.node_type})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Hedef Adım <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <select
+                  className="form-control"
+                  value={targetNodeId}
+                  onChange={(e) => setTargetNodeId(e.target.value)}
+                  required
+                >
+                  <option value="">-- Hedef Seçin --</option>
+                  {nodes
+                    .filter((n) => n.id !== sourceNodeId)
+                    .map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.step_order}. {n.name} ({n.node_type})
+                      </option>
+                    ))}
+                </select>
+              </div>
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Geçiş Koşulu
+
+            {/* Label / Branch Name */}
+            <div className="form-group">
+              <label className="form-label">
+                Bağlantı Etiketi / Dal Adı
               </label>
               <input
                 type="text"
+                className="form-control"
+                placeholder="Örn: Evet, Hayır, Onaylandı, Revizyon Gerekli"
+                value={label}
+                onChange={(e) => setLabel(e.target.value)}
+              />
+            </div>
+
+            {/* Condition Text */}
+            <div className="form-group">
+              <label className="form-label">
+                Geçiş Koşulu / İş Kuralı
+              </label>
+              <input
+                type="text"
+                className="form-control"
                 placeholder="Örn: Tutar > 50.000 TL"
                 value={conditionText}
                 onChange={(e) => setConditionText(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
               />
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "0.5rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >

@@ -66,7 +66,8 @@ export async function reconcileAndMigrateLegacyAttachments(
     report.totalScanned = rows.length;
 
     for (const row of rows) {
-      const oldRelPath = row.relative_path || "";
+      const oldRelPath = (row.relative_path || "").trim();
+      const canonicalRelPath = `attachment/${row.analysis_project_id}/${row.business_function_code}/${row.question_id}/${row.stored_file_name}`;
 
       // Zaten yeni standartta ise (attachment/ ile başlıyorsa)
       if (oldRelPath.startsWith("attachment/")) {
@@ -74,52 +75,65 @@ export async function reconcileAndMigrateLegacyAttachments(
         continue;
       }
 
-      // Legacy projects/ formatında ise
-      if (oldRelPath.startsWith("projects/")) {
-        const canonicalRelPath = `attachment/${row.analysis_project_id}/${row.business_function_code}/${row.question_id}/${row.stored_file_name}`;
+      // Legacy projects/ formatında veya absolute path veya boş/bozuk relative_path ise
+      try {
+        // Yeni kanonik konumda dosya zaten var mı?
+        let verified = await attachmentExists(canonicalRelPath);
 
-        try {
-          // Yeni konumda zaten var mı?
-          const newExists = await attachmentExists(canonicalRelPath);
+        if (!verified) {
+          let sourceData: Uint8Array | null = null;
 
-          if (!newExists) {
-            // Eski konumda var mı?
-            const oldData = await readAttachmentFile(oldRelPath);
+          // 1. Eski projects/ yolundan okumayı dene
+          if (oldRelPath.startsWith("projects/")) {
+            sourceData = await readAttachmentFile(oldRelPath);
+          }
 
-            if (oldData && oldData.byteLength > 0) {
-              // SHA-256 bütünlüğü kontrol et
-              const computedSha = await calculateSha256(oldData);
-              if (computedSha.toLowerCase() === row.sha256.toLowerCase()) {
-                // Yeni konuma yaz
-                await saveAttachmentFile(canonicalRelPath, oldData);
-              } else {
-                console.warn(
-                  `[Vault Migration] SHA-256 uyumsuzluğu: ${row.id} (${row.stored_file_name})`
-                );
+          // 2. Absolute path ise Tauri backend üzerinden okumayı dene
+          if (!sourceData && (oldRelPath.startsWith("/") || /^[a-zA-Z]:/.test(oldRelPath))) {
+            try {
+              const { invoke } = await import("@tauri-apps/api/core");
+              const bytes = await invoke<number[]>("read_file_binary", { path: oldRelPath });
+              if (bytes && bytes.length > 0) {
+                sourceData = new Uint8Array(bytes);
               }
-            } else {
-              report.missingFilesCount++;
-              console.warn(
-                `[Vault Migration] Fiziksel dosya bulunamadı: ${oldRelPath}`
-              );
+            } catch {
+              // Devam et
             }
           }
 
-          // Yeni konumda dosya varlığı doğrulandıysa DB kaydını güncelle
-          const verified = await attachmentExists(canonicalRelPath);
-          if (verified) {
-            const now = new Date().toISOString();
-            await db.execute(
-              "UPDATE question_attachments SET relative_path = $1, updated_at = $2 WHERE id = $3",
-              [canonicalRelPath, now, row.id]
+          if (sourceData && sourceData.byteLength > 0) {
+            // SHA-256 bütünlüğü kontrol et
+            const computedSha = await calculateSha256(sourceData);
+            if (!row.sha256 || computedSha.toLowerCase() === row.sha256.toLowerCase()) {
+              // Yeni kanonik konuma yaz
+              await saveAttachmentFile(canonicalRelPath, sourceData);
+              verified = await attachmentExists(canonicalRelPath);
+            } else {
+              console.warn(
+                `[Vault Migration] SHA-256 uyumsuzluğu: ${row.id} (${row.stored_file_name})`
+              );
+            }
+          } else {
+            report.missingFilesCount++;
+            console.warn(
+              `[Vault Migration] Fiziksel dosya bulunamadı: ${oldRelPath || row.stored_file_name}`
             );
-            report.migratedCount++;
           }
-        } catch (err: any) {
-          const errMsg = `Ek ${row.id} (${row.stored_file_name}) taşınamadı: ${err?.message || err}`;
-          report.errors.push(errMsg);
-          console.error(`[Vault Migration Error] ${errMsg}`);
         }
+
+        // Yeni konumda dosya varlığı doğrulandıysa DB kaydını güncelle
+        if (verified) {
+          const now = new Date().toISOString();
+          await db.execute(
+            "UPDATE question_attachments SET relative_path = $1, source_absolute_path = NULL, updated_at = $2 WHERE id = $3",
+            [canonicalRelPath, now, row.id]
+          );
+          report.migratedCount++;
+        }
+      } catch (err: any) {
+        const errMsg = `Ek ${row.id} (${row.stored_file_name}) taşınamadı: ${err?.message || err}`;
+        report.errors.push(errMsg);
+        console.error(`[Vault Migration Error] ${errMsg}`);
       }
     }
   } catch (err: any) {

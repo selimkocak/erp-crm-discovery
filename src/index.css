@@ -186,7 +186,8 @@ body {
 /* ── BUTTON DESIGN SYSTEM (Corporate Action Hierarchy) ──────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
-.btn {
+.btn,
+.button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -203,9 +204,11 @@ body {
   font-family: inherit;
   user-select: none;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
-.btn:focus-visible {
+.btn:focus-visible,
+.button:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--color-focus-ring);
@@ -213,20 +216,24 @@ body {
 
 /* ══════════════════════════════════════════════════════════════════════════════
    SEMANTIC ACTION BUTTON SUITE (WCAG AA)
-   - Başlat: Mavi (#2563eb) (.btn--start, .btn-start)
-   - Devam: Turkuaz/Teal (#0f766e) (.btn--continue, .btn-continue)
-   - Rapor Önizleme: Mor/Indigo (#4f46e5) (.btn--report, .btn-report, .btn-report-primary)
-   - Kaydet ve Çık / Tamamla: Zümrüt Yeşil (#15803d / #047857) (.btn--save, .btn-save, .btn-save-exit, .btn-success)
-   - Sonraki: Mavi (#2563eb) (.btn--next, .btn-next)
-   - Önceki / Geri: Nötr / Açık Teal (.btn--back, .btn-back, .btn-nav-home)
-   - Tehlike / Sil / Kritik: Kırmızı (#dc2626) (.btn--danger, .btn-danger)
+   - Başlat: Mavi (#2563eb) (.btn--start, .btn-start, .button--start)
+   - Devam: Turkuaz/Teal (#0f766e) (.btn--continue, .btn-continue, .button--continue)
+   - Rapor Önizleme: Mor/Indigo (#4f46e5) (.btn--report, .btn-report, .btn-report-primary, .button--report)
+   - Kaydet ve Çık / Tamamla: Zümrüt Yeşil (#15803d / #047857) (.btn--save, .btn-save, .btn-save-exit, .btn-success, .button--save)
+   - Sonraki: Mavi (#2563eb) (.btn--next, .btn-next, .button--next)
+   - Önceki / Geri: Nötr / Açık Teal (.btn--back, .btn-back, .btn-nav-home, .button--back)
+   - Tehlike / Sil / Kritik: Kırmızı (#dc2626) (.btn--danger, .btn-danger, .button--danger)
    ══════════════════════════════════════════════════════════════════════════════ */
 
 /* ── 1. Başlat / Yeni Analiz: Corporate Blue (#2563eb) ────────────────────── */
 .btn-primary,
 .btn--primary,
 .btn-start,
-.btn--start {
+.btn--start,
+.button-primary,
+.button--primary,
+.button-start,
+.button--start {
   background-color: var(--color-primary-600);
   color: #ffffff;
   border-color: var(--color-primary-700);
@@ -237,7 +244,11 @@ body {
 .btn-primary:hover:not(:disabled),
 .btn--primary:hover:not(:disabled),
 .btn-start:hover:not(:disabled),
-.btn--start:hover:not(:disabled) {
+.btn--start:hover:not(:disabled),
+.button-primary:hover:not(:disabled),
+.button--primary:hover:not(:disabled),
+.button-start:hover:not(:disabled),
+.button--start:hover:not(:disabled) {
   background-color: var(--color-primary-700);
   border-color: var(--color-primary-800);
   color: #ffffff;
@@ -266,7 +277,9 @@ body {
 
 /* ── 2. Devam / Analize Devam: Deep Turquoise / Teal (#0f766e) ───────────── */
 .btn-continue,
-.btn--continue {
+.btn--continue,
+.button-continue,
+.button--continue {
   background-color: #0f766e !important;
   color: #ffffff !important;
   border-color: #0d655e !important;
@@ -275,7 +288,9 @@ body {
 }
 
 .btn-continue:hover:not(:disabled),
-.btn--continue:hover:not(:disabled) {
+.btn--continue:hover:not(:disabled),
+.button-continue:hover:not(:disabled),
+.button--continue:hover:not(:disabled) {
   background-color: #0d655e !important;
   border-color: #0a524c !important;
   color: #ffffff !important;
@@ -284,7 +299,9 @@ body {
 }
 
 .btn-continue:active:not(:disabled),
-.btn--continue:active:not(:disabled) {
+.btn--continue:active:not(:disabled),
+.button-continue:active:not(:disabled),
+.button--continue:active:not(:disabled) {
   background-color: #0a524c !important;
   border-color: #0a524c !important;
   transform: translateY(0);
@@ -292,7 +309,9 @@ body {
 }
 
 .btn-continue:focus-visible,
-.btn--continue:focus-visible {
+.btn--continue:focus-visible,
+.button-continue:focus-visible,
+.button--continue:focus-visible {
   outline: 2px solid #0f766e !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.35);
@@ -302,7 +321,9 @@ body {
 .btn-report,
 .btn--report,
 .btn-report-primary,
-.btn--report-primary {
+.btn--report-primary,
+.button-report,
+.button--report {
   background-color: var(--color-report-600) !important;
   color: #ffffff !important;
   border-color: var(--color-report-700) !important;
@@ -313,7 +334,9 @@ body {
 .btn-report:hover:not(:disabled),
 .btn--report:hover:not(:disabled),
 .btn-report-primary:hover:not(:disabled),
-.btn--report-primary:hover:not(:disabled) {
+.btn--report-primary:hover:not(:disabled),
+.button-report:hover:not(:disabled),
+.button--report:hover:not(:disabled) {
   background-color: var(--color-report-700) !important;
   border-color: var(--color-report-800) !important;
   color: #ffffff !important;
@@ -324,7 +347,9 @@ body {
 .btn-report:active:not(:disabled),
 .btn--report:active:not(:disabled),
 .btn-report-primary:active:not(:disabled),
-.btn--report-primary:active:not(:disabled) {
+.btn--report-primary:active:not(:disabled),
+.button-report:active:not(:disabled),
+.button--report:active:not(:disabled) {
   background-color: var(--color-report-800) !important;
   border-color: var(--color-report-800) !important;
   transform: translateY(0);
@@ -334,7 +359,9 @@ body {
 .btn-report:focus-visible,
 .btn--report:focus-visible,
 .btn-report-primary:focus-visible,
-.btn--report-primary:focus-visible {
+.btn--report-primary:focus-visible,
+.button-report:focus-visible,
+.button--report:focus-visible {
   outline: 2px solid var(--color-report-600) !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px var(--color-report-focus-ring);
@@ -342,7 +369,9 @@ body {
 
 /* ── Secondary Action: Deep Teal / Slate (Ara Rapor, Özel Soru, İkincil Aksiyonlar) */
 .btn-secondary,
-.btn--secondary {
+.btn--secondary,
+.button-secondary,
+.button--secondary {
   background-color: var(--color-secondary-subtle);
   border-color: var(--color-secondary-border);
   color: var(--color-secondary-700);
@@ -351,7 +380,9 @@ body {
 }
 
 .btn-secondary:hover:not(:disabled),
-.btn--secondary:hover:not(:disabled) {
+.btn--secondary:hover:not(:disabled),
+.button-secondary:hover:not(:disabled),
+.button--secondary:hover:not(:disabled) {
   background-color: var(--color-secondary-600);
   border-color: var(--color-secondary-700);
   color: #ffffff;
@@ -360,13 +391,17 @@ body {
 }
 
 .btn-secondary:active:not(:disabled),
-.btn--secondary:active:not(:disabled) {
+.btn--secondary:active:not(:disabled),
+.button-secondary:active:not(:disabled),
+.button--secondary:active:not(:disabled) {
   background-color: var(--color-secondary-700);
   transform: translateY(0);
 }
 
 .btn-secondary:focus-visible,
-.btn--secondary:focus-visible {
+.btn--secondary:focus-visible,
+.button-secondary:focus-visible,
+.button--secondary:focus-visible {
   outline: 2px solid var(--color-secondary-600);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.35);
@@ -377,7 +412,9 @@ body {
 .btn--save,
 .btn-success,
 .btn--success,
-.btn-save-exit {
+.btn-save-exit,
+.button-save,
+.button--save {
   background-color: #047857 !important;
   color: #ffffff !important;
   border-color: #065f46 !important;
@@ -389,7 +426,9 @@ body {
 .btn--save:hover:not(:disabled),
 .btn-success:hover:not(:disabled),
 .btn--success:hover:not(:disabled),
-.btn-save-exit:hover:not(:disabled) {
+.btn-save-exit:hover:not(:disabled),
+.button-save:hover:not(:disabled),
+.button--save:hover:not(:disabled) {
   background-color: #065f46 !important;
   border-color: #064e3b !important;
   color: #ffffff !important;
@@ -401,7 +440,9 @@ body {
 .btn--save:active:not(:disabled),
 .btn-success:active:not(:disabled),
 .btn--success:active:not(:disabled),
-.btn-save-exit:active:not(:disabled) {
+.btn-save-exit:active:not(:disabled),
+.button-save:active:not(:disabled),
+.button--save:active:not(:disabled) {
   background-color: #064e3b !important;
   border-color: #064e3b !important;
   transform: translateY(0);
@@ -411,7 +452,9 @@ body {
 .btn--save:focus-visible,
 .btn-success:focus-visible,
 .btn--success:focus-visible,
-.btn-save-exit:focus-visible {
+.btn-save-exit:focus-visible,
+.button-save:focus-visible,
+.button--save:focus-visible {
   outline: 2px solid #047857 !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.35);
@@ -419,7 +462,9 @@ body {
 
 /* ── 5. Sonraki: Corporate Blue (#2563eb) ───────────────────────────────── */
 .btn-next,
-.btn--next {
+.btn--next,
+.button-next,
+.button--next {
   background-color: var(--color-primary-600) !important;
   color: #ffffff !important;
   border-color: var(--color-primary-700) !important;
@@ -428,7 +473,9 @@ body {
 }
 
 .btn-next:hover:not(:disabled),
-.btn--next:hover:not(:disabled) {
+.btn--next:hover:not(:disabled),
+.button-next:hover:not(:disabled),
+.button--next:hover:not(:disabled) {
   background-color: var(--color-primary-700) !important;
   border-color: var(--color-primary-800) !important;
   color: #ffffff !important;
@@ -437,14 +484,18 @@ body {
 }
 
 .btn-next:active:not(:disabled),
-.btn--next:active:not(:disabled) {
+.btn--next:active:not(:disabled),
+.button-next:active:not(:disabled),
+.button--next:active:not(:disabled) {
   background-color: var(--color-primary-800) !important;
   border-color: var(--color-primary-800) !important;
   transform: translateY(0);
 }
 
 .btn-next:focus-visible,
-.btn--next:focus-visible {
+.btn--next:focus-visible,
+.button-next:focus-visible,
+.button--next:focus-visible {
   outline: 2px solid var(--color-primary-600) !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
@@ -454,7 +505,11 @@ body {
 .btn-back,
 .btn--back,
 .btn-outline,
-.btn--outline {
+.btn--outline,
+.button-back,
+.button--back,
+.button-outline,
+.button--outline {
   background-color: var(--bg-surface);
   border-color: var(--color-neutral-300);
   color: var(--color-neutral-700);
@@ -464,7 +519,11 @@ body {
 .btn-back:hover:not(:disabled),
 .btn--back:hover:not(:disabled),
 .btn-outline:hover:not(:disabled),
-.btn--outline:hover:not(:disabled) {
+.btn--outline:hover:not(:disabled),
+.button-back:hover:not(:disabled),
+.button--back:hover:not(:disabled),
+.button-outline:hover:not(:disabled),
+.button--outline:hover:not(:disabled) {
   background-color: var(--color-neutral-100);
   border-color: var(--color-neutral-400);
   color: var(--color-neutral-900);
@@ -473,7 +532,11 @@ body {
 .btn-back:active:not(:disabled),
 .btn--back:active:not(:disabled),
 .btn-outline:active:not(:disabled),
-.btn--outline:active:not(:disabled) {
+.btn--outline:active:not(:disabled),
+.button-back:active:not(:disabled),
+.button--back:active:not(:disabled),
+.button-outline:active:not(:disabled),
+.button--outline:active:not(:disabled) {
   background-color: var(--color-neutral-200);
   transform: translateY(0);
 }
@@ -481,7 +544,11 @@ body {
 .btn-back:focus-visible,
 .btn--back:focus-visible,
 .btn-outline:focus-visible,
-.btn--outline:focus-visible {
+.btn--outline:focus-visible,
+.button-back:focus-visible,
+.button--back:focus-visible,
+.button-outline:focus-visible,
+.button--outline:focus-visible {
   outline: 2px solid var(--color-neutral-600);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.35);
@@ -489,7 +556,9 @@ body {
 
 /* ── 7. Warning Action: Amber (Sonra Dön, Dikkat, Hazırlanıyor) ────────── */
 .btn-warning,
-.btn--warning {
+.btn--warning,
+.button-warning,
+.button--warning {
   background-color: var(--color-warning-500);
   color: #ffffff;
   border-color: var(--color-warning-600);
@@ -498,7 +567,9 @@ body {
 }
 
 .btn-warning:hover:not(:disabled),
-.btn--warning:hover:not(:disabled) {
+.btn--warning:hover:not(:disabled),
+.button-warning:hover:not(:disabled),
+.button--warning:hover:not(:disabled) {
   background-color: var(--color-warning-600);
   border-color: var(--color-warning-700);
   color: #ffffff;
@@ -507,13 +578,17 @@ body {
 }
 
 .btn-warning:active:not(:disabled),
-.btn--warning:active:not(:disabled) {
+.btn--warning:active:not(:disabled),
+.button-warning:active:not(:disabled),
+.button--warning:active:not(:disabled) {
   background-color: var(--color-warning-700);
   transform: translateY(0);
 }
 
 .btn-warning:focus-visible,
-.btn--warning:focus-visible {
+.btn--warning:focus-visible,
+.button-warning:focus-visible,
+.button--warning:focus-visible {
   outline: 2px solid var(--color-warning-500);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.35);
@@ -521,7 +596,9 @@ body {
 
 /* ── 8. Tehlike / Sil / Kritik İşlem: Crimson Red (#dc2626) ─────────────── */
 .btn-danger,
-.btn--danger {
+.btn--danger,
+.button-danger,
+.button--danger {
   background-color: var(--color-danger-600) !important;
   color: #ffffff !important;
   border-color: var(--color-danger-700) !important;
@@ -530,7 +607,9 @@ body {
 }
 
 .btn-danger:hover:not(:disabled),
-.btn--danger:hover:not(:disabled) {
+.btn--danger:hover:not(:disabled),
+.button-danger:hover:not(:disabled),
+.button--danger:hover:not(:disabled) {
   background-color: var(--color-danger-700) !important;
   border-color: var(--color-danger-800) !important;
   color: #ffffff !important;
@@ -539,14 +618,18 @@ body {
 }
 
 .btn-danger:active:not(:disabled),
-.btn--danger:active:not(:disabled) {
+.btn--danger:active:not(:disabled),
+.button-danger:active:not(:disabled),
+.button--danger:active:not(:disabled) {
   background-color: var(--color-danger-800) !important;
   border-color: var(--color-danger-800) !important;
   transform: translateY(0);
 }
 
 .btn-danger:focus-visible,
-.btn--danger:focus-visible {
+.btn--danger:focus-visible,
+.button-danger:focus-visible,
+.button--danger:focus-visible {
   outline: 2px solid var(--color-danger-600) !important;
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.35);
@@ -713,48 +796,93 @@ body {
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
-  margin-bottom: 1.25rem;
+  gap: 0.35rem;
+  margin-bottom: 1.125rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.form-group label {
-  font-size: 0.875rem;
+.form-group label,
+.form-label {
+  display: block;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
 }
 
-.form-group label .required {
+.form-group label .required,
+.form-label .required {
   color: var(--danger);
   margin-left: 2px;
 }
 
-.form-control {
+.form-control,
+.form-input {
   width: 100%;
-  padding: 0.625rem 0.875rem;
+  max-width: 100%;
+  padding: 0.55rem 0.75rem;
   font-size: 0.875rem;
   font-family: inherit;
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
   background-color: var(--bg-surface);
   color: var(--text-primary);
+  box-sizing: border-box;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.form-control:focus {
+.form-control:focus,
+.form-input:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-textarea.form-control {
+textarea.form-control,
+textarea.form-input {
   min-height: 80px;
   resize: vertical;
+  line-height: 1.45;
 }
 
+.form-grid,
 .form-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-grid > *,
+.form-row > *,
+.gov-form-row > * {
+  min-width: 0;
+}
+
+.form-grid--3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-grid--3 > * {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .form-grid,
+  .form-row,
+  .form-grid--3,
+  .gov-form-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
 }
 
 /* Badges */
@@ -788,41 +916,84 @@ textarea.form-control {
 }
 
 /* Tables */
-.table-container {
+.table-container,
+.table-responsive,
+.table-wrapper {
+  width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   background-color: var(--bg-surface);
 }
 
-.custom-table {
+.table,
+.custom-table,
+.gov-table,
+.report-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.875rem;
+  margin: 0;
 }
 
-.custom-table th {
+.table th,
+.custom-table th,
+.gov-table th,
+.report-table th {
   background-color: var(--bg-surface-subtle);
   color: var(--text-secondary);
   font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
 }
 
-.custom-table td {
-  padding: 0.875rem 1rem;
+.table td,
+.custom-table td,
+.gov-table td,
+.report-table td {
+  padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-primary);
   vertical-align: middle;
 }
 
-.custom-table tbody tr:last-child td {
+.table tbody tr:last-child td,
+.custom-table tbody tr:last-child td,
+.gov-table tbody tr:last-child td,
+.report-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.custom-table tbody tr:hover {
+.table tbody tr:hover,
+.custom-table tbody tr:hover,
+.gov-table tbody tr:hover,
+.report-table tbody tr:hover {
   background-color: #f8fafc;
+}
+
+.table-striped tbody tr:nth-child(even) td,
+.report-table--striped tbody tr:nth-child(even) td {
+  background-color: #fafcff;
+}
+
+.table td .actions-cell,
+.table td .btn-group,
+.table td div:has(> .btn-icon),
+.table td div:has(> .btn),
+.table-actions,
+.actions-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  white-space: nowrap;
 }
 
 /* Checkbox Grid for Functions */
@@ -1644,16 +1815,205 @@ textarea.form-control {
 .badge--outline-warning { background: #fffbeb; border: 1px solid #fde68a; color: #b45309; }
 .badge--outline-secondary { background: #f8fafc; border: 1px solid #e2e8f0; color: #475569; }
 
-/* ── Modal Overlay & Content ──────────────────────────────────────── */
-.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
-.modal-content { background: var(--bg-surface, #ffffff); border-radius: 12px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid var(--border-subtle); animation: modalIn 0.2s ease-out; }
-@keyframes modalIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
-.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1.125rem 1.5rem; border-bottom: 1px solid var(--border-subtle); }
-.modal-header__title { display: flex; align-items: center; gap: 0.5rem; }
-.modal-header__title h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
-.modal-close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem; border-radius: 6px; }
-.modal-close-btn:hover { color: var(--text-primary); background: var(--bg-surface-subtle); }
-.modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.5rem; border-top: 1px solid var(--border-subtle); background: var(--bg-surface-subtle, #f8fafc); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+/* ── Universal Modal Framework ────────────────────────────────────── */
+.modal-overlay,
+.gov-modal-overlay,
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.modal-content,
+.gov-modal,
+.gov-modal-container,
+.modal-container,
+.modal {
+  background: var(--bg-surface, #ffffff);
+  border-radius: 12px;
+  width: min(960px, calc(100vw - 32px));
+  max-width: min(960px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.18), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  animation: modalIn 0.2s ease-out;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Modal Sizing Variants */
+.modal--sm,
+.modal-content--sm {
+  max-width: min(480px, calc(100vw - 32px));
+}
+
+.modal--md,
+.modal-content--md {
+  max-width: min(600px, calc(100vw - 32px));
+}
+
+.modal--lg,
+.modal-content--lg,
+.modal-content--wide,
+.gov-modal-container {
+  max-width: min(780px, calc(100vw - 32px));
+}
+
+.modal--xl,
+.gov-modal-container--large {
+  max-width: min(1080px, calc(100vw - 32px));
+}
+
+/* Modal Form Wrapper */
+.modal-content > form,
+.gov-modal > form,
+.modal > form,
+.gov-modal-container > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  margin: 0;
+}
+
+/* Modal Header */
+.modal-header,
+.gov-modal-header,
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.125rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle, #e2e8f0);
+  background: var(--bg-surface, #ffffff);
+  flex-shrink: 0;
+  gap: 0.75rem;
+}
+
+.modal-header__title,
+.modal__title,
+.gov-modal-title,
+.modal-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  word-break: break-word;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-close-btn,
+.gov-modal-close-btn,
+.btn-close {
+  background: none;
+  border: none;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover,
+.gov-modal-close-btn:hover,
+.btn-close:hover {
+  color: var(--text-primary, #0f172a);
+  background: var(--bg-surface-subtle, #f1f5f9);
+}
+
+/* Modal Body (Scrollable Container) */
+.modal-body,
+.gov-modal-body,
+.modal__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.25rem 1.5rem;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Modal Footer (Pinned Fixed Bottom) */
+.modal-footer,
+.gov-modal-footer,
+.gov-form-actions,
+.modal__footer,
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-subtle, #e2e8f0);
+  background: var(--bg-surface-subtle, #f8fafc);
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Modal Form Elements Universal Reset & Anti-Overflow */
+.modal input:not([type="checkbox"]):not([type="radio"]),
+.modal select,
+.modal textarea,
+.modal-content input:not([type="checkbox"]):not([type="radio"]),
+.modal-content select,
+.modal-content textarea,
+.gov-modal input:not([type="checkbox"]):not([type="radio"]),
+.gov-modal select,
+.gov-modal textarea,
+.gov-modal-container input:not([type="checkbox"]):not([type="radio"]),
+.gov-modal-container select,
+.gov-modal-container textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.modal [style*="gridTemplateColumns"],
+.gov-modal [style*="gridTemplateColumns"],
+.modal-content [style*="gridTemplateColumns"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal [style*="gridTemplateColumns"] > *,
+.gov-modal [style*="gridTemplateColumns"] > *,
+.modal-content [style*="gridTemplateColumns"] > * {
+  min-width: 0;
+}
+
+@media (max-width: 760px) {
+  .modal [style*="gridTemplateColumns"],
+  .gov-modal [style*="gridTemplateColumns"],
+  .modal-content [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
 
 /* ── Semantic Form ────────────────────────────────────────────────── */
 .semantic-form { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
@@ -1667,15 +2027,10 @@ textarea.form-control {
 .semantic-icon--requirement { color: #16a34a; }
 .semantic-icon--risk { color: #dc2626; }
 .semantic-icon--note { color: #d97706; }
-.btn-icon { background: none; border: none; cursor: pointer; padding: 0.375rem; border-radius: 4px; color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; }
-.btn-icon:hover { background: var(--bg-surface-subtle); color: var(--text-primary); }
-.btn-icon--danger:hover { background: #fee2e2; color: #dc2626; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.875rem; }
-.input-text, .input-textarea, .input-select { width: 100%; padding: 0.5rem 0.75rem; border: 1.5px solid var(--border-subtle); border-radius: 6px; font-size: 0.875rem; font-family: inherit; background: var(--bg-surface); color: var(--text-primary); outline: none; }
+.input-text, .input-textarea, .input-select { width: 100%; max-width: 100%; box-sizing: border-box; padding: 0.5rem 0.75rem; border: 1.5px solid var(--border-subtle); border-radius: 6px; font-size: 0.875rem; font-family: inherit; background: var(--bg-surface); color: var(--text-primary); outline: none; }
 .input-text:focus, .input-textarea:focus, .input-select:focus { border-color: var(--primary); }
 .input-select--sm { padding: 0.3rem 0.5rem; font-size: 0.8125rem; width: auto; }
 .form-error-banner { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.8125rem; }
-.modal-content--wide { max-width: 680px; }
 
 /* ── FAZ-4: Report Preview & Document Styles ──────────────────────── */
 .report-preview-container { min-height: 100vh; background: #f8fafc; display: flex; flex-direction: column; }
@@ -2713,23 +3068,36 @@ textarea.form-control {
 
 .gov-modal-body {
   padding: 1.5rem;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .gov-form {
   display: flex;
   flex-direction: column;
   gap: 1.125rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .gov-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gov-form-row > * {
+  min-width: 0;
 }
 
 @media (max-width: 768px) {
   .gov-form-row {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 }
 
@@ -2737,18 +3105,24 @@ textarea.form-control {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
-
 
 .gov-form-group label {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text-secondary);
+  margin-bottom: 0.2rem;
 }
 
-.gov-form-group input,
+.gov-form-group input:not([type="checkbox"]):not([type="radio"]),
 .gov-form-group select,
 .gov-form-group textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 0.45rem 0.625rem;
   font-size: 0.8125rem;
   border: 1px solid var(--border-subtle);
@@ -2762,6 +3136,7 @@ textarea.form-control {
   gap: 1rem;
   font-size: 0.8125rem;
   color: var(--text-primary);
+  flex-wrap: wrap;
 }
 
 .gov-checkbox-grid {
@@ -2774,6 +3149,18 @@ textarea.form-control {
   padding: 0.625rem;
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gov-checkbox-grid > * {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .gov-checkbox-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .gov-form-actions {
@@ -2783,6 +3170,7 @@ textarea.form-control {
   margin-top: 0.5rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
 }
 
 .gov-form-error {

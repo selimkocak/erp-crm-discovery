@@ -160,12 +160,12 @@ export const OtAlarmRequirementModal: React.FC<OtAlarmRequirementModalProps> = (
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "680px",
-          maxHeight: "92vh",
-          overflowY: "auto",
+          maxWidth: "min(680px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -206,14 +206,8 @@ export const OtAlarmRequirementModal: React.FC<OtAlarmRequirementModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
@@ -239,295 +233,224 @@ export const OtAlarmRequirementModal: React.FC<OtAlarmRequirementModalProps> = (
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.125rem" }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                color: "#b91c1c",
-                fontSize: "0.875rem",
-              }}
-            >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Row 1: Alarm Name & Code */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Alarm Adı <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Yüksek Mil Sıcaklığı, Basınç Düşüşü, E-Stop"
-                value={alarmName}
-                onChange={(e) => setAlarmName(e.target.value)}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
+            {errorMessage && (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: "8px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#b91c1c",
                   fontSize: "0.875rem",
-                }}
-                required
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Alarm Kodu / ID
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: ALM-201, E-04"
-                value={alarmCode}
-                onChange={(e) => setAlarmCode(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  fontFamily: "monospace",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 2: Source Type & Trigger Condition */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Alarm Kaynağı
-              </label>
-              <select
-                value={sourceType}
-                onChange={(e) => setSourceType(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
                 }}
               >
-                <option value="">Seçiniz</option>
-                <option value="PLC / Kontrolcü">PLC / Kontrolcü</option>
-                <option value="Safety Röle / I/O">Safety Röle / I/O</option>
-                <option value="SCADA / HMI">SCADA / HMI</option>
-                <option value="Sürücü / Servo Hatası">Sürücü / Servo Hatası</option>
-                <option value="Sensör / Transmitter">Sensör / Transmitter</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Tetikleme Koşulu (Hangi Durumda Üretilir?)
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Sıcaklık > 85°C veya Basınç < 4 bar (5 sn boyunca)"
-                value={triggerCondition}
-                onChange={(e) => setTriggerCondition(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
-          {/* Row 3: Severity & Safety Critical Checkbox */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", alignItems: "center" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Ciddiyet Seviyesi
-              </label>
-              <select
-                value={severity}
-                onChange={(e) => setSeverity(e.target.value as OtAlarmSeverity)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="critical">Kritik (Üretimi Durdurur)</option>
-                <option value="high">Yüksek (Performans/Kalite Kaybı)</option>
-                <option value="warning">Uyarı (Müdahale Gerektirir)</option>
-                <option value="info">Bilgilendirme (Operasyonel Kayıt)</option>
-              </select>
-            </div>
-            <div style={{ paddingTop: "1.25rem" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", fontWeight: 600, color: "#b91c1c", cursor: "pointer" }}>
+            {/* Row 1: Alarm Name & Code */}
+            <div className="form-grid" style={{ gridTemplateColumns: "2fr 1fr" }}>
+              <div className="form-group">
+                <label className="form-label">
+                  Alarm Adı <span style={{ color: "#ef4444" }}>*</span>
+                </label>
                 <input
-                  type="checkbox"
-                  checked={safetyCritical}
-                  onChange={(e) => setSafetyCritical(e.target.checked)}
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Yüksek Mil Sıcaklığı, Basınç Düşüşü, E-Stop"
+                  value={alarmName}
+                  onChange={(e) => setAlarmName(e.target.value)}
+                  required
                 />
-                <span>🚨 Safety Kritik (İSG / Can Güvenliği)</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Row 4: Responsible Role & Response SLA */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Sorumlu Rol / Ekip
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Bakım Teknisyeni, Vardiya Amiri"
-                value={responsibleRole}
-                onChange={(e) => setResponsibleRole(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Müdahale SLA / Süre Hedefi
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 5 dakika, 15 dakika, Anında"
-                value={responseSla}
-                onChange={(e) => setResponseSla(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 5: Required Action */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Gerekli Aksiyon / Standart Müdahale Prosedürü
-            </label>
-            <input
-              type="text"
-              placeholder="Örn: Soğutma sıvısı seviyesini kontrol et, filtre temizliği yap"
-              value={requiredAction}
-              onChange={(e) => setRequiredAction(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-              }}
-            />
-          </div>
-
-          {/* Row 6: Checkboxes (Acknowledgement & Escalation) & Target System */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem", alignItems: "center" }}>
-            <div>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", cursor: "pointer" }}>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Alarm Kodu / ID
+                </label>
                 <input
-                  type="checkbox"
-                  checked={acknowledgementRequired}
-                  onChange={(e) => setAcknowledgementRequired(e.target.checked)}
+                  type="text"
+                  className="form-control text-mono"
+                  placeholder="Örn: ALM-201, E-04"
+                  value={alarmCode}
+                  onChange={(e) => setAlarmCode(e.target.value)}
                 />
-                <span>Operatör Teyidi (Ack) Zorunlu</span>
-              </label>
+              </div>
             </div>
-            <div>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", cursor: "pointer" }}>
+
+            {/* Row 2: Source Type & Trigger Condition */}
+            <div className="form-grid" style={{ gridTemplateColumns: "1fr 2fr" }}>
+              <div className="form-group">
+                <label className="form-label">
+                  Alarm Kaynağı
+                </label>
+                <select
+                  className="form-control"
+                  value={sourceType}
+                  onChange={(e) => setSourceType(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="PLC / Kontrolcü">PLC / Kontrolcü</option>
+                  <option value="Safety Röle / I/O">Safety Röle / I/O</option>
+                  <option value="SCADA / HMI">SCADA / HMI</option>
+                  <option value="Sürücü / Servo Hatası">Sürücü / Servo Hatası</option>
+                  <option value="Sensör / Transmitter">Sensör / Transmitter</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Tetikleme Koşulu (Hangi Durumda Üretilir?)
+                </label>
                 <input
-                  type="checkbox"
-                  checked={escalationRequired}
-                  onChange={(e) => setEscalationRequired(e.target.checked)}
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Sıcaklık > 85°C veya Basınç < 4 bar (5 sn boyunca)"
+                  value={triggerCondition}
+                  onChange={(e) => setTriggerCondition(e.target.value)}
                 />
-                <span>Zamanında Çözülmezse Eskalasyon</span>
-              </label>
+              </div>
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Hedef Sistem
+
+            {/* Row 3: Severity & Safety Critical Checkbox */}
+            <div className="form-grid" style={{ alignItems: "center" }}>
+              <div className="form-group">
+                <label className="form-label">
+                  Ciddiyet Seviyesi
+                </label>
+                <select
+                  className="form-control"
+                  value={severity}
+                  onChange={(e) => setSeverity(e.target.value as OtAlarmSeverity)}
+                >
+                  <option value="critical">Kritik (Üretimi Durdurur)</option>
+                  <option value="high">Yüksek (Performans/Kalite Kaybı)</option>
+                  <option value="warning">Uyarı (Müdahale Gerektirir)</option>
+                  <option value="info">Bilgilendirme (Operasyonel Kayıt)</option>
+                </select>
+              </div>
+              <div className="form-group" style={{ paddingTop: "0.5rem" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", fontWeight: 600, color: "#b91c1c", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={safetyCritical}
+                    onChange={(e) => setSafetyCritical(e.target.checked)}
+                  />
+                  <span>🚨 Safety Kritik (İSG / Can Güvenliği)</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Row 4: Responsible Role & Response SLA */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Sorumlu Rol / Ekip
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Bakım Teknisyeni, Vardiya Amiri"
+                  value={responsibleRole}
+                  onChange={(e) => setResponsibleRole(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Müdahale SLA / Süre Hedefi
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: 5 dakika, 15 dakika, Anında"
+                  value={responseSla}
+                  onChange={(e) => setResponseSla(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 5: Required Action */}
+            <div className="form-group">
+              <label className="form-label">
+                Gerekli Aksiyon / Standart Müdahale Prosedürü
               </label>
               <input
                 type="text"
-                placeholder="Örn: MES, Andon, Bakım Modülü"
-                value={targetSystem}
-                onChange={(e) => setTargetSystem(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.4rem 0.6rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.8125rem",
-                }}
+                className="form-control"
+                placeholder="Örn: Soğutma sıvısı seviyesini kontrol et, filtre temizliği yap"
+                value={requiredAction}
+                onChange={(e) => setRequiredAction(e.target.value)}
               />
             </div>
-          </div>
 
-          {/* Row 7: Notes */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Alarm Notları
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Ek eskalasyon hiyerarşisi, hata kodları veya saha detayları..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-                resize: "vertical",
-              }}
-            />
+            {/* Row 6: Checkboxes (Acknowledgement & Escalation) & Target System */}
+            <div className="form-grid--3" style={{ alignItems: "center" }}>
+              <div className="form-group">
+                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={acknowledgementRequired}
+                    onChange={(e) => setAcknowledgementRequired(e.target.checked)}
+                  />
+                  <span>Operatör Teyidi (Ack) Zorunlu</span>
+                </label>
+              </div>
+              <div className="form-group">
+                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={escalationRequired}
+                    onChange={(e) => setEscalationRequired(e.target.checked)}
+                  />
+                  <span>Zamanında Çözülmezse Eskalasyon</span>
+                </label>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Hedef Sistem
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: MES, Andon, Bakım Modülü"
+                  value={targetSystem}
+                  onChange={(e) => setTargetSystem(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 7: Notes */}
+            <div className="form-group">
+              <label className="form-label">
+                Alarm Notları
+              </label>
+              <textarea
+                className="form-control"
+                rows={2}
+                placeholder="Ek eskalasyon hiyerarşisi, hata kodları veya saha detayları..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "0.5rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >

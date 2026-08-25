@@ -172,12 +172,12 @@ export const ProcessMapEditorModal: React.FC<ProcessMapEditorModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "14px",
           width: "100%",
-          maxWidth: "1050px",
-          maxHeight: "92vh",
-          overflowY: "auto",
+          maxWidth: "min(1080px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -594,7 +594,7 @@ export const ProcessMapEditorModal: React.FC<ProcessMapEditorModalProps> = ({
                 </button>
               </div>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+              <div className="table-responsive">
                 <table className="report-table" style={{ width: "100%", fontSize: "0.8125rem" }}>
                   <thead>
                     <tr>

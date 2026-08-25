@@ -467,7 +467,7 @@ export const ReadinessChecklistSection: React.FC<ReadinessChecklistSectionProps>
 
                           <td style={{ textAlign: "right" }}>
                             {!readOnly && (
-                              <div style={{ display: "inline-flex", gap: "0.25rem" }}>
+                              <div className="actions-cell">
                                 <button
                                   type="button"
                                   className="btn-icon"

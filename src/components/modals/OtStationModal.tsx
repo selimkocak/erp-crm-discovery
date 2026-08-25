@@ -162,12 +162,12 @@ export const OtStationModal: React.FC<OtStationModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "680px",
-          maxHeight: "90vh",
-          overflowY: "auto",
+          maxWidth: "min(680px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -208,285 +208,204 @@ export const OtStationModal: React.FC<OtStationModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                color: "#b91c1c",
-                fontSize: "0.875rem",
-              }}
-            >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Row 1: Code & Name */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                İstasyon Kodu <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: ST-01"
-                value={stationCode}
-                onChange={(e) => setStationCode(e.target.value)}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
+            {errorMessage && (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: "8px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#b91c1c",
                   fontSize: "0.875rem",
-                  fontFamily: "monospace",
-                }}
-                required
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                İstasyon Adı <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: 5 Eksen CNC İşleme İstasyonu"
-                value={stationName}
-                onChange={(e) => setStationName(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-                required
-              />
-            </div>
-          </div>
-
-          {/* Row 2: Area & Line */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Üretim Alanı (Area)
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Talaşlı İmalat Alanı"
-                value={areaName}
-                onChange={(e) => setAreaName(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Üretim Hattı (Line)
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Gövde İmalat Hattı 1"
-                value={lineName}
-                onChange={(e) => setLineName(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 3: Station Type & Machine Name */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                İstasyon Türü / Prosesi
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: CNC İşleme, Kaynak, Montaj"
-                value={stationType}
-                onChange={(e) => setStationType(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Makine / Ekipman Adı
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Dik İşleme Merkezi 1"
-                value={machineName}
-                onChange={(e) => setMachineName(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 4: Manufacturer & Model */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Makine Üreticisi (OEM)
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: DMG Mori, Mazak, Fanuc"
-                value={machineManufacturer}
-                onChange={(e) => setMachineManufacturer(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Makine Modeli
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: DMU 50, VCN-530C"
-                value={machineModel}
-                onChange={(e) => setMachineModel(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Row 5: PLC / Controller & Status */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                PLC / Controller Modeli
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Siemens S7-1500, Fanuc 31i"
-                value={plcOrController}
-                onChange={(e) => setPlcOrController(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Operatör Sayısı
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={operatorCount}
-                onChange={(e) => setOperatorCount(parseInt(e.target.value, 10) || 0)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Durum
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as StationStatus)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
                 }}
               >
-                <option value="active">Aktif</option>
-                <option value="passive">Pasif</option>
-              </select>
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Row 1: Code & Name */}
+            <div className="form-grid" style={{ gridTemplateColumns: "1fr 2fr" }}>
+              <div className="form-group">
+                <label className="form-label">
+                  İstasyon Kodu <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control text-mono"
+                  placeholder="Örn: ST-01"
+                  value={stationCode}
+                  onChange={(e) => setStationCode(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  İstasyon Adı <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: 5 Eksen CNC İşleme İstasyonu"
+                  value={stationName}
+                  onChange={(e) => setStationName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Row 2: Area & Line */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Üretim Alanı (Area)
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Talaşlı İmalat Alanı"
+                  value={areaName}
+                  onChange={(e) => setAreaName(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Üretim Hattı (Line)
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Gövde İmalat Hattı 1"
+                  value={lineName}
+                  onChange={(e) => setLineName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 3: Station Type & Machine Name */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  İstasyon Türü / Prosesi
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: CNC İşleme, Kaynak, Montaj"
+                  value={stationType}
+                  onChange={(e) => setStationType(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Makine / Ekipman Adı
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Dik İşleme Merkezi 1"
+                  value={machineName}
+                  onChange={(e) => setMachineName(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 4: Manufacturer & Model */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Makine Üreticisi (OEM)
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: DMG Mori, Mazak, Fanuc"
+                  value={machineManufacturer}
+                  onChange={(e) => setMachineManufacturer(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Makine Modeli
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: DMU 50, VCN-530C"
+                  value={machineModel}
+                  onChange={(e) => setMachineModel(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 5: PLC / Controller & Status */}
+            <div className="form-grid--3">
+              <div className="form-group">
+                <label className="form-label">
+                  PLC / Controller Modeli
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Siemens S7-1500, Fanuc 31i"
+                  value={plcOrController}
+                  onChange={(e) => setPlcOrController(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Operatör Sayısı
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  value={operatorCount}
+                  onChange={(e) => setOperatorCount(parseInt(e.target.value, 10) || 0)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Durum
+                </label>
+                <select
+                  className="form-control"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as StationStatus)}
+                >
+                  <option value="active">Aktif</option>
+                  <option value="passive">Pasif</option>
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "1rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >

@@ -133,19 +133,19 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: "680px", width: "95%" }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="modal-content modal--lg" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">
             {initialData ? "Saha Kanıtını Düzenle" : "Yeni Saha Kanıtı & Doğrulama Kaydı"}
           </h3>
-          <button type="button" className="btn-close" onClick={onClose} aria-label="Kapat">
+          <button type="button" className="btn-close modal-close-btn" onClick={onClose} aria-label="Kapat">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ maxHeight: "75vh", overflowY: "auto", paddingRight: "0.5rem" }}>
+          <div className="modal-body">
             {errorMsg && (
               <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                 {errorMsg}
@@ -187,7 +187,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             </div>
 
             {/* Kanıt Başlığı */}
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Kanıt Başlığı *</label>
               <input
                 type="text"
@@ -201,7 +201,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             </div>
 
             {/* Kanıt Türü & Kaynak Türü */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Kanıt Türü</label>
                 <select
@@ -239,7 +239,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             </div>
 
             {/* Toplayan Rol & Tarih */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Toplayan / Denetleyen Rol</label>
                 <input
@@ -270,7 +270,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
                 Doğrulama ve Güvenilirlik Değerlendirmesi
               </h4>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem" }}>
+              <div className="form-grid--3">
                 <div className="form-group">
                   <label className="form-label" style={{ fontSize: "0.75rem" }}>Doğrulama Durumu</label>
                   <select
@@ -317,7 +317,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             </div>
 
             {/* Kaynak Açıklaması */}
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Kaynak Açıklaması / Alındığı Ortam</label>
               <input
                 type="text"
@@ -330,7 +330,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             </div>
 
             {/* Notlar */}
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Analiz & Saha Notları</label>
               <textarea
                 className="form-control"
@@ -343,7 +343,7 @@ export const EvidenceModal: React.FC<EvidenceModalProps> = ({
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSaving}>
               İptal
             </button>

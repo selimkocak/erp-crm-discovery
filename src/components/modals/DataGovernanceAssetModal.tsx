@@ -125,19 +125,19 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: "680px", width: "95%" }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="modal-content modal--lg" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">
             {initialData ? "Veri Varlığını Düzenle" : "Yeni Veri Varlığı & Sahiplik Ekle"}
           </h3>
-          <button type="button" className="btn-close" onClick={onClose} aria-label="Kapat">
+          <button type="button" className="btn-close modal-close-btn" onClick={onClose} aria-label="Kapat">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ maxHeight: "75vh", overflowY: "auto", paddingRight: "0.5rem" }}>
+          <div className="modal-body">
             {errorMsg && (
               <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                 {errorMsg}
@@ -149,7 +149,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
               <strong>Kurumsal İlke:</strong> Şahıs adı yerine kurumsal rol veya pozisyon adı giriniz (örn: <em>"Finans Müdürü"</em>, <em>"Depo Sorumlusu"</em>, <em>"BT Sistem Yöneticisi"</em>).
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Veri Varlığı Adı *</label>
               <input
                 type="text"
@@ -162,7 +162,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
               />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Alan / Domain</label>
                 <input
@@ -191,7 +191,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Kayıt Sistemi (System of Record)</label>
                 <input
@@ -253,7 +253,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
                 3'lü Sahiplik ve Sorumluluk Modeli
               </h4>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem" }}>
+              <div className="form-grid--3">
                 <div className="form-group">
                   <label className="form-label" style={{ fontSize: "0.75rem" }}>Veri Sahibi (Owner Rolü)</label>
                   <input
@@ -312,7 +312,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Açıklama</label>
               <textarea
                 className="form-control"
@@ -324,7 +324,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
               />
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Denetim / Keşif Notları</label>
               <textarea
                 className="form-control"
@@ -337,7 +337,7 @@ export const DataGovernanceAssetModal: React.FC<DataGovernanceAssetModalProps> =
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSaving}>
               İptal
             </button>

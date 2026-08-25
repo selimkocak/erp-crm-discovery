@@ -228,7 +228,7 @@ export const ProjectScopeModal: React.FC<ProjectScopeModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="scope-modal-title"
-        style={{ maxWidth: "860px", maxHeight: "90vh", display: "flex", flexDirection: "column" }}
+        style={{ maxWidth: "min(860px, calc(100vw - 32px))", maxHeight: "calc(100vh - 48px)", display: "flex", flexDirection: "column" }}
       >
         {/* Modal Header */}
         <div className="modal-header">

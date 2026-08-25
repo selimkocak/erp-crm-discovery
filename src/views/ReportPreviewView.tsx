@@ -32,7 +32,7 @@ import { buildReportModel } from "../report/builder";
 import type { ReportModel, ReportAttachmentItem } from "../report/types";
 import { ReportProfileModal } from "../components/ReportProfileModal";
 import { exportReport } from "../export";
-import { openAttachment, showAttachmentInFolder } from "../storage/attachmentLinks";
+import { openAttachment, showAttachmentInFolder, attachmentExists } from "../storage/attachmentLinks";
 import {
   readAttachmentFile,
   getFileCategory,
@@ -62,6 +62,28 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
   // Attachment Lightbox & Error State
   const [previewImage, setPreviewImage] = useState<{ url: string; name: string; size: string; att: ReportAttachmentItem } | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
+  const [attachmentExistsMap, setAttachmentExistsMap] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    let isMounted = true;
+    async function verifyFiles() {
+      if (!report?.attachments || report.attachments.length === 0) {
+        if (isMounted) setAttachmentExistsMap({});
+        return;
+      }
+      const map: Record<string, boolean> = {};
+      for (const att of report.attachments) {
+        map[att.id] = await attachmentExists(att.relativePath);
+      }
+      if (isMounted) {
+        setAttachmentExistsMap(map);
+      }
+    }
+    verifyFiles();
+    return () => {
+      isMounted = false;
+    };
+  }, [report]);
 
   const handleOpenAttachment = async (att: ReportAttachmentItem) => {
     setAttachmentError(null);
@@ -2222,19 +2244,35 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                                   <span style={{ fontWeight: 600, color: "var(--color-secondary-700)" }}>Vault:</span> {MANAGED_VAULT_APP_NAME}/{att.relativePath}
                                 </div>
                                 <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "0.15rem", flexWrap: "wrap" }}>
-                                  <span
-                                    style={{
-                                      fontSize: "0.625rem",
-                                      padding: "0.1rem 0.35rem",
-                                      background: "rgba(16, 185, 129, 0.1)",
-                                      color: "#059669",
-                                      borderRadius: "3px",
-                                      border: "1px solid rgba(16, 185, 129, 0.3)",
-                                      fontWeight: 600,
-                                    }}
-                                  >
-                                    ✓ Managed kopya mevcut
-                                  </span>
+                                  {attachmentExistsMap[att.id] !== false ? (
+                                    <span
+                                      style={{
+                                        fontSize: "0.625rem",
+                                        padding: "0.1rem 0.35rem",
+                                        background: "rgba(16, 185, 129, 0.1)",
+                                        color: "#059669",
+                                        borderRadius: "3px",
+                                        border: "1px solid rgba(16, 185, 129, 0.3)",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      ✓ Managed kopya mevcut
+                                    </span>
+                                  ) : (
+                                    <span
+                                      style={{
+                                        fontSize: "0.625rem",
+                                        padding: "0.1rem 0.35rem",
+                                        background: "rgba(239, 68, 68, 0.1)",
+                                        color: "#dc2626",
+                                        borderRadius: "3px",
+                                        border: "1px solid rgba(239, 68, 68, 0.3)",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      ⚠ Managed Vault içinde dosya bulunamadı
+                                    </span>
+                                  )}
                                   <button
                                     type="button"
                                     onClick={() => handleOpenAttachment(att)}

@@ -198,12 +198,12 @@ export const OtDataRequirementModal: React.FC<OtDataRequirementModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "720px",
-          maxHeight: "92vh",
-          overflowY: "auto",
+          maxWidth: "min(720px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -244,382 +244,278 @@ export const OtDataRequirementModal: React.FC<OtDataRequirementModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.125rem" }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                color: "#b91c1c",
-                fontSize: "0.875rem",
-              }}
-            >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Row 1: Measurement & Category */}
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Ölçüm / Sinyal Adı <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Çevrim Süresi (Cycle Time), Fırın Sıcaklığı"
-                value={measurementName}
-                onChange={(e) => setMeasurementName(e.target.value)}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
+            {errorMessage && (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: "8px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#b91c1c",
                   fontSize: "0.875rem",
-                }}
-                required
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Veri Kategorisi
-              </label>
-              <select
-                value={dataCategory}
-                onChange={(e) => setDataCategory(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
                 }}
               >
-                <option value="">Seçiniz / Genel</option>
-                <option value="Proses / İşleme">Proses / İşleme</option>
-                <option value="Üretim Adedi & OEE">Üretim Adedi & OEE</option>
-                <option value="Kalite & Boyut">Kalite & Boyut</option>
-                <option value="Enerji & Tüketim">Enerji & Tüketim</option>
-                <option value="Bakım & Titreşim">Bakım & Titreşim</option>
-                <option value="İzlenebilirlik / Seri">İzlenebilirlik / Seri</option>
-              </select>
-            </div>
-          </div>
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
-          {/* Row 2: Purpose & Decision Supported */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Veri Toplama Amacı (Hangi İhtiyaç İçin?) <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Örn: İstasyon darboğazını ve çevrim sapmalarını anlık tespit etmek"
-              value={purpose}
-              onChange={(e) => setPurpose(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-              }}
-              required
-            />
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Desteklenen Karar (Hangi Karar Alınacak?) <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Hat hız revizyonu veya operatör takviyesi kararı"
-                value={decisionSupported}
-                onChange={(e) => setDecisionSupported(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-                required
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Tetiklenen Aksiyon (Hangi Aksiyona Bağlı?) <span style={{ color: "#ef4444" }}>*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: MES iş emri duraklatma, Andon panosuna uyarı"
-                value={requiredAction}
-                onChange={(e) => setRequiredAction(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-                required
-              />
-            </div>
-          </div>
-
-          {/* Row 3: Source, Method, Frequency */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Kaynak Türü
-              </label>
-              <select
-                value={sourceType}
-                onChange={(e) => setSourceType(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="">Seçiniz</option>
-                <option value="PLC / Kontrolcü">PLC / Kontrolcü</option>
-                <option value="Harici Sensör">Harici Sensör</option>
-                <option value="Barkod / RFID Okuyucu">Barkod / RFID Okuyucu</option>
-                <option value="Ölçüm Cihazı / Terazi">Ölçüm Cihazı / Terazi</option>
-                <option value="Operatör Terminali / HMI">Operatör Terminali / HMI</option>
-                <option value="Manuel Form">Manuel Form</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Toplama Yöntemi
-              </label>
-              <select
-                value={collectionMethod}
-                onChange={(e) => setCollectionMethod(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="">Seçiniz</option>
-                <option value="Otomatik (Doğrudan Veri)">Otomatik (Doğrudan Veri)</option>
-                <option value="Yarı Otomatik (Teyitli)">Yarı Otomatik (Teyitli)</option>
-                <option value="Manuel Giriş">Manuel Giriş</option>
-                <option value="Dosya Aktarımı (CSV/Log)">Dosya Aktarımı (CSV/Log)</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Toplama Sıklığı
-              </label>
-              <select
-                value={frequency}
-                onChange={(e) => setFrequency(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="">Seçiniz</option>
-                <option value="Gerçek Zamanlı (<1 sn)">Gerçek Zamanlı (&lt;1 sn)</option>
-                <option value="Parça / Çevrim Başına">Parça / Çevrim Başına</option>
-                <option value="Saatlik / Periyodik">Saatlik / Periyodik</option>
-                <option value="Vardiya Başına">Vardiya Başına</option>
-                <option value="Günlük Özet">Günlük Özet</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Row 4: Criticality, Priority, Target System */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Kritiklik Seviyesi
-              </label>
-              <select
-                value={criticality}
-                onChange={(e) => setCriticality(e.target.value as OtCriticality)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="critical">Kritik (Olmazsa Olmaz)</option>
-                <option value="high">Yüksek</option>
-                <option value="medium">Orta</option>
-                <option value="low">Düşük</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Entegrasyon Hedef Sistemi
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: ERP, MES, SCADA, WMS"
-                value={targetSystem}
-                onChange={(e) => setTargetSystem(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Entegrasyon Zorluğu
-              </label>
-              <select
-                value={integrationComplexity}
-                onChange={(e) => setIntegrationComplexity(e.target.value as OtIntegrationComplexity)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
-                }}
-              >
-                <option value="low">Kolay (Doğrudan Standart)</option>
-                <option value="medium">Orta (Protokol/Dönüşüm Gerekli)</option>
-                <option value="high">Yüksek (Özel Donanım/PLC Revizyonu)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Row 5: Retention Checkbox & Business Value */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", alignItems: "center" }}>
-            <div>
-              <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", fontWeight: 600, color: "#334155", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={retentionRequired}
-                  onChange={(e) => setRetentionRequired(e.target.checked)}
-                />
-                <span>Tarihsel Saklama & Arşivleme Zorunlu</span>
-              </label>
-              {retentionRequired && (
+            {/* Row 1: Measurement & Category */}
+            <div className="form-grid" style={{ gridTemplateColumns: "2fr 1fr" }}>
+              <div className="form-group">
+                <label className="form-label">
+                  Ölçüm / Sinyal Adı <span style={{ color: "#ef4444" }}>*</span>
+                </label>
                 <input
                   type="text"
-                  placeholder="Saklama süresi (örn: 5 yıl, yasal zorunluluk)"
-                  value={retentionPeriod}
-                  onChange={(e) => setRetentionPeriod(e.target.value)}
-                  style={{
-                    width: "100%",
-                    marginTop: "0.375rem",
-                    padding: "0.4rem 0.6rem",
-                    borderRadius: "6px",
-                    border: "1px solid #cbd5e1",
-                    fontSize: "0.8125rem",
-                  }}
+                  className="form-control"
+                  placeholder="Örn: Çevrim Süresi (Cycle Time), Fırın Sıcaklığı"
+                  value={measurementName}
+                  onChange={(e) => setMeasurementName(e.target.value)}
+                  required
                 />
-              )}
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Veri Kategorisi
+                </label>
+                <select
+                  className="form-control"
+                  value={dataCategory}
+                  onChange={(e) => setDataCategory(e.target.value)}
+                >
+                  <option value="">Seçiniz / Genel</option>
+                  <option value="Proses / İşleme">Proses / İşleme</option>
+                  <option value="Üretim Adedi & OEE">Üretim Adedi & OEE</option>
+                  <option value="Kalite & Boyut">Kalite & Boyut</option>
+                  <option value="Enerji & Tüketim">Enerji & Tüketim</option>
+                  <option value="Bakım & Titreşim">Bakım & Titreşim</option>
+                  <option value="İzlenebilirlik / Seri">İzlenebilirlik / Seri</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                İş Değeri / Beklenen Fayda
+
+            {/* Row 2: Purpose & Decision Supported */}
+            <div className="form-group">
+              <label className="form-label">
+                Veri Toplama Amacı (Hangi İhtiyaç İçin?) <span style={{ color: "#ef4444" }}>*</span>
               </label>
               <input
                 type="text"
-                placeholder="Örn: %8 duruş azaltımı, fire takibi"
-                value={businessValue}
-                onChange={(e) => setBusinessValue(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
+                className="form-control"
+                placeholder="Örn: İstasyon darboğazını ve çevrim sapmalarını anlık tespit etmek"
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                required
               />
             </div>
-          </div>
 
-          {/* Row 6: Notes */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Saha Notları / Açıklama
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Ek teknik detaylar, veri formatı veya istasyon sınırları..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-                resize: "vertical",
-              }}
-            />
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Desteklenen Karar (Hangi Karar Alınacak?) <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Hat hız revizyonu veya operatör takviyesi kararı"
+                  value={decisionSupported}
+                  onChange={(e) => setDecisionSupported(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Tetiklenen Aksiyon (Hangi Aksiyona Bağlı?) <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: MES iş emri duraklatma, Andon panosuna uyarı"
+                  value={requiredAction}
+                  onChange={(e) => setRequiredAction(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Row 3: Source, Method, Frequency */}
+            <div className="form-grid--3">
+              <div className="form-group">
+                <label className="form-label">
+                  Kaynak Türü
+                </label>
+                <select
+                  className="form-control"
+                  value={sourceType}
+                  onChange={(e) => setSourceType(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="PLC / Kontrolcü">PLC / Kontrolcü</option>
+                  <option value="Harici Sensör">Harici Sensör</option>
+                  <option value="Barkod / RFID Okuyucu">Barkod / RFID Okuyucu</option>
+                  <option value="Ölçüm Cihazı / Terazi">Ölçüm Cihazı / Terazi</option>
+                  <option value="Operatör Terminali / HMI">Operatör Terminali / HMI</option>
+                  <option value="Manuel Form">Manuel Form</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Toplama Yöntemi
+                </label>
+                <select
+                  className="form-control"
+                  value={collectionMethod}
+                  onChange={(e) => setCollectionMethod(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Otomatik (Doğrudan Veri)">Otomatik (Doğrudan Veri)</option>
+                  <option value="Yarı Otomatik (Teyitli)">Yarı Otomatik (Teyitli)</option>
+                  <option value="Manuel Giriş">Manuel Giriş</option>
+                  <option value="Dosya Aktarımı (CSV/Log)">Dosya Aktarımı (CSV/Log)</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Toplama Sıklığı
+                </label>
+                <select
+                  className="form-control"
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
+                >
+                  <option value="">Seçiniz</option>
+                  <option value="Gerçek Zamanlı (<1 sn)">Gerçek Zamanlı (&lt;1 sn)</option>
+                  <option value="Parça / Çevrim Başına">Parça / Çevrim Başına</option>
+                  <option value="Saatlik / Periyodik">Saatlik / Periyodik</option>
+                  <option value="Vardiya Başına">Vardiya Başına</option>
+                  <option value="Günlük Özet">Günlük Özet</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Row 4: Criticality, Priority, Target System */}
+            <div className="form-grid--3">
+              <div className="form-group">
+                <label className="form-label">
+                  Kritiklik Seviyesi
+                </label>
+                <select
+                  className="form-control"
+                  value={criticality}
+                  onChange={(e) => setCriticality(e.target.value as OtCriticality)}
+                >
+                  <option value="critical">Kritik (Olmazsa Olmaz)</option>
+                  <option value="high">Yüksek</option>
+                  <option value="medium">Orta</option>
+                  <option value="low">Düşük</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Entegrasyon Hedef Sistemi
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: ERP, MES, SCADA, WMS"
+                  value={targetSystem}
+                  onChange={(e) => setTargetSystem(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Entegrasyon Zorluğu
+                </label>
+                <select
+                  className="form-control"
+                  value={integrationComplexity}
+                  onChange={(e) => setIntegrationComplexity(e.target.value as OtIntegrationComplexity)}
+                >
+                  <option value="low">Kolay (Doğrudan Standart)</option>
+                  <option value="medium">Orta (Protokol/Dönüşüm Gerekli)</option>
+                  <option value="high">Yüksek (Özel Donanım/PLC Revizyonu)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Row 5: Retention Checkbox & Business Value */}
+            <div className="form-grid" style={{ alignItems: "center" }}>
+              <div className="form-group">
+                <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.875rem", fontWeight: 600, color: "#334155", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={retentionRequired}
+                    onChange={(e) => setRetentionRequired(e.target.checked)}
+                  />
+                  <span>Tarihsel Saklama & Arşivleme Zorunlu</span>
+                </label>
+                {retentionRequired && (
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Saklama süresi (örn: 5 yıl, yasal zorunluluk)"
+                    value={retentionPeriod}
+                    onChange={(e) => setRetentionPeriod(e.target.value)}
+                    style={{ marginTop: "0.375rem" }}
+                  />
+                )}
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  İş Değeri / Beklenen Fayda
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: %8 duruş azaltımı, fire takibi"
+                  value={businessValue}
+                  onChange={(e) => setBusinessValue(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Row 6: Notes */}
+            <div className="form-group">
+              <label className="form-label">
+                Saha Notları / Açıklama
+              </label>
+              <textarea
+                className="form-control"
+                rows={2}
+                placeholder="Ek teknik detaylar, veri formatı veya istasyon sınırları..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "0.5rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >

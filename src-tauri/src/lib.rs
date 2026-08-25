@@ -19,7 +19,38 @@ fn get_vault_root<R: tauri::Runtime>(app_handle: &tauri::AppHandle<R>) -> Result
         .local_data_dir()
         .map_err(|e| format!("Yerel veri dizini alinamadi: {}", e))?;
 
-    Ok(base.join("ERP CRM Discovery").join("attachment"))
+    let root = base.join("ERP CRM Discovery").join("attachment");
+    let _ = std::fs::create_dir_all(&root);
+    Ok(root)
+}
+
+/// Göreli yoldan güvenli hedef Vault yolunu çözer.
+fn resolve_target_vault_path(vault_root: &Path, relative_path: &str) -> Result<PathBuf, String> {
+    let clean_rel = relative_path.replace('\\', "/");
+    let trimmed = clean_rel.trim_matches('/');
+    if trimmed.is_empty() || trimmed.contains("..") || trimmed.contains('\0') {
+        return Err("Guvenlik Hatasi: Gecersiz veya guvensiz goreli dosya yolu (path traversal reddedildi).".into());
+    }
+
+    let sub_path = if let Some(stripped) = trimmed.strip_prefix("attachment/") {
+        stripped.to_string()
+    } else if let Some(stripped) = trimmed.strip_prefix("projects/") {
+        // legacy format: projects/{projectId}/attachments/{bfCode}/{questionId}/{file} -> {projectId}/{bfCode}/{questionId}/{file}
+        if stripped.contains("/attachments/") {
+            stripped.replace("/attachments/", "/")
+        } else {
+            stripped.to_string()
+        }
+    } else {
+        trimmed.to_string()
+    };
+
+    let target_path = vault_root.join(sub_path);
+    if !target_path.starts_with(vault_root) {
+        return Err("Guvenlik Hatasi: Hedef yol attachment vault kok dizininin disinda.".into());
+    }
+
+    Ok(target_path)
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
@@ -31,14 +62,6 @@ pub struct VaultWriteResult {
 }
 
 /// Attachment dosyasını fiziksel olarak kalıcı Managed Attachment Vault'a kaydeder/kopyalar.
-///
-/// Zorunlu Invariantlar:
-/// 1. Hedef klasörler oluşturulur (create_dir_all).
-/// 2. Dosya fiziksel olarak yazılır/kopyalanır.
-/// 3. Dosyanın diskte varlığı doğrulanır.
-/// 4. Dosya boyutu > 0 ve yazılan bayt sayısı ile eşleşir.
-/// 5. SHA-256 hesaplanır ve doğrulanır.
-/// 6. Herhangi bir adım başarısız olursa dosya temizlenir ve hata döner.
 #[tauri::command]
 fn save_attachment_to_vault(
     app: tauri::AppHandle,
@@ -46,28 +69,8 @@ fn save_attachment_to_vault(
     data: Vec<u8>,
     source_path: Option<String>,
 ) -> Result<VaultWriteResult, String> {
-    if relative_path.trim().is_empty() || relative_path.contains("..") || relative_path.contains('\0') {
-        return Err("Guvenlik Hatasi: Gecersiz veya guvensiz goreli dosya yolu (path traversal reddedildi).".into());
-    }
-
     let vault_root = get_vault_root(&app)?;
-
-    // Clean and normalize relative path
-    let clean_rel = relative_path.replace('\\', "/");
-    let sub_path = if clean_rel.starts_with("attachment/") {
-        &clean_rel["attachment/".len()..]
-    } else if clean_rel.starts_with("projects/") {
-        clean_rel.trim_start_matches("projects/")
-    } else {
-        &clean_rel
-    };
-
-    let target_path = vault_root.join(sub_path);
-
-    // Path traversal check
-    if !target_path.starts_with(&vault_root) {
-        return Err("Guvenlik Hatasi: Hedef yol attachment vault kok dizininin disinda.".into());
-    }
+    let target_path = resolve_target_vault_path(&vault_root, &relative_path)?;
 
     // Hedef klasör dizinini oluştur
     if let Some(parent) = target_path.parent() {
@@ -81,9 +84,11 @@ fn save_attachment_to_vault(
         if src_path.exists() && src_path.is_file() {
             std::fs::copy(src_path, &target_path)
                 .map_err(|e| format!("Kaynak dosyadan kasaya kopyalama basarisiz ({} -> {}): {}", src, target_path.display(), e))?;
-        } else {
+        } else if !data.is_empty() {
             std::fs::write(&target_path, &data)
                 .map_err(|e| format!("Kasaya dosya yazma basarisiz ({}): {}", target_path.display(), e))?;
+        } else {
+            return Err(format!("Kaynak dosya bulunamadi ve veri bos: {}", src));
         }
     } else {
         std::fs::write(&target_path, &data)
@@ -128,17 +133,8 @@ fn read_attachment_from_vault(
     relative_path: String,
 ) -> Result<Vec<u8>, String> {
     let vault_root = get_vault_root(&app)?;
-    let clean_rel = relative_path.replace('\\', "/");
-    let sub_path = if clean_rel.starts_with("attachment/") {
-        &clean_rel["attachment/".len()..]
-    } else {
-        &clean_rel
-    };
-    let target_path = vault_root.join(sub_path);
+    let target_path = resolve_target_vault_path(&vault_root, &relative_path)?;
 
-    if !target_path.starts_with(&vault_root) {
-        return Err("Guvenlik Hatasi: Hedef yol vault disinda.".into());
-    }
     if !target_path.exists() {
         return Err(format!("Dosya bulunamadi: {}", target_path.display()));
     }
@@ -153,17 +149,11 @@ fn check_attachment_exists_in_vault(
     relative_path: String,
 ) -> Result<bool, String> {
     let vault_root = get_vault_root(&app)?;
-    let clean_rel = relative_path.replace('\\', "/");
-    let sub_path = if clean_rel.starts_with("attachment/") {
-        &clean_rel["attachment/".len()..]
-    } else {
-        &clean_rel
+    let target_path = match resolve_target_vault_path(&vault_root, &relative_path) {
+        Ok(p) => p,
+        Err(_) => return Ok(false),
     };
-    let target_path = vault_root.join(sub_path);
 
-    if !target_path.starts_with(&vault_root) {
-        return Ok(false);
-    }
     Ok(target_path.exists() && target_path.is_file())
 }
 
@@ -174,17 +164,8 @@ fn delete_attachment_from_vault(
     relative_path: String,
 ) -> Result<bool, String> {
     let vault_root = get_vault_root(&app)?;
-    let clean_rel = relative_path.replace('\\', "/");
-    let sub_path = if clean_rel.starts_with("attachment/") {
-        &clean_rel["attachment/".len()..]
-    } else {
-        &clean_rel
-    };
-    let target_path = vault_root.join(sub_path);
+    let target_path = resolve_target_vault_path(&vault_root, &relative_path)?;
 
-    if !target_path.starts_with(&vault_root) {
-        return Err("Guvenlik Hatasi: Hedef yol vault disinda.".into());
-    }
     if target_path.exists() {
         std::fs::remove_file(&target_path).map_err(|e| format!("Dosya silinemedi: {}", e))?;
     }
@@ -215,38 +196,60 @@ fn get_vault_canonical_root(
     Ok(root.to_string_lossy().to_string())
 }
 
+/// Herhangi bir kaynak dosyayı binary olarak okur.
+#[tauri::command]
+fn read_file_binary(path: String) -> Result<Vec<u8>, String> {
+    let clean_path = path.trim();
+    let p = Path::new(clean_path);
+    if !p.exists() {
+        return Err(format!("Kaynak dosya bulunamadi: {}", clean_path));
+    }
+    std::fs::read(p).map_err(|e| format!("Dosya okunamadi ({}): {}", clean_path, e))
+}
+
 /// Attachment Vault'tan yönetilen dosyayı işletim sisteminin varsayılan uygulamasıyla açar.
 #[tauri::command]
 fn open_attachment_path(path: String) -> Result<(), String> {
-    let p = Path::new(&path);
+    let clean_path = path.trim();
+    let p = Path::new(clean_path);
     if !p.exists() {
-        return Err(format!("Dosya fiziksel olarak diskte mevcut degil: {}", path));
+        return Err(format!("Dosya fiziksel olarak diskte mevcut degil: {}", clean_path));
     }
 
     #[cfg(target_os = "windows")]
     {
-        std::process::Command::new("explorer.exe")
-            .arg(&path)
-            .spawn()
-            .map_err(|e| format!("Windows dosya acilamadi (explorer): {}", e))?;
+        let status = std::process::Command::new("explorer.exe")
+            .arg(clean_path)
+            .spawn();
+        if status.is_err() {
+            std::process::Command::new("cmd")
+                .args(["/C", "start", "", clean_path])
+                .spawn()
+                .map_err(|e| format!("Windows dosya acilamadi: {}", e))?;
+        }
         Ok(())
     }
 
     #[cfg(target_os = "macos")]
     {
-        std::process::Command::new("open")
-            .arg(&path)
-            .spawn()
-            .map_err(|e| format!("macOS dosya acilamadi: {}", e))?;
+        let status = std::process::Command::new("/usr/bin/open")
+            .arg(clean_path)
+            .spawn();
+        if status.is_err() {
+            std::process::Command::new("open")
+                .arg(clean_path)
+                .spawn()
+                .map_err(|e| format!("macOS dosya acilamadi (open): {}", e))?;
+        }
         Ok(())
     }
 
     #[cfg(target_os = "linux")]
     {
         std::process::Command::new("xdg-open")
-            .arg(&path)
+            .arg(clean_path)
             .spawn()
-            .map_err(|e| format!("Linux dosya acilamadi: {}", e))?;
+            .map_err(|e| format!("Linux dosya acilamadi (xdg-open): {}", e))?;
         Ok(())
     }
 }
@@ -254,15 +257,16 @@ fn open_attachment_path(path: String) -> Result<(), String> {
 /// Dosyayı seçili olarak dosya yöneticisinde gösterir.
 #[tauri::command]
 fn show_attachment_in_folder(path: String) -> Result<(), String> {
-    let p = Path::new(&path);
+    let clean_path = path.trim();
+    let p = Path::new(clean_path);
     if !p.exists() {
-        return Err(format!("Dosya fiziksel olarak diskte mevcut degil: {}", path));
+        return Err(format!("Dosya fiziksel olarak diskte mevcut degil: {}", clean_path));
     }
 
     #[cfg(target_os = "windows")]
     {
         std::process::Command::new("explorer.exe")
-            .arg(format!("/select,{}", path))
+            .arg(format!("/select,{}", clean_path))
             .spawn()
             .map_err(|e| format!("Windows klasor gosterilemedi: {}", e))?;
         Ok(())
@@ -270,11 +274,17 @@ fn show_attachment_in_folder(path: String) -> Result<(), String> {
 
     #[cfg(target_os = "macos")]
     {
-        std::process::Command::new("open")
+        let status = std::process::Command::new("/usr/bin/open")
             .arg("-R")
-            .arg(&path)
-            .spawn()
-            .map_err(|e| format!("macOS klasor gosterilemedi: {}", e))?;
+            .arg(clean_path)
+            .spawn();
+        if status.is_err() {
+            std::process::Command::new("open")
+                .arg("-R")
+                .arg(clean_path)
+                .spawn()
+                .map_err(|e| format!("macOS Finder'da gosterilemedi: {}", e))?;
+        }
         Ok(())
     }
 
@@ -313,6 +323,7 @@ pub fn run() {
             delete_attachment_from_vault,
             delete_project_from_vault,
             get_vault_canonical_root,
+            read_file_binary,
             open_attachment_path,
             show_attachment_in_folder
         ])

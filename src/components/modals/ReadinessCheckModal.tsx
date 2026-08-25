@@ -96,10 +96,10 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
       <div
         className="modal-content"
-        style={{ maxWidth: "640px", maxHeight: "90vh", overflowY: "auto" }}
+        style={{ maxWidth: "640px" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
@@ -115,7 +115,7 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <div className="modal-body">
             {error && (
               <div className="alert alert--danger" style={{ fontSize: "0.875rem" }}>
                 {error}
@@ -123,9 +123,9 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             )}
 
             {/* Kategori ve Kod */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div>
-                <label className="form-label font-bold" style={{ fontSize: "0.8125rem" }}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label font-bold">
                   Kategori *
                 </label>
                 <select
@@ -142,8 +142,8 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="form-label font-bold" style={{ fontSize: "0.8125rem" }}>
+              <div className="form-group">
+                <label className="form-label font-bold">
                   Kontrol Kodu *
                 </label>
                 <input
@@ -158,8 +158,8 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             </div>
 
             {/* Başlık */}
-            <div>
-              <label className="form-label font-bold" style={{ fontSize: "0.8125rem" }}>
+            <div className="form-group">
+              <label className="form-label font-bold">
                 Kontrol Başlığı *
               </label>
               <input
@@ -173,8 +173,8 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             </div>
 
             {/* Açıklama */}
-            <div>
-              <label className="form-label" style={{ fontSize: "0.8125rem" }}>
+            <div className="form-group">
+              <label className="form-label">
                 Açıklama / Değerlendirme Kriteri
               </label>
               <textarea
@@ -187,9 +187,9 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             </div>
 
             {/* Durum & Sorumlu Rol */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-              <div>
-                <label className="form-label font-bold" style={{ fontSize: "0.8125rem" }}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label font-bold">
                   Durum
                 </label>
                 <select
@@ -205,8 +205,8 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label className="form-label" style={{ fontSize: "0.8125rem" }}>
+              <div className="form-group">
+                <label className="form-label">
                   Sorumlu Rol
                 </label>
                 <input
@@ -220,7 +220,7 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             </div>
 
             {/* Kritiklik ve Kanıt Zorunluluğu Toggles */}
-            <div style={{ display: "flex", gap: "1.5rem", padding: "0.75rem", background: "var(--color-bg-subtle, #f8fafc)", borderRadius: "6px" }}>
+            <div style={{ display: "flex", gap: "1.5rem", padding: "0.75rem", background: "var(--color-bg-subtle, #f8fafc)", borderRadius: "6px", flexWrap: "wrap" }}>
               <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: "pointer", fontSize: "0.875rem" }}>
                 <input
                   type="checkbox"
@@ -252,8 +252,8 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
               </label>
 
               {actionRequired && (
-                <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "0.75rem" }}>
-                  <div>
+                <div className="form-grid" style={{ gridTemplateColumns: "2fr 1fr" }}>
+                  <div className="form-group">
                     <label className="form-label text-xs">Gerekli Aksiyon / Çözüm Notu</label>
                     <input
                       type="text"
@@ -263,7 +263,7 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
                       placeholder="Örn: Satınalma SoD yetkileri ayrıştırılmalı"
                     />
                   </div>
-                  <div>
+                  <div className="form-group">
                     <label className="form-label text-xs">Hedef Tarih</label>
                     <input
                       type="date"
@@ -277,8 +277,8 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             </div>
 
             {/* Ek Notlar */}
-            <div>
-              <label className="form-label" style={{ fontSize: "0.8125rem" }}>
+            <div className="form-group">
+              <label className="form-label">
                 Değerlendirme Notları
               </label>
               <textarea
@@ -291,7 +291,7 @@ export const ReadinessCheckModal: React.FC<ReadinessCheckModalProps> = ({
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={saving}>
               İptal
             </button>

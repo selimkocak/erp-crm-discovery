@@ -99,26 +99,26 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: "600px", width: "95%" }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="modal-content modal--md" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">
             {initialData ? "Onay Kuralını Düzenle" : "Yeni Onay Kuralı / Kademesi Ekle"}
           </h3>
-          <button type="button" className="btn-close" onClick={onClose} aria-label="Kapat">
+          <button type="button" className="btn-close modal-close-btn" onClick={onClose} aria-label="Kapat">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ maxHeight: "75vh", overflowY: "auto", paddingRight: "0.5rem" }}>
+          <div className="modal-body">
             {errorMsg && (
               <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                 {errorMsg}
               </div>
             )}
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Onay Kuralı Adı *</label>
               <input
                 type="text"
@@ -131,7 +131,7 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
               />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">Onaylayan Rol *</label>
                 <input
@@ -159,7 +159,7 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+            <div className="form-grid">
               <div className="form-group">
                 <label className="form-label">İlgili Veri Varlığı (Opsiyonel)</label>
                 <select
@@ -195,7 +195,7 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
               </div>
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Eşik / Limit / Tetikleyici Koşul</label>
               <input
                 type="text"
@@ -207,7 +207,7 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
               />
             </div>
 
-            <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem", background: "var(--color-neutral-50, #f8fafc)", padding: "0.75rem", borderRadius: "6px", border: "1px solid var(--border-color, #e2e8f0)" }}>
+            <div style={{ display: "flex", gap: "1.5rem", marginBottom: "1rem", background: "var(--color-neutral-50, #f8fafc)", padding: "0.75rem", borderRadius: "6px", border: "1px solid var(--border-color, #e2e8f0)", flexWrap: "wrap" }}>
               <label style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", cursor: "pointer", fontWeight: 600, fontSize: "0.875rem" }}>
                 <input
                   type="checkbox"
@@ -229,7 +229,7 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
               </label>
             </div>
 
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Notlar</label>
               <textarea
                 className="form-control"
@@ -242,7 +242,7 @@ export const DataGovernanceApprovalModal: React.FC<DataGovernanceApprovalModalPr
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSaving}>
               İptal
             </button>

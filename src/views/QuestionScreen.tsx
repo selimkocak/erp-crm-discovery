@@ -46,7 +46,6 @@ import {
   getOtStationAnswers,
   saveOtStationAnswer,
   saveLastQuestionId,
-  getLastQuestionId,
   updateFunctionStatusByCode,
   getFindings,
   getRequirements,
@@ -70,7 +69,7 @@ import {
 } from "../storage/attachmentManager";
 import { getVisibleQuestions } from "../engine/branching";
 import { adaptCustomQuestionToQuestion } from "../engine/customQuestionAdapter";
-import { calculateProgress, isQuestionAnswered, canAdvanceToNextQuestion, progressToStatus } from "../engine/progress";
+import { calculateProgress, isQuestionAnswered, hasProvidedAnswer, canAdvanceToNextQuestion, progressToStatus } from "../engine/progress";
 import { QuestionCard } from "../components/QuestionCard";
 import { ProgressBar } from "../components/ProgressBar";
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
@@ -85,6 +84,7 @@ interface QuestionScreenProps {
   bfNameTr: string;
   pack: QuestionPack;
   station?: OtStation | null;
+  initialQuestionId?: string;
   onBack: () => void;
   onOpenReport?: () => void;
 }
@@ -97,6 +97,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
   bfNameTr,
   pack,
   station,
+  initialQuestionId,
   onBack,
   onOpenReport,
 }) => {
@@ -147,7 +148,6 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         dbCustomQuestions,
         dbFollowups,
         dbAttachments,
-        lastQId,
       ] = await Promise.all([
         station
           ? getOtStationAnswers(projectId, station.id)
@@ -156,7 +156,6 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         getCustomQuestions(projectId, bfCode),
         getQuestionFollowups(projectId, bfCode),
         getProjectAttachments(projectId),
-        getLastQuestionId(projectId, bfCode),
       ]);
 
       // Merge canonical and custom answers into unified map
@@ -180,17 +179,33 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
       setFollowups(dbFollowups);
       setAttachmentsMap(attMap);
 
-      // Build initial question list to resolve lastQId
+      // Build initial question list
       const canonicalVisible = getVisibleQuestions(pack.questions, mergedAnswers);
       const adaptedCustom = dbCustomQuestions.map((cq, idx) =>
         adaptCustomQuestionToQuestion(cq, pack.questions.length + idx + 1)
       );
       const allInitial = [...canonicalVisible, ...adaptedCustom];
 
-      // Kaldığı yerden devam (Resume)
-      if (lastQId) {
-        const idx = allInitial.findIndex((q) => q.id === lastQId);
-        if (idx >= 0) setCurrentIndex(idx);
+      // ── Kaldığı yerden devam (Resume): İlk gerçek cevapsız soruya konumlanma ──
+      // 1. Kullanıcı açıkça belirli bir soru seçerek geldiyse öncelik ver
+      if (initialQuestionId) {
+        const explicitIdx = allInitial.findIndex((q) => q.id === initialQuestionId);
+        if (explicitIdx >= 0) {
+          setCurrentIndex(explicitIdx);
+          return;
+        }
+      }
+
+      // 2. Modüle girişte ilk görünür ve cevaplanmamış soruyu bul
+      const firstUnansweredIndex = allInitial.findIndex(
+        (q) => !hasProvidedAnswer(q, mergedAnswers.get(q.id))
+      );
+
+      if (firstUnansweredIndex >= 0) {
+        setCurrentIndex(firstUnansweredIndex);
+      } else if (allInitial.length > 0) {
+        // Tüm sorular cevaplandıysa son aktif soruya git
+        setCurrentIndex(allInitial.length - 1);
       }
     } catch (err) {
       console.error("Sorular ve cevaplar yüklenemedi:", err);
@@ -198,7 +213,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
     } finally {
       setIsLoading(false);
     }
-  }, [projectId, bfCode, pack.questions, station]);
+  }, [projectId, bfCode, pack.questions, station, initialQuestionId]);
 
   useEffect(() => {
     loadData();
@@ -286,7 +301,10 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
           );
         }
         // Durumu güncelle
-        const newStatus = progressToStatus(progress.answered, progress.total);
+        const nextAnswers = new Map(answers);
+        nextAnswers.set(qId, data);
+        const currentProg = calculateProgress(visibleQuestions, nextAnswers, followups);
+        const newStatus = progressToStatus(currentProg.answered, currentProg.total);
         await updateFunctionStatusByCode(projectId, bfCode, newStatus);
         setSaveStatus("saved");
         setLastSavedAt(new Date());
@@ -296,7 +314,7 @@ export const QuestionScreen: React.FC<QuestionScreenProps> = ({
         setSaveStatus("error");
       }
     },
-    [projectId, bfCode, pack.meta, progress.answered, progress.total, station]
+    [projectId, bfCode, pack.meta, answers, visibleQuestions, followups, station]
   );
 
   // ── Autosave Tetikleyici ────────────────────────────────────────────────

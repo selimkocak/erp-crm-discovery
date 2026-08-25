@@ -125,17 +125,17 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" style={{ maxWidth: "560px", width: "95%" }} onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
+      <div className="modal-content modal--md" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3 className="modal-title">Kanıtı Hedefe Bağla</h3>
-          <button type="button" className="btn-close" onClick={onClose} aria-label="Kapat">
+          <button type="button" className="btn-close modal-close-btn" onClick={onClose} aria-label="Kapat">
             <X size={18} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ paddingRight: "0.5rem" }}>
+          <div className="modal-body">
             {errorMsg && (
               <div className="alert alert-danger" style={{ marginBottom: "1rem" }}>
                 {errorMsg}
@@ -150,7 +150,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
             </div>
 
             {/* Hedef Tipi */}
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Hedef Keşif Türü</label>
               <select
                 className="form-control"
@@ -166,7 +166,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
 
             {/* Hedefe Özel Seçim Alanları */}
             {targetType === "QUESTION" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
+              <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">İş Fonksiyonu</label>
                   <select
@@ -197,7 +197,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
             )}
 
             {targetType === "OT_STATION" && (
-              <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <div className="form-group">
                 <label className="form-label">İstasyon Seçiniz *</label>
                 {otStations.length === 0 ? (
                   <div className="alert alert-warning" style={{ fontSize: "0.8125rem", margin: 0 }}>
@@ -221,7 +221,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
             )}
 
             {targetType === "PROCESS_MAP" && (
-              <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <div className="form-group">
                 <label className="form-label">Süreç Haritası Seçiniz *</label>
                 {processMaps.length === 0 ? (
                   <div className="alert alert-warning" style={{ fontSize: "0.8125rem", margin: 0 }}>
@@ -245,7 +245,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
             )}
 
             {targetType === "GOVERNANCE_ASSET" && (
-              <div className="form-group" style={{ marginBottom: "1rem" }}>
+              <div className="form-group">
                 <label className="form-label">Veri Varlığı Seçiniz *</label>
                 {governanceAssets.length === 0 ? (
                   <div className="alert alert-warning" style={{ fontSize: "0.8125rem", margin: 0 }}>
@@ -269,7 +269,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
             )}
 
             {/* Bağlantı Notu */}
-            <div className="form-group" style={{ marginBottom: "1rem" }}>
+            <div className="form-group">
               <label className="form-label">Bağlantı & İspat Notu</label>
               <textarea
                 className="form-control"
@@ -281,7 +281,7 @@ export const EvidenceLinkModal: React.FC<EvidenceLinkModalProps> = ({
             </div>
           </div>
 
-          <div className="modal-footer" style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose} disabled={isSaving}>
               İptal
             </button>

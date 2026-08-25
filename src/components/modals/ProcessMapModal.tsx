@@ -111,12 +111,12 @@ export const ProcessMapModal: React.FC<ProcessMapModalProps> = ({
           backgroundColor: "#ffffff",
           borderRadius: "12px",
           width: "100%",
-          maxWidth: "600px",
-          maxHeight: "90vh",
-          overflowY: "auto",
+          maxWidth: "min(600px, calc(100vw - 32px))",
+          maxHeight: "calc(100vh - 48px)",
           boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
           display: "flex",
           flexDirection: "column",
+          overflow: "hidden",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -157,186 +157,135 @@ export const ProcessMapModal: React.FC<ProcessMapModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            style={{
-              border: "none",
-              background: "transparent",
-              color: "#94a3b8",
-              cursor: "pointer",
-              padding: "4px",
-              borderRadius: "6px",
-            }}
+            className="modal-close-btn"
+            aria-label="Kapat"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-          {errorMessage && (
-            <div
-              style={{
-                backgroundColor: "#fef2f2",
-                border: "1px solid #fecaca",
-                borderRadius: "8px",
-                padding: "0.75rem 1rem",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                color: "#b91c1c",
-                fontSize: "0.875rem",
-              }}
-            >
-              <AlertCircle size={18} style={{ flexShrink: 0 }} />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Process Name */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Süreç Adı <span style={{ color: "#ef4444" }}>*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Örn: Siparişten Tahsilata (O2C) Akışı"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-              }}
-              required
-            />
-          </div>
-
-          {/* Process Area & Owner Role */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Süreç Alanı / Kapsamı
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Satış, Üretim, Satın Alma"
-                value={processArea}
-                onChange={(e) => setProcessArea(e.target.value)}
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", flex: "1 1 auto", minHeight: 0, overflow: "hidden" }}>
+          <div className="modal-body">
+            {errorMessage && (
+              <div
                 style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
+                  backgroundColor: "#fef2f2",
+                  border: "1px solid #fecaca",
+                  borderRadius: "8px",
+                  padding: "0.75rem 1rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  color: "#b91c1c",
                   fontSize: "0.875rem",
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Süreç Sahibi Rol / Departman
-              </label>
-              <input
-                type="text"
-                placeholder="Örn: Satış Operasyon Müdürü"
-                value={ownerRole}
-                onChange={(e) => setOwnerRole(e.target.value)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-              Süreç Açıklaması & Kapsam Notları
-            </label>
-            <textarea
-              rows={3}
-              placeholder="Sürecin başlangıç tetikleyicisi, temel amacı ve beklenen ana çıktısı..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "0.5rem 0.75rem",
-                borderRadius: "6px",
-                border: "1px solid #cbd5e1",
-                fontSize: "0.875rem",
-                resize: "vertical",
-              }}
-            />
-          </div>
-
-          {/* Status & Sort Order */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Durum
-              </label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as ProcessMapStatus)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                  backgroundColor: "#ffffff",
                 }}
               >
-                <option value="active">Aktif</option>
-                <option value="draft">Taslak</option>
-                <option value="archived">Arşivlendi</option>
-              </select>
-            </div>
-            <div>
-              <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, color: "#334155", marginBottom: "0.375rem" }}>
-                Sıralama Önceliği
+                <AlertCircle size={18} style={{ flexShrink: 0 }} />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Process Name */}
+            <div className="form-group">
+              <label className="form-label">
+                Süreç Adı <span style={{ color: "#ef4444" }}>*</span>
               </label>
               <input
-                type="number"
-                value={sortOrder}
-                onChange={(e) => setSortOrder(parseInt(e.target.value, 10) || 0)}
-                style={{
-                  width: "100%",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "6px",
-                  border: "1px solid #cbd5e1",
-                  fontSize: "0.875rem",
-                }}
+                type="text"
+                className="form-control"
+                placeholder="Örn: Siparişten Tahsilata (O2C) Akışı"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
               />
+            </div>
+
+            {/* Process Area & Owner Role */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Süreç Alanı / Kapsamı
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Satış, Üretim, Satın Alma"
+                  value={processArea}
+                  onChange={(e) => setProcessArea(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Süreç Sahibi Rol / Departman
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Örn: Satış Operasyon Müdürü"
+                  value={ownerRole}
+                  onChange={(e) => setOwnerRole(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* Description */}
+            <div className="form-group">
+              <label className="form-label">
+                Süreç Açıklaması & Kapsam Notları
+              </label>
+              <textarea
+                className="form-control"
+                rows={3}
+                placeholder="Sürecin başlangıç tetikleyicisi, temel amacı ve beklenen ana çıktısı..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            {/* Status & Sort Order */}
+            <div className="form-grid">
+              <div className="form-group">
+                <label className="form-label">
+                  Durum
+                </label>
+                <select
+                  className="form-control"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as ProcessMapStatus)}
+                >
+                  <option value="active">Aktif</option>
+                  <option value="draft">Taslak</option>
+                  <option value="archived">Arşivlendi</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">
+                  Sıralama Önceliği
+                </label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(parseInt(e.target.value, 10) || 0)}
+                />
+              </div>
             </div>
           </div>
 
           {/* Footer Actions */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "0.75rem",
-              marginTop: "1rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid #e2e8f0",
-            }}
-          >
+          <div className="modal-footer">
             <button
               type="button"
               onClick={onClose}
-              className="button button--secondary"
+              className="btn btn-secondary"
               disabled={isSubmitting}
             >
               Vazgeç
             </button>
             <button
               type="submit"
-              className="button button--save"
+              className="btn btn-save"
               disabled={isSubmitting}
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >
