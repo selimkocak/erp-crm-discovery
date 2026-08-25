@@ -336,9 +336,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 <th>Proje / Analiz Adı</th>
                 <th>Durum</th>
                 <th>Takvim</th>
-                <th>Lokasyon</th>
-                <th>Kapsam</th>
-                <th>Son Güncelleme</th>
+                <th className="hide-on-mobile">Lokasyon</th>
+                <th className="hide-on-mobile">Kapsam</th>
+                <th className="hide-on-mobile">Son Güncelleme</th>
                 <th style={{ textAlign: "right" }}>Aksiyonlar</th>
               </tr>
             </thead>
@@ -390,17 +390,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
                         );
                       })()}
                     </td>
-                    <td>
+                    <td className="hide-on-mobile">
                       <span style={{ color: "var(--text-muted)" }}>
                         {proj.city ? proj.city : "—"}
                       </span>
                     </td>
-                    <td>
+                    <td className="hide-on-mobile">
                       <span className="badge badge-not-started">
                         {proj.selected_function_count} Fonksiyon
                       </span>
                     </td>
-                    <td>
+                    <td className="hide-on-mobile">
                       <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", color: "var(--text-muted)", fontSize: "0.8rem" }}>
                         <Calendar size={14} />
                         {formatDate(proj.updated_at)}

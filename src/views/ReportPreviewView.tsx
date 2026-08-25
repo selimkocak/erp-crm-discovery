@@ -319,7 +319,7 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
       )}
 
       {!profile.executive_summary && (
-        <div className="report-warning-banner" style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1.25rem", background: "var(--warning-light, #fef3c7)", color: "#92400e", borderRadius: "8px", margin: "1rem 1.5rem 0", fontSize: "0.875rem" }}>
+        <div className="report-warning-banner" style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1.25rem", background: "var(--warning-light, #fef3c7)", color: "#92400e", borderRadius: "8px", margin: "1rem var(--page-padding, 10px) 0", fontSize: "0.875rem" }}>
           <AlertCircle size={16} />
           <span>Final rapor öncesinde <strong>Yönetici Özeti</strong> henüz girilmedi. İsterseniz "Notları Düzenle" butonundan ekleyebilirsiniz.</span>
         </div>

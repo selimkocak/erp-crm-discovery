@@ -15,7 +15,7 @@
  * [Tümü] [Cevaplanan] [🟡 Sonra Dön (N)] [🔴 Kritik (N)] [Cevaplanmayan]
  */
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CheckCircle2,
   Circle,
@@ -61,6 +61,22 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [activeFilter, setActiveFilter] = useState<NavigatorFilterType>("all");
+
+  // Escape key handler when drawer is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onToggle();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen, onToggle]);
 
   // Calculate follow-up, attachment and completion counts for tabs
   let totalAnsweredCount = 0;
@@ -185,22 +201,13 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
   }
 
   return (
-    <aside
-      className="question-navigator"
-      style={{
-        width: "330px",
-        minWidth: "330px",
-        height: "calc(100vh - 4rem)",
-        position: "sticky",
-        top: "4rem",
-        backgroundColor: "var(--bg-surface)",
-        borderRight: "1px solid var(--border-subtle)",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 35,
-        boxShadow: "var(--shadow-sm)",
-      }}
-    >
+    <>
+      <div
+        className="question-navigator-backdrop"
+        onClick={onToggle}
+        aria-hidden="true"
+      />
+      <aside className="question-navigator">
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div
         style={{
@@ -656,5 +663,6 @@ export const QuestionNavigator: React.FC<QuestionNavigatorProps> = ({
         </div>
       </div>
     </aside>
+    </>
   );
 };
