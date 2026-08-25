@@ -93,6 +93,15 @@ Aşağıdaki 3 temel metadata kaynağının sürüm bilgisi ve proje tanımlayı
   - Tam Geri Yükleme: 39 tablonun tamamı yeni UUID'lerle geri yüklenir.
   - Şablon Çoğaltma: Sorular ve yapı korunurken, cevaplar ve Go-Live kontrolleri `NOT_STARTED` olarak sıfırlanır.
 
+### 6.1 Kanonik Soru Külliyatı İstatistikleri (`npm run audit:corpus`)
+- **Toplam Soru Paketi:** 35 Paket
+- **Toplam Kanonik Soru:** 1.550 Soru
+- **Zorunlu Sorular (Required):** 831 Soru (%53.6)
+- **Opsiyonel Sorular (Optional):** 719 Soru (%46.4)
+- **Koşullu Dallanma Noktası (Branching):** 222 Nokta
+- **Kapsanan İş Fonksiyonu:** 34 Kanonik İş Fonksiyonu (%100 Kapsama)
+- **Külliyat Bütünlüğü:** 0 ID Mükerrerliği, 0 Bileşik Anahtar Çakışması, 0 Branching Hatası (%100 TEMİZ)
+
 ---
 
 ## 7. Kalite Kapıları ve Doğrulama Durumu

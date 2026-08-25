@@ -41,7 +41,7 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 
 ## Temel Özellikler (Features)
 
-- **34 Kanonik İş Fonksiyonu & 35 Soru Paketi (1.550 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama, Ana Veri Yönetimi ve Endüstriyel OT Veri Keşfi dahil 35 hazır soru paketi (822 zorunlu, 728 opsiyonel, 222 koşullu).
+- **34 Kanonik İş Fonksiyonu & 35 Soru Paketi (1.550 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama, Ana Veri Yönetimi ve Endüstriyel OT Veri Keşfi dahil 35 hazır soru paketi (831 zorunlu, 719 opsiyonel, 222 koşullu).
 - **Deklaratif Soru Motoru (Question Engine):** Kod yazmadan, tamamen açık JSON şeması ile genişletilebilir soru paketleri. Tekli seçim, çoklu seçim, açık uçlu metin, seçenek bazlı özel notlar ve genel görüşme notları.
 - **Tek Seçimli Cevabı Kaldırma (Clear Selection):** Yanlışlıkla yapılan seçimleri kolayca geri alma ve klavyeden `Escape` ile temizleme desteği.
 - **Dinamik Koşullu Dallanma (222 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
@@ -130,10 +130,10 @@ npm run tauri dev
 
 ## Kanonik Soru Paketi Kataloğu (Question Pack Catalog)
 
-`v0.1.0` itibarıyla **34 soru paketi** (33 dikey kanonik modül + 1 yatay yönetişim paketi) ile **33 kanonik iş fonksiyonunun tamamı (%100)** mühürlenmiştir. Sistemde eksik kanonik modül bulunmamaktadır.
-Toplam: **1.492 soru**, **792 zorunlu soru**, **700 opsiyonel soru**, **213 koşullu dallanma (branching) noktası**.
+`v0.1.4` itibarıyla **35 soru paketi** (34 dikey kanonik modül + 1 yatay yönetişim paketi) ile **34 kanonik iş fonksiyonunun tamamı (%100)** mühürlenmiştir. Sistemde eksik kanonik modül bulunmamaktadır.
+Toplam: **1.550 soru**, **831 zorunlu soru** (%53.6), **719 opsiyonel soru** (%46.4), **222 koşullu dallanma (branching) noktası**.
 
-### Dikey Kanonik Modüller (33 Paket) ve Yatay Yönetişim (1 Paket)
+### Dikey Kanonik Modüller (34 Paket) ve Yatay Yönetişim (1 Paket)
 
 | # | Modül | İş Fonksiyonu Kodu | Soru | Zorunlu | Branching | Durum |
 |---|---|---|:---:|:---:|:---:|:---:|
@@ -171,7 +171,8 @@ Toplam: **1.492 soru**, **792 zorunlu soru**, **700 opsiyonel soru**, **213 koş
 | 32 | Genel Yönetim & Kurumsal Yönetişim | `MANAGEMENT` | 47 | 25 | 7 | ✅ Mühürlü |
 | 33 | Stratejik Planlama & Performans | `STRATEGY` | 47 | 25 | 8 | ✅ Mühürlü |
 | 34 | Eğitim ve Gelişim Yönetimi | `TRAINING` | 47 | 25 | 8 | ✅ Mühürlü |
-| | **TOPLAM (34 Paket)** | | **1.492** | **792** | **213** | **%100 Kapsama** |
+| 35 | Saha Veri Toplama & OT Keşfi | `OT_INDUSTRIAL_DATA` | 58 | 39 | 9 | ✅ Mühürlü |
+| | **TOPLAM (35 Paket)** | | **1.550** | **831** | **222** | **%100 Kapsama** |
 
 ---
 
