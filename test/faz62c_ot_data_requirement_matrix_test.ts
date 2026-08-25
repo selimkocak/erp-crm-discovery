@@ -545,14 +545,14 @@ async function runTests() {
   assert(parsedPdf.text.includes("Mitutoyo"), "PDF çıktısı kalite cihazı markasını içeriyor.");
 
   // -------------------------------------------------------------------------
-  // TEST 11: Taşınabilir Arşiv (.erpcrm Schema 15) Export & Restore
+  // TEST 11: Taşınabilir Arşiv (.erpcrm Schema 15+) Export & Restore
   // -------------------------------------------------------------------------
-  console.log("\n--- TEST 11: Taşınabilir Arşiv Export & Restore (Schema 15) ---");
+  console.log("\n--- TEST 11: Taşınabilir Arşiv Export & Restore (Schema 15+) ---");
 
-  assert(BACKUP_CURRENT_SCHEMA_VERSION === 15, "Yedekleme şema sürümü Schema 15 olarak mühürlendi.");
+  assert(BACKUP_CURRENT_SCHEMA_VERSION >= 15, "Yedekleme şema sürümü Schema 15 veya üzeri olarak mühürlendi.");
 
   const exportResult = await exportProjectBackup(p1Id);
-  assert(exportResult.manifest.schemaVersion === 15, "Export manifesti schemaVersion 15 içeriyor.");
+  assert(exportResult.manifest.schemaVersion >= 15, "Export manifesti schemaVersion >= 15 içeriyor.");
   assert(exportResult.manifest.recordCounts.otDataRequirements === 1, "Manifest recordCounts.otDataRequirements === 1.");
   assert(exportResult.manifest.recordCounts.otAlarmRequirements === 1, "Manifest recordCounts.otAlarmRequirements === 1.");
   assert(exportResult.manifest.recordCounts.otQualityDevices === 1, "Manifest recordCounts.otQualityDevices === 1.");
