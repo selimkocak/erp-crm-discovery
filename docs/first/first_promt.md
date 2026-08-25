@@ -1,9 +1,9 @@
 ERP CRM Discovery Projesi — Bellek Tazeleme ve Oturum Başlangıç Talimatı
 
 Çalışma Dizini: /home/selim/projects/erp-crm-discovery
-Mevcut Sürüm: v0.1.4 | Git Durumu: 35 Soru Paketi (1.550 Soru, 831 Zorunlu, 719 Opsiyonel, 222 Branching, 34 İş Fonksiyonu + 1 Temel Eğitim Paketi) + Yönetişim Matrisi (FAZ-46..50) + .erpcrm Schema 19 Taşınabilir Arşiv (FAZ-51..66) + Proje Yaşam Döngüsü & Kapsam Revizyonu (FAZ-55) + Sentetik Kesikli Üretim Pilotu Marmara Endüstriyel (FAZ-57/58) + İki Seviyeli Takvim (FAZ-59) + Ajan Mimarisi (FAZ-60/61) + OT Endüstriyel Veri Keşfi & İstasyon Profili (FAZ-62A/B/C) + BPMN Süreç Haritaları & Benimseme Riski (FAZ-63) + Veri Yönetişimi Varlıkları (FAZ-64) + Saha Kanıtları Doğrulama Defteri (FAZ-65) + Pilot Saha Kabulü & Go-Live Hazırlığı (FAZ-66) + Uzman İnceleme Rehberi & Yayın Hazırlığı (FAZ-67) + macOS Apple Silicon v0.1.4 DMG Dağıtımı
-Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz66_faz67_readiness_and_v014_macos_release_2026_08_25
-Doğrulama Durumu: 39 SQLite Tablosu, 19 Migrasyon, Clean Install (57/57 PASS), FAZ-66 Smoke Testi (88/88 PASS), npm run build (0 Hata, 1.971 modül), cargo check (0 Hata), GitHub Actions CI 100% Yeşil (Linux, macOS, Windows)
+Mevcut Sürüm: v0.1.4 | Git Durumu: bfc18c0 (main ve origin/main senkron, çalışma ağacı %100 temiz) | 35 Soru Paketi (1.550 Soru, 831 Zorunlu, 719 Opsiyonel, 222 Branching, 34 İş Fonksiyonu + 1 Temel Eğitim Paketi) + Yönetişim Matrisi (FAZ-46..50) + .erpcrm Schema 19 Taşınabilir Arşiv (FAZ-51..66) + Proje Yaşam Döngüsü & Kapsam Revizyonu (FAZ-55) + Sentetik Kesikli Üretim Pilotu Marmara Endüstriyel (FAZ-57/58) + İki Seviyeli Takvim (FAZ-59) + Ajan Mimarisi (FAZ-60/61) + OT Endüstriyel Veri Keşfi & İstasyon Profili (FAZ-62A/B/C) + BPMN Süreç Haritaları & Benimseme Riski (FAZ-63) + Veri Yönetişimi Varlıkları (FAZ-64) + Saha Kanıtları Doğrulama Defteri (FAZ-65) + Pilot Saha Kabulü & Go-Live Hazırlığı (FAZ-66) + Uzman İnceleme Rehberi & Yayın Hazırlığı (FAZ-67) + Son Adversarial Kalite Denetimi R2 (FAZ-68) + Responsive UI ve 10px Layout Harmonizasyonu (FAZ-69) + macOS Apple Silicon DMG ve Windows Native NSIS Setup Dağıtım Paketleri (FAZ-70)
+Kalıcı Bellek Kaydı (Knowledge Item): wo_erp_crm_discovery_faz68_to_faz70_responsive_ui_and_packaging_2026_08_25
+Doğrulama Durumu: 39 SQLite Tablosu, 19 Migrasyon, 86 Test Paketi (1.800+ Test %100 PASS, 0 Hata), Clean Install (57/57 PASS), FAZ-66 Smoke Testi (88/88 PASS), npm run build (0 Hata, 1.971 modül), cargo check (0 Hata), GitHub Actions CI & Paketleme %100 Yeşil (Linux, macOS, Windows)
 
 ======================================================================
 1. MİMARİ VE TEKNOLOJİ ÖZETİ
@@ -48,15 +48,28 @@ Doğrulama Durumu: 39 SQLite Tablosu, 19 Migrasyon, Clean Install (57/57 PASS), 
   · `docs/review/FAZ67_MARMARA_PILOT_ACCEPTANCE_GUIDE.md`: Marmara pilotu 14 aşamalı kabul rehberi ve UAT kontrol listesi.
   · `docs/release/FAZ67_RELEASE_READINESS_REPORT.md`: Kapsamlı yayın hazırlık raporu.
   · `docs/USER_GUIDE_TR.md`: 15 bölümlü Türkçe son kullanıcı kılavuzu.
+- Son Uzman Kalite Kontrolü R2 (FAZ-68):
+  · `docs/review/FAZ68_FINAL_EXPERT_QUALITY_REVIEW_R2.md`: 35 paket, 1.550 soru, 831 zorunlu soru, 222 branching kuralı, 7 çapraz benzer çift (Jaccard ≥ %65) bağımsız script doğrulaması.
+  · Model metadata standardı: `Claude Opus 4.6 (Thinking) — Antigravity IDE`.
+  · `READY_WITH_MANUAL_ACCEPTANCE` sınıflandırması, Managed Vault `DESIGN_VERIFIED` statüsü.
+- Responsive UI ve 10px Layout Harmonizasyonu (FAZ-69):
+  · Global `--page-padding: 10px;` token'ı tanımlandı; tüm view, header, question screen, modal ve döküman kenar boşlukları 10px'e bağlandı.
+  · Anti-overflow kuralları ile `100vw` kaynaklı yatay taşmalar temizlendi; `.main-content` ve `.header-inner` için `max-width: 1560px; margin: 0 auto;` ortalaması yapıldı.
+  · `QuestionNavigator.tsx`: Mobilde (`<=900px`) sabit sticky yerine backdrop'lu modal drawer ve `Escape` klavye dinleyicisi ile erişilebilir kılındı.
+  · `HomeView.tsx`: Mobilde (`<=768px`) gereksiz kolonlar `.hide-on-mobile` ile gizlendi, tablo yatay scroll korumasına alındı.
+  · 10 modal bileşeninde `calc(100vw - 20px)` ve dinamik `100dvh` viewport sınırları uygulandı.
+  · Canlı Vite dev sunucusu (`http://localhost:1420`) ayağa kaldırılarak `curl -I` ve tarayıcı oturumu ile PNG/WebP görsel kanıtları üretildi.
+  · `docs/review/FAZ69_RESPONSIVE_UI_ACCEPTANCE_REVIEW.md` raporu `ACCEPTED_WITH_MINOR_ISSUES` ile mühürlendi; `bfc18c0` commit'i ile `origin/main` senkronize edildi.
 - Sentetik Marmara Endüstriyel Pilot Projesi (FAZ-57/58 & FAZ-66):
   · 19 Aktif İş Fonksiyonu (9 Tamamlandı, 10 Devam Ediyor, 0 Başlanmadı).
   · 94 Kanonik Cevap, 427 Zorunlu Soru, %22 İlerleme.
   · 11 OT İstasyonu, 4 BPMN Süreç Haritası, 5 Yönetişim Nesnesi, SoD çakışması (`CHK-GOV-03` BLOCKED), 3 Saha Kanıtı.
 - Taşınabilir Format (.erpcrm Schema 19): Sıfır bağımlılıklı POSIX USTAR + GZIP arşiv motoru (`src/storage/tarArchive.ts`). 39 SQLite tablosu, manifest.json (Schema Version 19), project-data.json, checksums.json ve Managed Vault kanıt dosyaları.
-- Dağıtım Paketleri (v0.1.4):
-  · macOS Apple Silicon (aarch64 DMG + .app.tar.gz) — GitHub Actions Run #32821447752 üzerinden derlendi ve indirildi:
-    `ERP CRM Discovery_0.1.4_aarch64.dmg` (6.36 MB — SHA-256: `dffbcb1321db74dc28da415e4ff52ecb3445d1afa73dcfc56a18eadf038abea2`)
-  · Windows (x64 NSIS Setup .exe) — Yalnızca kullanıcı onayıyla tag/release tetiklenir.
+- Dağıtım Paketleri (v0.1.4 — FAZ-70):
+  · macOS Apple Silicon (`aarch64-apple-darwin` DMG + .app.tar.gz) — GitHub Actions Run #32842377269 (SUCCESS):
+    `ERP-CRM-Discovery-macOS-Apple-Silicon` (12.31 MB — SHA-256 doğrulandı).
+  · Windows Native NSIS (`x86_64-pc-windows-msvc` Setup .exe) — GitHub Actions Run #32842380436 (SUCCESS):
+    `ERP-CRM-Discovery-Windows-Setup` (4.41 MB — SHA-256 doğrulandı).
 
 ======================================================================
 2. TAMAMLANAN FAZLAR KRONOLOJİSİ
@@ -79,7 +92,10 @@ Doğrulama Durumu: 39 SQLite Tablosu, 19 Migrasyon, Clean Install (57/57 PASS), 
 - FAZ-64: Veri Yönetişimi Varlıkları ve Çok Kademeli Onay Akışları (SQLite Migration 17 data_governance_assets, data_governance_access, data_governance_approvals, Bölüm 5 raporu).
 - FAZ-65: Saha Kanıtları ve Doğrulama Kayıt Defteri (SQLite Migration 18 evidence_items, evidence_links, Managed Attachment Vault SHA-256 doğrulaması, kanıtsız kritik konular uyarısı).
 - FAZ-66: Pilot Saha Kabulü, Rapor Kalitesi ve Go-Live Hazırlığı (SQLite Migration 19 readiness_checks, 8 kategori, 24 kontrol maddesi, NOT_APPLICABLE payda hesabı, kritik açık kuralı, .erpcrm Schema 19, Bölüm 7 rapor paritesi).
-- FAZ-67: Uzman Saha İncelemesi, Ürünleştirme ve Yayın Hazırlığı (5 uzman dokümanı, 35 paket matrisi, Marmara kabul rehberi, 15 bölümlü kullanıcı kılavuzu, Release Readiness raporu, v0.1.4 macOS DMG derlemesi ve indirmesi).
+- FAZ-67: Uzman Saha İncelemesi, Ürünleştirme ve Yayın Hazırlığı (5 uzman dokümanı, 35 paket matrisi, Marmara kabul rehberi, 15 bölümlü kullanıcı kılavuzu, Release Readiness raporu).
+- FAZ-68: Son Uzman Kalite Kontrolü R2 (35 paket 1.550 soru, 831 zorunlu soru, 222 branching kuralı, 7 çapraz çift doğrulaması, Claude Opus 4.6 Thinking metadata mühürleme, R1 taslak temizliği).
+- FAZ-69: Responsive UI ve Layout Harmonizasyonu (Global 10px sayfa dolgusu, anti-overflow, max-width: 1560px, QuestionNavigator mobil çekmece & Escape desteği, HomeView mobil kolon gizleme, 10 modal 100dvh güncellemesi, canlı önizleme görsel kabulü, FAZ69_RESPONSIVE_UI_ACCEPTANCE_REVIEW.md raporu, bfc18c0 commit & push).
+- FAZ-70: macOS ve Windows Release Paketleme Doğrulaması (GitHub Actions Run #32842377269 macOS DMG ve Run #32842380436 Windows NSIS Setup %100 SUCCESS, SHA-256 doğrulaması).
 
 ======================================================================
 3. AKTİF KÜLLİYAT VE MODÜL LİSTESİ (35 PAKET / 1.550 SORU — %100 TAMAMLANDI)
@@ -125,24 +141,26 @@ Külliyat Toplamı: 35 Paket, 1.550 Soru, 831 Zorunlu (%53.6), 719 Opsiyonel (%4
 ======================================================================
 4. KRİTİK GÜVENLİK, APİ VE AJAN ÇALIŞTIRMA KURALLARI
 ======================================================================
-1. Ajan Rol Disiplini: Her fazda `ROLE: Investigator` → `ROLE: Implementer` → `ROLE: QA` tek satırlık rol beyanları kullanılmalıdır. Kapsam dışı dosyalara veya mimariye dokunulmamalıdır.
+1. Ajan Rol Disiplini: Her fazda `ROLE: Investigator` → `ROLE: Implementer` → `ROLE: QA` → `ROLE: Release` tek satırlık rol beyanları kullanılmalıdır. Kapsam dışı dosyalara veya mimariye dokunulmamalıdır.
 2. AI İzolasyonu: Gemini veya benzeri AI sistemleri geliştirme ortamının araçlarıdır; ERP CRM Discovery uygulamasının çalışma zamanı (runtime) bileşeni değildir. `src/` veya `src-tauri/` içine AI API çağrısı eklenemez.
 3. Sıfır SQL Transaction Kuralı: `@tauri-apps/plugin-sql` bağlantı havuzundan (SqlitePool) ötürü frontend'de `BEGIN`, `COMMIT`, `ROLLBACK` kullanılmaz; sıralı `INSERT` ve hata durumunda `deleteProject(newProjectId)` telafi mekanizması kullanılır.
 4. Tarih ve Takvim Format Kuralı: Tarihler veritabanında saat içermeyen ISO `YYYY-MM-DD` biçiminde saklanır (`NULL` destekli). Gün farkı hesaplamalarında saat dilimi ve daylight-saving kaymalarını önlemek için saf matematiksel `Date.UTC / 86400000` formülü kullanılır.
 5. Saf Masaüstü Kuralı: ERP CRM Discovery bir masaüstü uygulamasıdır. Tarayıcı indirmesi (`<a download>`, Blob URL, `URL.createObjectURL`) asla kullanılmaz; her zaman `@tauri-apps/plugin-dialog` ve `@tauri-apps/plugin-fs` kullanılır.
-6. Yedek Klasör Hafızası: Son kullanılan klasör `localStorage['erp_crm_last_backup_directory']` hafızasında tutulur; varsayılan yol `documentDir()/ERP CRM Discovery Yedekleri` dizinidir.
-7. Test Çalıştırma Standardı: Testler doğrudan `npm exec -- tsx <test_path>` veya `npm test` ile çalıştırılır (Global paket bağımlılığı yoktur).
-8. Pager ve Arka Plan Görev Güvenliği: `git diff` veya terminal komutlarında sayfalayıcı kilitlenmelerini önlemek için `PAGER=cat` kullanılmalıdır. Asılı kalan süreçler `manage_task` ile temizlenmelidir.
-9. formatAnswer() dönüş tipi: { isAnswered, selectedOptions, textValue, generalNote, summaryText }
-10. ReportModel şeması: { metadata, company, profile, scope[], businessFunctions[], followups[], scheduleSummary, otStationsSummary, processMapsSummary, dataGovernanceSummary, evidenceSummary, readinessSummary, globalFindings[], globalRequirements[], globalRisks[], projectNotes[], summaryStats }
-11. buildDocxBuffer(report: ReportModel) / buildPdfBuffer(report: ReportModel) — tek argüman, async
-12. PDFParse kullanımı: new PDFParse({ data: pdfBuf }).getText()
-13. Branching & Progress engine: Map<string, AnswerData> kullanılır
+6. Responsive & Layout Kuralı: Kenar boşlukları daima `--page-padding: 10px;` token'ına bağlanır. `width: 100vw` yerine `width: 100%` ve `overflow-x: hidden` kullanılır. Modallarda `calc(100vw - 20px)` ve `100dvh` kullanılır.
+7. Yedek Klasör Hafızası: Son kullanılan klasör `localStorage['erp_crm_last_backup_directory']` hafızasında tutulur; varsayılan yol `documentDir()/ERP CRM Discovery Yedekleri` dizinidir.
+8. Test Çalıştırma Standardı: Testler doğrudan `npm exec -- tsx <test_path>` veya `npm test` ile çalıştırılır (Global paket bağımlılığı yoktur).
+9. Pager ve Arka Plan Görev Güvenliği: `git diff` veya terminal komutlarında sayfalayıcı kilitlenmelerini önlemek için `PAGER=cat` kullanılmalıdır. Asılı kalan süreçler `manage_task` ile temizlenmelidir.
+10. formatAnswer() dönüş tipi: { isAnswered, selectedOptions, textValue, generalNote, summaryText }
+11. ReportModel şeması: { metadata, company, profile, scope[], businessFunctions[], followups[], scheduleSummary, otStationsSummary, processMapsSummary, dataGovernanceSummary, evidenceSummary, readinessSummary, globalFindings[], globalRequirements[], globalRisks[], projectNotes[], summaryStats }
+12. buildDocxBuffer(report: ReportModel) / buildPdfBuffer(report: ReportModel) — tek argüman, async
+13. PDFParse kullanımı: new PDFParse({ data: pdfBuf }).getText()
+14. Branching & Progress engine: Map<string, AnswerData> kullanılır
 
 ======================================================================
 5. TEMEL DOĞRULAMA KOMUTLARI
 ======================================================================
 - Külliyat Bütünlüğü Denetimi: npm run audit:corpus
+- Test Paketi Çalıştırma (86 Test): npm test
 - Clean Install Şema Testi (39 Tablo): npm exec -- tsx test/clean_install_test.ts
 - FAZ-66 Go-Live Hazırlığı Kabul Testi: npm exec -- tsx test/faz66_pilot_readiness_smoke_test.ts
 - FAZ-62C OT Veri Gereksinim Matrisi Testi: npm exec -- tsx test/faz62c_ot_data_requirement_matrix_test.ts
@@ -154,6 +172,7 @@ Külliyat Toplamı: 35 Paket, 1.550 Soru, 831 Zorunlu (%53.6), 719 Opsiyonel (%4
 - Registry Yenileme: npm run generate
 - Frontend Üretim Derlemesi: npm run build
 - Backend Rust Derlemesi: cargo check --manifest-path src-tauri/Cargo.toml
-- macOS DMG Paketi İndirilen Konum: ~/Downloads/erp-crm-discovery-v0.1.4-macos/ERP-CRM-Discovery-macOS-Apple-Silicon/
+- macOS Apple Silicon DMG Paketi: GitHub Actions Run #32842377269 (12.31 MB — SUCCESS)
+- Windows Native NSIS Setup Paketi: GitHub Actions Run #32842380436 (4.41 MB — SUCCESS)
 
 Belleği bu bağlamla tazele ve yeni vereceğim görev için hazır olduğunu bildir.

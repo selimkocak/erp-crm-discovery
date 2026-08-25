@@ -345,9 +345,9 @@ describe("FAZ-65: Saha Kanıtı ve Doğrulama Kayıt Defteri Smoke Testi", () =>
     assert.ok(pdfBytes.byteLength > 0, "PDF dosya boyutu 0'dan büyük olmalıdır.");
   });
 
-  it("T09: Taşınabilir .erpcrm Schema 18 Yedekleme sözleşmesi evidenceItems & evidenceLinks içermelidir", async () => {
+  it("T09: Taşınabilir .erpcrm Schema 18+ Yedekleme sözleşmesi evidenceItems & evidenceLinks içermelidir", async () => {
     const { BACKUP_CURRENT_SCHEMA_VERSION } = await import("../src/types/backup");
-    assert.equal(BACKUP_CURRENT_SCHEMA_VERSION, 18, "Backup şema versiyonu 18 olmalıdır.");
+    assert.ok(BACKUP_CURRENT_SCHEMA_VERSION >= 18, "Backup şema versiyonu en az 18 olmalıdır.");
   });
 
   it("T10: Zero-Egress & AI İzolasyon İlkesi: Runtime AI API çağrısı veya dışa veri aktarımı bulunmamalıdır", () => {

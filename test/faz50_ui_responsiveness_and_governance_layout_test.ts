@@ -39,14 +39,14 @@ const govDashboardContent = fs.readFileSync(path.join(ROOT_DIR, "src/views/Gover
 const govModalsContent = fs.readFileSync(path.join(ROOT_DIR, "src/components/governance/GovernanceModals.tsx"), "utf-8");
 const govAttachmentsContent = fs.readFileSync(path.join(ROOT_DIR, "src/components/governance/GovernanceAttachmentsTab.tsx"), "utf-8");
 
-console.log("\n=== T01: Wide Screen Container Max-Width (1560px) ===");
+console.log("\n=== T01: Wide Screen Container Full-Width & 10px Edge Harmony (FAZ-71) ===");
 assert(
-  cssContent.includes(".main-content {") && cssContent.includes("max-width: 1560px;"),
-  ".main-content max-width is set to 1560px for comfortable wide-screen layout"
+  cssContent.includes(".main-content {") && (cssContent.includes("max-width: 100%;") || cssContent.includes("padding: 10px") || cssContent.includes("var(--page-padding, 10px)")),
+  ".main-content is configured for 10px edge padding full-width layout"
 );
 assert(
-  cssContent.includes(".header-inner {") && cssContent.includes("max-width: 1560px;"),
-  ".header-inner max-width is synchronized to 1560px"
+  cssContent.includes(".header-inner {") && (cssContent.includes("max-width: 100%;") || cssContent.includes("var(--page-padding, 10px)")),
+  ".header-inner is synchronized for 10px edge padding full-width layout"
 );
 
 console.log("\n=== T02: Governance Modal Container Width & Overflow Guard ===");

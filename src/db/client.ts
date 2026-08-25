@@ -1,3 +1,4 @@
+import { isTauriEnvironment, getRepository } from '../infrastructure/repository/createRepository';
 /**
  * ERP CRM Discovery — Database Client
  *
@@ -115,6 +116,9 @@ export function generateId(prefix: string = "id"): string {
 // 1. Proje listesi
 // ---------------------------------------------------------------
 export async function getProjects(): Promise<ProjectListItem[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjects();
+  }
   const db = await getDb();
   return db.select<ProjectListItem[]>(`
     SELECT
@@ -155,6 +159,9 @@ export async function updateProjectStatus(
 // 2. Master iş fonksiyonları listesi
 // ---------------------------------------------------------------
 export async function getMasterBusinessFunctions(): Promise<BusinessFunction[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getMasterBusinessFunctions();
+  }
   const db = await getDb();
   return db.select<BusinessFunction[]>(`
     SELECT id, code, name_tr, name_en, category, sort_order, is_active
@@ -168,6 +175,9 @@ export async function getMasterBusinessFunctions(): Promise<BusinessFunction[]> 
 // 3. Yeni analiz projesi oluştur
 // ---------------------------------------------------------------
 export async function createProject(payload: CreateProjectPayload): Promise<string> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).createProject(payload);
+  }
   const db = await getDb();
   const projectId = generateId("proj");
   const companyProfileId = generateId("comp");
@@ -339,6 +349,9 @@ export async function assignBusinessFunctionsToProject(
 // 4. Proje detayı
 // ---------------------------------------------------------------
 export async function getProjectDetail(projectId: string): Promise<ProjectDetailData | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjectDetail(projectId);
+  }
   const db = await getDb();
 
   const projects = await db.select<ProjectDetailData["project"][]>(
@@ -862,6 +875,9 @@ export async function getFunctionDataCounts(
 // 4.6 Kapsam Yönetimi: Değişiklik Geçmişi
 // ---------------------------------------------------------------
 export async function getProjectScopeChanges(projectId: string): Promise<ProjectScopeChange[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProjectScopeChanges(projectId);
+  }
   const db = await getDb();
   return db.select<ProjectScopeChange[]>(
     "SELECT * FROM project_scope_changes WHERE analysis_project_id = $1 ORDER BY created_at DESC",
@@ -904,6 +920,9 @@ export async function updateProjectBusinessFunction(
 // 6. Proje sil (cascade + physical storage cleanup)
 // ---------------------------------------------------------------
 export async function deleteProject(projectId: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteProject(projectId);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM analysis_projects WHERE id = $1`, [projectId]);
   try {
@@ -1117,6 +1136,9 @@ export async function updateFinding(
 }
 
 export async function deleteFinding(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteFinding(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM analysis_findings WHERE id = $1`, [id]);
 }
@@ -1201,6 +1223,9 @@ export async function updateRequirement(
 }
 
 export async function deleteRequirement(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteRequirement(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM analysis_requirements WHERE id = $1`, [id]);
 }
@@ -1292,6 +1317,9 @@ export async function updateRisk(
 }
 
 export async function deleteRisk(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteRisk(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM analysis_risks WHERE id = $1`, [id]);
 }
@@ -1368,6 +1396,9 @@ export async function updateProjectNote(
 }
 
 export async function deleteProjectNote(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteProjectNote(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM project_notes WHERE id = $1`, [id]);
 }
@@ -1445,6 +1476,9 @@ export interface ReportProfileData {
 }
 
 export async function getReportProfile(projectId: string): Promise<ReportProfileData | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getReportProfile(projectId);
+  }
   const db = await getDb();
   const rows = await db.select<ReportProfileData[]>(
     `SELECT id, analysis_project_id, executive_summary, overall_assessment, open_topics, created_at, updated_at
@@ -1641,6 +1675,9 @@ export async function updateCustomQuestion(
 }
 
 export async function deleteCustomQuestion(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteCustomQuestion(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM project_custom_questions WHERE id = $1`, [id]);
 }
@@ -2063,6 +2100,9 @@ export async function getAttachmentSummaryStats(
  * Projeye ait tüm OT istasyonlarını sıralı olarak döndürür.
  */
 export async function getOtStations(projectId: string): Promise<OtStation[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtStations(projectId);
+  }
   const db = await getDb();
   return db.select<OtStation[]>(
     `SELECT * FROM ot_stations
@@ -2076,6 +2116,9 @@ export async function getOtStations(projectId: string): Promise<OtStation[]> {
  * Tek bir OT istasyonunu ID ile getirir.
  */
 export async function getOtStationById(stationId: string): Promise<OtStation | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtStationById(stationId);
+  }
   const db = await getDb();
   const rows = await db.select<OtStation[]>(
     `SELECT * FROM ot_stations WHERE id = $1 LIMIT 1`,
@@ -2221,6 +2264,9 @@ export async function toggleOtStationStatus(
  * OT istasyonunu ve ona bağlı tüm istasyon cevaplarını siler.
  */
 export async function deleteOtStation(stationId: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteOtStation(stationId);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM ot_stations WHERE id = $1`, [stationId]);
 }
@@ -2478,6 +2524,9 @@ export async function updateOtDataRequirement(
 }
 
 export async function deleteOtDataRequirement(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteOtDataRequirement(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM ot_data_requirements WHERE id = $1`, [id]);
 }
@@ -2500,6 +2549,9 @@ export async function getOtDataRequirements(
 }
 
 export async function getOtDataRequirementById(id: string): Promise<OtDataRequirement | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtDataRequirementById(id);
+  }
   const db = await getDb();
   const rows = await db.select<OtDataRequirement[]>(
     `SELECT * FROM ot_data_requirements WHERE id = $1 LIMIT 1`,
@@ -2634,6 +2686,9 @@ export async function updateOtAlarmRequirement(
 }
 
 export async function deleteOtAlarmRequirement(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteOtAlarmRequirement(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM ot_alarm_requirements WHERE id = $1`, [id]);
 }
@@ -2656,6 +2711,9 @@ export async function getOtAlarmRequirements(
 }
 
 export async function getOtAlarmRequirementById(id: string): Promise<OtAlarmRequirement | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtAlarmRequirementById(id);
+  }
   const db = await getDb();
   const rows = await db.select<OtAlarmRequirement[]>(
     `SELECT * FROM ot_alarm_requirements WHERE id = $1 LIMIT 1`,
@@ -2813,6 +2871,9 @@ export async function updateOtQualityDevice(
 }
 
 export async function deleteOtQualityDevice(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteOtQualityDevice(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM ot_quality_devices WHERE id = $1`, [id]);
 }
@@ -2835,6 +2896,9 @@ export async function getOtQualityDevices(
 }
 
 export async function getOtQualityDeviceById(id: string): Promise<OtQualityDevice | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getOtQualityDeviceById(id);
+  }
   const db = await getDb();
   const rows = await db.select<OtQualityDevice[]>(
     `SELECT * FROM ot_quality_devices WHERE id = $1 LIMIT 1`,
@@ -2971,6 +3035,9 @@ export async function createProcessMap(
 }
 
 export async function getProcessMaps(projectId: string): Promise<ProcessMap[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProcessMaps(projectId);
+  }
   const db = await getDb();
   return db.select<ProcessMap[]>(
     `SELECT * FROM process_maps WHERE project_id = $1 ORDER BY sort_order ASC, created_at ASC`,
@@ -2979,6 +3046,9 @@ export async function getProcessMaps(projectId: string): Promise<ProcessMap[]> {
 }
 
 export async function getProcessMapById(id: string): Promise<ProcessMap | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProcessMapById(id);
+  }
   const db = await getDb();
   const rows = await db.select<ProcessMap[]>(
     `SELECT * FROM process_maps WHERE id = $1 LIMIT 1`,
@@ -3021,6 +3091,9 @@ export async function updateProcessMap(
 }
 
 export async function deleteProcessMap(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteProcessMap(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM process_maps WHERE id = $1`, [id]);
 }
@@ -3108,6 +3181,9 @@ export async function createProcessNode(
 }
 
 export async function getProcessNodes(processMapId: string): Promise<ProcessNode[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProcessNodes(processMapId);
+  }
   const db = await getDb();
   return db.select<ProcessNode[]>(
     `SELECT * FROM process_nodes WHERE process_map_id = $1 ORDER BY step_order ASC, created_at ASC`,
@@ -3116,6 +3192,9 @@ export async function getProcessNodes(processMapId: string): Promise<ProcessNode
 }
 
 export async function getProcessNodeById(id: string): Promise<ProcessNode | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProcessNodeById(id);
+  }
   const db = await getDb();
   const rows = await db.select<ProcessNode[]>(
     `SELECT * FROM process_nodes WHERE id = $1 LIMIT 1`,
@@ -3210,6 +3289,9 @@ export async function updateProcessNode(
 }
 
 export async function deleteProcessNode(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteProcessNode(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM process_nodes WHERE id = $1`, [id]);
 }
@@ -3251,6 +3333,9 @@ export async function createProcessEdge(
 }
 
 export async function getProcessEdges(processMapId: string): Promise<ProcessEdge[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getProcessEdges(processMapId);
+  }
   const db = await getDb();
   return db.select<ProcessEdge[]>(
     `SELECT * FROM process_edges WHERE process_map_id = $1 ORDER BY sort_order ASC, created_at ASC`,
@@ -3259,6 +3344,9 @@ export async function getProcessEdges(processMapId: string): Promise<ProcessEdge
 }
 
 export async function deleteProcessEdge(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteProcessEdge(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM process_edges WHERE id = $1`, [id]);
 }
@@ -3461,6 +3549,9 @@ export async function updateDataGovernanceAsset(
 }
 
 export async function deleteDataGovernanceAsset(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteDataGovernanceAsset(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM data_governance_assets WHERE id = $1`, [id]);
 }
@@ -3566,6 +3657,9 @@ export async function updateDataGovernanceAccess(
 }
 
 export async function deleteDataGovernanceAccess(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteDataGovernanceAccess(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM data_governance_access WHERE id = $1`, [id]);
 }
@@ -3660,6 +3754,9 @@ export async function updateDataGovernanceApproval(
 }
 
 export async function deleteDataGovernanceApproval(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteDataGovernanceApproval(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM data_governance_approvals WHERE id = $1`, [id]);
 }
@@ -3921,6 +4018,9 @@ import { deleteEvidencePhysicalFile } from "../storage/attachmentManager";
  * Projeye ait tüm saha kanıtı kayıtlarını (ve bağlı link sayılarını) döndürür.
  */
 export async function getEvidenceItems(projectId: string): Promise<EvidenceItem[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getEvidenceItems(projectId);
+  }
   const db = await getDb();
   const items = await db.select<EvidenceItem[]>(
     `SELECT e.*,
@@ -3937,6 +4037,9 @@ export async function getEvidenceItems(projectId: string): Promise<EvidenceItem[
  * Tek bir saha kanıtı kaydını linkleriyle birlikte getirir.
  */
 export async function getEvidenceItemById(id: string): Promise<EvidenceItem | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getEvidenceItemById(id);
+  }
   const db = await getDb();
   const rows = await db.select<EvidenceItem[]>(
     `SELECT e.*,
@@ -4067,6 +4170,9 @@ export async function updateEvidenceItem(
  * Saha kanıtını, fiziksel dosyasını ve tüm bağlantılarını siler.
  */
 export async function deleteEvidenceItem(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteEvidenceItem(id);
+  }
   const db = await getDb();
   const existing = await getEvidenceItemById(id);
   if (existing?.stored_path) {
@@ -4118,6 +4224,9 @@ export async function getEvidenceLinks(
  * Belirli bir kanıta bağlı tüm bağlantıları getirir.
  */
 export async function getEvidenceLinksByEvidenceId(evidenceId: string): Promise<EvidenceLink[]> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getEvidenceLinksByEvidenceId(evidenceId);
+  }
   const db = await getDb();
   return db.select<EvidenceLink[]>(
     `SELECT el.*, e.title as evidence_title, e.evidence_type, e.verification_status
@@ -4187,6 +4296,9 @@ export async function createEvidenceLink(
  * Yalnızca kanıt bağlantısını kaldırır (Unlink - Kanıt ve dosya silinmez).
  */
 export async function deleteEvidenceLink(id: string): Promise<void> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteEvidenceLink(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM evidence_links WHERE id = $1`, [id]);
 }
@@ -4195,6 +4307,9 @@ export async function deleteEvidenceLink(id: string): Promise<void> {
  * Projenin kanıt ve saha doğrulama özet metriklerini hesaplar.
  */
 export async function getEvidenceSummaryStats(projectId: string): Promise<EvidenceSummaryStats> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getEvidenceSummaryStats(projectId);
+  }
   const items = await getEvidenceItems(projectId);
   const links = await getEvidenceLinks(projectId);
 
@@ -4421,6 +4536,9 @@ export async function getReadinessChecks(
  * Tek bir hazırlık kontrol kaydını getirir.
  */
 export async function getReadinessCheckById(id: string): Promise<ReadinessCheckItem | null> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getReadinessCheckById(id);
+  }
   const db = await getDb();
   const rows = await db.select<ReadinessCheckItem[]>(
     `SELECT * FROM readiness_checks WHERE id = $1`,
@@ -4553,6 +4671,9 @@ export async function updateReadinessCheck(
  * Hazırlık kontrol kaydını siler.
  */
 export async function deleteReadinessCheck(id: string): Promise<boolean> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).deleteReadinessCheck(id);
+  }
   const db = await getDb();
   await db.execute(`DELETE FROM readiness_checks WHERE id = $1`, [id]);
   return true;
@@ -4562,6 +4683,9 @@ export async function deleteReadinessCheck(id: string): Promise<boolean> {
  * Projeye ait 24 standart keşif ve go-live hazırlık kontrol maddesini tohumlar.
  */
 export async function seedStarterReadinessChecks(projectId: string): Promise<number> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).seedStarterReadinessChecks(projectId);
+  }
   const existing = await getReadinessChecks(projectId);
   if (existing.length > 0) {
     return 0; // Zaten mevcut
@@ -4884,6 +5008,9 @@ export async function seedStarterReadinessChecks(projectId: string): Promise<num
  * Projeye ait hazır olma (Discovery Readiness) metrik ve analiz özetini hesaplar.
  */
 export async function getReadinessSummary(projectId: string): Promise<ReadinessSummaryResult> {
+  if (!isTauriEnvironment()) {
+    return (getRepository() as any).getReadinessSummary(projectId);
+  }
   const checks = await getReadinessChecks(projectId);
 
   const totalChecks = checks.length;
@@ -5037,3 +5164,137 @@ export async function getReadinessSummary(projectId: string): Promise<ReadinessS
 }
 
 export * from './governanceClient';
+
+export {
+  getProjects as getProjectsInternal,
+  updateProjectStatus as updateProjectStatusInternal,
+  getMasterBusinessFunctions as getMasterBusinessFunctionsInternal,
+  createProject as createProjectInternal,
+  assignBusinessFunctionsToProject as assignBusinessFunctionsToProjectInternal,
+  getProjectDetail as getProjectDetailInternal,
+  updateCompanyProfile as updateCompanyProfileInternal,
+  updateProjectDetails as updateProjectDetailsInternal,
+  deleteProject as deleteProjectInternal,
+  updateProjectSchedule as updateProjectScheduleInternal,
+  getProjectSchedule as getProjectScheduleInternal,
+  updateProjectFunctionSchedule as updateProjectFunctionScheduleInternal,
+  getProjectFunctionSchedule as getProjectFunctionScheduleInternal,
+  addOrReactivateProjectFunction as addOrReactivateProjectFunctionInternal,
+  deactivateProjectFunction as deactivateProjectFunctionInternal,
+  getFunctionDataCounts as getFunctionDataCountsInternal,
+  getProjectScopeChanges as getProjectScopeChangesInternal,
+  updateProjectBusinessFunction as updateProjectBusinessFunctionInternal,
+  saveAnswer as saveAnswerInternal,
+  getAnswer as getAnswerInternal,
+  getAllAnswers as getAllAnswersInternal,
+  saveLastQuestionId as saveLastQuestionIdInternal,
+  getLastQuestionId as getLastQuestionIdInternal,
+  updateFunctionStatusByCode as updateFunctionStatusByCodeInternal,
+  createFinding as createFindingInternal,
+  updateFinding as updateFindingInternal,
+  deleteFinding as deleteFindingInternal,
+  getFindings as getFindingsInternal,
+  createRequirement as createRequirementInternal,
+  updateRequirement as updateRequirementInternal,
+  deleteRequirement as deleteRequirementInternal,
+  getRequirements as getRequirementsInternal,
+  createRisk as createRiskInternal,
+  updateRisk as updateRiskInternal,
+  deleteRisk as deleteRiskInternal,
+  getRisks as getRisksInternal,
+  createProjectNote as createProjectNoteInternal,
+  updateProjectNote as updateProjectNoteInternal,
+  deleteProjectNote as deleteProjectNoteInternal,
+  getProjectNotes as getProjectNotesInternal,
+  getSemanticSummaryCounts as getSemanticSummaryCountsInternal,
+  getReportProfile as getReportProfileInternal,
+  saveReportProfile as saveReportProfileInternal,
+  createCustomQuestion as createCustomQuestionInternal,
+  getCustomQuestions as getCustomQuestionsInternal,
+  updateCustomQuestion as updateCustomQuestionInternal,
+  deleteCustomQuestion as deleteCustomQuestionInternal,
+  saveCustomAnswer as saveCustomAnswerInternal,
+  getCustomAnswers as getCustomAnswersInternal,
+  setQuestionFollowup as setQuestionFollowupInternal,
+  removeQuestionFollowup as removeQuestionFollowupInternal,
+  resolveQuestionFollowup as resolveQuestionFollowupInternal,
+  getQuestionFollowups as getQuestionFollowupsInternal,
+  getAllProjectFollowups as getAllProjectFollowupsInternal,
+  getFollowupSummaryCounts as getFollowupSummaryCountsInternal,
+  addQuestionAttachment as addQuestionAttachmentInternal,
+  updateQuestionAttachmentReimport as updateQuestionAttachmentReimportInternal,
+  getQuestionAttachments as getQuestionAttachmentsInternal,
+  getProjectAttachments as getProjectAttachmentsInternal,
+  updateAttachmentDescription as updateAttachmentDescriptionInternal,
+  deleteQuestionAttachment as deleteQuestionAttachmentInternal,
+  findAttachmentBySha256 as findAttachmentBySha256Internal,
+  getAttachmentSummaryStats as getAttachmentSummaryStatsInternal,
+  getOtStations as getOtStationsInternal,
+  getOtStationById as getOtStationByIdInternal,
+  createOtStation as createOtStationInternal,
+  updateOtStation as updateOtStationInternal,
+  toggleOtStationStatus as toggleOtStationStatusInternal,
+  deleteOtStation as deleteOtStationInternal,
+  getOtStationAnswers as getOtStationAnswersInternal,
+  getOtStationAnswer as getOtStationAnswerInternal,
+  saveOtStationAnswer as saveOtStationAnswerInternal,
+  getOtStationsSummary as getOtStationsSummaryInternal,
+  createOtDataRequirement as createOtDataRequirementInternal,
+  updateOtDataRequirement as updateOtDataRequirementInternal,
+  deleteOtDataRequirement as deleteOtDataRequirementInternal,
+  getOtDataRequirements as getOtDataRequirementsInternal,
+  createOtAlarmRequirement as createOtAlarmRequirementInternal,
+  updateOtAlarmRequirement as updateOtAlarmRequirementInternal,
+  deleteOtAlarmRequirement as deleteOtAlarmRequirementInternal,
+  getOtAlarmRequirements as getOtAlarmRequirementsInternal,
+  createOtQualityDevice as createOtQualityDeviceInternal,
+  updateOtQualityDevice as updateOtQualityDeviceInternal,
+  deleteOtQualityDevice as deleteOtQualityDeviceInternal,
+  getOtQualityDevices as getOtQualityDevicesInternal,
+  getOtMatrixSummaryCounts as getOtMatrixSummaryCountsInternal,
+  getProcessMaps as getProcessMapsInternal,
+  getProcessMapById as getProcessMapByIdInternal,
+  createProcessMap as createProcessMapInternal,
+  updateProcessMap as updateProcessMapInternal,
+  deleteProcessMap as deleteProcessMapInternal,
+  getProcessNodes as getProcessNodesInternal,
+  createProcessNode as createProcessNodeInternal,
+  updateProcessNode as updateProcessNodeInternal,
+  deleteProcessNode as deleteProcessNodeInternal,
+  getProcessEdges as getProcessEdgesInternal,
+  createProcessEdge as createProcessEdgeInternal,
+  deleteProcessEdge as deleteProcessEdgeInternal,
+  getProcessMapsSummaryStats as getProcessMapsSummaryStatsInternal,
+  getDataGovernanceAssets as getDataGovernanceAssetsInternal,
+  getDataGovernanceAssetById as getDataGovernanceAssetByIdInternal,
+  createDataGovernanceAsset as createDataGovernanceAssetInternal,
+  updateDataGovernanceAsset as updateDataGovernanceAssetInternal,
+  deleteDataGovernanceAsset as deleteDataGovernanceAssetInternal,
+  getDataGovernanceAccessRules as getDataGovernanceAccessRulesInternal,
+  createDataGovernanceAccess as createDataGovernanceAccessInternal,
+  updateDataGovernanceAccess as updateDataGovernanceAccessInternal,
+  deleteDataGovernanceAccess as deleteDataGovernanceAccessInternal,
+  getDataGovernanceApprovals as getDataGovernanceApprovalsInternal,
+  createDataGovernanceApproval as createDataGovernanceApprovalInternal,
+  updateDataGovernanceApproval as updateDataGovernanceApprovalInternal,
+  deleteDataGovernanceApproval as deleteDataGovernanceApprovalInternal,
+  getDataGovernanceSummaryStats as getDataGovernanceSummaryStatsInternal,
+  getEvidenceItems as getEvidenceItemsInternal,
+  getEvidenceItemById as getEvidenceItemByIdInternal,
+  createEvidenceItem as createEvidenceItemInternal,
+  updateEvidenceItem as updateEvidenceItemInternal,
+  deleteEvidenceItem as deleteEvidenceItemInternal,
+  getEvidenceLinks as getEvidenceLinksInternal,
+  createEvidenceLink as createEvidenceLinkInternal,
+  deleteEvidenceLink as deleteEvidenceLinkInternal,
+  getEvidenceSummaryStats as getEvidenceSummaryStatsInternal,
+  getReadinessChecks as getReadinessChecksInternal,
+  getReadinessCheckById as getReadinessCheckByIdInternal,
+  createReadinessCheck as createReadinessCheckInternal,
+  updateReadinessCheck as updateReadinessCheckInternal,
+  deleteReadinessCheck as deleteReadinessCheckInternal,
+  seedStarterReadinessChecks as seedStarterReadinessChecksInternal,
+  getReadinessSummary as getReadinessSummaryInternal,
+};
+
+

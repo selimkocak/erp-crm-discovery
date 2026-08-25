@@ -1,6 +1,6 @@
 # Antigravity Geliştirme Ajanı Ana Kontrol Sözleşmesi
 
-Bu belge, **ERP CRM Discovery** deposunda Antigravity IDE ve Gemini geliştirme ajanlarının kontrollü, öngörülebilir ve denetlenebilir çalışmasını sağlayan kanonik sözleşmedir.
+Bu belge, **ERP CRM Discovery** deposunda Antigravity IDE ve Gemini geliştirme ajanlarının kontrollü, öngörülebilir ve denetlenebilir çalışmasını sağlayan **bağlayıcı çalışma zamanı sözleşmesidir (Runtime Operating Contract)**. `.agents/` dizini pasif bir dokümantasyon arşivi değil; her görevin zorunlu işletim sistemidir.
 
 ---
 
@@ -24,11 +24,52 @@ ERP CRM Discovery (Geliştirilen %100 Çevrimdışı Masaüstü Ürün)
 
 ---
 
-## 2. Ajan Görev Rolleri ve Sınırları
+## 2. Zorunlu Ajan Yürütme Protokolü (Execution Chain)
+
+Her ajan, göreve başlarken aşağıdaki zinciri işletir:
+
+```text
+AGENTS.md (Ana Sözleşme)
+   ↓
+İlgili Policy (.agents/policies/*)
+   ↓
+İlgili Skill (.agents/skills/*)
+   ↓
+İlgili Workflow (.agents/workflows/*)
+   ↓
+Test & Doğrulama (Browser vs Tauri Desktop İki Katmanlı Sınır)
+   ↓
+Kanıt & Log Dosyası
+   ↓
+Kabul / UNVERIFIED (Kullanıcı onayı olmadan PASS / commit / push yasağı)
+```
+
+### Başlangıç Görev Beyanı (Preamble Header)
+Ajan, ilk çıktısında hangi belgeleri bağladığını ve test kabul sınırlarını şu şekilde beyan eder:
+
+```text
+Loaded:
+- .agents/agents.md
+- .agents/policies/<ilgili-politika>.md
+- .agents/skills/<ilgili-beceri>/SKILL.md
+- .agents/workflows/<ilgili-is-akisi>.md
+
+Selected workflow:
+- <workflow-adi>
+
+Acceptance boundary:
+- Browser Test Mode: <UI/Form/Navigasyon/Responsive test kapsamı>
+- Tauri Desktop: <SQLite/Managed Vault/Native File/Export kapsamı>
+- Native features pending: <Yerel işletim sistemi doğrulama bekleyen maddeler>
+```
+
+---
+
+## 3. Ajan Görev Rolleri ve Sınırları
 
 Antigravity geliştirme ajanları bir görevi icra ederken aşağıdaki 4 rolden birini üstlenir ve o rolün sınırlarına kesinlikle uyar:
 
-### 2.1 Investigator (İnceleme ve Teşhis Rolü)
+### 3.1 Investigator (İnceleme ve Teşhis Rolü)
 
 * **Amaç:** Sorunu veya gereksinimi salt-okunur olarak analiz etmek, ilk gerçek hata noktasını ve kök nedeni kanıtlamak.
 * **Görevleri:**
@@ -42,7 +83,7 @@ Antigravity geliştirme ajanları bir görevi icra ederken aşağıdaki 4 rolden
   * ❌ "Muhtemelen şundandır" diyerek tahmine dayalı yama geliştirmek.
   * ❌ Hatanın tüm resmini görmeden test assertion'larını değiştirmek.
 
-### 2.2 Implementer (Geliştirme ve Uygulama Rolü)
+### 3.2 Implementer (Geliştirme ve Uygulama Rolü)
 
 * **Amaç:** Onaylanmış faz veya talimat kapsamındaki teknik geliştirmeyi minimum ve izlenebilir dikey dilimlerle kodlamak.
 * **Görevleri:**
@@ -57,22 +98,24 @@ Antigravity geliştirme ajanları bir görevi icra ederken aşağıdaki 4 rolden
   * ❌ Kullanıcı onayı olmadan yeni npm/Cargo bağımlılığı eklemek.
   * ❌ Testi geçirmek amacıyla gerçek iş kuralını veya hata ayrıntısını zayıflatmak.
 
-### 2.3 QA (Kalite Güvence ve Test Rolü)
+### 3.3 QA (Kalite Güvence ve Test Rolü)
 
-* **Amaç:** Talimatın kabul kriterlerini doğrulamak, gerçek üretim hatası ile eski test beklentisini ayırmak ve masaüstü dürüstlüğünü sağlamak.
+* **Amaç:** Talimatın kabul kriterlerini doğrulamak, gerçek üretim hatası ile eski test beklentisini ayırmak ve iki katmanlı (Browser vs Desktop) dürüst doğrulamayı sağlamak.
 * **Görevleri:**
   * Önce yeni/hedef testi (`test/fazXX_*_test.ts`) çalıştırmak.
   * İlgili regresyon testlerini doğrulamak.
+  * Browser Test Harness (`BrowserTestRepository`) ile UI ve form akışlarını doğrulamak.
   * `npm run build`, `cargo check` ve `git diff --check` kontrollerini tamamlamak.
-  * UI değişikliklerinde otomasyon yanında gerçek masaüstü kabul adımlarını tanımlamak.
+  * Kanıtı olmayan (log / ekran / assertion çıktısı bulunmayan) maddeleri `UNVERIFIED` olarak işaretlemek.
 * **Yasakları:**
   * ❌ Üretim kodunu habersiz değiştirmek.
+  * ❌ `npm test` veya `npm run build` geçişini tek başına "kullanıcı kabulü tamamlandı" saymak.
   * ❌ Başarısız olan her testi otomatikman "ürün hatası" sayarak doğru ürün mantığını bozmak.
   * ❌ Başarısız testi sessizce `skip` etmek veya silmek.
   * ❌ Platform bağımlılığı (örn. macOS/Windows native) nedeniyle çalışmayan testi `PASS` olarak raporlamak.
-  * ❌ Gerçek masaüstünde test edilmeyen bir akış için "Görsel kabul tamamlandı" demek.
+  * ❌ Kullanıcı onayı olmadan `PASS / Commit / Push` ilan etmek.
 
-### 2.4 Release (Yayın ve Paketleme Rolü)
+### 3.4 Release (Yayın ve Paketleme Rolü)
 
 * **Amaç:** Sürüm bütünlüğünü doğrulamak, metadata uyumunu sağlamak ve dağıtım paketlerini denetlemek.
 * **Görevleri:**
@@ -89,7 +132,7 @@ Antigravity geliştirme ajanları bir görevi icra ederken aşağıdaki 4 rolden
 
 ---
 
-## 3. Rehber Belgeler ve Dizin Haritası
+## 4. Rehber Belgeler ve Dizin Haritası
 
 * **İş Akışları (Workflows):**
   * [implement-phase.md](file:///.agents/workflows/implement-phase.md) — Yeni faz ve özellik geliştirme standardı
@@ -108,7 +151,7 @@ Antigravity geliştirme ajanları bir görevi icra ederken aşağıdaki 4 rolden
   * [release-packaging](file:///.agents/skills/release-packaging/SKILL.md) — Tag, installer ve SHA-256 doğrulama
 * **Politikalar (Policies):**
   * [change-scope.md](file:///.agents/policies/change-scope.md) — Kapsam sınırları ve refactor yasağı
-  * [testing-policy.md](file:///.agents/policies/testing-policy.md) — Dürüst test ve assertion kuralları
+  * [testing-policy.md](file:///.agents/policies/testing-policy.md) — İki katmanlı test, kanıt ve dürüst kabul kuralları
   * [ci-recovery-policy.md](file:///.agents/policies/ci-recovery-policy.md) — CI düzeltme ve tek commit döngüsü
   * [git-release-policy.md](file:///.agents/policies/git-release-policy.md) — Git, tag ve sürüm kısıtları
   * [user-data-policy.md](file:///.agents/policies/user-data-policy.md) — Sentetik veri, gizlilik ve sıfır sızıntı
