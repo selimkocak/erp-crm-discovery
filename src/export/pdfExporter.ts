@@ -443,12 +443,106 @@ export async function buildPdfBuffer(report: ReportModel): Promise<Uint8Array> {
     }
   }
 
-  // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
+  // ── Section 4: Süreç Haritaları, Süreç Sadelik ve Kullanıcı Benimsemesi (FAZ-63) ──
+  if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) {
+    const pmapSummary = report.processMapsSummary;
+    checkPageBreak(35);
+    doc.setFont(PDF_FONT_FAMILY, "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(2, 132, 199);
+    doc.text("4. Süreç Haritaları, Süreç Sadelik ve Kullanıcı Benimsemesi", marginX, currentY);
+    currentY += 6;
+
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text(
+      `Toplam ${pmapSummary.stats.totalMaps} model süreç, ${pmapSummary.stats.totalNodes} adım, ${pmapSummary.stats.highAdoptionRiskCount} yüksek risk, ${pmapSummary.stats.simplificationOpportunityCount} sadeleştirme fırsatı, ${pmapSummary.stats.totalApprovals} onay, ${pmapSummary.stats.totalHandoffs} handoff.`,
+      marginX,
+      currentY
+    );
+    currentY += 6;
+
+    for (let mIdx = 0; mIdx < pmapSummary.maps.length; mIdx++) {
+      const pm = pmapSummary.maps[mIdx];
+      checkPageBreak(25);
+      doc.setFont(PDF_FONT_FAMILY, "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`4.1.${mIdx + 1} ${pm.name}${pm.processArea ? ` (${pm.processArea})` : ""}`, marginX, currentY);
+      currentY += 4.5;
+
+      doc.setFont(PDF_FONT_FAMILY, "normal");
+      doc.setFontSize(7.5);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Sahip: ${pm.ownerRole || "—"} | Durum: ${pm.status} | Adım: ${pm.nodes.length}${pm.description ? ` | ${pm.description}` : ""}`, marginX, currentY);
+      currentY += 4.5;
+
+      if (pm.nodes.length > 0) {
+        const stepRows = pm.nodes.map((n) => {
+          const metricsStr = [
+            `Onay: ${n.approvalCount}`,
+            `Handoff: ${n.handoffCount}`,
+            n.duplicateDataEntry ? "Mükerrer" : null,
+            n.bypassPossible ? "Bypass" : null,
+          ].filter(Boolean).join(", ");
+
+          return [
+            `${n.stepOrder}`,
+            `${n.name}\n[${n.nodeType}]${n.otStationCode ? ` (🏭 ${n.otStationCode})` : ""}`,
+            `${n.responsibleRole || "—"}${n.responsibleDepartment ? `\n(${n.responsibleDepartment})` : ""}`,
+            `G: ${n.inputDescription || "—"}\nÇ: ${n.outputDescription || "—"}`,
+            metricsStr,
+            n.adoptionRisk === "high" ? "🚨 YÜKSEK" : n.adoptionRisk === "medium" ? "⚠️ ORTA" : "✅ DÜŞÜK",
+          ];
+        });
+
+        autoTable(doc, {
+          startY: currentY,
+          margin: { left: marginX, right: marginX },
+          head: [["Sıra", "Adım & Tip", "Sorumlu", "Girdi & Çıktı", "Metrikler", "Benimseme Riski"]],
+          body: stepRows,
+          theme: "striped",
+          styles: { font: PDF_FONT_FAMILY, fontSize: 7.5 },
+          headStyles: { font: PDF_FONT_FAMILY, fontStyle: "bold", fillColor: [241, 245, 249], textColor: [51, 65, 85], fontSize: 7.5 },
+          bodyStyles: { font: PDF_FONT_FAMILY, fontStyle: "normal", fontSize: 7.5, cellPadding: 2 },
+          columnStyles: {
+            0: { cellWidth: 10 },
+            1: { cellWidth: 42 },
+            2: { cellWidth: 35 },
+            3: { cellWidth: 40 },
+            4: { cellWidth: 32 },
+            5: { cellWidth: "auto" },
+          },
+        });
+        currentY = (doc as any).lastAutoTable.finalY + 6;
+      }
+    }
+
+    checkPageBreak(15);
+    doc.setFont(PDF_FONT_FAMILY, "normal");
+    doc.setFontSize(7);
+    doc.setTextColor(180, 83, 9);
+    doc.text(
+      "⚠️ Güvenlik ve Kontrol Sınırı: Finansal kontrol, kalite, iş güvenliği ve görevler ayrılığı kontrolleri sadeleştirme adına kaldırılamaz.",
+      marginX,
+      currentY
+    );
+    currentY += 6;
+  }
+
+  // ── Section 5 / 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   checkPageBreak(35);
   doc.setFont(PDF_FONT_FAMILY, "bold");
   doc.setFontSize(13);
   doc.setTextColor(2, 132, 199);
-  doc.text("4. İş Fonksiyonları & Süreç Analizleri", marginX, currentY);
+  doc.text(
+    report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0
+      ? "5. İş Fonksiyonları & Süreç Analizleri"
+      : "4. İş Fonksiyonları & Süreç Analizleri",
+    marginX,
+    currentY
+  );
   currentY += 6;
 
   for (let fIdx = 0; fIdx < businessFunctions.length; fIdx++) {

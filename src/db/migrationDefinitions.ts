@@ -621,5 +621,71 @@ export const MIGRATION_DEFINITIONS: readonly MigrationDefinition[] = [
       `CREATE INDEX IF NOT EXISTS idx_ot_qual_dev_project ON ot_quality_devices(project_id);`,
       `CREATE INDEX IF NOT EXISTS idx_ot_qual_dev_station ON ot_quality_devices(station_id);`
     ]
+  },
+  {
+    version: 16,
+    description: "Process Maps, Simplification and User Adoption Risk Model (FAZ-63)",
+    sql: [
+      `CREATE TABLE IF NOT EXISTS process_maps (
+        id           TEXT PRIMARY KEY,
+        project_id   TEXT NOT NULL,
+        name         TEXT NOT NULL,
+        process_area TEXT,
+        owner_role   TEXT,
+        status       TEXT NOT NULL DEFAULT 'active',
+        description  TEXT,
+        sort_order   INTEGER NOT NULL DEFAULT 0,
+        created_at   TEXT NOT NULL,
+        updated_at   TEXT NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES analysis_projects(id) ON DELETE CASCADE
+      );`,
+      `CREATE TABLE IF NOT EXISTS process_nodes (
+        id                     TEXT PRIMARY KEY,
+        process_map_id         TEXT NOT NULL,
+        node_type              TEXT NOT NULL DEFAULT 'ACTIVITY',
+        name                   TEXT NOT NULL,
+        description            TEXT,
+        responsible_department TEXT,
+        responsible_role       TEXT,
+        business_function_code TEXT,
+        ot_station_id          TEXT,
+        step_order             INTEGER NOT NULL DEFAULT 1,
+        input_description      TEXT,
+        output_description     TEXT,
+        approval_count         INTEGER NOT NULL DEFAULT 0,
+        handoff_count          INTEGER NOT NULL DEFAULT 0,
+        duplicate_data_entry   INTEGER NOT NULL DEFAULT 0,
+        bypass_possible        INTEGER NOT NULL DEFAULT 0,
+        manual_work            INTEGER NOT NULL DEFAULT 0,
+        value_added            INTEGER NOT NULL DEFAULT 1,
+        adoption_risk          TEXT NOT NULL DEFAULT 'low',
+        notes                  TEXT,
+        created_at             TEXT NOT NULL,
+        updated_at             TEXT NOT NULL,
+        FOREIGN KEY (process_map_id) REFERENCES process_maps(id) ON DELETE CASCADE,
+        FOREIGN KEY (ot_station_id) REFERENCES ot_stations(id) ON DELETE SET NULL
+      );`,
+      `CREATE TABLE IF NOT EXISTS process_edges (
+        id             TEXT PRIMARY KEY,
+        process_map_id TEXT NOT NULL,
+        source_node_id TEXT NOT NULL,
+        target_node_id TEXT NOT NULL,
+        label          TEXT,
+        condition_text TEXT,
+        sort_order     INTEGER NOT NULL DEFAULT 0,
+        created_at     TEXT NOT NULL,
+        updated_at     TEXT NOT NULL,
+        FOREIGN KEY (process_map_id) REFERENCES process_maps(id) ON DELETE CASCADE,
+        FOREIGN KEY (source_node_id) REFERENCES process_nodes(id) ON DELETE CASCADE,
+        FOREIGN KEY (target_node_id) REFERENCES process_nodes(id) ON DELETE CASCADE
+      );`,
+      `CREATE INDEX IF NOT EXISTS idx_process_maps_project ON process_maps(project_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_process_nodes_map ON process_nodes(process_map_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_process_nodes_bf ON process_nodes(business_function_code);`,
+      `CREATE INDEX IF NOT EXISTS idx_process_nodes_station ON process_nodes(ot_station_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_process_edges_map ON process_edges(process_map_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_process_edges_source ON process_edges(source_node_id);`,
+      `CREATE INDEX IF NOT EXISTS idx_process_edges_target ON process_edges(target_node_id);`
+    ]
   }
 ] as const;

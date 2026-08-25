@@ -31,7 +31,7 @@ import type {
 } from "../types/backup";
 
 export const BACKUP_FORMAT_VERSION = "1.1.0";
-export const BACKUP_CURRENT_SCHEMA_VERSION = 15;
+export const BACKUP_CURRENT_SCHEMA_VERSION = 16;
 export const LAST_BACKUP_DIR_KEY = "erp_crm_last_backup_directory";
 
 /**
@@ -274,6 +274,28 @@ export async function exportProjectBackup(
     [projectId]
   );
 
+  // 8. FAZ-63: Süreç Haritaları, Düğümleri ve Bağlantıları
+  const processMaps = await db.select<any[]>(
+    "SELECT * FROM process_maps WHERE project_id = $1 ORDER BY sort_order ASC, created_at ASC",
+    [projectId]
+  );
+
+  const processMapIds = processMaps.map((m) => m.id);
+  let processNodes: any[] = [];
+  let processEdges: any[] = [];
+
+  if (processMapIds.length > 0) {
+    const placeholders = processMapIds.map((_, i) => `$${i + 1}`).join(",");
+    processNodes = await db.select<any[]>(
+      `SELECT * FROM process_nodes WHERE process_map_id IN (${placeholders}) ORDER BY step_order ASC, created_at ASC`,
+      processMapIds
+    );
+    processEdges = await db.select<any[]>(
+      `SELECT * FROM process_edges WHERE process_map_id IN (${placeholders}) ORDER BY sort_order ASC, created_at ASC`,
+      processMapIds
+    );
+  }
+
   const projectData: ProjectBackupData = {
     project,
     company,
@@ -304,6 +326,9 @@ export async function exportProjectBackup(
     otDataRequirements,
     otAlarmRequirements,
     otQualityDevices,
+    processMaps,
+    processNodes,
+    processEdges,
   };
 
   const enc = new TextEncoder();
@@ -363,6 +388,9 @@ export async function exportProjectBackup(
     otDataRequirements: otDataRequirements.length,
     otAlarmRequirements: otAlarmRequirements.length,
     otQualityDevices: otQualityDevices.length,
+    processMaps: processMaps.length,
+    processNodes: processNodes.length,
+    processEdges: processEdges.length,
   };
 
   const manifest: BackupManifest = {
@@ -1409,6 +1437,92 @@ export async function restoreProjectBackup(
       );
     }
 
+    // AA. process_maps, process_nodes, process_edges (FAZ-63)
+    const pmapIdMap = new Map<string, string>();
+    for (const pm of projectData.processMaps || []) {
+      const newPmapId = generateId("pmap");
+      pmapIdMap.set(pm.id, newPmapId);
+      await db.execute(
+        `INSERT INTO process_maps
+           (id, project_id, name, process_area, owner_role, status, description, sort_order, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          newPmapId,
+          newProjectId,
+          pm.name,
+          pm.process_area || null,
+          pm.owner_role || null,
+          pm.status || "active",
+          pm.description || null,
+          pm.sort_order ?? 0,
+          pm.created_at || now,
+          pm.updated_at || now,
+        ]
+      );
+    }
+
+    const pnodeIdMap = new Map<string, string>();
+    for (const pn of projectData.processNodes || []) {
+      const newPnodeId = generateId("pnode");
+      pnodeIdMap.set(pn.id, newPnodeId);
+      const mappedMapId = pmapIdMap.get(pn.process_map_id) || pn.process_map_id;
+      const mappedStationId = pn.ot_station_id ? (stationIdMap.get(pn.ot_station_id) || pn.ot_station_id) : null;
+
+      await db.execute(
+        `INSERT INTO process_nodes
+           (id, process_map_id, node_type, name, description, responsible_department, responsible_role, business_function_code, ot_station_id, step_order, input_description, output_description, approval_count, handoff_count, duplicate_data_entry, bypass_possible, manual_work, value_added, adoption_risk, notes, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22)`,
+        [
+          newPnodeId,
+          mappedMapId,
+          pn.node_type || "ACTIVITY",
+          pn.name,
+          pn.description || null,
+          pn.responsible_department || null,
+          pn.responsible_role || null,
+          pn.business_function_code || null,
+          mappedStationId,
+          pn.step_order ?? 1,
+          pn.input_description || null,
+          pn.output_description || null,
+          pn.approval_count ?? 0,
+          pn.handoff_count ?? 0,
+          pn.duplicate_data_entry ? 1 : 0,
+          pn.bypass_possible ? 1 : 0,
+          pn.manual_work ? 1 : 0,
+          pn.value_added !== undefined ? (pn.value_added ? 1 : 0) : 1,
+          pn.adoption_risk || "low",
+          pn.notes || null,
+          pn.created_at || now,
+          pn.updated_at || now,
+        ]
+      );
+    }
+
+    for (const pe of projectData.processEdges || []) {
+      const newPedgeId = generateId("pedge");
+      const mappedMapId = pmapIdMap.get(pe.process_map_id) || pe.process_map_id;
+      const mappedSourceId = pnodeIdMap.get(pe.source_node_id) || pe.source_node_id;
+      const mappedTargetId = pnodeIdMap.get(pe.target_node_id) || pe.target_node_id;
+
+      await db.execute(
+        `INSERT INTO process_edges
+           (id, process_map_id, source_node_id, target_node_id, label, condition_text, sort_order, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          newPedgeId,
+          mappedMapId,
+          mappedSourceId,
+          mappedTargetId,
+          pe.label || null,
+          pe.condition_text || null,
+          pe.sort_order ?? 0,
+          pe.created_at || now,
+          pe.updated_at || now,
+        ]
+      );
+    }
+
     // 2. Fiziksel Ek Dosyaları Managed Vault'a Yeni Proje Yoluyla Yaz
     const writtenRelativePaths: string[] = [];
     for (const [archivePath, fileData] of Array.from(filesMap.entries())) {
@@ -1557,6 +1671,9 @@ export async function duplicateProject(
       otDataRequirements: exportData.manifest.recordCounts.otDataRequirements || 0,
       otAlarmRequirements: exportData.manifest.recordCounts.otAlarmRequirements || 0,
       otQualityDevices: exportData.manifest.recordCounts.otQualityDevices || 0,
+      processMaps: exportData.manifest.recordCounts.processMaps || 0,
+      processNodes: exportData.manifest.recordCounts.processNodes || 0,
+      processEdges: exportData.manifest.recordCounts.processEdges || 0,
     },
   };
 

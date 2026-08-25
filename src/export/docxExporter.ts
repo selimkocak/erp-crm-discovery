@@ -860,14 +860,142 @@ export async function buildDocxBuffer(report: ReportModel): Promise<Uint8Array> 
     }
   }
 
-  // ── Section 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
+  // ── Section 4: Süreç Haritaları, Süreç Sadelik ve Kullanıcı Benimsemesi (FAZ-63) ──
+  if (report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0) {
+    const pmapSummary = report.processMapsSummary;
+
+    docChildren.push(
+      new Paragraph({
+        heading: HeadingLevel.HEADING_1,
+        spacing: { before: 300, after: 120 },
+        children: [
+          new TextRun({
+            text: "4. Süreç Haritaları, Süreç Sadelik ve Kullanıcı Benimsemesi",
+            bold: true,
+            size: 28,
+            color: COLOR_PRIMARY,
+            font: FONT_FAMILY,
+          }),
+        ],
+      }),
+      new Paragraph({
+        spacing: { before: 100, after: 100 },
+        children: [
+          new TextRun({
+            text: `Toplam ${pmapSummary.stats.totalMaps} model süreç, ${pmapSummary.stats.totalNodes} süreç adımı, ${pmapSummary.stats.highAdoptionRiskCount} yüksek benimseme riski, ${pmapSummary.stats.simplificationOpportunityCount} sadeleştirme fırsatı, ${pmapSummary.stats.totalApprovals} onay adımı ve ${pmapSummary.stats.totalHandoffs} el değiştirme (handoff) analiz edilmiştir.`,
+            size: 20,
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+
+    // Her süreç haritası için adımlar tablosu
+    for (let mIdx = 0; mIdx < pmapSummary.maps.length; mIdx++) {
+      const pm = pmapSummary.maps[mIdx];
+
+      docChildren.push(
+        new Paragraph({
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 180, after: 80 },
+          children: [
+            new TextRun({
+              text: `4.1.${mIdx + 1} ${pm.name}${pm.processArea ? ` (${pm.processArea})` : ""}`,
+              bold: true,
+              size: 22,
+              color: COLOR_DARK,
+              font: FONT_FAMILY,
+            }),
+          ],
+        }),
+        new Paragraph({
+          spacing: { after: 80 },
+          children: [
+            new TextRun({
+              text: `Süreç Sahibi: ${pm.ownerRole || "—"} | Durum: ${pm.status} | Adım Sayısı: ${pm.nodes.length}${pm.description ? `\nAçıklama: ${pm.description}` : ""}`,
+              size: 18,
+              color: COLOR_MUTED,
+              italics: true,
+              font: FONT_FAMILY,
+            }),
+          ],
+        })
+      );
+
+      if (pm.nodes.length > 0) {
+        const stepHeaderRow = new TableRow({
+          tableHeader: true,
+          children: [
+            createTableCell("Sıra", { isHeader: true, widthPercent: 8 }),
+            createTableCell("Adım & Tip", { isHeader: true, widthPercent: 22 }),
+            createTableCell("Sorumlu (Dep / Rol)", { isHeader: true, widthPercent: 20 }),
+            createTableCell("Girdi & Çıktı", { isHeader: true, widthPercent: 20 }),
+            createTableCell("Metrikler & Riskler", { isHeader: true, widthPercent: 18 }),
+            createTableCell("Benimseme Riski", { isHeader: true, widthPercent: 12 }),
+          ],
+        });
+
+        const stepRows: TableRow[] = pm.nodes.map((n) => {
+          const metricsStr = [
+            `Onay: ${n.approvalCount}`,
+            `Handoff: ${n.handoffCount}`,
+            n.duplicateDataEntry ? "⚠️ Mükerrer Veri" : null,
+            n.bypassPossible ? "🚨 Bypass Riski" : null,
+            n.valueAdded ? "Katma Değerli" : "İsraf/Bekleme",
+          ].filter(Boolean).join("\n");
+
+          return new TableRow({
+            children: [
+              createTableCell(`${n.stepOrder}`, { bold: true }),
+              createTableCell(`${n.name}\n[${n.nodeType}]${n.otStationCode ? `\n(🏭 ${n.otStationCode})` : ""}`),
+              createTableCell(`${n.responsibleRole || "—"}${n.responsibleDepartment ? `\n(${n.responsibleDepartment})` : ""}`),
+              createTableCell(`G: ${n.inputDescription || "—"}\nÇ: ${n.outputDescription || "—"}`),
+              createTableCell(metricsStr),
+              createTableCell(
+                n.adoptionRisk === "high" ? "🚨 YÜKSEK" : n.adoptionRisk === "medium" ? "⚠️ ORTA" : "✅ DÜŞÜK",
+                { bold: true, bgColor: n.adoptionRisk === "high" ? "FEF2F2" : n.adoptionRisk === "medium" ? "FFFBEB" : "F0FDF4" }
+              ),
+            ],
+          });
+        });
+
+        docChildren.push(
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            rows: [stepHeaderRow, ...stepRows],
+          }),
+          new Paragraph({ spacing: { after: 120 } })
+        );
+      }
+    }
+
+    // 4.2 Sadeleştirme & Güvenlik Sınırı Notu
+    docChildren.push(
+      new Paragraph({
+        spacing: { before: 100, after: 150 },
+        children: [
+          new TextRun({
+            text: "⚠️ Süreç Sadeleştirme ve Kontrol Güvenlik İlkesi: Basit süreç, kontrolsüz süreç değildir. Finansal kontrol, kalite, iş güvenliği, mevzuat ve görevler ayrılığı (SoD) kontrolleri sadeleştirme adına kaldırılamaz. Yalnızca gereksiz tekrar, bekleme, belirsizlik ve kullanıcı yükü azaltılabilir.",
+            italics: true,
+            size: 18,
+            color: "B45309",
+            font: FONT_FAMILY,
+          }),
+        ],
+      })
+    );
+  }
+
+  // ── Section 5 / 4: İş Fonksiyonları Detay Analizi ──────────────────────────────
   docChildren.push(
     new Paragraph({
       heading: HeadingLevel.HEADING_1,
       spacing: { before: 300, after: 120 },
       children: [
         new TextRun({
-          text: "4. İş Fonksiyonları & Süreç Analizleri",
+          text: report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0
+            ? "5. İş Fonksiyonları & Süreç Analizleri"
+            : "4. İş Fonksiyonları & Süreç Analizleri",
           bold: true,
           size: 28,
           color: COLOR_PRIMARY,

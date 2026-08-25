@@ -29,6 +29,10 @@ import {
   getOtAlarmRequirements,
   getOtQualityDevices,
   getOtMatrixSummaryCounts,
+  getProcessMaps,
+  getProcessNodes,
+  getProcessEdges,
+  getProcessMapsSummaryStats,
 } from "../db/client";
 import { loadQuestionPack, getPackIdForFunction } from "../engine/loader";
 import { getVisibleQuestions } from "../engine/branching";
@@ -61,6 +65,10 @@ import type {
   ReportScheduleSummary,
   ReportOtStationsSummary,
   ReportOtMatrixSummary,
+  ReportProcessMapsSummary,
+  ReportProcessMap,
+  ReportProcessNode,
+  ReportProcessEdge,
 } from "./types";
 import type { QuestionPack, Question } from "../engine/types";
 import type { Finding, Requirement, Risk, ProjectNote } from "../types";
@@ -98,6 +106,8 @@ export async function buildReportModel(
     otAlarmReqs,
     otQualityDevs,
     otMatrixCounts,
+    procMaps,
+    procSummaryStats,
   ] = await Promise.all([
     getProjectDetail(projectId),
     getReportProfile(projectId),
@@ -119,8 +129,16 @@ export async function buildReportModel(
     getOtAlarmRequirements(projectId),
     getOtQualityDevices(projectId),
     getOtMatrixSummaryCounts(projectId),
+    getProcessMaps(projectId),
+    getProcessMapsSummaryStats(projectId),
   ]);
 
+  const allProcNodes = await Promise.all(
+    (procMaps || []).map((m) => getProcessNodes(m.id))
+  );
+  const allProcEdges = await Promise.all(
+    (procMaps || []).map((m) => getProcessEdges(m.id))
+  );
 
   if (!detailData) {
     throw new Error(`Analiz projesi bulunamadı: ${projectId}`);
@@ -848,6 +866,89 @@ export async function buildReportModel(
     };
   }
 
+  // Süreç Haritaları, Sadelik ve Benimseme Riski Özeti (FAZ-63 / Bölüm 4)
+  let processMapsSummary: ReportProcessMapsSummary | undefined = undefined;
+  if (procMaps && procMaps.length > 0) {
+    const stationMap = new Map<string, { code: string; name: string }>();
+    for (const st of otStations || []) {
+      stationMap.set(st.id, { code: st.station_code, name: st.station_name });
+    }
+
+    const mapsData: ReportProcessMap[] = [];
+
+    for (let i = 0; i < procMaps.length; i++) {
+      const pm = procMaps[i];
+      const nodes = allProcNodes[i] || [];
+      const edges = allProcEdges[i] || [];
+
+      const nodeNameMap = new Map<string, string>();
+      for (const n of nodes) {
+        nodeNameMap.set(n.id, n.name);
+      }
+
+      const reportNodes: ReportProcessNode[] = nodes.map((n) => {
+        const st = n.ot_station_id ? stationMap.get(n.ot_station_id) : undefined;
+        return {
+          id: n.id,
+          processMapId: n.process_map_id,
+          nodeType: n.node_type || "ACTIVITY",
+          name: n.name,
+          description: n.description || null,
+          responsibleDepartment: n.responsible_department || null,
+          responsibleRole: n.responsible_role || null,
+          businessFunctionCode: n.business_function_code || null,
+          otStationCode: st ? st.code : null,
+          otStationName: st ? st.name : null,
+          stepOrder: n.step_order ?? 1,
+          inputDescription: n.input_description || null,
+          outputDescription: n.output_description || null,
+          approvalCount: n.approval_count ?? 0,
+          handoffCount: n.handoff_count ?? 0,
+          duplicateDataEntry: Boolean(n.duplicate_data_entry),
+          bypassPossible: Boolean(n.bypass_possible),
+          manualWork: Boolean(n.manual_work),
+          valueAdded: n.value_added !== undefined ? Boolean(n.value_added) : true,
+          adoptionRisk: (n.adoption_risk as any) || "low",
+          notes: n.notes || null,
+        };
+      });
+
+      const reportEdges: ReportProcessEdge[] = edges.map((e) => ({
+        id: e.id,
+        processMapId: e.process_map_id,
+        sourceNodeId: e.source_node_id,
+        targetNodeId: e.target_node_id,
+        sourceNodeName: nodeNameMap.get(e.source_node_id) || "Başlangıç Adımı",
+        targetNodeName: nodeNameMap.get(e.target_node_id) || "Hedef Adım",
+        label: e.label || null,
+        conditionText: e.condition_text || null,
+        sortOrder: e.sort_order ?? 0,
+      }));
+
+      const highRiskCount = reportNodes.filter((n) => n.adoptionRisk === "high").length;
+
+      mapsData.push({
+        id: pm.id,
+        name: pm.name,
+        processArea: pm.process_area || null,
+        ownerRole: pm.owner_role || null,
+        status: pm.status === "active" ? "Aktif" : "Pasif",
+        description: pm.description || null,
+        sortOrder: pm.sort_order ?? 0,
+        nodeCount: reportNodes.length,
+        edgeCount: reportEdges.length,
+        highRiskNodeCount: highRiskCount,
+        nodes: reportNodes,
+        edges: reportEdges,
+      });
+    }
+
+    processMapsSummary = {
+      stats: procSummaryStats,
+      maps: mapsData,
+    };
+  }
+
   return {
     metadata,
     profile,
@@ -860,6 +961,7 @@ export async function buildReportModel(
     scheduleSummary,
     otStationsSummary,
     otMatrixSummary,
+    processMapsSummary,
     globalFindings,
     globalRequirements,
     globalRisks,

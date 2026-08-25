@@ -335,21 +335,30 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
                 3.3 OT Veri, Alarm & Kalite Matrisi
               </a>
             )}
+            {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 && (
+              <a href="#sec-process-maps" className="report-toc__link">
+                4. Süreç Haritaları & Benimseme Riski
+              </a>
+            )}
             <div className="report-toc__group">
-              <span className="report-toc__group-title">4. İş Fonksiyonları</span>
+              <span className="report-toc__group-title">
+                {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "5. İş Fonksiyonları" : "4. İş Fonksiyonları"}
+              </span>
               {businessFunctions.map((fn, idx) => (
                 <a key={fn.code} href={`#sec-fn-${fn.code}`} className="report-toc__sublink">
-                  4.{idx + 1} {fn.nameTr}
+                  {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? `5.${idx + 1}` : `4.${idx + 1}`} {fn.nameTr}
                 </a>
               ))}
             </div>
             {report.governance && (
               <a href="#sec-governance" className="report-toc__link">
-                5. Veri Sahipliği ve Yönetişim
+                {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "6. Veri Sahipliği ve Yönetişim" : "5. Veri Sahipliği ve Yönetişim"}
               </a>
             )}
             <a href="#sec-notes" className="report-toc__link">
-              {report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular"}
+              {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0
+                ? (report.governance ? "7. Proje Notları & Açık Konular" : "6. Proje Notları & Açık Konular")
+                : (report.governance ? "6. Proje Notları & Açık Konular" : "5. Proje Notları & Açık Konular")}
             </a>
           </nav>
 
@@ -952,10 +961,151 @@ export const ReportPreviewView: React.FC<ReportPreviewViewProps> = ({
             </section>
           )}
 
-          {/* ── Bölüm 4: İş Fonksiyonları Detay Analizi ─────────────────── */}
+          {/* ── Bölüm 4: Süreç Haritaları, Süreç Sadelik ve Kullanıcı Benimsemesi (FAZ-63) ── */}
+          {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 && (
+            <section id="sec-process-maps" className="report-section">
+              <div className="report-section__header">
+                <span className="report-section__num">BÖLÜM 4</span>
+                <h2 className="report-section__title">Süreç Haritaları, Süreç Sadelik ve Kullanıcı Benimsemesi</h2>
+              </div>
+
+              {/* Process KPI Overview Box */}
+              <div className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                <h3 className="report-summary-box__title">4.1 Süreç Haritaları & Benimseme Riski Özeti</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "1rem", marginTop: "0.75rem" }}>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>MODEL SÜREÇ SAYISI</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "var(--color-primary, #1e3a8a)" }}>
+                      {report.processMapsSummary.stats.totalMaps} Süreç
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>TOPLAM SÜREÇ ADIMI</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700 }}>
+                      {report.processMapsSummary.stats.totalNodes} Adım
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>YÜKSEK BENİMSEME RİSKİ</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: report.processMapsSummary.stats.highAdoptionRiskCount > 0 ? "#b91c1c" : "#15803d" }}>
+                      {report.processMapsSummary.stats.highAdoptionRiskCount} Adım
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-xs text-muted font-bold" style={{ display: "block" }}>SADELEŞTİRME FIRSATI</span>
+                    <span style={{ fontSize: "1.125rem", fontWeight: 700, color: "#b45309" }}>
+                      {report.processMapsSummary.stats.simplificationOpportunityCount} Nokta
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", marginTop: "0.75rem", fontSize: "0.8125rem", color: "var(--text-muted)" }}>
+                  <span><strong>Onay Sayısı:</strong> {report.processMapsSummary.stats.totalApprovals}</span>
+                  <span>•</span>
+                  <span><strong>El Değiştirme (Handoff):</strong> {report.processMapsSummary.stats.totalHandoffs}</span>
+                  <span>•</span>
+                  <span><strong>Mükerrer Veri Girişi:</strong> {report.processMapsSummary.stats.duplicateDataEntryCount}</span>
+                  <span>•</span>
+                  <span><strong>Bypass / Gayriresmi Yol:</strong> {report.processMapsSummary.stats.bypassPossibleCount}</span>
+                </div>
+              </div>
+
+              {/* Process Maps & Steps */}
+              {report.processMapsSummary.maps.map((pm, mapIdx) => (
+                <div key={pm.id} className="report-summary-box" style={{ marginBottom: "1.25rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.5rem" }}>
+                    <h3 className="report-summary-box__title" style={{ margin: 0 }}>
+                      4.2.{mapIdx + 1} {pm.name}
+                      {pm.processArea && <span className="text-muted text-xs font-normal" style={{ marginLeft: "0.5rem" }}>({pm.processArea})</span>}
+                    </h3>
+                    <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                      {pm.ownerRole && <span className="badge badge--muted text-xs">Sahip: {pm.ownerRole}</span>}
+                      <span className={`badge ${pm.status === "Aktif" ? "badge--on-track" : "badge--neutral"}`}>{pm.status}</span>
+                    </div>
+                  </div>
+                  {pm.description && <p className="text-xs text-muted" style={{ marginBottom: "0.75rem" }}>{pm.description}</p>}
+
+                  {pm.nodes.length > 0 ? (
+                    <div className="report-table-wrapper" style={{ overflowX: "auto" }}>
+                      <table className="report-table report-table--striped" style={{ width: "100%", fontSize: "0.8125rem" }}>
+                        <thead>
+                          <tr>
+                            <th style={{ width: "6%" }}>Sıra</th>
+                            <th style={{ width: "22%" }}>Adım & Tip</th>
+                            <th style={{ width: "18%" }}>Sorumlu (Dep / Rol)</th>
+                            <th style={{ width: "18%" }}>Girdi & Çıktı</th>
+                            <th style={{ width: "16%" }}>Süreç Metrikleri</th>
+                            <th style={{ width: "10%" }}>Benimseme Riski</th>
+                            <th style={{ width: "10%" }}>Katma Değer</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pm.nodes.map((n) => (
+                            <tr key={n.id}>
+                              <td><strong className="text-mono">{n.stepOrder}</strong></td>
+                              <td>
+                                <div className="font-bold">{n.name}</div>
+                                <span className="badge badge--secondary text-xs">{n.nodeType}</span>
+                                {n.otStationCode && (
+                                  <span className="badge badge--info text-xs" style={{ marginLeft: "4px" }}>
+                                    🏭 {n.otStationCode}
+                                  </span>
+                                )}
+                              </td>
+                              <td>
+                                <div>{n.responsibleRole || "—"}</div>
+                                {n.responsibleDepartment && (
+                                  <span className="text-xs text-muted">{n.responsibleDepartment}</span>
+                                )}
+                              </td>
+                              <td>
+                                {n.inputDescription && <div className="text-xs"><strong>G:</strong> {n.inputDescription}</div>}
+                                {n.outputDescription && <div className="text-xs text-muted"><strong>Ç:</strong> {n.outputDescription}</div>}
+                                {!n.inputDescription && !n.outputDescription && "—"}
+                              </td>
+                              <td>
+                                <div className="text-xs">
+                                  <span>Onay: {n.approvalCount} | Handoff: {n.handoffCount}</span>
+                                  {n.duplicateDataEntry && <div className="text-danger">⚠️ Mükerrer Veri</div>}
+                                  {n.bypassPossible && <div className="text-danger font-bold">🚨 Bypass / Excel Riski</div>}
+                                </div>
+                              </td>
+                              <td>
+                                <span className={`badge ${n.adoptionRisk === "high" ? "badge--danger" : n.adoptionRisk === "medium" ? "badge--warning" : "badge--success"}`}>
+                                  {n.adoptionRisk === "high" ? "Yüksek Risk" : n.adoptionRisk === "medium" ? "Orta Risk" : "Düşük Risk"}
+                                </span>
+                              </td>
+                              <td>
+                                <span className={`badge ${n.valueAdded ? "badge--outline-success" : "badge--outline-danger"}`}>
+                                  {n.valueAdded ? "Katma Değerli" : "İsraf / Bekleme"}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-muted text-xs italic">Bu süreç için henüz adım tanımlanmamış.</p>
+                  )}
+                </div>
+              ))}
+
+              {/* 4.3 Simplification Opportunities & Safety Boundary Note */}
+              <div className="report-summary-box" style={{ marginTop: "1.25rem", borderLeft: "4px solid #b45309" }}>
+                <h3 className="report-summary-box__title" style={{ color: "#92400e" }}>4.3 Sadeleştirme Fırsatları ve Kontrol Güvenlik İlkesi</h3>
+                <p className="text-xs text-muted" style={{ lineHeight: 1.6 }}>
+                  Sadeleştirme, kontrollerin kaldırılması anlamına gelmez. <strong>Finansal kontrol, kalite, iş güvenliği, mevzuat ve görevler ayrılığı (SoD) kontrolleri</strong> hiçbir koşulda sadeleştirme adına ortadan kaldırılamaz. İyileştirme odağı; mükerrer manuel girişler, gereksiz onay kuyrukları ve gayriresmi excel/kağıt bypass hatlarının ortadan kaldırılmasıdır.
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* ── Bölüm 5 / 4: İş Fonksiyonları Detay Analizi ─────────────────── */}
           <section id="sec-functions" className="report-section">
             <div className="report-section__header">
-              <span className="report-section__num">BÖLÜM 4</span>
+              <span className="report-section__num">
+                {report.processMapsSummary && report.processMapsSummary.stats.totalMaps > 0 ? "BÖLÜM 5" : "BÖLÜM 4"}
+              </span>
               <h2 className="report-section__title">İş Fonksiyonları & Süreç Analizleri</h2>
             </div>
 

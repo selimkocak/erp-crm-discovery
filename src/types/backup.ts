@@ -29,6 +29,9 @@ export interface BackupRecordCounts {
   otDataRequirements?: number;
   otAlarmRequirements?: number;
   otQualityDevices?: number;
+  processMaps?: number;
+  processNodes?: number;
+  processEdges?: number;
 }
 
 export interface BackupManifest {
@@ -39,7 +42,7 @@ export interface BackupManifest {
   projectId?: string;
   projectName: string;
   companyName: string;
-  schemaVersion: number; // 11 | 12 | 13 | 14 | 15
+  schemaVersion: number; // 11 | 12 | 13 | 14 | 15 | 16
   recordCounts: BackupRecordCounts;
   attachmentCount: number;
   dataChecksum: string; // SHA-256 of project-data.json
@@ -75,6 +78,9 @@ export interface ProjectBackupData {
   otDataRequirements?: Record<string, any>[];
   otAlarmRequirements?: Record<string, any>[];
   otQualityDevices?: Record<string, any>[];
+  processMaps?: Record<string, any>[];
+  processNodes?: Record<string, any>[];
+  processEdges?: Record<string, any>[];
 }
 
 export interface BackupInspectionResult {

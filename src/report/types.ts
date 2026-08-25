@@ -449,6 +449,75 @@ export interface ReportOtMatrixSummary {
   qualityDevices: ReportOtQualityDevice[];
 }
 
+export interface ReportProcessNode {
+  id: string;
+  processMapId: string;
+  nodeType: string;
+  name: string;
+  description: string | null;
+  responsibleDepartment: string | null;
+  responsibleRole: string | null;
+  businessFunctionCode: string | null;
+  otStationCode: string | null;
+  otStationName: string | null;
+  stepOrder: number;
+  inputDescription: string | null;
+  outputDescription: string | null;
+  approvalCount: number;
+  handoffCount: number;
+  duplicateDataEntry: boolean;
+  bypassPossible: boolean;
+  manualWork: boolean;
+  valueAdded: boolean;
+  adoptionRisk: 'low' | 'medium' | 'high';
+  notes: string | null;
+}
+
+export interface ReportProcessEdge {
+  id: string;
+  processMapId: string;
+  sourceNodeId: string;
+  targetNodeId: string;
+  sourceNodeName: string;
+  targetNodeName: string;
+  label: string | null;
+  conditionText: string | null;
+  sortOrder: number;
+}
+
+export interface ReportProcessMap {
+  id: string;
+  name: string;
+  processArea: string | null;
+  ownerRole: string | null;
+  status: string;
+  description: string | null;
+  sortOrder: number;
+  nodeCount: number;
+  edgeCount: number;
+  highRiskNodeCount: number;
+  nodes: ReportProcessNode[];
+  edges: ReportProcessEdge[];
+}
+
+export interface ReportProcessMapsSummary {
+  stats: {
+    totalMaps: number;
+    totalNodes: number;
+    totalEdges: number;
+    totalApprovals: number;
+    totalHandoffs: number;
+    duplicateDataEntryCount: number;
+    bypassPossibleCount: number;
+    highAdoptionRiskCount: number;
+    mediumAdoptionRiskCount: number;
+    lowAdoptionRiskCount: number;
+    valueAddedStepCount: number;
+    simplificationOpportunityCount: number;
+  };
+  maps: ReportProcessMap[];
+}
+
 export interface ReportModel {
   metadata: ReportMetadata;
   profile: ReportProfile;
@@ -461,6 +530,7 @@ export interface ReportModel {
   scheduleSummary?: ReportScheduleSummary;
   otStationsSummary?: ReportOtStationsSummary;
   otMatrixSummary?: ReportOtMatrixSummary;
+  processMapsSummary?: ReportProcessMapsSummary;
   globalFindings: ReportFinding[];
   globalRequirements: ReportRequirement[];
   globalRisks: ReportRisk[];

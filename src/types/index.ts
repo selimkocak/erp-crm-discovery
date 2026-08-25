@@ -526,6 +526,107 @@ export interface OtMatrixSummaryCounts {
   highComplexityItems: number;
 }
 
+export type ProcessNodeType =
+  | 'START'
+  | 'ACTIVITY'
+  | 'DECISION'
+  | 'APPROVAL'
+  | 'SYSTEM'
+  | 'QUALITY_CHECK'
+  | 'END';
+
+export type AdoptionRiskLevel = 'low' | 'medium' | 'high';
+export type ProcessMapStatus = 'active' | 'passive';
+
+export interface ProcessMap {
+  id: string;
+  project_id: string;
+  name: string;
+  process_area?: string | null;
+  owner_role?: string | null;
+  status: ProcessMapStatus;
+  description?: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProcessNode {
+  id: string;
+  process_map_id: string;
+  node_type: ProcessNodeType;
+  name: string;
+  description?: string | null;
+  responsible_department?: string | null;
+  responsible_role?: string | null;
+  business_function_code?: string | null;
+  ot_station_id?: string | null;
+  step_order: number;
+  input_description?: string | null;
+  output_description?: string | null;
+  approval_count: number;
+  handoff_count: number;
+  duplicate_data_entry: number;
+  bypass_possible: number;
+  manual_work: number;
+  value_added: number;
+  adoption_risk: AdoptionRiskLevel;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProcessEdge {
+  id: string;
+  process_map_id: string;
+  source_node_id: string;
+  target_node_id: string;
+  label?: string | null;
+  condition_text?: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProcessMapsSummaryStats {
+  totalMaps: number;
+  totalNodes: number;
+  totalEdges: number;
+  totalApprovals: number;
+  totalHandoffs: number;
+  duplicateDataEntryCount: number;
+  bypassPossibleCount: number;
+  highAdoptionRiskCount: number;
+  mediumAdoptionRiskCount: number;
+  lowAdoptionRiskCount: number;
+  valueAddedStepCount: number;
+  simplificationOpportunityCount: number;
+}
+
+export function calculateAdoptionRisk(node: {
+  bypass_possible?: number | boolean;
+  approval_count?: number;
+  handoff_count?: number;
+  duplicate_data_entry?: number | boolean;
+  manual_work?: number | boolean;
+  value_added?: number | boolean;
+}): AdoptionRiskLevel {
+  const bypass = Boolean(node.bypass_possible);
+  const approvals = Number(node.approval_count) || 0;
+  const handoffs = Number(node.handoff_count) || 0;
+  const dupData = Boolean(node.duplicate_data_entry);
+  const manual = Boolean(node.manual_work);
+  const valueAdded = node.value_added === undefined ? true : Boolean(node.value_added);
+
+  if (bypass || approvals >= 3 || (handoffs >= 3 && dupData) || (manual && !valueAdded)) {
+    return 'high';
+  }
+  if (approvals >= 2 || handoffs >= 2 || dupData || manual || !valueAdded) {
+    return 'medium';
+  }
+  return 'low';
+}
+
 export * from './governance';
 export * from './backup';
 

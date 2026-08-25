@@ -24,6 +24,7 @@ import {
   Info,
   Layers,
   X as XIcon,
+  GitCommit,
 } from "lucide-react";
 import {
   getProjectDetail,
@@ -37,6 +38,7 @@ import {
 import { SaveStatusIndicator } from "../components/SaveStatusIndicator";
 import { SemanticSummarySection } from "../components/SemanticSummarySection";
 import { OtStationsSection } from "../components/OtStationsSection";
+import { ProcessMapsSection } from "../components/ProcessMapsSection";
 import { QuestionScreen } from "../views/QuestionScreen";
 import { ReportPreviewView } from "../views/ReportPreviewView";
 import { GovernanceDashboardView } from "../views/GovernanceDashboardView";
@@ -80,7 +82,7 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error" | "idle">("idle");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
-  const [viewMode, setViewMode] = useState<"process" | "governance">("process");
+  const [viewMode, setViewMode] = useState<"process" | "process_maps" | "governance">("process");
 
   // Backup & Operations state
   const [isRestoreOpen, setIsRestoreOpen] = useState(false);
@@ -810,8 +812,8 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         );
       })()}
 
-      {/* View Mode Tabs (Süreç Analizi & Veri/Yetki Yönetişimi) */}
-      <div className="project-view-mode-tabs" style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem" }}>
+      {/* View Mode Tabs (Süreç Analizi & Süreç Haritaları & Veri/Yetki Yönetişimi) */}
+      <div className="project-view-mode-tabs" style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
         <button
           type="button"
           className={`btn ${viewMode === "process" ? "btn-primary" : "btn-secondary"}`}
@@ -820,6 +822,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
         >
           <FileText size={16} />
           <span>Süreç Analizi ({activeFunctions.length} Fonksiyon)</span>
+        </button>
+        <button
+          type="button"
+          className={`btn ${viewMode === "process_maps" ? "btn-primary" : "btn-secondary"}`}
+          style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.625rem 1.25rem", fontWeight: 600 }}
+          onClick={() => setViewMode("process_maps")}
+        >
+          <GitCommit size={16} />
+          <span>Süreç Haritaları & Benimseme Riski</span>
         </button>
         <button
           type="button"
@@ -1135,6 +1146,15 @@ export const ProjectDetailView: React.FC<ProjectDetailViewProps> = ({
             />
           )}
         </div>
+      ) : viewMode === "process_maps" ? (
+        /* Process Maps & Adoption Section (FAZ-63) */
+        <ProcessMapsSection
+          projectId={projectId}
+          availableFunctions={activeFunctions.map((f) => ({
+            code: f.code,
+            name_tr: f.name_tr,
+          }))}
+        />
       ) : (
         /* Governance Dashboard View Mode */
         <GovernanceDashboardView

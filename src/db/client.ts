@@ -49,7 +49,12 @@ import type {
   OtAlarmRequirement,
   OtQualityDevice,
   OtMatrixSummaryCounts,
+  ProcessMap,
+  ProcessNode,
+  ProcessEdge,
+  ProcessMapsSummaryStats,
 } from "../types";
+import { calculateAdoptionRisk } from "../types";
 import type { AnswerData } from "../engine/types";
 
 // ---------------------------------------------------------------
@@ -2916,6 +2921,422 @@ export async function getOtMatrixSummaryCounts(
     automatedTransferDevices,
     pdfOnlyDevices,
     highComplexityItems,
+  };
+}
+
+// ---------------------------------------------------------------
+// 23. FAZ-63: Süreç Haritaları, Düğümleri ve Bağlantıları (Process Maps, Nodes, Edges)
+// ---------------------------------------------------------------
+
+export async function createProcessMap(
+  payload: Omit<ProcessMap, "id" | "created_at" | "updated_at">
+): Promise<ProcessMap> {
+  const db = await getDb();
+  const id = generateId("pmap");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO process_maps
+       (id, project_id, name, process_area, owner_role, status, description, sort_order, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9)`,
+    [
+      id,
+      payload.project_id,
+      payload.name,
+      payload.process_area ?? null,
+      payload.owner_role ?? null,
+      payload.status || "active",
+      payload.description ?? null,
+      payload.sort_order ?? 0,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    project_id: payload.project_id,
+    name: payload.name,
+    process_area: payload.process_area ?? null,
+    owner_role: payload.owner_role ?? null,
+    status: payload.status || "active",
+    description: payload.description ?? null,
+    sort_order: payload.sort_order ?? 0,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function getProcessMaps(projectId: string): Promise<ProcessMap[]> {
+  const db = await getDb();
+  return db.select<ProcessMap[]>(
+    `SELECT * FROM process_maps WHERE project_id = $1 ORDER BY sort_order ASC, created_at ASC`,
+    [projectId]
+  );
+}
+
+export async function getProcessMapById(id: string): Promise<ProcessMap | null> {
+  const db = await getDb();
+  const rows = await db.select<ProcessMap[]>(
+    `SELECT * FROM process_maps WHERE id = $1 LIMIT 1`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+export async function updateProcessMap(
+  id: string,
+  updates: Partial<Pick<ProcessMap, "name" | "process_area" | "owner_role" | "status" | "description" | "sort_order">>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `UPDATE process_maps
+     SET name = COALESCE($1, name),
+         process_area = CASE WHEN $2 IS NOT NULL THEN $3 ELSE process_area END,
+         owner_role = CASE WHEN $4 IS NOT NULL THEN $5 ELSE owner_role END,
+         status = COALESCE($6, status),
+         description = CASE WHEN $7 IS NOT NULL THEN $8 ELSE description END,
+         sort_order = COALESCE($9, sort_order),
+         updated_at = $10
+     WHERE id = $11`,
+    [
+      updates.name ?? null,
+      updates.process_area !== undefined ? 1 : null,
+      updates.process_area ?? null,
+      updates.owner_role !== undefined ? 1 : null,
+      updates.owner_role ?? null,
+      updates.status ?? null,
+      updates.description !== undefined ? 1 : null,
+      updates.description ?? null,
+      updates.sort_order ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteProcessMap(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM process_maps WHERE id = $1`, [id]);
+}
+
+export async function createProcessNode(
+  payload: Omit<ProcessNode, "id" | "adoption_risk" | "created_at" | "updated_at"> & { adoption_risk?: string }
+): Promise<ProcessNode> {
+  const db = await getDb();
+  const id = generateId("pnode");
+  const now = new Date().toISOString();
+  const adoptionRisk =
+    payload.adoption_risk ||
+    calculateAdoptionRisk({
+      bypass_possible: payload.bypass_possible,
+      approval_count: payload.approval_count,
+      handoff_count: payload.handoff_count,
+      duplicate_data_entry: payload.duplicate_data_entry,
+      manual_work: payload.manual_work,
+      value_added: payload.value_added,
+    });
+
+  await db.execute(
+    `INSERT INTO process_nodes (
+       id, process_map_id, node_type, name, description,
+       responsible_department, responsible_role, business_function_code, ot_station_id,
+       step_order, input_description, output_description, approval_count,
+       handoff_count, duplicate_data_entry, bypass_possible, manual_work,
+       value_added, adoption_risk, notes, created_at, updated_at
+     ) VALUES (
+       $1, $2, $3, $4, $5,
+       $6, $7, $8, $9,
+       $10, $11, $12, $13,
+       $14, $15, $16, $17,
+       $18, $19, $20, $21, $21
+     )`,
+    [
+      id,
+      payload.process_map_id,
+      payload.node_type || "ACTIVITY",
+      payload.name,
+      payload.description ?? null,
+      payload.responsible_department ?? null,
+      payload.responsible_role ?? null,
+      payload.business_function_code ?? null,
+      payload.ot_station_id ?? null,
+      payload.step_order ?? 1,
+      payload.input_description ?? null,
+      payload.output_description ?? null,
+      payload.approval_count ?? 0,
+      payload.handoff_count ?? 0,
+      payload.duplicate_data_entry ? 1 : 0,
+      payload.bypass_possible ? 1 : 0,
+      payload.manual_work ? 1 : 0,
+      payload.value_added !== undefined ? (payload.value_added ? 1 : 0) : 1,
+      adoptionRisk,
+      payload.notes ?? null,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    process_map_id: payload.process_map_id,
+    node_type: payload.node_type || "ACTIVITY",
+    name: payload.name,
+    description: payload.description ?? null,
+    responsible_department: payload.responsible_department ?? null,
+    responsible_role: payload.responsible_role ?? null,
+    business_function_code: payload.business_function_code ?? null,
+    ot_station_id: payload.ot_station_id ?? null,
+    step_order: payload.step_order ?? 1,
+    input_description: payload.input_description ?? null,
+    output_description: payload.output_description ?? null,
+    approval_count: payload.approval_count ?? 0,
+    handoff_count: payload.handoff_count ?? 0,
+    duplicate_data_entry: payload.duplicate_data_entry ? 1 : 0,
+    bypass_possible: payload.bypass_possible ? 1 : 0,
+    manual_work: payload.manual_work ? 1 : 0,
+    value_added: payload.value_added !== undefined ? (payload.value_added ? 1 : 0) : 1,
+    adoption_risk: adoptionRisk as any,
+    notes: payload.notes ?? null,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function getProcessNodes(processMapId: string): Promise<ProcessNode[]> {
+  const db = await getDb();
+  return db.select<ProcessNode[]>(
+    `SELECT * FROM process_nodes WHERE process_map_id = $1 ORDER BY step_order ASC, created_at ASC`,
+    [processMapId]
+  );
+}
+
+export async function getProcessNodeById(id: string): Promise<ProcessNode | null> {
+  const db = await getDb();
+  const rows = await db.select<ProcessNode[]>(
+    `SELECT * FROM process_nodes WHERE id = $1 LIMIT 1`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+export async function updateProcessNode(
+  id: string,
+  updates: Partial<Omit<ProcessNode, "id" | "process_map_id" | "created_at" | "updated_at">>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  // If node metrics changed and adoption_risk not explicitly passed, recalculate
+  let calculatedRisk: string | undefined = updates.adoption_risk;
+  if (!calculatedRisk && (
+    updates.bypass_possible !== undefined ||
+    updates.approval_count !== undefined ||
+    updates.handoff_count !== undefined ||
+    updates.duplicate_data_entry !== undefined ||
+    updates.manual_work !== undefined ||
+    updates.value_added !== undefined
+  )) {
+    const existing = await getProcessNodeById(id);
+    if (existing) {
+      calculatedRisk = calculateAdoptionRisk({
+        bypass_possible: updates.bypass_possible !== undefined ? updates.bypass_possible : existing.bypass_possible,
+        approval_count: updates.approval_count !== undefined ? updates.approval_count : existing.approval_count,
+        handoff_count: updates.handoff_count !== undefined ? updates.handoff_count : existing.handoff_count,
+        duplicate_data_entry: updates.duplicate_data_entry !== undefined ? updates.duplicate_data_entry : existing.duplicate_data_entry,
+        manual_work: updates.manual_work !== undefined ? updates.manual_work : existing.manual_work,
+        value_added: updates.value_added !== undefined ? updates.value_added : existing.value_added,
+      });
+    }
+  }
+
+  await db.execute(
+    `UPDATE process_nodes
+     SET node_type = COALESCE($1, node_type),
+         name = COALESCE($2, name),
+         description = CASE WHEN $3 IS NOT NULL THEN $4 ELSE description END,
+         responsible_department = CASE WHEN $5 IS NOT NULL THEN $6 ELSE responsible_department END,
+         responsible_role = CASE WHEN $7 IS NOT NULL THEN $8 ELSE responsible_role END,
+         business_function_code = CASE WHEN $9 IS NOT NULL THEN $10 ELSE business_function_code END,
+         ot_station_id = CASE WHEN $11 IS NOT NULL THEN $12 ELSE ot_station_id END,
+         step_order = COALESCE($13, step_order),
+         input_description = CASE WHEN $14 IS NOT NULL THEN $15 ELSE input_description END,
+         output_description = CASE WHEN $16 IS NOT NULL THEN $17 ELSE output_description END,
+         approval_count = COALESCE($18, approval_count),
+         handoff_count = COALESCE($19, handoff_count),
+         duplicate_data_entry = COALESCE($20, duplicate_data_entry),
+         bypass_possible = COALESCE($21, bypass_possible),
+         manual_work = COALESCE($22, manual_work),
+         value_added = COALESCE($23, value_added),
+         adoption_risk = COALESCE($24, adoption_risk),
+         notes = CASE WHEN $25 IS NOT NULL THEN $26 ELSE notes END,
+         updated_at = $27
+     WHERE id = $28`,
+    [
+      updates.node_type ?? null,
+      updates.name ?? null,
+      updates.description !== undefined ? 1 : null,
+      updates.description ?? null,
+      updates.responsible_department !== undefined ? 1 : null,
+      updates.responsible_department ?? null,
+      updates.responsible_role !== undefined ? 1 : null,
+      updates.responsible_role ?? null,
+      updates.business_function_code !== undefined ? 1 : null,
+      updates.business_function_code ?? null,
+      updates.ot_station_id !== undefined ? 1 : null,
+      updates.ot_station_id ?? null,
+      updates.step_order ?? null,
+      updates.input_description !== undefined ? 1 : null,
+      updates.input_description ?? null,
+      updates.output_description !== undefined ? 1 : null,
+      updates.output_description ?? null,
+      updates.approval_count !== undefined ? updates.approval_count : null,
+      updates.handoff_count !== undefined ? updates.handoff_count : null,
+      updates.duplicate_data_entry !== undefined ? (updates.duplicate_data_entry ? 1 : 0) : null,
+      updates.bypass_possible !== undefined ? (updates.bypass_possible ? 1 : 0) : null,
+      updates.manual_work !== undefined ? (updates.manual_work ? 1 : 0) : null,
+      updates.value_added !== undefined ? (updates.value_added ? 1 : 0) : null,
+      calculatedRisk ?? null,
+      updates.notes !== undefined ? 1 : null,
+      updates.notes ?? null,
+      now,
+      id,
+    ]
+  );
+}
+
+export async function deleteProcessNode(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM process_nodes WHERE id = $1`, [id]);
+}
+
+export async function createProcessEdge(
+  payload: Omit<ProcessEdge, "id" | "created_at" | "updated_at">
+): Promise<ProcessEdge> {
+  const db = await getDb();
+  const id = generateId("pedge");
+  const now = new Date().toISOString();
+
+  await db.execute(
+    `INSERT INTO process_edges
+       (id, process_map_id, source_node_id, target_node_id, label, condition_text, sort_order, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $8)`,
+    [
+      id,
+      payload.process_map_id,
+      payload.source_node_id,
+      payload.target_node_id,
+      payload.label ?? null,
+      payload.condition_text ?? null,
+      payload.sort_order ?? 0,
+      now,
+    ]
+  );
+
+  return {
+    id,
+    process_map_id: payload.process_map_id,
+    source_node_id: payload.source_node_id,
+    target_node_id: payload.target_node_id,
+    label: payload.label ?? null,
+    condition_text: payload.condition_text ?? null,
+    sort_order: payload.sort_order ?? 0,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+export async function getProcessEdges(processMapId: string): Promise<ProcessEdge[]> {
+  const db = await getDb();
+  return db.select<ProcessEdge[]>(
+    `SELECT * FROM process_edges WHERE process_map_id = $1 ORDER BY sort_order ASC, created_at ASC`,
+    [processMapId]
+  );
+}
+
+export async function deleteProcessEdge(id: string): Promise<void> {
+  const db = await getDb();
+  await db.execute(`DELETE FROM process_edges WHERE id = $1`, [id]);
+}
+
+export async function getProcessMapsSummaryStats(
+  projectId: string
+): Promise<ProcessMapsSummaryStats> {
+  const db = await getDb();
+  const [maps, nodes, edges] = await Promise.all([
+    db.select<ProcessMap[]>(
+      `SELECT * FROM process_maps WHERE project_id = $1`,
+      [projectId]
+    ),
+    db.select<ProcessNode[]>(
+      `SELECT n.* FROM process_nodes n
+       JOIN process_maps m ON m.id = n.process_map_id
+       WHERE m.project_id = $1`,
+      [projectId]
+    ),
+    db.select<ProcessEdge[]>(
+      `SELECT e.* FROM process_edges e
+       JOIN process_maps m ON m.id = e.process_map_id
+       WHERE m.project_id = $1`,
+      [projectId]
+    ),
+  ]);
+
+  const totalMaps = maps.length;
+  const totalNodes = nodes.length;
+  const totalEdges = edges.length;
+
+  let totalApprovals = 0;
+  let totalHandoffs = 0;
+  let duplicateDataEntryCount = 0;
+  let bypassPossibleCount = 0;
+  let highAdoptionRiskCount = 0;
+  let mediumAdoptionRiskCount = 0;
+  let lowAdoptionRiskCount = 0;
+  let valueAddedStepCount = 0;
+  let simplificationOpportunityCount = 0;
+
+  for (const n of nodes) {
+    const appr = Number(n.approval_count) || 0;
+    const hand = Number(n.handoff_count) || 0;
+    const dup = Number(n.duplicate_data_entry) === 1;
+    const bypass = Number(n.bypass_possible) === 1;
+    const manual = Number(n.manual_work) === 1;
+    const valueAdded = Number(n.value_added) === 1;
+    const risk = n.adoption_risk || calculateAdoptionRisk(n);
+
+    totalApprovals += appr;
+    totalHandoffs += hand;
+    if (dup) duplicateDataEntryCount++;
+    if (bypass) bypassPossibleCount++;
+    if (valueAdded) valueAddedStepCount++;
+
+    if (risk === "high") {
+      highAdoptionRiskCount++;
+    } else if (risk === "medium") {
+      mediumAdoptionRiskCount++;
+    } else {
+      lowAdoptionRiskCount++;
+    }
+
+    if (bypass || dup || appr >= 2 || hand >= 2 || (manual && !valueAdded)) {
+      simplificationOpportunityCount++;
+    }
+  }
+
+  return {
+    totalMaps,
+    totalNodes,
+    totalEdges,
+    totalApprovals,
+    totalHandoffs,
+    duplicateDataEntryCount,
+    bypassPossibleCount,
+    highAdoptionRiskCount,
+    mediumAdoptionRiskCount,
+    lowAdoptionRiskCount,
+    valueAddedStepCount,
+    simplificationOpportunityCount,
   };
 }
 
