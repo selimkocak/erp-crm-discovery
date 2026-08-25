@@ -4301,7 +4301,7 @@ export async function getUnsupportedCriticalFindings(
     }
   }
 
-  // 2. Yüksek/Kritik Riskler (project_risks with impact/probability high/critical)
+  // 2. Yüksek/Kritik Riskler (analysis_risks with impact/probability high/critical)
   const criticalRisks = await db.select<{
     id: string;
     business_function_code: string | null;
@@ -4310,7 +4310,7 @@ export async function getUnsupportedCriticalFindings(
     question_id: string | null;
   }[]>(
     `SELECT id, business_function_code, title, description, question_id
-     FROM project_risks
+     FROM analysis_risks
      WHERE analysis_project_id = $1 AND (impact IN ('high', 'critical') OR probability IN ('high', 'critical'))`,
     [projectId]
   );
