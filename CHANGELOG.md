@@ -7,12 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.4] - 2026-08-24
+## [0.1.4] - 2026-08-25
+
+### Added
+* **FAZ-62A Endüstriyel Veri Keşfi (OT_INDUSTRIAL_DATA):** 34. kanonik iş fonksiyonu ve 35. soru paketi (`tr.ot_industrial_data.core` v0.1.0, 58 soru, 22 süreç, 9 branching) — PLC, SCADA, sensör, OEE, kestirimci bakım, enerji analizörü ve dark data keşfi.
+* **FAZ-62B OT İstasyon Profili ve Saha Hiyerarşisi:** `Plant -> Area -> Line -> Station -> Machine` 5 kademeli endüstriyel hiyerarşi, SQLite Migration 14 (`ot_stations` ve `ot_station_answers`), istasyon bazlı bağımsız cevap motoru ve DOCX/PDF Bölüm 3.2 entegrasyonu.
+* **FAZ-62C Endüstriyel Veri ve Alarm Gereksinim Matrisi:** SQLite Migration 15 (`ot_data_requirements`, `ot_alarm_requirements`, `ot_quality_devices`), PLC/SCADA veri protokolleri, kalite ölçüm cihazları ve PDF-only senaryoları.
+* **FAZ-63 BPMN Süreç Haritaları & Benimseme Riski (Adoption Risk):** SQLite Migration 16 (`process_maps`, `process_nodes`, `process_edges`), onay döngüleri ve karar düğümlerine göre otomatik süreç karmaşıklığı hesaplama, yüksek benimseme riski uyarısı ve Bölüm 4 raporlama entegrasyonu.
+* **FAZ-64 Veri Yönetişimi Varlıkları ve Çok Kademeli Onaylar:** SQLite Migration 17 (`data_governance_assets`, `data_governance_access`, `data_governance_approvals`), veri varlığı yaşam döngüsü, onay kademeleri ve Bölüm 5 veri sahipliği raporu.
+* **FAZ-65 Saha Kanıtı ve Doğrulama Kayıt Defteri:** SQLite Migration 18 (`evidence_items`, `evidence_links`), Managed Attachment Vault SHA-256 bütünlüğü, kanıt doğrulama durumları, kanıt kapsama oranı ve kanıtsız kritik konu tespiti.
+* **FAZ-66 Pilot Saha Kabulü ve Go-Live Hazırlığı:** SQLite Migration 19 (`readiness_checks`), 8 kategori, 24 standart kontrol maddesi, NOT_APPLICABLE payda hesabı, kritik açık kuralı (blokeyken hazır saymama), öncelikli aksiyon planı ve Bölüm 7 raporlama entegrasyonu.
+* **FAZ-67 Uzman Saha İncelemesi & Yayın Hazırlığı:**
+  - `docs/review/FAZ67_EXPERT_FIELD_REVIEW_GUIDE.md`: MCS ve bağımsız uzmanlar için 10 başlıklı saha inceleme rehberi.
+  - `docs/review/FAZ67_QUESTION_PACK_REVIEW_MATRIX.md`: 35 soru paketinin tamamını içeren detaylı denetim matrisi.
+  - `docs/review/FAZ67_MARMARA_PILOT_ACCEPTANCE_GUIDE.md`: Marmara pilotu 14 aşamalı kabul rehberi ve UAT kontrol listesi.
+  - `docs/release/FAZ67_RELEASE_READINESS_REPORT.md`: Kapsamlı yayın hazırlık raporu.
+  - `docs/USER_GUIDE_TR.md`: 15 bölümlü Türkçe son kullanıcı kılavuzu.
 
 ### Fixed
 * **Sentetik Üretim Pilotu Foreign Key Eşleme Onarımı:** `src/demo/manufacturingPilot.ts` içinde iş fonksiyonları eklenirken statik id yerine `business_functions` master tablosundaki gerçek anahtar kimliklerinin dinamik olarak sorgulanıp eşlenmesi sağlandı.
-* **Aşama Bazlı Hata İzolasyonu ve Atomik Temizlik:** Demo oluşturma sürecindeki 13 ayrı veri grubu aşamalandırıldı; beklenmeyen bir hata durumunda `deleteProject` mekanizmasıyla yarım projenin ve bağlı kayıtların disk/veritabanından otomatik temizlenmesi güvence altına alındı.
+* **Aşama Bazlı Hata İzolasyonu ve Atomik Temizlik:** Demo oluşturma sürecindeki 14 ayrı veri grubu aşamalandırıldı; beklenmeyen bir hata durumunda `deleteProject` mekanizmasıyla yarım projenin ve bağlı kayıtların disk/veritabanından otomatik temizlenmesi güvence altına alındı.
 * **SQLite Bütünlük Denetimi (PRAGMA foreign_key_check):** Demo proje kurulumu sonrasında `PRAGMA foreign_key_check` ile 0 ihlal kontrolü eklendi; `PRAGMA foreign_keys = ON` ortamlarında `%100` hatasız sentetik demo başlatma sağlandı.
+* **Sayaç ve Font Paritesi:** PDF exportta font stil uyumluluğu sağlandı; HTML, DOCX ve PDF çıktılarında sıfır `undefined` ve sıfır veri sapması güvenceye alındı.
 
 ---
 

@@ -41,24 +41,22 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 
 ## Temel Özellikler (Features)
 
-- **33 Kanonik İş Fonksiyonu & 34 Soru Paketi (1.492 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama & Kurumsal Performans ve yatay Ana Veri Yönetimi dahil 34 hazır soru paketi (792 zorunlu, 700 opsiyonel, 213 koşullu).
+- **34 Kanonik İş Fonksiyonu & 35 Soru Paketi (1.550 Soru):** Satış, Satın Alma, Üretim, Depo, Kalite, Muhasebe, Finans, İK, Hukuk & Uyum, BT, Proje Yönetimi, E-Dönüşüm, Faturalama & Gider, Doküman Yönetimi, İthalat & Gümrük, İhracat & Gümrük, E-Ticaret, Genel Yönetim & Kurumsal Yönetişim, Stratejik Planlama, Ana Veri Yönetimi ve Endüstriyel OT Veri Keşfi dahil 35 hazır soru paketi (822 zorunlu, 728 opsiyonel, 222 koşullu).
 - **Deklaratif Soru Motoru (Question Engine):** Kod yazmadan, tamamen açık JSON şeması ile genişletilebilir soru paketleri. Tekli seçim, çoklu seçim, açık uçlu metin, seçenek bazlı özel notlar ve genel görüşme notları.
 - **Tek Seçimli Cevabı Kaldırma (Clear Selection):** Yanlışlıkla yapılan seçimleri kolayca geri alma ve klavyeden `Escape` ile temizleme desteği.
-- **Dinamik Koşullu Dallanma (213 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
-- **Semantik Analiz Katmanı:** Ham soru-cevapların ötesinde yapılandırılmış **Bulgu (Finding)**, **Gereksinim (Requirement)**, **Risk** ve **Proje Notu** yönetimi.
-- **Soru Takip Bayrakları:** 🟡 *Sonra Dön* ve 🔴 *Kritik Takip* bayrakları — saha görüşmesinde belirsizleri işaretleyip Bölüm 5 Açık Konular tablosuna otomatik taşıma.
-- **Yönetilen Kanıt Kasası (Managed Attachment Vault):** Soru bazlı eklenen dosyaları (PDF, Excel, resim vb.) proje dizininde izole kopyalayarak koruma ve belgelere `file:///` köprüsüyle doğrudan erişim.
+- **Dinamik Koşullu Dallanma (222 Branching Noktası):** Şirketin yapısına göre ilgili olmayan soruları dinamik olarak gizleyen deterministik soru akışı.
+- **Endüstriyel OT ve İstasyon Keşif Katmanı:** `Fabrika -> Alan -> Hat -> İstasyon -> Makine` hiyerarşisi, PLC/SCADA protokolleri, Dark Data, kestirimci bakım, OEE ve enerji analizörü veri gereksinimleri.
+- **BPMN Süreç Haritaları & Benimseme Riski (Adoption Risk):** Onay döngüleri, karar düğümleri ve aktör çeşitliliğine göre otomatik süreç karmaşıklığı ve kullanıcı benimseme riski analizi.
 - **Veri Sahipliği, Yetki ve SoD Yönetişim Katmanı:** 23 kanonik yönetişim nesnesi, As-Is/To-Be RACI sorumluluk matrisleri, efektif yetki sapması (discrepancy) analizi, parasal onay limitleri ve Görevler Ayrılığı (SoD) risk matrisi.
-- **Kurgusal Kesikli Üretim Saha Pilotu:** `[KURGUSAL] DeltaForm Endüstriyel Sistemler A.Ş.` üzerinde 20 iş fonksiyonu, 860 soru cevabı ve 15 kritik operasyonel problem ile uçtan uca doğrulanmış saha senaryosu.
-- **Külliyat Denetim Motoru (`npm run audit:corpus`):** 34 pakette 0 mükerrer ID, 0 bileşik anahtar çakışması ve 0 bozuk branching kuralı garantisi.
-- **Proje Özel Soruları:** Kanonik paketi bozmadan SQLite izolasyonunda müşteriye özel ek sorular tanımlama.
-- **Resumable Analiz & Autosave:** Kapatıp açınca kalınan sorudan devam etme; debounced otomatik kayıt.
-- **Soru Navigatörü:** Modüller ve süreç grupları arasında hızlı atlama, tamamlanma durumu ve ataç (📎) göstergesi.
-- **Kesintisiz Çalışma (Offline Persistence):** Gömülü yerel SQLite veritabanı (25 tablo, 11 migrasyon — Transaction & Rollback Korumalı) — sıfır ağ bağımlılığı.
+- **Saha Kanıtları ve Doğrulama Kayıt Defteri:** Soru bazlı eklenen dosyaları (PDF, Excel, resim vb.) Yönetilen Kanıt Kasası'nda (Managed Attachment Vault) SHA-256 bütünlüğüyle koruma ve kanıtsız kritik konuları tespit etme.
+- **Pilot Saha Kabulü ve Go-Live Hazırlığı (Bölüm 7):** 8 alanda 24 kontrol maddesiyle keşif hazırlık skoru ve sorumlu rollerle öncelikli aksiyon planı.
+- **Sentetik İmalat Saha Pilotu:** `Marmara Endüstriyel Sistemler A.Ş.` üzerinde 19 iş fonksiyonu, 94 soru cevabı, 11 OT istasyonu, 4 süreç haritası ve SoD çakışmalarıyla uçtan uca doğrulanmış referans saha senaryosu.
+- **Külliyat Denetim Motoru (`npm run audit:corpus`):** 35 pakette 0 mükerrer ID, 0 bileşik anahtar çakışması ve 0 bozuk branching kuralı garantisi.
+- **Kesintisiz Çalışma (Offline Persistence):** Gömülü yerel SQLite veritabanı (39 tablo, 19 migrasyon — Transaction & Rollback Korumalı) — sıfır ağ bağımlılığı.
 - **Profesyonel Dışa Aktarım (DOCX & PDF):**
   - **Microsoft Word (.docx):** Tamamen düzenlenebilir kurumsal başlık hiyerarşisi, renkli tablolar, risk kartları ve kanıt ekleri tablosu.
   - **PDF (.pdf):** Yerel gömülü Liberation Sans TrueType fontu ile %100 kayıpsız Türkçe Unicode desteği; seçilebilir ve aranabilir vektörel metin.
-- **Yerel İşletim Sistemi Entegrasyonu:** Web indirme hack'leri yerine Tauri 2 Native Save Dialog ve doğrudan diske ikili yazma.
+- **Taşınabilir Proje Arşivi (.erpcrm Schema 19):** Sıfır bağımlılıklı saf POSIX USTAR + GZIP arşivleme ile tek tıkla tam yedekleme, geri yükleme ve şablon olarak çoğaltma.
 
 ---
 
@@ -76,12 +74,12 @@ ERP CRM Discovery'nin sınırları bilinçli ve net biçimde çizilmiştir:
 ```text
 Frontend:         React 18 / TypeScript 5.x / Vite 6.x / Vanilla CSS (Design Tokens)
 Desktop Engine:   Tauri 2 (Rust)
-Database:         Lokal SQLite (@tauri-apps/plugin-sql / sqlx) — 25 tablo, 11 migrasyon
-Native I/O:       @tauri-apps/plugin-dialog, @tauri-apps/plugin-fs
+Database:         Lokal SQLite (@tauri-apps/plugin-sql / sqlx) — 39 tablo, 19 migrasyon
+Native I/O:       @tauri-apps/plugin-dialog, @tauri-apps/plugin-fs, @tauri-apps/plugin-opener
 Reporting:        docx (npm), jsPDF + jsPDF-AutoTable (Embedded Liberation Sans TrueType)
 Icons:            Lucide React
 Audit Engine:     scripts/audit_question_corpus.mjs
-Test Runner:      tsx (TypeScript execute) — 71 test suite (2.120+ test)
+Test Runner:      tsx (TypeScript execute)
 ```
 
 ---
@@ -302,17 +300,16 @@ Her modül testi şu 15 alanı doğrular:
 
 ---
 
-## Dağıtım ve Masaüstü Paketleri (Distribution & Desktop Packages)
+## Dağıtım ve Dokümantasyon Belgeleri (Distribution & Documentation)
 
-- **Birincil Hedef:** Windows 11 x64 / Windows 10 x64 & macOS Apple Silicon (ARM64).
-- **Windows Formatı:** NSIS Setup Executable (`ERP.CRM.Discovery_0.1.1_x64-setup.exe`).
-- **macOS Formatı:** Apple Silicon DMG (`ERP.CRM.Discovery_0.1.1_aarch64.dmg`) & `.app.tar.gz`.
-- **Mevcut Durum:** `v0.1.1 Kararlı Sürüm (Stable Release)` — 34 soru paketi, veri yönetişimi, responsive/usability hotfix ve üretim pilotu ile mühürlendi.
-- **Kurulum ve Dağıtım Belgeleri:**
-  - Windows Derleme & Dağıtım: [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
-  - Windows Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt`](docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt)
-  - macOS Son Kullanıcı Kurulum Yardımı: [`docs/guides/installation/MACOS_KURULUM_YARDIMI.txt`](docs/guides/installation/MACOS_KURULUM_YARDIMI.txt)
-  - Sürüm Kabul Kontrol Listesi: [`docs/release/FAZ49_V0.1.0_RELEASE_CHECKLIST.md`](docs/release/FAZ49_V0.1.0_RELEASE_CHECKLIST.md)
+- **Türkçe Kullanıcı Kılavuzu:** [`docs/USER_GUIDE_TR.md`](docs/USER_GUIDE_TR.md)
+- **Uzman Saha İnceleme Rehberi:** [`docs/review/FAZ67_EXPERT_FIELD_REVIEW_GUIDE.md`](docs/review/FAZ67_EXPERT_FIELD_REVIEW_GUIDE.md)
+- **Soru Paketi İnceleme Matrisi:** [`docs/review/FAZ67_QUESTION_PACK_REVIEW_MATRIX.md`](docs/review/FAZ67_QUESTION_PACK_REVIEW_MATRIX.md)
+- **Marmara Sentetik Pilot Kabul Rehberi:** [`docs/review/FAZ67_MARMARA_PILOT_ACCEPTANCE_GUIDE.md`](docs/review/FAZ67_MARMARA_PILOT_ACCEPTANCE_GUIDE.md)
+- **Yayın Hazırlık Raporu (Release Readiness):** [`docs/release/FAZ67_RELEASE_READINESS_REPORT.md`](docs/release/FAZ67_RELEASE_READINESS_REPORT.md)
+- **Windows Derleme & Dağıtım:** [`docs/WINDOWS_BUILD_RELEASE.md`](docs/WINDOWS_BUILD_RELEASE.md)
+- **Windows Son Kullanıcı Kurulum Yardımı:** [`docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt`](docs/guides/installation/WINDOWS_KURULUM_YARDIMI.txt)
+- **macOS Son Kullanıcı Kurulum Yardımı:** [`docs/guides/installation/MACOS_KURULUM_YARDIMI.txt`](docs/guides/installation/MACOS_KURULUM_YARDIMI.txt)
 
 
 
