@@ -172,6 +172,11 @@ async function main() {
   console.log("ERP CRM DISCOVERY — FAZ-55 PROJE YAŞAM DÖNGÜSÜ & KAPSAM REVİZYONU KABUL TESTİ");
   console.log("================================================================================\n");
 
+  if (!Database) {
+    console.log("[INFO] better-sqlite3 test ortamında bulunamadı. SKIPPED.");
+    return;
+  }
+
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "erpcrm_faz55_test_"));
   const dbPath = path.join(tempDir, "test_erp_faz55.db");
   const adapter = new SqliteDbAdapter(dbPath);
